@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Loupe.Extensibility</id>
+    <version>$version$</version>
+    <title>Loupe Extension Reference Types</title>
+    <authors>Gibraltar Software</authors>
+    <owners>Gibraltar Software</owners>
+    <iconUrl>http://www.gibraltarsoftware.com/loupe.ico</iconUrl>
+    <licenseUrl>http://www.gibraltarsoftware.com/Support/Documentation.aspx?Page=Reference_GibraltarAgentLicense.html</licenseUrl>
+    <projectUrl>http://www.gibraltarsoftware.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Contains the various types and attributes necessary to create
+extensions for Loupe Desktop and Server.  This assembly
+is not used when collecting information within your application, to customize
+data collection see the Loupe Agent.</description>
+    <summary />
+    <tags>Loupe Logging</tags>
+  </metadata>
+</package>

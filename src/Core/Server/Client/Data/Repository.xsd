@@ -1,0 +1,394 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Repository"
+    targetNamespace="http://www.gibraltarsoftware.com/Gibraltar/Repository.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://www.gibraltarsoftware.com/Gibraltar/Repository.xsd"
+    xmlns:mstns="http://www.gibraltarsoftware.com/Gibraltar/Repository.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="HubConfigurationXml" type="HubConfigurationXml" />
+  <xs:element name="FoldersListXml" type="FoldersListXml" />
+  <!--<xs:element name="SessionXml" type="SessionXml" /> -->
+  <xs:element name="SessionsListXml" type="SessionsListXml" />
+  <xs:element name="SessionFilesListXml" type="SessionFilesListXml" />
+  <xs:element name="RepositoryXml" type="RepositoryXml" />
+  <xs:element name="ClientRepositoryXml" type="ClientRepositoryXml" />
+  <xs:element name="RepositoryMailboxXml" type="RepositoryMailboxXml" />
+  <xs:element name="RepositorySubmissionMetricsXml" type="RepositorySubmissionMetricsXml" />
+  <xs:element name="RepositorySubscriptionXml" type="RepositorySubscriptionXml" />
+  <xs:element name="RepositorySubscriptionStateXml" type="RepositorySubscriptionStateXml" />
+  <xs:element name="AddInDefinitionListXml" type="AddInDefinitionsListXml" />
+  <xs:element name="StoredCredentialsListXml" type="StoredCredentialsListXml" />
+  <xs:complexType name="HubConfigurationXml">
+    <xs:sequence>
+      <xs:element name="expirationDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="mailbox" type="RepositoryMailboxXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="clientRepositories" type="ClientRepositoryListXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="publicKey" type="xs:string" minOccurs="0" maxOccurs="1" />
+      <xs:element name="liveStream" type="LiveStreamServerXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="redirectRequested" type="xs:boolean" use="required" />
+    <xs:attribute name="status" type="HubStatusXml" use="required" />
+    <xs:attribute name="timeToLive" type="xs:int" use="required" />
+    <xs:attribute name="protocolVersion" type="xs:string" use="optional" />
+    <xs:attribute name="redirectUseGibraltarSds" type="xs:boolean" use="optional" />
+    <xs:attribute name="redirectCustomerName" type="xs:string" use="optional" />
+    <xs:attribute name="redirectHostName" type="xs:string" use="optional" />
+    <xs:attribute name="redirectPort" type="xs:int" use="optional" />
+    <xs:attribute name="redirectUseSsl" type="xs:boolean" use="optional" />
+    <xs:attribute name="redirectApplicationBaseDirectory" type="xs:string" use="optional" />
+    <xs:attribute name="id" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="RepositorySubscriptionXml">
+    <xs:sequence>
+      <xs:element name="addedDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="serverRepositoryId" type="xs:string" use="optional" />
+    <xs:attribute name="computerKey" type="xs:string" use="required" />
+    <xs:attribute name="useGibraltarSds" type="xs:boolean" use="required" />
+    <xs:attribute name="customerName" type="xs:string" use="optional" />
+    <xs:attribute name="hostName" type="xs:string" use="optional" />
+    <xs:attribute name="port" type="xs:int" use="optional" />
+    <xs:attribute name="useSsl" type="xs:boolean" use="optional" />
+    <xs:attribute name="applicationBaseDirectory" type="xs:string" use="optional" />
+    <xs:attribute name="repository" type="xs:string" use="optional" />
+    <xs:attribute name="syncMode" type="SessionSynchronizationModeXml" use="required" />
+    <xs:attribute name="useApiKey" type="xs:boolean" use="optional" />
+    <xs:attribute name="userName" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="RepositorySubscriptionStateXml">
+    <xs:sequence>
+      <xs:element name="lastContactDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="sessionsVersion" type="xs:long" use="required" />
+    <xs:attribute name="sessionsDataVersion" type="xs:long" use="required" />
+  </xs:complexType>
+  <xs:complexType name="ClientRepositoryXml">
+    <xs:sequence>
+      <xs:element name="addedDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="lastContactDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="hostName" type="xs:string" use="optional" />
+    <xs:attribute name="computerKey" type="xs:string" use="optional" />
+    <xs:attribute name="currentSessionsVersion" type="xs:long" use="optional" />
+    <xs:attribute name="publicKey" type="xs:string" use="optional" />
+    <xs:attribute name="status" type="ClientRepositoryStatusXml" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="ClientRepositoryListXml">
+    <xs:sequence>
+      <xs:element name="clientRepository" type="ClientRepositoryXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RepositoryXml">
+    <xs:sequence>
+      <xs:element name="folders" type="FoldersListXml" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="sessions" type="SessionsListXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FoldersListXml">
+    <xs:sequence>
+      <xs:element name="folders" type="FoldersXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="version" type="xs:long" use="optional" default="0" />
+  </xs:complexType>
+  <xs:complexType name="FoldersXml">
+    <xs:sequence>
+      <xs:element name="folder" type="FolderXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>    
+  </xs:complexType>
+  <xs:complexType name="FolderXml">
+    <xs:sequence>
+      <xs:element name="folderDetail" type="FolderDetailXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"  />
+    <xs:attribute name="version" type="xs:long" use="required" />
+    <xs:attribute name="deleted" type="xs:boolean" use="required" />
+  </xs:complexType>
+  <xs:complexType name="FolderDetailXml">
+    <xs:sequence>
+      <xs:element name="updatedDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="sessions" type="SessionsXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="addedSessions" type="SessionsXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="removedSessions" type="SessionsXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="selectionCriteriaXml" type="xs:string" minOccurs="0" maxOccurs="1"  />
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"  />
+    <xs:attribute name="parentFolderId" type="xs:string" use="required"  />
+    <xs:attribute name="folderType" type="FolderTypeXml" use="required"  />
+    <xs:attribute name="updateUser" type="xs:string" use="required"  />
+  </xs:complexType>
+  <xs:complexType name="SessionsListXml">
+    <xs:sequence>
+      <xs:element name="sessions" type="SessionsXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="version" type="xs:long" use="optional" default="0" />
+  </xs:complexType>
+  <xs:complexType name="SessionsXml">
+    <xs:sequence>
+      <xs:element name="session" type="SessionXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SessionFilesListXml">
+    <xs:sequence>
+      <xs:element name="files" type="SessionFilesXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"  />
+    <xs:attribute name="version" type="xs:long" use="required"/>
+    <xs:attribute name="singleStreamOnly" type="xs:boolean" use="required" />
+  </xs:complexType>
+  <xs:complexType name="SessionFilesXml">
+    <xs:sequence>
+      <xs:element name="file" type="SessionFileXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SessionFileXml">
+    <xs:attribute name="id" type="xs:string" use="required"  />
+    <xs:attribute name="sequence" type="xs:long" use="required" />
+    <xs:attribute name="version" type="xs:long" use="required" />
+  </xs:complexType>
+  <xs:complexType name="SessionXml">
+    <xs:sequence>
+      <xs:element name="sessionDetail" type="SessionDetailXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="files" type="SessionFilesXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"  />
+    <xs:attribute name="version" type="xs:long" use="required" />
+    <xs:attribute name="deleted" type="xs:boolean" use="required" />
+    <xs:attribute name="isComplete" type="xs:boolean" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="SessionDetailXml">
+    <xs:sequence>
+      <xs:element name="startDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="endDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="addedDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="updatedDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="properties" type="SessionPropertiesXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="logMessageCategories" type="LogMessageCategoriesXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="logMessageClasses" type="LogMessageClassesXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="productName" type="xs:string" use="required" />
+    <xs:attribute name="applicationName" type="xs:string" use="required" />
+    <xs:attribute name="environmentName" type="xs:string" use="optional" />
+    <xs:attribute name="promotionLevelName" type="xs:string" use="optional" />
+    <xs:attribute name="applicationVersion" type="xs:string" use="required" />
+    <xs:attribute name="applicationType" type="ApplicationTypeXml" use="required" />
+    <xs:attribute name="applicationDescription" type="xs:string" use="required" />
+    <xs:attribute name="caption" type="xs:string" use="required" />
+    <xs:attribute name="status" type="SessionStatusXml" use="required" />
+    <xs:attribute name="timeZoneCaption" type="xs:string" use="required" />
+    <xs:attribute name="durationSec" type="xs:int" use="required" />
+    <xs:attribute name="agentVersion" type="xs:string" use="required" />
+    <xs:attribute name="userName" type="xs:string" use="required" />
+    <xs:attribute name="userDomainName" type="xs:string" use="required" />
+    <xs:attribute name="hostName" type="xs:string" use="required" />
+    <xs:attribute name="dnsDomainName" type="xs:string" use="required" />
+    <xs:attribute name="isNew" type="xs:boolean" use="required" />
+    <xs:attribute name="isComplete" type="xs:boolean" use="required" />
+    <xs:attribute name="messageCount" type="xs:int" use="required" />
+    <xs:attribute name="criticalMessageCount" type="xs:int" use="required" />
+    <xs:attribute name="errorMessageCount" type="xs:int" use="required" />
+    <xs:attribute name="warningMessageCount" type="xs:int" use="required" />
+    <xs:attribute name="updateUser" type="xs:string" use="required" />
+    <xs:attribute name="osPlatformCode" type="xs:int" use="required" />
+    <xs:attribute name="osVersion" type="xs:string" use="required" />
+    <xs:attribute name="osServicePack" type="xs:string" use="required" />
+    <xs:attribute name="osCultureName" type="xs:string" use="required" />
+    <xs:attribute name="osArchitecture" type="ProcessorArchitectureXml" use="required" />
+    <xs:attribute name="osBootMode" type="BootModeXml" use="required" />
+    <xs:attribute name="osSuiteMaskCode" type="xs:int" use="required" />
+    <xs:attribute name="osProductTypeCode" type="xs:int" use="required" />
+    <xs:attribute name="runtimeVersion" type="xs:string" use="required" />
+    <xs:attribute name="runtimeArchitecture" type="ProcessorArchitectureXml" use="required" />
+    <xs:attribute name="currentCultureName" type="xs:string" use="required" />
+    <xs:attribute name="currentUiCultureName" type="xs:string" use="required" />
+    <xs:attribute name="memoryMb" type="xs:int" use="required" />
+    <xs:attribute name="processors" type="xs:int" use="required" />
+    <xs:attribute name="processorCores" type="xs:int" use="required" />
+    <xs:attribute name="userInteractive" type="xs:boolean" use="required" />
+    <xs:attribute name="terminalServer" type="xs:boolean" use="required" />
+    <xs:attribute name="screenWidth" type="xs:int" use="required" />
+    <xs:attribute name="screenHeight" type="xs:int" use="required" />
+    <xs:attribute name="colorDepth" type="xs:int" use="required" />
+    <xs:attribute name="commandLine" type="xs:string" use="required" />
+    <xs:attribute name="fileSize" type="xs:long" use="required" />
+    <xs:attribute name="fileAvailable" type="xs:boolean" use="required" />
+    <xs:attribute name="computerId" type="xs:string" use="optional"  />
+  </xs:complexType>
+  <xs:complexType name="AddInDefinitionsListXml">
+    <xs:sequence>
+      <xs:element name="definitions" type="AddInDefinitionsXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AddInDefinitionsXml">
+    <xs:sequence>
+      <xs:element name="definition" type="AddInDefinitionXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AddInDefinitionXml">
+    <xs:attribute name="typeName" type="xs:string" use="required" />
+    <xs:attribute name="enabled" type="xs:boolean" use="required" />
+    <xs:attribute name="caption" type="xs:string" use="optional" />
+    <xs:attribute name="description" type="xs:string" use="optional" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+    <xs:attribute name="source" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="LogMessageCategoriesXml">
+    <xs:sequence>
+      <xs:element name="logMessageCategory" type="LogMessageCategoryXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LogMessageCategoryXml">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="severity" type="LogMessageSeverityXml" use="required" />
+    <xs:attribute name="category" type="xs:string" use="required" />
+    <xs:attribute name="caption" type="xs:string" use="required" />
+    <xs:attribute name="messageCount" type="xs:int" use="required" />
+  </xs:complexType>
+  <xs:complexType name="LogMessageClassesXml">
+    <xs:sequence>
+      <xs:element name="logMessageClass" type="LogMessageClassXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LogMessageClassXml">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="severity" type="LogMessageSeverityXml" use="required" />
+    <xs:attribute name="class" type="xs:string" use="required" />
+    <xs:attribute name="caption" type="xs:string" use="required" />
+    <xs:attribute name="messageCount" type="xs:int" use="required" />
+  </xs:complexType>
+  <xs:complexType name="SessionPropertiesXml">
+    <xs:sequence>
+      <xs:element name="property" type="SessionPropertyXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SessionPropertyXml">
+    <xs:attribute name="id" type="xs:string" use="required"  />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="value" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="RepositoryMailboxXml">
+    <xs:sequence>
+      <xs:element name="updatedDt" type="DateTimeOffsetXml" minOccurs="0" maxOccurs="1" />
+      <xs:element name="tracking" type="RepositoryMailboxTrackingXml" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="server" type="xs:string" use="required" />
+    <xs:attribute name="port" type="xs:int" use="optional" default="0" />
+    <xs:attribute name="useSsl" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="userName" type="xs:string" use="required" />
+    <xs:attribute name="password" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="RepositoryMailboxTrackingXml">
+    <xs:sequence>
+      <xs:element name="statusMessage" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="lastContactDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+      <xs:element name="updatedDt" type="DateTimeOffsetXml" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="inError" type="xs:boolean" use="required" />    
+  </xs:complexType>  
+  <xs:complexType name="RepositorySubmissionMetricsXml">
+    <xs:sequence>
+      <xs:element name="metric" type="RepositorySubmissionMetricXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RepositorySubmissionMetricXml">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="date" type="xs:date" use="required" />
+    <xs:attribute name="sessions" type="xs:int" use="required" />
+    <xs:attribute name="criticalSessions" type="xs:int" use="required" />
+    <xs:attribute name="errorSessions" type="xs:int" use="required" />
+    <xs:attribute name="uniqueHosts" type="xs:int" use="required" />
+    <xs:attribute name="bytesReceived" type="xs:long" use="required" />
+  </xs:complexType>
+  <xs:complexType name="StoredCredentialsListXml">
+    <xs:sequence>
+      <xs:element name="credential" type="StoredCredentialXml" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StoredCredentialXml">
+    <xs:attribute name="key" type="xs:string" use="required" />
+    <xs:attribute name="account" type="xs:string" use="required" />
+    <xs:attribute name="password" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="LiveStreamServerXml">
+    <xs:attribute name="agentPort" type="xs:int" use="required" />
+    <xs:attribute name="clientPort" type="xs:int" use="required" />
+    <xs:attribute name="useSsl" type="xs:boolean" use="required" />
+  </xs:complexType>
+  <xs:complexType name="DateTimeOffsetXml">
+    <xs:attribute name="DateTime" type="xs:dateTime" use="required" />
+    <xs:attribute name="Offset" type="xs:int" use="required" />
+  </xs:complexType>
+  <xs:simpleType name="ApplicationTypeXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="unknown" />
+      <xs:enumeration value="console" />
+      <xs:enumeration value="windows" />
+      <xs:enumeration value="service" />
+      <xs:enumeration value="aspnet" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BootModeXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="unknown" />
+      <xs:enumeration value="normal" />
+      <xs:enumeration value="failsafe" />
+      <xs:enumeration value="failsafewithnetwork" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FolderTypeXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="manual" />
+      <xs:enumeration value="search" />
+      <xs:enumeration value="dynamic" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LogMessageSeverityXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="verbose" />
+      <xs:enumeration value="information" />
+      <xs:enumeration value="warning" />
+      <xs:enumeration value="error" />
+      <xs:enumeration value="critical" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ProcessorArchitectureXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="unknown" />
+      <xs:enumeration value="x86" />
+      <xs:enumeration value="amd64" />
+      <xs:enumeration value="ia64" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ClientRepositoryStatusXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="active" />
+      <xs:enumeration value="pending" />
+      <xs:enumeration value="inactive" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SessionStatusXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="unknown" />
+      <xs:enumeration value="running" />
+      <xs:enumeration value="normal" />
+      <xs:enumeration value="crashed" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SessionSynchronizationModeXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="manual" />
+      <xs:enumeration value="summaryOnly" />
+      <xs:enumeration value="automatic" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HubStatusXml">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="available" />
+      <xs:enumeration value="maintenance" />
+      <xs:enumeration value="expired" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

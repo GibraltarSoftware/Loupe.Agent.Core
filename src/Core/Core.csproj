@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Loupe.Core</AssemblyName>
+    <RootNamespace>Gibraltar</RootNamespace>
+    <Version>4.5.0</Version>
+    <Copyright>Copyright © 2008-2017 Gibraltar Software, Inc.</Copyright>
+    <Description>Core Functions for Loupe Agent</Description>
+    <Product>Loupe</Product>
+    <Company>Gibraltar Software, Inc.</Company>
+    <Authors>Gibraltar Software, Inc.</Authors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Server\Client\Data\Repository.xsd" />
+    <None Remove="Server\Client\Data\RepositoryGen.bat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem.DriveInfo" Version="4.3.0" />
+    <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Security.Claims" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.3.0" />
+    <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Server\Data\" />
+  </ItemGroup>
+
+</Project>
