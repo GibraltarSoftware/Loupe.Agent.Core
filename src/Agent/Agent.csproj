@@ -2,20 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <PackageId>Loupe.Agent</PackageId>
+    <PackageId>Loupe.Agent.Core</PackageId>
     <Version>4.5.0</Version>
     <Company>Gibraltar Software, Inc.</Company>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2017 Gibraltar Software, Inc.</Copyright>
-    <Description>The core Loupe Agent - a black box for recording diagnostic information for your .NET application.  Download additional agent extensions for extended integration with different .NET subsystems and third party libraries</Description>
+    <Description>The Loupe Agent for .NET Core - a black box for recording diagnostic information for your .NET Core application.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyName>Loupe.Agent</AssemblyName>
-    <RootNamespace>Loupe.Agent</RootNamespace>
+    <AssemblyName>Loupe.Agent.NETCore</AssemblyName>
+    <RootNamespace>Gibraltar.Agent</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Agent.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp1.1\Loupe.Agent.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

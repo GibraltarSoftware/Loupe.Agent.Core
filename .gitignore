@@ -47,6 +47,9 @@ build/
 *.scc
 *.jfm
 
+#nuget files
+*.nupkg
+
 # Visual C++ cache files
 ipch/
 *.aps
