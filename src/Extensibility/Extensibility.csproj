@@ -2,19 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <PackageId>Loupe.Extensibility</PackageId>
+    <PackageId>Loupe.Agent.Core.Extensibility</PackageId>
     <Version>4.5.0</Version>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
-    <Description>Types and utilities for creating Loupe Extensions</Description>
+    <Description>Shared types for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
     <Copyright>Copyright © 2008-2017 Gibraltar Software, Inc.</Copyright>
     <Company>Gibraltar Software, Inc.</Company>
-    <AssemblyName>Loupe.Extensibility</AssemblyName>
+    <AssemblyName>Loupe.Extensibility.NETCore</AssemblyName>
     <RootNamespace>Loupe</RootNamespace>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp1.1\Loupe.Extensibility.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Extensibility.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
