@@ -11,8 +11,15 @@ is therefore only recommended for .NET Core 1.1 and 2.0 applications.
 
 ## How do I use Loupe with my Application? ##
 
+To add Loupe to your application we recommend referencing either the [Loupe.Extensions.Logging package](https://www.nuget.org/packages/Loupe.Extensions.Logging/)
+or [Loupe.Agent.Core package](https://www.nuget.org/packages/Loupe.Agent.Core/).  These will pull in the related dependencies.
+
 This agent works nearly identically to the main Loupe Agent so you can refer to the [Getting Started Guide](https://doc.onloupe.com/#GettingStarted_Introduction.html)
-of the main Loupe documentation for how to get moving.  You can also use the [free Loupe Desktop viewer](https://onloupe.com/local-logging/free-net-log-viewer) to
+of the main Loupe documentation for how to get moving. The main difference is configuration - since .NET Core doesn't
+support the traditional app.config/web.config style configuration this has all been externalized into the Loupe.Configuration.AgentConfiguration
+class which you can use with your preferred configuration approach for .NET Core.
+
+You can use the [free Loupe Desktop viewer](https://onloupe.com/local-logging/free-net-log-viewer) to
 view logs & analyze metrics for your application or use [Loupe Cloud-Hosted](https://onloupe.com/) to add centralized logging,
 alerting, and error analysis to your application.
 
@@ -21,11 +28,15 @@ If you want, you can even develop your own viewer from the classes exposed by Lo
 ## What's In This Repository ##
 
 This is the repository for the Loupe Agent for .NET Core.
-The following deliverables live here:
+The following NuGet packages live here:
 
-* Loupe.Agent
-* Loupe.Core
-* Loupe.Extensions.Logging
+* Loupe.Agent.Core: The primary API to use for logging & metrics.
+* Loupe.Agent.Core.Extensibility: Contains some reused types and the configuration classes.
+* Loupe.Agent.Core.Internal: The internal implementation of Loupe, not typically used directly by client applications.
+* Loupe.Extensions.Logging: An implementation of Microsoft.Extensions.Logging.Abstractions to interface with common .NET Core libraries.
+
+Each of these packages maps to a single project in the repository. Other projects, primarily for unit testing, are not
+included in the packages.
 
 ## How To Build These Projects ##
 
