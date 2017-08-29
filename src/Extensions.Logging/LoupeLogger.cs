@@ -20,31 +20,36 @@ namespace Loupe.Extensions.Logging
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
+            if (!IsEnabled(logLevel))
+                return;
+
+            LogMessageSeverity severity;
             switch (logLevel)
                 {
                     case LogLevel.Trace:
-                        // TODO: What does Trace map to?
-                        break;
                     case LogLevel.Debug:
+                       severity = LogMessageSeverity.Verbose;
                         break;
                     case LogLevel.Information:
-                        Gibraltar.Agent.Log.Information(exception, LogWriteMode.Queued, _category, string.Empty, formatter(state, exception), state);
+                        severity = LogMessageSeverity.Information;
                         break;
                     case LogLevel.Warning:
-                        Gibraltar.Agent.Log.Warning(exception, LogWriteMode.Queued, _category, string.Empty, formatter(state, exception), state);
+                        severity = LogMessageSeverity.Warning;
                         break;
                     case LogLevel.Error:
-                        Gibraltar.Agent.Log.Error(exception, LogWriteMode.Queued, _category, string.Empty, formatter(state, exception), state);
+                        severity = LogMessageSeverity.Error;
                         break;
                     case LogLevel.Critical:
-                        Gibraltar.Agent.Log.Critical(exception, LogWriteMode.Queued, _category, string.Empty, formatter(state, exception), state);
+                        severity = LogMessageSeverity.Critical;
                         break;
                     case LogLevel.None:
-                        // TODO: What does None map to?
+                        severity = LogMessageSeverity.None;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
                 }
+
+            Gibraltar.Agent.Log.Write(severity, "loupe", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
         }
 
         /// <inheritdoc />
