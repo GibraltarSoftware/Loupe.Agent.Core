@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
     <PackageId>Loupe.Agent.Core</PackageId>
-    <Version>4.5.0</Version>
+    <Version>4.5.0.1</Version>
     <Company>Gibraltar Software, Inc.</Company>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
@@ -16,6 +16,7 @@
     <AssemblyName>Loupe.Agent.NETCore</AssemblyName>
     <RootNamespace>Gibraltar.Agent</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <FileVersion>4.5.0.1</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
