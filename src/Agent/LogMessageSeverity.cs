@@ -20,26 +20,26 @@ namespace Gibraltar.Agent
         /// <summary>
         /// Fatal error or application crash.
         /// </summary>
-        Critical = LogLevel.Critical,
+        Critical = Loupe.Extensibility.Data.LogMessageSeverity.Critical,
 
         /// <summary>
         /// Recoverable error.
         /// </summary>
-        Error = LogLevel.Error,
+        Error = Loupe.Extensibility.Data.LogMessageSeverity.Error,
 
         /// <summary>
         /// Noncritical problem.
         /// </summary>
-        Warning = LogLevel.Warning,
+        Warning = Loupe.Extensibility.Data.LogMessageSeverity.Warning,
 
         /// <summary>
         /// Informational message.
         /// </summary>
-        Information = LogLevel.Information,
+        Information = Loupe.Extensibility.Data.LogMessageSeverity.Information,
 
         /// <summary>
         /// Debugging trace.
         /// </summary>
-        Verbose = LogLevel.Debug,
+        Verbose = Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
     }
 }
