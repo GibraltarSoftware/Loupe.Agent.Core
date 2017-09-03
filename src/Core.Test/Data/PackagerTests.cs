@@ -14,7 +14,7 @@ namespace Loupe.Core.Test.Data
     [TestFixture]
     public class PackagerTests
     {
-        private const string SDSCustomerName = "esymmetrix";
+        private const string RepositoryName = "ConfigurationTest";
 
         private string m_OutputFileNamePath;
         private PackageSendEventArgs m_EndSendResult;
@@ -34,6 +34,15 @@ namespace Loupe.Core.Test.Data
 
             m_OutputFileNamePath = tempFileName + "." + Log.PackageExtension;
             File.Delete(m_OutputFileNamePath); //get temp file name creates the file as part of allocating the name.
+
+            Log.EndFile("Rolling over log file to ensure we have something to package");
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            File.Delete(m_OutputFileNamePath);
+            Assert.IsFalse(File.Exists(m_OutputFileNamePath));
         }
 
         [Test]
@@ -46,7 +55,6 @@ namespace Loupe.Core.Test.Data
 
             //because this is the none package it won't have any content, but won't thrown an error.
             Assert.IsFalse(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
         }
 
         [Test]
@@ -64,8 +72,7 @@ namespace Loupe.Core.Test.Data
                 newPackager.SendToFile(SessionCriteria.NewSessions, false, m_OutputFileNamePath, false);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -76,8 +83,7 @@ namespace Loupe.Core.Test.Data
                 newPackager.SendToFile(SessionCriteria.AllSessions, false, m_OutputFileNamePath, false);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -88,8 +94,7 @@ namespace Loupe.Core.Test.Data
                 newPackager.SendToFile(SessionCriteria.ActiveSession, false, m_OutputFileNamePath, false);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -109,7 +114,7 @@ namespace Loupe.Core.Test.Data
                 //create the package
                 newPackager.SendToFile(SessionCriteria.NewSessions, true, m_OutputFileNamePath, false);
             }
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
 
             //Now find out what new sessions there are to compare.
             var newSessionsPost = GetNewSessions();
@@ -128,8 +133,6 @@ namespace Loupe.Core.Test.Data
                     Assert.AreEqual(null, newSessionsPost.Find(new Predicate<ISessionSummary>(x => x.Id == newSession.Id)), "The session {0} is still in the index as new and should have been marked sent.", newSession.Id); //null is not found
                 }
             }
-
-            File.Delete(m_OutputFileNamePath);
         }
         
         [Test]
@@ -150,7 +153,7 @@ namespace Loupe.Core.Test.Data
         {
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, true, SDSCustomerName, null, 0, false, null, null, false);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, true, RepositoryName, null, 0, false, null, null, false);
             }
         }
 
