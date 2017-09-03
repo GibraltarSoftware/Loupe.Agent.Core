@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <PackageId>Loupe.Agent.Core.Extensibility</PackageId>
-    <Version>4.5.0</Version>
+    <Version>4.5.0.2</Version>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Description>Shared types for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
@@ -19,11 +19,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp1.1\Loupe.Extensibility.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netstandard1.6\Loupe.Extensibility.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Extensibility.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard1.6\Loupe.Extensibility.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
