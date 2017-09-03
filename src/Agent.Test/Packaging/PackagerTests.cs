@@ -31,6 +31,14 @@ namespace Loupe.Agent.Test.Packaging
             //we have to smack on a GLP or the extension will get replaced.
             m_OutputFileNamePath += "." + Log.PackageExtension;
             File.Delete(m_OutputFileNamePath); //get temp file name creates the file as part of allocating the name.
+
+            Log.EndFile("Rolling over file to be sure we have something to package");
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            File.Delete(m_OutputFileNamePath);
         }
 
 
@@ -67,7 +75,6 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.NewSessions, false, m_OutputFileNamePath);
             }
 
@@ -80,12 +87,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.AllSessions, false, m_OutputFileNamePath);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -96,12 +101,10 @@ namespace Loupe.Agent.Test.Packaging
 
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.ActiveSession, false, m_OutputFileNamePath);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -109,12 +112,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.CompletedSessions, false, m_OutputFileNamePath);
             }
 
             //we don't do the assert on this one because there may be no completed sessions package.
-            File.Delete(m_OutputFileNamePath);
         }
 
         [Test]
@@ -122,7 +123,6 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.CriticalSessions, false, m_OutputFileNamePath);
             }
 
@@ -135,12 +135,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.ErrorSessions, false, m_OutputFileNamePath);
             }
 
             //we don't do the assert on this one because there may be no error sessions package.
-            File.Delete(m_OutputFileNamePath);
         }
 
         [Test]
@@ -148,12 +146,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.WarningSessions, false, m_OutputFileNamePath);
             }
 
             //we don't do the assert on this one because there may be no warning sessions package.
-            File.Delete(m_OutputFileNamePath);
         }
 
         [Test]
@@ -161,12 +157,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(SessionCriteria.WarningSessions | SessionCriteria.NewSessions | SessionCriteria.None, false, m_OutputFileNamePath);
             }
 
             //we don't do the assert on this one because there may be no sessions package.
-            File.Delete(m_OutputFileNamePath);
         }
 
         [Test]
@@ -174,12 +168,10 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile((s) => s.HostName == Log.SessionSummary.HostName, false, m_OutputFileNamePath);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
-            File.Delete(m_OutputFileNamePath);            
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
         }
 
         [Test]
@@ -188,13 +180,11 @@ namespace Loupe.Agent.Test.Packaging
             using (Packager newPackager = new Packager())
             {
                 m_PredicateMatches = 0;
-                File.Delete(m_OutputFileNamePath);
                 newPackager.SendToFile(OnPackagerNamedMethodPredicate, false, m_OutputFileNamePath);
             }
 
-            Assert.IsTrue(File.Exists(m_OutputFileNamePath));
+            Assert.IsTrue(File.Exists(m_OutputFileNamePath), "There was no output file from the package, most likely because there is no local data to package (like when unit tests are run the first time)");
             Assert.IsTrue(m_PredicateMatches > 0);
-            File.Delete(m_OutputFileNamePath);
         }
 
         private int m_PredicateMatches;
@@ -231,7 +221,6 @@ namespace Loupe.Agent.Test.Packaging
 
                 using (Packager newPackager = new Packager("Loupe", null, loggingPath))
                 {
-                    File.Delete(m_OutputFileNamePath);
                     newPackager.SendToFile(SessionCriteria.AllSessions, false, m_OutputFileNamePath);
                 }
 
@@ -239,7 +228,6 @@ namespace Loupe.Agent.Test.Packaging
             }
             finally
             {
-                File.Delete(m_OutputFileNamePath);
                 Directory.Delete(tempDir, true);
             }
         }
@@ -271,7 +259,7 @@ namespace Loupe.Agent.Test.Packaging
         {
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, ServerOverrideServerName, 0, false, ServerOverrideBaseDirectory, null);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, ServerOverrideServerName, 0, false, null, ServerOverrideRepository);
             }
         }
 

@@ -699,8 +699,9 @@ namespace Gibraltar.Server.Client
                 var configurationGetRequest = new HubConfigurationGetRequest();
                 await channel.ExecuteRequest(configurationGetRequest, 1).ConfigureAwait(false); //we'd like it to succeed, so we'll give it one retry 
 
+                var configurationXml = configurationGetRequest.Configuration;
+
                 //now, if we got back a redirect we need to go THERE to get the status.
-                HubConfigurationXml configurationXml = configurationGetRequest.Configuration;
                 if (configurationXml.redirectRequested)
                 {
                     //recursively try again.

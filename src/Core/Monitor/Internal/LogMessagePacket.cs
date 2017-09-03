@@ -462,7 +462,15 @@ namespace Gibraltar.Monitor.Internal
         IPacket[] IPacket.GetRequiredPackets()
         {
             // We now hold the ThreadId ourselves, so we depend on the ThreadInfoPacket
-            Debug.Assert(ThreadInfoPacket != null, "There is no thread info packet set in the log message.");
+#if DEBUG
+            if (ReferenceEquals(ThreadInfoPacket, null))
+            {
+                //There is no thread info packet set in the log message.
+                if (Debugger.IsAttached)
+                    Debugger.Break();
+                return null;
+            }
+#endif
 
             //we always depend on the Thread Info Packet; we depend on the Application User packet if it's set (may not be)
             return (UserPacket == null) ? new IPacket[] { ThreadInfoPacket } : new IPacket[] { ThreadInfoPacket, UserPacket };
@@ -690,6 +698,13 @@ namespace Gibraltar.Monitor.Internal
 
             if (m_ThreadIndex == 0)
                 m_ThreadIndex = m_ThreadId; // Zero isn't legal, so it must not have had it.  Fall back to ThreadId.
+
+            //we now know enough to get our thread info packet (if we don't, we can't re-serialize ourselves)
+            ThreadInfo threadInfo;
+            if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out threadInfo))
+            {
+                ThreadInfoPacket = threadInfo.Packet;
+            }
 
             if (applicationUserId != Guid.Empty)
             {

@@ -23,7 +23,7 @@ namespace Gibraltar
         /// <param name="state">Arguments to pass to the callBack delegate</param>
         public void Execute(WaitCallback callBack, string title, object state)
         {
-            AsyncTaskArguments arguments = new AsyncTaskArguments(title, state);
+            var arguments = new AsyncTaskArguments(title, state);
             m_ProgressMonitors = arguments.ProgressMonitors;
 
             //and initialize our different UI elements
@@ -86,7 +86,7 @@ namespace Gibraltar
             }
             catch (Exception ex)
             {
-                try //while it seems really unlikely we'll get an exception here, we need to be extra cautious beacuse we're called from the tread pool
+                try //while it seems really unlikely we'll get an exception here, we need to be extra cautious because we're called from the tread pool
                 {
                     //set a result..
                     TaskResults = new AsyncTaskResultEventArgs(AsyncTaskResult.Error, ex.Message, ex);

@@ -514,7 +514,7 @@ namespace Gibraltar.Data
         /// <param name="processAsynchronously">True to return immediately after dispatch, false to wait until completion and then throw an exception if there is an error.</param>
         private void AsyncTaskExecute(WaitCallback asyncTask, string title, object state, bool processAsynchronously)
         {
-            AsynchronousTask execTask = new AsynchronousTask();
+            var execTask = new AsynchronousTask();
             execTask.Execute(asyncTask, title, state);
 
             if (processAsynchronously == false)
@@ -1470,7 +1470,13 @@ namespace Gibraltar.Data
 
         private void SafeHandleAsyncSendException(object state, string message, Exception ex)
         {
-            AsyncTaskArguments asyncTaskArguments = state as AsyncTaskArguments;
+            //unwrap any AggregateExceptions..
+            if (ex is System.AggregateException)
+            {
+                ex = ex.GetBaseException();
+            }
+
+            var asyncTaskArguments = state as AsyncTaskArguments;
             if (asyncTaskArguments != null)
             {
                 asyncTaskArguments.TaskResult = new AsyncTaskResultEventArgs(AsyncTaskResult.Error, message, ex);
