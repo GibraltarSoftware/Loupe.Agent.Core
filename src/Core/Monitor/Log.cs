@@ -185,7 +185,7 @@ namespace Gibraltar.Monitor
         /// it hasn't already been started.  If that call is canceled through our Initializing event then 
         /// it will return false.  After the first call it will indicate if logging is currently initialized
         /// and not attempt to initialize.</remarks>
-        public static bool IsLoggingActive(bool suppressTraceInitialize)
+        public static bool IsLoggingActive()
         {
             if (s_Initialized)
                 return true; //this is our fastest case - we're up and running, nothing more to say.
@@ -194,7 +194,7 @@ namespace Gibraltar.Monitor
             //done for the first time right now.  That ensures consistency between threads.
             if (s_InitializationNeverAttempted)
             {
-                Initialize(null, suppressTraceInitialize);
+                Initialize(null);
             }
 
             return s_Initialized;
@@ -216,7 +216,7 @@ namespace Gibraltar.Monitor
         /// <remarks>If calling initialization from a path that may have started with the trace listener,
         /// you must set suppressTraceInitialize to true to guarantee that the application will not deadlock
         /// or throw an unexpected exception.</remarks>
-        public static bool Initialize(AgentConfiguration configuration, bool suppressTraceInitialize)
+        public static bool Initialize(AgentConfiguration configuration)
         {
             //NOTE TO MAINTAINERS:  THIS CLASS RELIES ON THE INITIALIZER VARIABLES BEING VOLATILE TO AVOID LOCKS
 
@@ -248,7 +248,7 @@ namespace Gibraltar.Monitor
                 //we have to be sure that any initialization failure won't damage our lock state which would deadlock logging
                 try
                 {
-                    s_Initialized = OnInitialize(configuration, suppressTraceInitialize);
+                    s_Initialized = OnInitialize(configuration);
                 }
                 finally
                 {
@@ -1308,7 +1308,7 @@ namespace Gibraltar.Monitor
                 return;
 
             //otherwise we try to initialize and log a message.
-            Initialize(configuration, false);
+            Initialize(configuration);
 
             if (s_Initialized)
             {
@@ -1863,7 +1863,7 @@ namespace Gibraltar.Monitor
         /// Perform the critical central initialization and indicate if we should be active or not
         /// </summary>
         /// <returns>True if initialization was completed and logging can now commence, false otherwise.</returns>
-        private static bool OnInitialize(AgentConfiguration configuration, bool suppressTraceInitialize)
+        private static bool OnInitialize(AgentConfiguration configuration)
         {
             //make sure that we don't ever run again once we're initialized, that would be bad.
             if (s_Initialized)
@@ -1936,7 +1936,7 @@ namespace Gibraltar.Monitor
             Write(s_SessionStartInfo.Packet);
             
             //initialize the listener architecture.
-            Listener.Initialize(s_RunningConfiguration, suppressTraceInitialize, true);
+            Listener.Initialize(s_RunningConfiguration, true);
 
             //and we need to load up the session publisher if it's enabled.
             StartPublishEngine(); //this checks to see if it can start based on configuration
