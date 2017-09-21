@@ -5,7 +5,7 @@
     <AssemblyName>Loupe.Extensions.Logging</AssemblyName>
     <RootNamespace>Loupe.Extensions.Logging</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.5.0.2</Version>
+    <Version>4.5.0.3</Version>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
@@ -15,7 +15,7 @@
     <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <FileVersion>4.5.0.2</FileVersion>
+    <FileVersion>4.5.0.3</FileVersion>
     <AssemblyVersion>4.5.0.0</AssemblyVersion>
   </PropertyGroup>
 

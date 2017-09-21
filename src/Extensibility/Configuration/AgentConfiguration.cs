@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Loupe.Configuration
 {
@@ -64,6 +65,7 @@ namespace Loupe.Configuration
             Listener = new ListenerConfiguration();
             NetworkViewer = new NetworkViewerConfiguration();
             Packager = new PackagerConfiguration();
+            Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Publisher = new PublisherConfiguration();
             Server = new ServerConfiguration();
             SessionFile = new SessionFileConfiguration();
