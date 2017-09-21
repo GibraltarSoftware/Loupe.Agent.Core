@@ -24,13 +24,11 @@ namespace Gibraltar.Monitor
 
         //our various listeners we're controlling
         private static bool m_ConsoleListenerRegistered; //LOCKED BY LISTENERLOCK
-        private static ProcessMonitor m_ProcessMonitor; //LOCKED BY LISTENERLOCK
         private static CLRListener m_CLRListener; //LOCKED BY LISTENERLOCK
 
         private static MetricSampleInterval m_SamplingInterval = MetricSampleInterval.Minute;
         private static DateTimeOffset m_PollingStarted;
         private static bool m_EventsInitialized;
-        private static bool m_SuppressTraceInitialize;
         private static bool m_SuppressAlerts;
 
         static Listener()
@@ -43,19 +41,17 @@ namespace Gibraltar.Monitor
         /// Apply the provided listener configuration
         /// </summary>
         /// <param name="agentConfiguration"></param>
-        /// <param name="suppressTraceInitialize">True to prevent any interaction with the Trace subsystem</param>
         /// <param name="async"></param>
         /// <remarks>If calling initialization from a path that may have started with the trace listener,
         /// you must set suppressTraceInitialize to true to guarantee that the application will not deadlock
         /// or throw an unexpected exception.</remarks>
-        public static void Initialize(AgentConfiguration agentConfiguration, bool suppressTraceInitialize, bool async)
+        public static void Initialize(AgentConfiguration agentConfiguration, bool async)
         {
             ListenerConfiguration listenerConfiguration = agentConfiguration.Listener;
             //get a configuration lock so we can update the configuration
             lock(m_ConfigLock)
             {
                 //and store the configuration; it's processed by the background thread.
-                m_SuppressTraceInitialize = suppressTraceInitialize; //order is important since as soon as we touch the configuration the background thread could go.
                 m_AgentConfiguration = agentConfiguration; // Set the top config before the local Listener config.
                 m_Configuration = listenerConfiguration; // Monitor thread looks for this to be non-null before proceeding.
                 m_PendingConfigChange = true;
@@ -240,7 +236,6 @@ namespace Gibraltar.Monitor
             lock (m_ConfigLock)
             {
                 m_PendingConfigChange = false;
-                m_SuppressTraceInitialize = false;
                 m_Initialized = true;
 
                 System.Threading.Monitor.PulseAll(m_ConfigLock);

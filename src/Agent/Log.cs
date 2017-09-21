@@ -365,7 +365,7 @@ namespace Gibraltar.Agent
             set
             {
                 //don't do jack if we aren't initialized.
-                if (Monitor.Log.IsLoggingActive(false) == false)
+                if (Monitor.Log.IsLoggingActive() == false)
                     return;
 
                 Monitor.Log.SetSendSessionsOnExit(value); // Jump to the method (not property) for correct source attribution.
@@ -406,7 +406,7 @@ namespace Gibraltar.Agent
         public static void Verbose(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -443,7 +443,7 @@ namespace Gibraltar.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -480,7 +480,7 @@ namespace Gibraltar.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -523,7 +523,7 @@ namespace Gibraltar.Agent
                                    string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -550,7 +550,7 @@ namespace Gibraltar.Agent
                                          params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -581,7 +581,7 @@ namespace Gibraltar.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -608,7 +608,7 @@ namespace Gibraltar.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -641,7 +641,7 @@ namespace Gibraltar.Agent
                                          string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -676,7 +676,7 @@ namespace Gibraltar.Agent
         public static void Information(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -713,7 +713,7 @@ namespace Gibraltar.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -750,7 +750,7 @@ namespace Gibraltar.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -793,7 +793,7 @@ namespace Gibraltar.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -820,7 +820,7 @@ namespace Gibraltar.Agent
                                              params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -851,7 +851,7 @@ namespace Gibraltar.Agent
                                              string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -878,7 +878,7 @@ namespace Gibraltar.Agent
                                              string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -911,7 +911,7 @@ namespace Gibraltar.Agent
                                              string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -946,7 +946,7 @@ namespace Gibraltar.Agent
         public static void Warning(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -983,7 +983,7 @@ namespace Gibraltar.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1020,7 +1020,7 @@ namespace Gibraltar.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1063,7 +1063,7 @@ namespace Gibraltar.Agent
                                    string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1090,7 +1090,7 @@ namespace Gibraltar.Agent
                                          params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1121,7 +1121,7 @@ namespace Gibraltar.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1148,7 +1148,7 @@ namespace Gibraltar.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1181,7 +1181,7 @@ namespace Gibraltar.Agent
                                          string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -1216,7 +1216,7 @@ namespace Gibraltar.Agent
         public static void Error(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1253,7 +1253,7 @@ namespace Gibraltar.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1291,7 +1291,7 @@ namespace Gibraltar.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1328,7 +1328,7 @@ namespace Gibraltar.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1371,7 +1371,7 @@ namespace Gibraltar.Agent
                                  string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1415,7 +1415,7 @@ namespace Gibraltar.Agent
                                  string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1442,7 +1442,7 @@ namespace Gibraltar.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1473,7 +1473,7 @@ namespace Gibraltar.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1505,7 +1505,7 @@ namespace Gibraltar.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1532,7 +1532,7 @@ namespace Gibraltar.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1565,7 +1565,7 @@ namespace Gibraltar.Agent
                                        string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1599,7 +1599,7 @@ namespace Gibraltar.Agent
                                        string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -1634,7 +1634,7 @@ namespace Gibraltar.Agent
         public static void Critical(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1671,7 +1671,7 @@ namespace Gibraltar.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1709,7 +1709,7 @@ namespace Gibraltar.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1746,7 +1746,7 @@ namespace Gibraltar.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1789,7 +1789,7 @@ namespace Gibraltar.Agent
                                     string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1833,7 +1833,7 @@ namespace Gibraltar.Agent
                                     string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1860,7 +1860,7 @@ namespace Gibraltar.Agent
                                           params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1891,7 +1891,7 @@ namespace Gibraltar.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1923,7 +1923,7 @@ namespace Gibraltar.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1950,7 +1950,7 @@ namespace Gibraltar.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -1983,7 +1983,7 @@ namespace Gibraltar.Agent
                                           string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -2017,7 +2017,7 @@ namespace Gibraltar.Agent
                                           string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -2069,7 +2069,7 @@ namespace Gibraltar.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             if (skipFrames < 0)
@@ -2128,7 +2128,7 @@ namespace Gibraltar.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             if (skipFrames < 0)
@@ -2172,7 +2172,7 @@ namespace Gibraltar.Agent
                                  string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.Log.WriteMessage((Loupe.Extensibility.Data.LogMessageSeverity)severity, (Monitor.LogWriteMode)writeMode, logSystem,
@@ -2244,7 +2244,7 @@ namespace Gibraltar.Agent
         public static void TraceVerbose(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -2271,7 +2271,7 @@ namespace Gibraltar.Agent
         public static void TraceVerbose(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
@@ -2293,7 +2293,7 @@ namespace Gibraltar.Agent
         public static void TraceInformation(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -2320,7 +2320,7 @@ namespace Gibraltar.Agent
         public static void TraceInformation(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
@@ -2342,7 +2342,7 @@ namespace Gibraltar.Agent
         public static void TraceWarning(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -2369,7 +2369,7 @@ namespace Gibraltar.Agent
         public static void TraceWarning(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
@@ -2391,7 +2391,7 @@ namespace Gibraltar.Agent
         public static void TraceError(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -2418,7 +2418,7 @@ namespace Gibraltar.Agent
         public static void TraceError(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
@@ -2440,7 +2440,7 @@ namespace Gibraltar.Agent
         public static void TraceCritical(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -2467,7 +2467,7 @@ namespace Gibraltar.Agent
         public static void TraceCritical(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
             Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
@@ -2804,7 +2804,7 @@ namespace Gibraltar.Agent
         public static async Task<bool> SendSessions(SessionCriteria criteria)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, false).ConfigureAwait(false);
@@ -2829,7 +2829,7 @@ namespace Gibraltar.Agent
         public static async Task<bool> SendSessions(Predicate<SessionSummary> sessionMatchPredicate)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
@@ -2855,7 +2855,7 @@ namespace Gibraltar.Agent
         public static async Task<bool> SendSessionsAsync(SessionCriteria criteria)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, true).ConfigureAwait(false);
@@ -2880,7 +2880,7 @@ namespace Gibraltar.Agent
         public static async Task<bool> SendSessionsAsync(Predicate<SessionSummary> sessionMatchPredicate)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive(false) == false)
+            if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);

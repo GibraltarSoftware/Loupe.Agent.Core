@@ -106,7 +106,7 @@ namespace Gibraltar.Agent
         public Packager()
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive(false);
+            Monitor.Log.IsLoggingActive();
 
             m_Packager = new Gibraltar.Data.Packager();
             Initialize();
@@ -120,7 +120,7 @@ namespace Gibraltar.Agent
         public Packager(string productName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive(false);
+            Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
             m_Packager = new Gibraltar.Data.Packager(productName);
@@ -136,7 +136,7 @@ namespace Gibraltar.Agent
         public Packager(string productName, string applicationName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive(false);
+            Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
             m_Packager = new Gibraltar.Data.Packager(productName, applicationName);
@@ -156,7 +156,7 @@ namespace Gibraltar.Agent
         public Packager(string productName, string applicationName = null, string directory = null)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive(false);
+            Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
             m_Packager = new Gibraltar.Data.Packager(productName, applicationName, directory);
