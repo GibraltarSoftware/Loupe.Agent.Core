@@ -24,7 +24,7 @@ namespace Loupe.Core.Test
             Log.Initializing += Log_Initializing;
 
             //Do our first initialize.
-            Log.Initialize(null, true);
+            Log.Initialize(null);
 
             //we shouldn't be up...
             if (Log.Initialized)
@@ -34,7 +34,7 @@ namespace Loupe.Core.Test
             else
             {
                 //try again which should really initialize it.
-                Log.Initialize(null, false);
+                Log.Initialize(null);
             }
 
             if (Log.Initialized == false)
