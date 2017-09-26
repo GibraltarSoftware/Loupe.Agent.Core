@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-#if(NETCOREAPP2_0)
+#if(NETCOREAPP2_0 || NETSTANDARD2_0)
 namespace Loupe.Extensions.Logging
 {
     public static class LoggerBuilderExtensions

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;netstandard2.0;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>Loupe.Extensions.Logging</AssemblyName>
     <RootNamespace>Loupe.Extensions.Logging</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -27,6 +27,10 @@
     <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Extensions.Logging.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <DefineConstants>NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
@@ -35,7 +39,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
 
