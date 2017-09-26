@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>Loupe.Extensions.Logging</AssemblyName>
     <RootNamespace>Loupe.Extensions.Logging</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -19,17 +19,24 @@
     <AssemblyVersion>4.5.0.0</AssemblyVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netcoreapp1.1'">
     <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1</DefineConstants>
-    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netcoreapp1.1'">
     <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Extensions.Logging.xml</DocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <DefineConstants>NETCOREAPP2_0</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.1'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

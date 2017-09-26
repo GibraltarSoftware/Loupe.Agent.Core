@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Loupe.Agent.AspNetCore;
+using Loupe.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,10 @@ namespace AspNetCore2.Sandbox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLoupe();
+            services.AddLogging(builder =>
+            {
+                builder.AddLoupe();
+            });
             services.AddMvc();
         }
 

@@ -18,14 +18,13 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]
-        public virtual void BeforeAction(IProxyHttpContext httpContext,
-            IProxyActionDescriptor actionDescriptor)
+        public virtual void BeforeAction(IProxyHttpContext httpContext, IProxyActionDescriptor actionDescriptor)
         {
             _actions[httpContext.TraceIdentifier] = _actionMetricFactory.Start(Environment.TickCount, actionDescriptor.DisplayName);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterAction")]
-        public virtual void AfterAction(IProxyHttpContext httpContext, IProxyActionDescriptor actionDescriptor)
+        public virtual void AfterAction(IProxyHttpContext httpContext)
         {
             long ticks = Environment.TickCount;
             if (_actions.TryRemove(httpContext.TraceIdentifier, out var metric))
@@ -35,8 +34,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnActionExecuted")]
-        public virtual void AfterOnActionExecuted(IProxyActionDescriptor actionDescriptor,
-            IProxyActionExecutedContext actionExecutedContext)
+        public virtual void AfterOnActionExecuted(IProxyActionExecutedContext actionExecutedContext)
         {
             if (actionExecutedContext.Exception == null) return;
 
@@ -46,41 +44,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             }
         }
 
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnException")]
-        public virtual void BeforeOnException(IProxyActionDescriptor actionDescriptor,
-            IProxyExceptionContext exceptionContext, IProxyExceptionFilter filter)
-        {
-            Debug.WriteLine("Microsoft.AspNetCore.Mvc.BeforeOnException");
-        }
-
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnException")]
-        public virtual void AfterOnException(IProxyActionDescriptor actionDescriptor,
-            IProxyExceptionContext exceptionContext, IProxyExceptionFilter filter)
-        {
-            Debug.WriteLine("Microsoft.AspNetCore.Mvc.AfterOnException");
-        }
-
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeActionResult")]
-        public virtual void BeforeActionResult(IProxyActionContext actionContext, IProxyActionResult actionResult)
-        {
-            Debug.WriteLine("Microsoft.AspNetCore.Mvc.BeforeActionResult");
-        }
-
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterActionResult")]
-        public virtual void AfterActionResult(IProxyActionContext actionContext, IProxyActionResult actionResult)
-        {
-            Debug.WriteLine("Microsoft.AspNetCore.Mvc.AfterActionResult");
-        }
-
         public string Name => "Microsoft.AspNetCore";
-    }
-
-    public interface IProxyExceptionContext
-    {
-    }
-
-    public interface IProxyExceptionFilter
-    {
     }
 
     public interface IProxyActionExecutedContext
@@ -88,37 +52,13 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         Exception Exception { get; }
         HttpContext HttpContext { get; }
     }
-
-    public interface IProxyAsyncActionFilter
-    {
-    }
-
-    public interface IProxyActionExecutingContext
-    {
-    }
-
     public interface IProxyHttpContext
     {
         string TraceIdentifier { get; }
     }
 
-    public interface IProxyRouteData
-    {
-    }
-
     public interface IProxyActionDescriptor
     {
         string DisplayName { get; }
-    }
-
-    public interface IProxyActionContext
-    {
-        IProxyHttpContext HttpContext { get; }
-        IProxyActionDescriptor ActionDescriptor { get; }
-    }
-
-    public interface IProxyActionResult
-    {
-        
     }
 }
