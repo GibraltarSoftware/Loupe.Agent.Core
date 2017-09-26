@@ -31,9 +31,14 @@ namespace Loupe.Agent.AspNetCore
         {
             foreach (var listener in _listeners)
             {
-                if (listener.Name == value.Name)
+                if (listener.Name != value.Name) continue;
+                if (listener is IObserver<KeyValuePair<string, object>> observer)
                 {
-                    _subscriptions.Add(value.Subscribe(listener));
+                    _subscriptions.Add(value.Subscribe(observer));
+                }
+                else
+                {
+                    value.SubscribeWithAdapter(listener);
                 }
             }
         }
@@ -47,7 +52,7 @@ namespace Loupe.Agent.AspNetCore
         }
     }
 
-    internal interface ILoupeDiagnosticListener : IObserver<KeyValuePair<string, object>>
+    internal interface ILoupeDiagnosticListener
     {
         string Name { get; }
     }

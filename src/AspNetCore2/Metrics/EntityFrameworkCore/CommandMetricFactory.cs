@@ -2,7 +2,7 @@
 using Gibraltar.Agent.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Loupe.Agent.AspNetCore.Metrics
+namespace Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore
 {
     internal class CommandMetricFactory
     {

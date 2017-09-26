@@ -38,8 +38,6 @@ namespace AspNetCore2.Sandbox
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseLoupe();
-
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
@@ -48,6 +46,8 @@ namespace AspNetCore2.Sandbox
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseLoupe();
         }
     }
 }

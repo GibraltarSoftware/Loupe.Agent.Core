@@ -5,9 +5,9 @@ using Gibraltar.Agent;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Loupe.Agent.AspNetCore.Metrics
+namespace Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore
 {
-    internal class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener
+    internal class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
     {
         private readonly CommandMetricFactory _commandMetricFactory;
         private readonly ConnectionMetricFactory _connectionMetricFactory;

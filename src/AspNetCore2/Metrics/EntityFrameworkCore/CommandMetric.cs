@@ -1,7 +1,7 @@
 ﻿using Gibraltar.Agent.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Loupe.Agent.AspNetCore.Metrics
+namespace Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore
 {
     internal class CommandMetric
     {
@@ -36,7 +36,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
             var sample = _metric.CreateSample();
             sample.SetValue("query", _eventData.Command.CommandText);
             sample.SetValue("duration", eventData.Duration);
-            sample.SetValue("error", eventData.Exception.Message);
+            sample.SetValue("error", eventData.Exception?.GetType().Name);
             sample.Write();
         }
 

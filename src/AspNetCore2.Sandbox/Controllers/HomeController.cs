@@ -29,6 +29,11 @@ namespace AspNetCore2.Sandbox.Controllers
             return View();
         }
 
+        public IActionResult Throw()
+        {
+            throw new NotImplementedException();
+        }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
