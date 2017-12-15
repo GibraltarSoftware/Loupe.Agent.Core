@@ -14,7 +14,8 @@ namespace Loupe.Agent.Test.LogMessages
             Log.ResolveApplicationUser += OnResolveUserForCurrentPrincipal;
             try
             {
-                Log.Information("LogTests.ApplicationUser.Assign For Current Principal", "This message should be attributed to the current user",
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, "ApplicationUserAssignJustOnce", null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Assign For Current Principal", "This message should be attributed to the current user",
                     "And we should get the resolution event following it.");
             }
             finally
@@ -25,7 +26,8 @@ namespace Loupe.Agent.Test.LogMessages
 
         private void OnResolveUserForCurrentPrincipal(object sender, ApplicationUserResolutionEventArgs e)
         {
-            var identity = e.Principal.Identity;
+            var identity = e.Principal?.Identity;
+            var userName = e.UserName;
             var newUser = e.GetUser();
             newUser.Caption = Environment.GetEnvironmentVariable("USERNAME"); 
             newUser.Organization = "Unit test";
