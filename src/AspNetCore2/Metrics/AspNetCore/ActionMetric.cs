@@ -9,6 +9,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         private static readonly double TickResolution = Stopwatch.Frequency / 1000d;
         private readonly EventMetric _metric;
         private readonly IProxyHttpContext _context;
+        private long _request;
         private long _requestAuthorization;
         private long _requestExecution;
 
@@ -16,6 +17,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         {
             _metric = metric;
             _context = context;
+            _request = Stopwatch.GetTimestamp();
         }
 
         public void StartRequestAuthorization()
@@ -44,11 +46,13 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             }
         }
 
-        public void Stop(Activity activity)
+        public void Stop()
         {
+            _request = Stopwatch.GetTimestamp() - _request;
             var sample = _metric.CreateSample();
 
-            sample.SetValue(MetricValue.TotalDuration, activity.Duration.TotalMilliseconds);
+            sample.SetValue(MetricValue.TotalDuration, _request / TickResolution);
+            
             if (_requestAuthorization > 0)
             {
                 sample.SetValue(MetricValue.AuthorizeRequestDuration, _requestAuthorization / TickResolution);
@@ -69,7 +73,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             }
             else
             {
-                int lastDelimiter = path.LastIndexOf('/', path.Length - 2);
+                var lastDelimiter = path.LastIndexOf('/', path.Length - 2);
                 page = lastDelimiter >= 0 ? path.Substring(lastDelimiter + 1) : path;
             }
             sample.SetValue(MetricValue.AbsolutePath, _context.Request.Path);

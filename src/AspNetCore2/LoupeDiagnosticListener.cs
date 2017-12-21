@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Loupe.Agent.AspNetCore
 {
-    internal sealed class LoupeDiagnosticListener : IObserver<DiagnosticListener>, IDisposable
+    public sealed class LoupeDiagnosticListener : IObserver<DiagnosticListener>, IDisposable
     {
         private readonly List<ILoupeDiagnosticListener> _listeners = new List<ILoupeDiagnosticListener>();
         private readonly List<IDisposable> _subscriptions = new List<IDisposable>();
@@ -52,7 +53,7 @@ namespace Loupe.Agent.AspNetCore
         }
     }
 
-    internal interface ILoupeDiagnosticListener
+    public interface ILoupeDiagnosticListener
     {
         string Name { get; }
     }

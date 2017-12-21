@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
 {
@@ -7,5 +8,6 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         string TraceIdentifier { get; }
         HttpRequest Request { get; }
         HttpResponse Response { get; }
+        IFeatureCollection Features { get; }
     }
 }

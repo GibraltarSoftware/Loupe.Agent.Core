@@ -1,12 +1,10 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using Microsoft.Extensions.DiagnosticAdapter;
+﻿using Microsoft.Extensions.DiagnosticAdapter;
 
 namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ActionDiagnosticListener : ILoupeDiagnosticListener
     {
-        private readonly ConcurrentDictionary<string, ActionMetric> _actions = new ConcurrentDictionary<string, ActionMetric>();
         private readonly ActionMetricFactory _actionMetricFactory;
 
         public ActionDiagnosticListener(LoupeAgent agent)
@@ -14,86 +12,52 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             _actionMetricFactory = new ActionMetricFactory(agent.ApplicationName);
         }
 
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Start")]
-        public virtual void HttpRequestInStart(IProxyHttpContext httpContext)
+        [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
+        public virtual void BeginRequest(IProxyHttpContext httpContext)
         {
-            if (httpContext == null) return;
-            _actions[httpContext.TraceIdentifier] = _actionMetricFactory.Start(httpContext);
+            httpContext?.Features.Set(_actionMetricFactory.Start(httpContext));
         }
-
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop")]
-        public virtual void AfterHttpRequestIn(IProxyHttpContext httpContext)
+        
+        [DiagnosticName("Microsoft.AspNetCore.Hosting.EndRequest")]
+        public virtual void EndRequest(IProxyHttpContext httpContext)
         {
-            if (httpContext == null) return;
-            var activity = Activity.Current;
-            if (_actions.TryRemove(httpContext.TraceIdentifier, out var metric))
-            {
-                metric.Stop(activity);
-            }
+            httpContext?.Features.Get<ActionMetric>()?.Stop();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecuting")]
         public virtual void BeforeOnResourceExecuting(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(resourceExecutingContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StartRequestExecution();
-            }
+            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecuted")]
         public virtual void AfterOnResourceExecuted(IProxyActionContext resourceExecutedContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(resourceExecutedContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StopRequestExecution();
-            }
+            resourceExecutedContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestExecution();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecution")]
         public virtual void BeforeOnResourceExecution(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(resourceExecutingContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StartRequestExecution();
-            }
+            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecution")]
         public virtual void AfterOnResourceExecution(IProxyActionContext resourceExecutedContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(resourceExecutedContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StopRequestExecution();
-            }
+            resourceExecutedContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestExecution();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnAuthorization")]
         public virtual void BeforeOnAuthorization(IProxyActionContext actionContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(actionContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StartRequestAuthorization();
-            }
+            actionContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestAuthorization();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnAuthorization")]
         public virtual void AfterOnAuthorization(IProxyActionContext actionContext, IProxyActionDescriptor actionDescriptor)
         {
-            if (TryGetMetric(actionContext?.HttpContext?.TraceIdentifier, out var metric))
-            {
-                metric.StopRequestAuthorization();
-            }
-        }
-
-        private bool TryGetMetric(string identifier, out ActionMetric metric)
-        {
-            if (identifier == null)
-            {
-                metric = null;
-                return false;
-            }
-            return _actions.TryGetValue(identifier, out metric);
+            actionContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestAuthorization();
         }
 
         public string Name => "Microsoft.AspNetCore";

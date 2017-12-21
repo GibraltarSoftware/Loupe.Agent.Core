@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Loupe.Agent.AspNetCore.Metrics;
 using Loupe.Agent.AspNetCore.Metrics.AspNetCore;
