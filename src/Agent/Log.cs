@@ -14,8 +14,7 @@ namespace Gibraltar.Agent
     /// <summary>This static class is the primary API for logging with the Loupe Agent.</summary>
     /// <remarks>
     /// 	<para>
-    ///         By default the Loupe Agent will collect trace messages (from <see cref="System.Diagnostics.Trace">System.Diagnostics.Trace</see>) and automatically
-    ///         monitor certain other system events. This Log class provides the API for
+    ///         This Log class provides the API for
     ///         directly logging to Loupe and for receiving log messages from logging
     ///         systems such as log4net. Messages sent directly to Loupe will not go
     ///         through System.Diagnostics.Trace and will not be seen by trace listeners or by
@@ -42,10 +41,9 @@ namespace Gibraltar.Agent
     /// 	<para>
     ///         The various Trace methods provide a quick way to record a log message at a
     ///         chosen severity level with the fewest arguments to manage. These methods
-    ///         include direct replacements for <see cref="System.Diagnostics.Trace.TraceInformation(string)">Trace.TraceInformation</see>,
-    ///         <see cref="System.Diagnostics.Trace.TraceWarning(string)">Trace.TraceWarning</see>, and
-    ///         <see cref="System.Diagnostics.Trace.TraceError(string)">Trace.TraceError</see>,
-    ///         as well as a Trace() call (replacing the use of <see cref="System.Diagnostics.Trace.Write(string)">Trace.Write</see> and <see cref="System.Diagnostics.Trace.WriteLine(string)">Trace.WriteLine</see> for logging
+    ///         include direct replacements for Trace.TraceInformation,
+    ///         Trace.TraceWarning, and Trace.TraceError,
+    ///         as well as a Trace() call (replacing the use of Trace.Write and Trace.WriteLine for logging
     ///         Verbose messages).
     ///     </para>
     /// 	<para>

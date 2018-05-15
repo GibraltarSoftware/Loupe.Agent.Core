@@ -8,7 +8,6 @@
         /// <summary>
         /// Initialize the session file configuration from the application configuration
         /// </summary>
-        /// <param name="configuration"></param>
         public SessionFileConfiguration()
         {
             Enabled = true;

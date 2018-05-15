@@ -8,7 +8,7 @@ namespace Loupe.Configuration
     /// Log.Initializing event.
     /// </summary>
     /// <remarks>
-    ///     This object is created by the agent and supplied to user code during the <see cref="Gibraltar.Agent.Log.Initializing">Log.Initializing</see> event to allow for
+    ///     This object is created by the agent and supplied to user code during the Log.Initializing event to allow for
     ///     configuration to be determined in code at runtime. This configuration is applied
     ///     over whatever has been configured in the application configuration file.
     /// </remarks>

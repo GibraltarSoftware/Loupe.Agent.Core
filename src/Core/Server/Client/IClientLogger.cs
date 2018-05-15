@@ -3,6 +3,9 @@ using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Server.Client
 {
+    /// <summary>
+    /// HTTP Client logging interface
+    /// </summary>
     public interface IClientLogger
     {
         /// <summary>

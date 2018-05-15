@@ -11,8 +11,6 @@ namespace Gibraltar.Server.Client
         /// <summary>
         /// Create a new web channel exception
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="innerException"></param>
         public WebChannelException(string message, Exception innerException, Uri requestUri)
             : base(message, innerException)
         {

@@ -210,7 +210,6 @@ namespace Gibraltar.Monitor
         /// Attempt to initialize the log system.  If it is already initialized it will return immediately.
         /// </summary>
         /// <param name="configuration">Optional.  A default configuration to start with instead of the configuration file.</param>
-        /// <param name="suppressTraceInitialize">True to prevent any interaction with the Trace subsystem, false normally.</param>
         /// <returns>True if the initialization has completed (on this call or prior),
         /// false if a re-entrant call returns to avoid deadlocks and infinite recursion.</returns>
         /// <remarks>If calling initialization from a path that may have started with the trace listener,

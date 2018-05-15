@@ -1,3 +1,5 @@
+using System;
+
 namespace Gibraltar.Agent
 {
     /// <summary>
