@@ -35,8 +35,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnActionExecution")]
         public virtual void AfterOnActionExecution(ActionExecutedContext actionExecutedContext)
         {
-            var metric = actionExecutedContext?.HttpContext?.Features.Get<RequestMetric>();
-            metric?.Record();
+            actionExecutedContext?.HttpContext?.Features.Get<RequestMetric>()?.Record(actionExecutedContext);
         }
         
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecuting")]

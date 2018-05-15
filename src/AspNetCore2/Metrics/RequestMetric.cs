@@ -188,6 +188,19 @@ namespace Loupe.Agent.AspNetCore.Metrics
             EventMetric.Write(this);
         }
 
+        /// <summary>
+        /// Records the metrics for this request
+        /// </summary>
+        /// <param name="actionExecutedContext">The <see cref="ActionExecutedContext"/> from ASP.NET Core.</param>
+        public void Record(ActionExecutedContext actionExecutedContext)
+        {
+            if (actionExecutedContext.Exception != null)
+            {
+                Exception = actionExecutedContext.Exception;
+            }
+            Record();
+        }
+
         public string MethodName { get; set; }
 
         public string ClassName { get; set; }
