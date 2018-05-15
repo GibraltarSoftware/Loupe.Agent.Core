@@ -4,8 +4,16 @@ using System.Runtime.InteropServices;
 
 namespace Gibraltar
 {
+    /// <summary>
+    /// Conversion extensions
+    /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// Convert from .NET Core Architecture type to ProcessorArchitecture type.
+        /// </summary>
+        /// <param name="architecture"></param>
+        /// <returns></returns>
         public static ProcessorArchitecture ToProcessorArchitecture(this Architecture architecture)
         {
             switch (architecture)

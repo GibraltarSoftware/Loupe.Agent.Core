@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Loupe.Extensibility.Data;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace Gibraltar.Server.Client.Internal
 {

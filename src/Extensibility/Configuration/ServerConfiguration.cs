@@ -65,7 +65,7 @@ namespace Loupe.Configuration
     ///     </para>
     /// 	<para>
     ///         If the configuration is not valid the <see cref="Enabled">Enabled</see>
-    ///         property is automatically set to False at the end of the <see cref="Gibraltar.Agent.Log.Initializing">Log.Initializing</see> event. This isn't
+    ///         property is automatically set to False at the end of the Log.Initializing event. This isn't
     ///         checked until the end of the initialization cycle so properties can be set in
     ///         any order.
     ///     </para>
@@ -116,7 +116,6 @@ namespace Loupe.Configuration
         /// <summary>
         /// Initialize the server configuration from the application configuration
         /// </summary>
-        /// <param name="configuration"></param>
         public ServerConfiguration()
         {
             Enabled = true;

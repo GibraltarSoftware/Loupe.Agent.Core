@@ -4,6 +4,24 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>Loupe.Agent.AspNetCore</AssemblyName>
     <RootNamespace>Loupe.Agent.AspNetCore</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>4.5.0.3</Version>
+    <Authors>Gibraltar Software, Inc.</Authors>
+    <Company>Gibraltar Software, Inc.</Company>
+    <Product>Loupe</Product>
+    <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
+    <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>The Loupe Agent for ASP.NET Core - automatically recording diagnostic information for ASP.NET Core applications.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
+    <AssemblyVersion>4.5.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\Loupe.Agent.AspNetCore.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.0\Loupe.Agent.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.1" />
