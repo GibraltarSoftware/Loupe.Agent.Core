@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Gibraltar.Agent.Metrics;
+using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
 {
@@ -8,18 +9,18 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
     {
         private static readonly double TickResolution = Stopwatch.Frequency / 1000d;
         private readonly EventMetric _metric;
-        private readonly IProxyHttpContext _context;
+        private readonly HttpContext _context;
         private long _request;
         private long _requestAuthorization;
         private long _requestExecution;
 
-        public ActionMetric(EventMetric metric, IProxyHttpContext context)
+        public ActionMetric(EventMetric metric, HttpContext context)
         {
             _metric = metric;
             _context = context;
             _request = Stopwatch.GetTimestamp();
         }
-
+        
         public void StartRequestAuthorization()
         {
             _requestAuthorization = Stopwatch.GetTimestamp();
@@ -83,5 +84,6 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         }
 
         public Exception Exception { get; set; }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
 {
@@ -23,7 +24,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             _metric = EventMetric.Register(definition, null);
         }
 
-        public ActionMetric Start(IProxyHttpContext context)
+        public ActionMetric Start(HttpContext context)
         {
             return new ActionMetric(_metric, context);
         }

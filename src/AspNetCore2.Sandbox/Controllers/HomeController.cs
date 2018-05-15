@@ -22,8 +22,10 @@ namespace AspNetCore2.Sandbox.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public async Task<IActionResult> Contact()
         {
+            await Task.Delay(100);
+            
             ViewData["Message"] = "Your contact page.";
 
             return View();

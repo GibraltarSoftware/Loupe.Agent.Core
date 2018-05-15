@@ -6,6 +6,7 @@ using Loupe.Agent.AspNetCore.Metrics.AspNetCore;
 using Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore;
 using Loupe.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -15,6 +16,7 @@ namespace Loupe.Agent.AspNetCore
         {
             services.AddSingleton(_ => new LoupeAgentConfigurationCallback(configure));
             RegisterDiagnosticListeners(services);
+            services.AddSingleton<IHostedService, LoupeAgentService>();
             return services.AddSingleton<LoupeAgent>();
         }
 
@@ -22,6 +24,7 @@ namespace Loupe.Agent.AspNetCore
         {
             services.AddSingleton(_ => new LoupeAgentConfigurationCallback());
             RegisterDiagnosticListeners(services);
+            services.AddSingleton<IHostedService, LoupeAgentService>();
             return services.AddSingleton<LoupeAgent>();
         }
 

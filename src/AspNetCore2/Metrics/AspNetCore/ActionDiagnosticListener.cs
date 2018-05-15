@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DiagnosticAdapter;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DiagnosticAdapter;
 
 namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
 {
@@ -13,7 +15,7 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
-        public virtual void BeginRequest(IProxyHttpContext httpContext)
+        public virtual void BeginRequest(HttpContext httpContext)
         {
             httpContext?.Features.Set(_actionMetricFactory.Start(httpContext));
         }
@@ -24,6 +26,19 @@ namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
             httpContext?.Features.Get<ActionMetric>()?.Stop();
         }
 
+        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnActionExecution")]
+        public virtual void BeforeOnActionExecution(ActionExecutingContext actionExecutingContext)
+        {
+            actionExecutingContext?.HttpContext?.Features.Set(new RequestMetric(actionExecutingContext));
+        }
+        
+        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnActionExecution")]
+        public virtual void AfterOnActionExecution(ActionExecutedContext actionExecutedContext)
+        {
+            var metric = actionExecutedContext?.HttpContext?.Features.Get<RequestMetric>();
+            metric?.Record();
+        }
+        
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecuting")]
         public virtual void BeforeOnResourceExecuting(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
         {

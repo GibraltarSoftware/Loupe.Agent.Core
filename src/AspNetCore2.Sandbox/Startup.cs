@@ -48,7 +48,6 @@ namespace AspNetCore2.Sandbox
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseLoupe();
         }
     }
 }
