@@ -97,6 +97,7 @@ namespace Gibraltar.Monitor
         private volatile static bool s_ExplicitStartSessionCalled; // protected by being volatile
 
         private static Notifier s_MessageAlertNotifier; // PROTECTED BY NOTIFIERLOCK (weak check outside lock allowed)
+        private static Notifier s_MessageNotifier; // PROTECTED BY NOTIFIERLOCK (weak check outside lock allowed)
         private static UserResolutionNotifier s_UserResolutionNotifier;
 
         // A thread-specific static flag for each thread to identify if this thread is the current initialize
@@ -336,6 +337,26 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
+        /// Get the official Notifier instance that returns all messages.  Will create it if it doesn't already exist.
+        /// </summary>
+        public static Notifier MessageNotifier
+        {
+            get
+            {
+                if (s_MessageNotifier == null)
+                {
+                    lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
+                    {
+                        if (s_MessageNotifier == null) // Double-check that it's actually still null.
+                            s_MessageNotifier = new Notifier(LogMessageSeverity.Verbose, "Messages", false);
+                    }
+                }
+
+                return s_MessageNotifier; // It's never altered again once created, so we can just read it now.
+            }
+        }
+
+        /// <summary>
         /// Get the official user resolution notifier instance.  Will create it if it doesn't already exist.
         /// </summary>
         public static UserResolutionNotifier UserResolutionNotifier
@@ -424,6 +445,15 @@ namespace Gibraltar.Monitor
             }
 
             return goodToGo;
+        }
+
+        /// <summary>
+        /// Ensure all messages have been written completely
+        /// </summary>
+        public static void Flush()
+        {
+            IMessengerPacket commandPacket = new CommandPacket(MessagingCommand.Flush);
+            Write(new[] {commandPacket}, LogWriteMode.WaitForCommit);
         }
 
         /// <summary>

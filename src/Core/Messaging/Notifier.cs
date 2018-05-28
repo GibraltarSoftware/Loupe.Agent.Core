@@ -22,6 +22,7 @@ namespace Gibraltar.Messaging
         private readonly object m_MessageQueueLock = new object();
         private readonly object m_MessageDispatchThreadLock = new object();
         private readonly LogMessageSeverity m_MinimumSeverity;
+        private readonly bool m_GroupMessages;
         private readonly string m_NotifierName;
         private readonly string m_NotifierCategoryName;
         private readonly Queue<LogMessagePacket> m_MessageQueue; // LOCKED BY QUEUELOCK
@@ -43,10 +44,12 @@ namespace Gibraltar.Messaging
         /// </summary>
         /// <param name="minimumSeverity">The minimum LogMessageSeverity to look for.</param>
         /// <param name="notifierName">A name for this notifier (may be null for generic).</param>
-        public Notifier(LogMessageSeverity minimumSeverity, string notifierName) // Note: Add config, etc?
+        /// <param name="groupMessages">True to delay and group messages together for more efficient processing</param>
+        public Notifier(LogMessageSeverity minimumSeverity, string notifierName, bool groupMessages = true)
         {
             m_MessageQueue = new Queue<LogMessagePacket>(50); // a more or less arbitrary initial size.
             m_MinimumSeverity = minimumSeverity;
+            m_GroupMessages = groupMessages;
             m_MinimumWaitNextNotify = TimeSpan.Zero; // No delay by default.
             m_MessageDispatchThreadFailed = true; // We'll need to start one if we get a packet we care about.
 
@@ -216,23 +219,28 @@ namespace Gibraltar.Messaging
                             }
                         }
 
-                        DateTimeOffset now = DateTimeOffset.UtcNow;
-                        if (m_BurstCollectionWait == DateTimeOffset.MinValue)
+                        if (m_GroupMessages)
                         {
-                            // We know there must be a positive Count to exit the wait loop above, so Peek() is safe.
-                            DateTimeOffset firstTime = m_MessageQueue.Peek().Timestamp;
-                            m_BurstCollectionWait = firstTime.AddMilliseconds(BurstMillisecondLatency);
-                            if (m_BurstCollectionWait < now) // Are we somehow already past this burst wait period?
-                                m_BurstCollectionWait = now.AddMilliseconds(10); // Then allow a minimum wait in case of lag.
-                        }
-                        if (m_NextNotifyAfter < m_BurstCollectionWait && m_BurstCollectionWait > now)
-                            m_NextNotifyAfter = m_BurstCollectionWait; // Wait for a burst to collect.
+                            DateTimeOffset now = DateTimeOffset.UtcNow;
+                            if (m_BurstCollectionWait == DateTimeOffset.MinValue)
+                            {
+                                // We know there must be a positive Count to exit the wait loop above, so Peek() is safe.
+                                DateTimeOffset firstTime = m_MessageQueue.Peek().Timestamp;
+                                m_BurstCollectionWait = firstTime.AddMilliseconds(BurstMillisecondLatency);
+                                if (m_BurstCollectionWait < now) // Are we somehow already past this burst wait period?
+                                    m_BurstCollectionWait =
+                                        now.AddMilliseconds(10); // Then allow a minimum wait in case of lag.
+                            }
 
-                        while (m_NextNotifyAfter > now && m_MessageQueue.Count > 0)
-                        {
-                            TimeSpan waitTime = m_NextNotifyAfter - now; // How long must we wait to notify again?
-                            System.Threading.Monitor.Wait(m_MessageQueueLock, waitTime); // Wait the timeout.
-                            now = DateTimeOffset.UtcNow;
+                            if (m_NextNotifyAfter < m_BurstCollectionWait && m_BurstCollectionWait > now)
+                                m_NextNotifyAfter = m_BurstCollectionWait; // Wait for a burst to collect.
+
+                            while (m_NextNotifyAfter > now && m_MessageQueue.Count > 0)
+                            {
+                                TimeSpan waitTime = m_NextNotifyAfter - now; // How long must we wait to notify again?
+                                System.Threading.Monitor.Wait(m_MessageQueueLock, waitTime); // Wait the timeout.
+                                now = DateTimeOffset.UtcNow;
+                            }
                         }
 
                         // The wait has ended.  Get our subscriber(s) and messages, if any.

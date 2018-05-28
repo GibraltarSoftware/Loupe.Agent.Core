@@ -19,32 +19,60 @@ namespace Loupe.Agent.Test.LogMessages
         [Test]
         public void WriteTrace()
         {
-            Log.TraceVerbose("This is a call to Log.TraceVerbose with no arguments");
-            Log.TraceVerbose("This is a call to Log.TraceVerbose with two arguments #1:{0}, #2:{1}", 1, 2);
-            Log.TraceVerbose(new AssertionException("This is our test trace exception"), "This is a call to Log.TraceVerbose with no arguments");
-            Log.TraceVerbose(new AssertionException("This is our test trace exception"), "This is a call to Log.TraceVerbose with two arguments #1:{0}, #2:{1}", 1, 2);
+            using (var verifier = new MessageTester())
+            {
+                verifier.Reset();
+                Log.TraceVerbose("This is a call to Log.TraceVerbose with no arguments");
+                Log.TraceVerbose("This is a call to Log.TraceVerbose with two arguments #1:{0}, #2:{1}", 1, 2);
+                Log.TraceVerbose(new AssertionException("This is our test trace exception"),
+                    "This is a call to Log.TraceVerbose with no arguments");
+                Log.TraceVerbose(new AssertionException("This is our test trace exception"),
+                    "This is a call to Log.TraceVerbose with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.WaitForMessages();
+                Assert.That(verifier.VerboseCount, Is.EqualTo(4));
 
-            Log.TraceInformation("This is a call to Log.TraceInformation with no arguments");
-            Log.TraceInformation("This is a call to Log.TraceInformation with two arguments #1:{0}, #2:{1}", 1, 2);
-            Log.TraceInformation(new AssertionException("This is our test trace information exception"), "This is a call to Log.TraceInformation with no arguments");
-            Log.TraceInformation(new AssertionException("This is our test trace information exception"), "This is a call to Log.TraceInformation with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.Reset();
+                Log.TraceInformation("This is a call to Log.TraceInformation with no arguments");
+                Log.TraceInformation("This is a call to Log.TraceInformation with two arguments #1:{0}, #2:{1}", 1, 2);
+                Log.TraceInformation(new AssertionException("This is our test trace information exception"),
+                    "This is a call to Log.TraceInformation with no arguments");
+                Log.TraceInformation(new AssertionException("This is our test trace information exception"),
+                    "This is a call to Log.TraceInformation with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.WaitForMessages();
+                Assert.That(verifier.InfoCount, Is.EqualTo(4));
 
-            Log.TraceWarning("This is a call to Log.TraceWarning with no arguments");
-            Log.TraceWarning("This is a call to Log.TraceWarning with two arguments #1:{0}, #2:{1}", 1, 2);
-            Log.TraceWarning(new AssertionException("This is our test trace warning exception"), "This is a call to Log.TraceWarning with no arguments");
-            Log.TraceWarning(new AssertionException("This is our test trace warning exception"), "This is a call to Log.TraceWarning with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.Reset();
+                Log.TraceWarning("This is a call to Log.TraceWarning with no arguments");
+                Log.TraceWarning("This is a call to Log.TraceWarning with two arguments #1:{0}, #2:{1}", 1, 2);
+                Log.TraceWarning(new AssertionException("This is our test trace warning exception"),
+                    "This is a call to Log.TraceWarning with no arguments");
+                Log.TraceWarning(new AssertionException("This is our test trace warning exception"),
+                    "This is a call to Log.TraceWarning with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.WaitForMessages();
+                Assert.That(verifier.WarningCount, Is.EqualTo(4));
 
-            Log.TraceError("This is a call to Log.TraceError with no arguments");
-            Log.TraceError("This is a call to Log.TraceError with two arguments #1:{0}, #2:{1}", 1, 2);
-            Log.TraceError(new AssertionException("This is our test trace error exception"), "This is a call to Log.TraceError with no arguments");
-            Log.TraceError(new AssertionException("This is our test trace error exception"), "This is a call to Log.TraceError with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.Reset();
+                Log.TraceError("This is a call to Log.TraceError with no arguments");
+                Log.TraceError("This is a call to Log.TraceError with two arguments #1:{0}, #2:{1}", 1, 2);
+                Log.TraceError(new AssertionException("This is our test trace error exception"),
+                    "This is a call to Log.TraceError with no arguments");
+                Log.TraceError(new AssertionException("This is our test trace error exception"),
+                    "This is a call to Log.TraceError with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.WaitForMessages();
+                Assert.That(verifier.ErrorCount, Is.EqualTo(4));
 
-            Log.TraceCritical("This is a call to Log.TraceCritical with no arguments");
-            Log.TraceCritical("This is a call to Log.TraceCritical with two arguments #1:{0}, #2:{1}", 1, 2);
-            Log.TraceCritical(new AssertionException("This is our test trace critical exception"), "This is a call to Log.TraceCritical with no arguments");
-            Log.TraceCritical(new AssertionException("This is our test trace critical exception"), "This is a call to Log.TraceCritical with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.Reset();
+                Log.TraceCritical("This is a call to Log.TraceCritical with no arguments");
+                Log.TraceCritical("This is a call to Log.TraceCritical with two arguments #1:{0}, #2:{1}", 1, 2);
+                Log.TraceCritical(new AssertionException("This is our test trace critical exception"),
+                    "This is a call to Log.TraceCritical with no arguments");
+                Log.TraceCritical(new AssertionException("This is our test trace critical exception"),
+                    "This is a call to Log.TraceCritical with two arguments #1:{0}, #2:{1}", 1, 2);
+                verifier.WaitForMessages();
+                Assert.That(verifier.CriticalCount, Is.EqualTo(4));
+            }
         }
-
+        
         /// <summary>
         /// Write a log message with an attached exception object.
         /// </summary>
@@ -79,7 +107,7 @@ namespace Loupe.Agent.Test.LogMessages
         public void WriteMessageFullFormat()
         {
             //do one that should be pinned on US
-            Log.Write(LogMessageSeverity.Verbose,  "GibraltarTest", 0, null, LogWriteMode.Queued, null,
+            Log.Write(LogMessageSeverity.Verbose, "GibraltarTest", 0, null, LogWriteMode.Queued, null,
                 "Test.Agent.LogMessages.WriteMessage", "This message should be verbose and ascribed to the LogTests class.", null);
             Log.Write(LogMessageSeverity.Critical, "GibraltarTest", 1, null, LogWriteMode.Queued, null,
                 "Test.Agent.LogMessages.WriteMessage", "This message should be critical and ascribed to whatever is calling our test class.", null);
@@ -104,9 +132,9 @@ namespace Loupe.Agent.Test.LogMessages
                 "Test.Agent.LogMessages.WriteDetail", "Test data details", "Values:\r\n{0}: {1}\r\n{2}: {3}\r\n", 5, 23, 6, 42);
 
             Log.Write(LogMessageSeverity.Error, "GibraltarTest", 0, null, LogWriteMode.Queued,
-                "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n"+
+                "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n" +
                 "<test complete=\"true\"><data index=\"1\" value=\"4\" /><data index=\"2\" value=\"8\" />\r\n" +
-                "<data index=\"3\" value=\"15\" /><data index=\"4\" value=\"16\" />\r\n"+
+                "<data index=\"3\" value=\"15\" /><data index=\"4\" value=\"16\" />\r\n" +
                 "<data index=\"5\" value=\"23\" /><data index=\"6\" value=\"42\" /></test>",
                 "Test.Agent.LogMessages.WriteDetail", "Test data complete", "Test sequence data: {0}, {1}, {2}, {3}, {4}, {5}\r\n",
                 4, 8, 15, 16, 23, 42);
@@ -191,8 +219,8 @@ namespace Loupe.Agent.Test.LogMessages
 
         public void BetterLogSample()
         {
-            Log.Critical("Period.Delimited.Category", "This is a critical problem", 
-                "We are writing a test message with multiple insertion strings: {0} {1} {2}", 
+            Log.Critical("Period.Delimited.Category", "This is a critical problem",
+                "We are writing a test message with multiple insertion strings: {0} {1} {2}",
                 "string", 124, DateTime.Now);
 
             Log.Warning("Period.Delimited.Category", "This might be a problem problem",
@@ -209,7 +237,7 @@ namespace Loupe.Agent.Test.LogMessages
             Log.Critical(LogWriteMode.WaitForCommit, "Your.Category", "We had a problem and may crash",
                 "Just like our first method above we can now provide extended detail with insertion strings");
 
-            Log.Verbose("Your.Category", "This is our lowest severity message", 
+            Log.Verbose("Your.Category", "This is our lowest severity message",
                 "Verbose is like a debug or success message - below all other severities.");
         }
 
