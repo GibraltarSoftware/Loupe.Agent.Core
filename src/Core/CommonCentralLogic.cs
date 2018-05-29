@@ -179,8 +179,8 @@ namespace Gibraltar
                             if (trustSkipFrames || (firstSystem != null))
                                 break;
 
-                            if (frameModule.Equals("Gibraltar.Agent.dll") == false &&
-                                frameModule.Equals("Gibraltar.Core.dll") == false)
+                            if (frameModule.Equals("Loupe.Agent.NETCore.dll") == false &&
+                                frameModule.Equals("Loupe.Core.NETCore.dll") == false)
                             {
                                 // This is the first frame which is not in our known ecosystem,
                                 // so this must be the client code calling us.

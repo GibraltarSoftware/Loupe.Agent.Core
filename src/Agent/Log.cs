@@ -174,6 +174,7 @@ namespace Gibraltar.Agent
         private static SessionSummary s_SessionSummary;
         private static readonly MetricDefinitionCollection s_MetricDefinitions = new MetricDefinitionCollection(Monitor.Log.Metrics);
 
+        private static event MessageEventHandler s_MessageEvent;
         private static event MessageAlertEventHandler s_MessageAlertEvent;
         private static event MessageFilterEventHandler s_MessageFilterEvent;
         private static readonly object s_MessageEventLock = new object(); // Locks add/remove of Message event subscriptions.
@@ -204,6 +205,13 @@ namespace Gibraltar.Agent
         /// Even if canceled it is possible for the logging system to attempt to reinitialize if a call 
         /// is explicitly made to start a session.</remarks>
         public static event InitializingEventHandler Initializing;
+
+        /// <summary>
+        /// Handler type for a message event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void MessageEventHandler(object sender, LogMessageEventArgs e);
 
         /// <summary>
         /// Handler type for a message filter event.
@@ -264,6 +272,49 @@ namespace Gibraltar.Agent
                     if (s_MessageAlertEvent == null)
                     {
                         Monitor.Log.MessageAlertNotifier.NotificationEvent -= MessageAlertNotifierOnNotificationEvent;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Raised to publish log messages as they are committed
+        /// </summary>
+        /// <remarks>This event is raised after a log message is committed.  Any new qualifying log messages received during a required wait period will
+        /// be queued and included as a batch in the next event, unless there is an excessive number in which case later
+        /// ones will be ignored. </remarks>
+        public static event MessageEventHandler MessagePublished
+        {
+            add
+            {
+                if (value == null)
+                    return;
+
+                lock (s_MessageEventLock)
+                {
+                    if (s_MessageEvent == null)
+                    {
+                        Monitor.Log.MessageNotifier.NotificationEvent += MessageNotifierOnNotificationEvent;
+                    }
+
+                    s_MessageEvent += value;
+                }
+            }
+            remove
+            {
+                if (value == null)
+                    return;
+
+                lock (s_MessageEventLock)
+                {
+                    if (s_MessageEvent == null)
+                        return; // Already empty, no subscriptions to remove.
+
+                    s_MessageEvent -= value;
+
+                    if (s_MessageEvent == null)
+                    {
+                        Monitor.Log.MessageNotifier.NotificationEvent -= MessageNotifierOnNotificationEvent;
                     }
                 }
             }
@@ -2991,7 +3042,7 @@ namespace Gibraltar.Agent
 
             if (eventHandler != null)
             {
-                ApplicationUserResolutionEventArgs eventArgs = new ApplicationUserResolutionEventArgs(e);
+                var eventArgs = new ApplicationUserResolutionEventArgs(e);
                 eventHandler(null, eventArgs);
             }
         }
@@ -3002,7 +3053,18 @@ namespace Gibraltar.Agent
 
             if (eventHandler != null)
             {
-                LogMessageAlertEventArgs eventArgs = new LogMessageAlertEventArgs(e);
+                var eventArgs = new LogMessageAlertEventArgs(e);
+                eventHandler(null, eventArgs);
+            }
+        }
+
+        private static void MessageNotifierOnNotificationEvent(object sender, Messaging.NotificationEventArgs e)
+        {
+            var eventHandler = s_MessageEvent;
+
+            if (eventHandler != null)
+            {
+                var eventArgs = new LogMessageEventArgs(e);
                 eventHandler(null, eventArgs);
             }
         }

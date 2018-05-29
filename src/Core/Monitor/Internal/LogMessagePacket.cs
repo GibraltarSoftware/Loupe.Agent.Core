@@ -326,7 +326,7 @@ namespace Gibraltar.Monitor.Internal
 
         public override string ToString()
         {
-            string text = string.Format(CultureInfo.CurrentCulture, "{0:d} {0:t}: {2}", Timestamp, Caption);
+            string text = string.Format(CultureInfo.CurrentCulture, "{0:d} {0:t}: {1}", Timestamp, Caption);
             return text;
         }
 
