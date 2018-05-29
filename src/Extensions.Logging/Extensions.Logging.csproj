@@ -12,7 +12,7 @@
     <Description>Implements Microsoft.Extensions.Logging.Abstractions for the Loupe Agent for .NET Core (Loupe.Agent.Core)</Description>
     <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <FileVersion>4.5.1.0</FileVersion>

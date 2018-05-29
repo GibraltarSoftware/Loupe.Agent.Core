@@ -10,7 +10,7 @@
     <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
     <Description>The Loupe Agent for .NET Core - a black box for recording diagnostic information for your .NET Core application.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <AssemblyName>Loupe.Agent.NETCore</AssemblyName>

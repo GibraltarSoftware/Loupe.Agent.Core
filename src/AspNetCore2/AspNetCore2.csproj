@@ -11,7 +11,7 @@
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>The Loupe Agent for ASP.NET Core - automatically recording diagnostic information for ASP.NET Core applications.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>

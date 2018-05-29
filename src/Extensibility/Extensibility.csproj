@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
   </PropertyGroup>
