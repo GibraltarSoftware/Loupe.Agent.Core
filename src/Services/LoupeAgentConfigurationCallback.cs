@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Configuration;
 
-namespace Loupe.Agent.AspNetCore
+namespace Loupe.Agent.Core.Services
 {
     public class LoupeAgentConfigurationCallback
     {

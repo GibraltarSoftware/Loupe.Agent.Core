@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace Loupe.Agent.AspNetCore
+namespace Loupe.Agent.Core.Services
 {
     internal sealed class LoupeAgentService : IHostedService
     {

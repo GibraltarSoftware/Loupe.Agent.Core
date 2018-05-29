@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Loupe.Agent.AspNetCore
+namespace Loupe.Agent.Core.Services
 {
     public sealed class LoupeDiagnosticListener : IObserver<DiagnosticListener>, IDisposable
     {
@@ -52,10 +51,4 @@ namespace Loupe.Agent.AspNetCore
             }
         }
     }
-
-    public interface ILoupeDiagnosticListener
-    {
-        string Name { get; }
-    }
-
 }

@@ -1,7 +1,7 @@
 ﻿using Gibraltar.Agent.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore
+namespace Loupe.Agent.EntityFrameworkCore
 {
     internal class ConnectionMetric
     {
