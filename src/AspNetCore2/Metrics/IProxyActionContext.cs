@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
+namespace Loupe.Agent.AspNetCore.Metrics
 {
     public interface IProxyActionContext
     {

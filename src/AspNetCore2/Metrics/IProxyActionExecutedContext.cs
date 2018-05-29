@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
+namespace Loupe.Agent.AspNetCore.Metrics
 {
     public interface IProxyActionExecutedContext
     {

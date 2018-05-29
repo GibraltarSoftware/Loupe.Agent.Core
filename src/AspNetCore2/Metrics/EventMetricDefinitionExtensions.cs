@@ -1,6 +1,6 @@
 ﻿using Gibraltar.Agent.Metrics;
 
-namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
+namespace Loupe.Agent.AspNetCore.Metrics
 {
     internal static class EventMetricDefinitionExtensions
     {

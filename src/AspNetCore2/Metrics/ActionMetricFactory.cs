@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading;
-using Gibraltar.Agent;
-using Gibraltar.Agent.Metrics;
+﻿using Gibraltar.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
 
-namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
+namespace Loupe.Agent.AspNetCore.Metrics
 {
     public class ActionMetricFactory
     {

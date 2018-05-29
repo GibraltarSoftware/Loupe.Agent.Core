@@ -1,4 +1,6 @@
 ﻿using Loupe.Agent.AspNetCore;
+using Loupe.Agent.Core.Services;
+using Loupe.Agent.EntityFrameworkCore;
 using Loupe.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,11 +21,15 @@ namespace AspNetCore2.Sandbox
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLoupe();
+            services.AddLoupe()
+                .AddAspNetCoreDiagnostics()
+                .AddEntityFrameworkCoreDiagnostics();
+            
             services.AddLogging(builder =>
             {
                 builder.AddLoupe();
             });
+            
             services.AddMvc();
         }
 
