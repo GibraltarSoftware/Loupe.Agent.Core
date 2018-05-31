@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Gibraltar.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
 
-namespace Loupe.Agent.AspNetCore.Metrics.AspNetCore
+namespace Loupe.Agent.AspNetCore.Metrics
 {
     public class ActionMetric
     {

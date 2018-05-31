@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using Gibraltar.Agent;
 using Loupe.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-namespace Loupe.Agent.AspNetCore
+namespace Loupe.Agent.Core.Services
 {
     public sealed class LoupeAgent : IDisposable
     {

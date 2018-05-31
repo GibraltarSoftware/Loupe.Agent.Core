@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AspNetCore2\AspNetCore2.csproj" />
+    <ProjectReference Include="..\EFCore2\EFCore2.csproj" />
     <ProjectReference Include="..\Extensions.Logging\Extensions.Logging.csproj" />
   </ItemGroup>
 </Project>

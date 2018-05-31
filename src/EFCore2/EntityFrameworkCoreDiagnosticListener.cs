@@ -2,11 +2,14 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Gibraltar.Agent;
+using Loupe.Agent.Core.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
+using ILoupeDiagnosticListener = Loupe.Agent.Core.Services.ILoupeDiagnosticListener;
 
-namespace Loupe.Agent.AspNetCore.Metrics.EntityFrameworkCore
+namespace Loupe.Agent.EntityFrameworkCore
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
     {
         private readonly CommandMetricFactory _commandMetricFactory;
