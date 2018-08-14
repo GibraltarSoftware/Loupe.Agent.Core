@@ -1,4 +1,6 @@
-﻿namespace Loupe.Agent.Core.Services
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Loupe.Agent.Core.Services
 {
     public interface ILoupeAgentBuilder
     {

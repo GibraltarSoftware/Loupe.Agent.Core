@@ -1,4 +1,7 @@
 ﻿using System.Linq;
+using System.Net.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 
@@ -22,6 +25,19 @@ namespace Loupe.Agent.AspNetCore
 
             var attributeRoute = routing.RouteData.Routers.OfType<MvcAttributeRouteHandler>().FirstOrDefault();
             return attributeRoute?.Actions.FirstOrDefault()?.AttributeRouteInfo?.Template;
+        }
+
+        public static string GetPageName(this IRoutingFeature routing)
+        {
+            if (routing == null) return null;
+
+            var attributeRouteHandler = routing.RouteData.Routers.OfType<MvcAttributeRouteHandler>().FirstOrDefault();
+            if (attributeRouteHandler?.Actions.FirstOrDefault() is ControllerActionDescriptor action)
+            {
+                return $"{action.ControllerName}.{action.ActionName}";
+            }
+            return attributeRouteHandler?.Actions.FirstOrDefault()?.DisplayName;
+
         }
     }
 }

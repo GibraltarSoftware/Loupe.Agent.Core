@@ -3,5 +3,7 @@
     public interface IProxyActionDescriptor
     {
         string DisplayName { get; }
+        string ControllerName { get; }
+        string ActionName { get; }
     }
 }

@@ -10,11 +10,13 @@ namespace AspNetCore2.Sandbox.Controllers
 {
     public class HomeController : Controller
     {
+        [HttpGet(Name = nameof(Index))]
         public IActionResult Index()
         {
             return View();
         }
 
+        [HttpGet("about", Name = nameof(About))]
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -22,6 +24,7 @@ namespace AspNetCore2.Sandbox.Controllers
             return View();
         }
 
+        [HttpGet("contact", Name = nameof(Contact))]
         public async Task<IActionResult> Contact()
         {
             await Task.Delay(100);
@@ -31,6 +34,7 @@ namespace AspNetCore2.Sandbox.Controllers
             return View();
         }
 
+        [HttpGet("throw", Name = nameof(Throw))]
         public IActionResult Throw()
         {
             throw new NotImplementedException();
