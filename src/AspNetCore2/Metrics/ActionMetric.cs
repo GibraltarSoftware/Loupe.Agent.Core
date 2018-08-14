@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using Gibraltar.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
@@ -13,6 +15,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         private long _request;
         private long _requestAuthorization;
         private long _requestExecution;
+        private string _pageName;
 
         public ActionMetric(EventMetric metric, HttpContext context)
         {
@@ -20,7 +23,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
             _context = context;
             _request = Stopwatch.GetTimestamp();
         }
-        
+
         public void StartRequestAuthorization()
         {
             _requestAuthorization = Stopwatch.GetTimestamp();
@@ -34,9 +37,13 @@ namespace Loupe.Agent.AspNetCore.Metrics
             }
         }
 
-        public void StartRequestExecution()
+        public void StartRequestExecution(IProxyActionDescriptor actionDescriptor)
         {
             _requestExecution = Stopwatch.GetTimestamp();
+            if (actionDescriptor != null)
+            {
+                SetPageName($"{actionDescriptor.ControllerName}.{actionDescriptor.ActionName}");
+            }
         }
 
         public void StopRequestExecution()
@@ -47,43 +54,36 @@ namespace Loupe.Agent.AspNetCore.Metrics
             }
         }
 
+        public void SetPageName(string pageName)
+        {
+            _pageName = pageName;
+        }
+
         public void Stop()
         {
             _request = Stopwatch.GetTimestamp() - _request;
             var sample = _metric.CreateSample();
 
             sample.SetValue(MetricValue.TotalDuration, _request / TickResolution);
-            
+
             if (_requestAuthorization > 0)
             {
                 sample.SetValue(MetricValue.AuthorizeRequestDuration, _requestAuthorization / TickResolution);
             }
+
             if (_requestExecution > 0)
             {
                 sample.SetValue(MetricValue.RequestHandlerExecuteDuration, _requestExecution / TickResolution);
             }
+
             string path = _context.Request.Path;
-            string page;
-            if (path == "/" || string.IsNullOrEmpty(path))
-            {
-                page = "";
-            }
-            else if (path.Length == 1)
-            {
-                page = path;
-            }
-            else
-            {
-                var lastDelimiter = path.LastIndexOf('/', path.Length - 2);
-                page = lastDelimiter >= 0 ? path.Substring(lastDelimiter + 1) : path;
-            }
-            sample.SetValue(MetricValue.AbsolutePath, _context.Request.Path);
+            string page = _pageName ?? path;
+            sample.SetValue(MetricValue.AbsolutePath, path);
             sample.SetValue(MetricValue.PageName, page);
             sample.SetValue(MetricValue.QueryString, _context.Request.QueryString);
             sample.Write();
         }
 
         public Exception Exception { get; set; }
-
     }
 }

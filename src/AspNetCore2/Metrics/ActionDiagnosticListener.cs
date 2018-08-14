@@ -42,7 +42,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecuting")]
         public virtual void BeforeOnResourceExecuting(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
         {
-            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution();
+            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution(actionDescriptor);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecuted")]
@@ -54,7 +54,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecution")]
         public virtual void BeforeOnResourceExecution(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
         {
-            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution();
+            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution(actionDescriptor);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecution")]
