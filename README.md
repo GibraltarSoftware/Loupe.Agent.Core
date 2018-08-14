@@ -31,10 +31,11 @@ This is the repository for the Loupe Agent for .NET Core.
 The following NuGet packages live here:
 
 * Loupe.Agent.Core: The primary API to use for logging & metrics.
-* Loupe.Agent.AspNetCore: The primary agent for ASP.NET Core applications.
 * Loupe.Agent.Core.Extensibility: Contains some reused types and the configuration classes.
 * Loupe.Agent.Core.Internal: The internal implementation of Loupe, not typically used directly by client applications.
 * Loupe.Extensions.Logging: An implementation of Microsoft.Extensions.Logging.Abstractions to interface with common .NET Core libraries.
+* Loupe.Agent.AspNetCore: The primary agent for ASP.NET Core applications.
+* Loupe.Agent.EntityFrameworkCore: Performance and diagnostic information for EF Core 2.
 
 Each of these packages maps to a single project in the repository. Other projects, primarily for unit testing, are not
 included in the packages.
