@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Gibraltar.Monitor;
 using Gibraltar.Server.Client.Internal;
 using Loupe.Extensibility.Data;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -726,9 +727,12 @@ namespace Gibraltar.Server.Client
                         requestHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
                     }
 
-                    var clientLogger = new HttpClientLogger(m_Logger, requestHandler);
+                    if (!Log.SilentMode)
+                    {
+                        var clientLogger = new HttpClientLogger(m_Logger, requestHandler);
+                        m_Connection = new HttpClient(clientLogger);
+                    }
 
-                    m_Connection = new HttpClient(clientLogger);
                     m_Connection.BaseAddress = m_BaseAddress;
                     m_Connection.Timeout = new TimeSpan(0, 2, 0);
                 }

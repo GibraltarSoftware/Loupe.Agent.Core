@@ -29,6 +29,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Server\Data\**" />
+    <EmbeddedResource Remove="Server\Data\**" />
+    <None Remove="Server\Data\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Server\Client\Data\Repository.xsd" />
     <None Remove="Server\Client\Data\RepositoryGen.bat" />
   </ItemGroup>
@@ -53,10 +59,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Server\Data\" />
   </ItemGroup>
 
 </Project>
