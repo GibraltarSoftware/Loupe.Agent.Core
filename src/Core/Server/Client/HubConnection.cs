@@ -200,7 +200,8 @@ namespace Gibraltar.Server.Client
             //before we return, lets set our status to track what we just calculated.
             lock (m_StatusLock)
             {
-                m_HubStatus = new HubConnectionStatus(connectionStatus.Configuration, connectionStatus.IsValid, connectionStatus.Status, connectionStatus.Message);
+                //make a copy of the connection status so the caller does NOT get our connection object.
+                m_HubStatus = new HubConnectionStatus(connectionStatus.Configuration, null, connectionStatus.Repository, connectionStatus.IsValid, connectionStatus.Status, connectionStatus.Message);
                 m_HubRepository = connectionStatus.Repository;
             }
 
@@ -502,7 +503,8 @@ namespace Gibraltar.Server.Client
                     //before we return, lets set our status to track what we just calculated.
                     lock (m_StatusLock)
                     {
-                        m_HubStatus = new HubConnectionStatus(connectionStatus.Configuration, connectionStatus.IsValid, connectionStatus.Status, connectionStatus.Message);
+                        //make a copy of the connection status without the connection so they can't accidentally call it.
+                        m_HubStatus = new HubConnectionStatus(connectionStatus.Configuration, null, connectionStatus.Repository, connectionStatus.IsValid, connectionStatus.Status, connectionStatus.Message);
                         m_HubRepository = connectionStatus.Repository;
                     }
 
