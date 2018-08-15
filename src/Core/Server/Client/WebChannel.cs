@@ -732,6 +732,10 @@ namespace Gibraltar.Server.Client
                         var clientLogger = new HttpClientLogger(m_Logger, requestHandler);
                         m_Connection = new HttpClient(clientLogger);
                     }
+                    else
+                    {
+                        m_Connection = new HttpClient();
+                    }
 
                     m_Connection.BaseAddress = m_BaseAddress;
                     m_Connection.Timeout = new TimeSpan(0, 2, 0);
