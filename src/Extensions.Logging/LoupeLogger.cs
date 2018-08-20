@@ -49,7 +49,7 @@ namespace Loupe.Extensions.Logging
                         throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
                 }
 
-            Gibraltar.Agent.Log.Write(severity, "loupe", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
+            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
         }
 
         /// <inheritdoc />
