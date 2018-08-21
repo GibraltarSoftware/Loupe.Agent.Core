@@ -19,12 +19,16 @@
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' And '$(TargetFramework)' == 'netcoreapp1.1'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' And '$(TargetFramework)' == 'netcoreapp1.1'">
-    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Extensions.Logging.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp1.1'">
+    <DefineConstants>NETCOREAPP1_1</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\$(TargetFramework)\Loupe.Extensions.Logging.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
