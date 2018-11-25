@@ -116,8 +116,9 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(ExceptionInfoPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(ExceptionInfoPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
+
             definition.Fields.Add("TypeName", FieldType.String);
             definition.Fields.Add("Message", FieldType.String);
             definition.Fields.Add("Source", FieldType.String);

@@ -478,8 +478,8 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(LogMessagePacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, true);
+            const string typeName = nameof(LogMessagePacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, true);
 
             definition.Fields.Add("ID", FieldType.Guid);
             definition.Fields.Add("Caption", FieldType.String);

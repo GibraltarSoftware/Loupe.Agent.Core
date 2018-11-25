@@ -119,9 +119,10 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(ThreadInfoPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
-            definition.Fields.Add("ThreadIndex", FieldType.Int32); // New field (without bumping version)
+            const string typeName = nameof(ThreadInfoPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
+
+            definition.Fields.Add("ThreadIndex", FieldType.Int32); 
             definition.Fields.Add("ThreadId", FieldType.Int32);
             definition.Fields.Add("ThreadName", FieldType.String);
             definition.Fields.Add("DomainId", FieldType.Int32);
@@ -134,7 +135,7 @@ namespace Gibraltar.Monitor.Internal
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
-            packet.SetField("ThreadIndex", m_ThreadIndex); // New field (without bumping version)
+            packet.SetField("ThreadIndex", m_ThreadIndex); 
             packet.SetField("ThreadId", m_ThreadId);
             packet.SetField("ThreadName", m_ThreadName);
             packet.SetField("DomainId", m_DomainId);

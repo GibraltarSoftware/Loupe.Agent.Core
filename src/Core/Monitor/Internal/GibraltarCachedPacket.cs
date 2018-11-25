@@ -108,8 +108,9 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(GibraltarCachedPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, Version, false);
+            const string typeName = nameof(GibraltarCachedPacket);
+            var definition = new PacketDefinition(typeName, Version, false);
+
             definition.Fields.Add("Sequence", FieldType.Int64);
             definition.Fields.Add("TimeStamp", FieldType.DateTimeOffset);
             definition.Fields.Add("ID", FieldType.Guid);

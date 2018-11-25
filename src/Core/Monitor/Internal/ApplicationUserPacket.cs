@@ -197,8 +197,9 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(ApplicationUserPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(ApplicationUserPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
+
             definition.Fields.Add("Key", FieldType.String);
             definition.Fields.Add("UserName", FieldType.String);
             definition.Fields.Add("Caption", FieldType.String);

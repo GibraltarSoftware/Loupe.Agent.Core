@@ -124,8 +124,9 @@ namespace Gibraltar.Monitor.Internal
         /// Packet Definitions must be invariant for an entire data stream.</remarks>
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(SessionFragmentPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(SessionFragmentPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
+
             definition.Fields.Add("FileStartDateTime", FieldType.DateTimeOffset);
             definition.Fields.Add("FileEndDateTime", FieldType.DateTimeOffset);
             definition.Fields.Add("IsLastFile", FieldType.Bool);

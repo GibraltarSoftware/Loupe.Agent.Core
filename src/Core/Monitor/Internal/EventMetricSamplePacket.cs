@@ -122,8 +122,8 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(EventMetricSamplePacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(EventMetricSamplePacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
 
             //now we need to write out the definition of each of our values to our type.
             //we're a dynamic packet so we can have a different definition for our declaring type each time.

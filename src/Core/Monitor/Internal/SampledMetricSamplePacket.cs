@@ -169,8 +169,9 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(SampledMetricSamplePacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(SampledMetricSamplePacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
+
             definition.Fields.Add("rawTimeStamp", FieldType.DateTimeOffset);
             definition.Fields.Add("rawValue", FieldType.Double);
             return definition;

@@ -391,8 +391,8 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(SessionSummaryPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(SessionSummaryPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
 
             //Session index information
             definition.Fields.Add("ComputerId", FieldType.Guid);

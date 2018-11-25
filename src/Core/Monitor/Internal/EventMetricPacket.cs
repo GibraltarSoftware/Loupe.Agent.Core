@@ -111,8 +111,9 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(EventMetricPacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, true);
+            const string typeName = nameof(EventMetricPacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, true);
+
             //we only exist to do the required packet thing
             return definition;
         }

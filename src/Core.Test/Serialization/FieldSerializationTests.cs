@@ -1,6 +1,4 @@
-﻿#if DEBUG
-
-using System;
+﻿using System;
 using System.IO;
 using Gibraltar.Serialization;
 using NUnit.Framework;
@@ -552,5 +550,3 @@ namespace Loupe.Core.Serialization.UnitTests
         }
     }
 }
-
-#endif

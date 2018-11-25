@@ -1,6 +1,4 @@
-﻿#if DEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -62,7 +60,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(DynoPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
 
             for (int i = 0; i < m_Strings.Length; i++)
@@ -250,7 +248,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(ThreadInfo);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("ID", FieldType.Guid);
             definition.Fields.Add("threadId", FieldType.Int32);
@@ -341,20 +339,20 @@ namespace Loupe.Core.Serialization.UnitTests
 
     internal class LogPacket : IPacket, IEquatable<LogPacket>
     {
-        public static void Write(string caption, IPacketWriter writer)
+        public static void Write(string caption, int threadId, IPacketWriter writer)
         {
-            writer.Write(ThreadInfo.AddOrGet(Thread.CurrentThread.ManagedThreadId));
-            writer.Write(new LogPacket(caption));
+            writer.Write(ThreadInfo.AddOrGet(threadId));
+            writer.Write(new LogPacket(caption, threadId));
         }
 
         private DateTime m_TimeStamp;
         private int m_ThreadId;
         private string m_Caption;
 
-        public LogPacket(string caption)
+        public LogPacket(string caption, int threadId)
         {
             m_TimeStamp = DateTime.Now; //we convert to UTC during serialization, we want local time.
-            m_ThreadId = Thread.CurrentThread.ManagedThreadId;
+            m_ThreadId = threadId;
             m_Caption = caption;
         }
 
@@ -380,7 +378,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(LogPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("timestamp", FieldType.DateTime);
             definition.Fields.Add("threadId", FieldType.Int32);
@@ -540,7 +538,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(BasePacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("ID", FieldType.Int32);
             definition.Fields.Add("text", FieldType.String);
@@ -710,7 +708,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(DerivedPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 2, true);
             definition.Fields.Add("text", FieldType.String);
             return definition;
@@ -808,7 +806,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(SubPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("text", FieldType.String);
             return definition;
@@ -930,7 +928,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(RootPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("timestamp", FieldType.DateTime);
             definition.Fields.Add("threadId", FieldType.Int32);
@@ -1074,7 +1072,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(InnerPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("timestamp", FieldType.DateTime);
             definition.Fields.Add("threadId", FieldType.Int32);
@@ -1222,7 +1220,7 @@ namespace Loupe.Core.Serialization.UnitTests
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            string typeName = GetType().Name;
+            string typeName = nameof(OuterPacket);
             PacketDefinition definition = new PacketDefinition(typeName, 1, true);
             definition.Fields.Add("timestamp", FieldType.DateTime);
             definition.Fields.Add("threadId", FieldType.Int32);
@@ -1326,5 +1324,3 @@ namespace Loupe.Core.Serialization.UnitTests
     }
 
 }
-
-#endif

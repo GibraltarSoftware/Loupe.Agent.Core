@@ -83,7 +83,7 @@ namespace Gibraltar.Serialization
         public long Length { get { return m_Stream.Length; } }
 
         /// <summary>
-        /// Returns the cache of unique string values tht have been written
+        /// Returns the cache of unique string values that have been written
         /// </summary>
         public UniqueStringList Strings { get { return m_Strings; } }
 

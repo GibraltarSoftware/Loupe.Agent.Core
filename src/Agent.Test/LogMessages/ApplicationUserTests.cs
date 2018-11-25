@@ -73,6 +73,6 @@ namespace Loupe.Agent.Test.LogMessages
             var newUser = e.GetUser();
         }
 
-        private int m_UserResolutionRequests;
+        private volatile int m_UserResolutionRequests;
     }
 }

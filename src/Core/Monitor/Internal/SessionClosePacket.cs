@@ -144,8 +144,8 @@ namespace Gibraltar.Monitor.Internal
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-            var typeName = typeof(SessionClosePacket).Name;
-            PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
+            const string typeName = nameof(SessionClosePacket);
+            var definition = new PacketDefinition(typeName, SerializationVersion, false);
 
             definition.Fields.Add("Id", FieldType.Guid);
             definition.Fields.Add("Status", FieldType.Int32);

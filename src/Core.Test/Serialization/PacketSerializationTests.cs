@@ -1,13 +1,9 @@
-﻿#if DEBUG
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Gibraltar.Serialization;
 using NUnit.Framework;
-
 
 
 namespace Loupe.Core.Serialization.UnitTests
@@ -34,7 +30,7 @@ namespace Loupe.Core.Serialization.UnitTests
             m_PacketReader.RegisterType(typeof(WrapperPacket));
             WrapperPacket writtenPacket = new WrapperPacket("Test1", 100);
             m_PacketWriter.Write(writtenPacket);
-            Assert.AreEqual(111, m_MemoryStream.Position);
+            Assert.AreEqual(108, m_MemoryStream.Position);
             m_MemoryStream.Position = 0;
             IPacket readPacket = m_PacketReader.Read();
             Assert.AreEqual(writtenPacket, readPacket);
@@ -47,9 +43,9 @@ namespace Loupe.Core.Serialization.UnitTests
             WrapperPacket packet1 = new WrapperPacket("Test1", 100);
             WrapperPacket packet2 = new WrapperPacket("Test2", 200);
             m_PacketWriter.Write(packet1);
-            Assert.AreEqual(111, m_MemoryStream.Position);
+            Assert.AreEqual(108, m_MemoryStream.Position);
             m_PacketWriter.Write(packet2);
-            Assert.AreEqual(129, m_MemoryStream.Position);
+            Assert.AreEqual(126, m_MemoryStream.Position);
             m_MemoryStream.Position = 0;
             Assert.AreEqual(packet1, m_PacketReader.Read());
             Assert.AreEqual(packet2, m_PacketReader.Read());
@@ -62,19 +58,19 @@ namespace Loupe.Core.Serialization.UnitTests
             m_PacketReader.RegisterType(typeof(LogPacket));
             m_PacketReader.RegisterType(typeof(ThreadInfo));
 
-            LogPacket.Write("message 1", m_PacketWriter);
-            Assert.AreEqual(141, m_MemoryStream.Position);
+            LogPacket.Write("message 1", 101, m_PacketWriter);
+            Assert.AreEqual(145, m_MemoryStream.Position);
             Thread.Sleep(50);
 
-            LogPacket.Write("message 2", m_PacketWriter);
-            Assert.AreEqual(160, m_MemoryStream.Position);
+            LogPacket.Write("message 2", 101, m_PacketWriter);
+            Assert.AreEqual(165, m_MemoryStream.Position);
             Thread.Sleep(50);
 
-            LogPacket.Write("message 3", m_PacketWriter);
-            Assert.AreEqual(179, m_MemoryStream.Position);
+            LogPacket.Write("message 3", 101, m_PacketWriter);
+            Assert.AreEqual(185, m_MemoryStream.Position);
 
-            LogPacket.Write("message 1", m_PacketWriter);
-            Assert.AreEqual(198, m_MemoryStream.Position);
+            LogPacket.Write("message 1", 101, m_PacketWriter);
+            Assert.AreEqual(205, m_MemoryStream.Position);
 
             m_MemoryStream.Position = 0;
 
@@ -84,15 +80,14 @@ namespace Loupe.Core.Serialization.UnitTests
             LogPacket message3 = (LogPacket)m_PacketReader.Read();
             LogPacket message4 = (LogPacket)m_PacketReader.Read();
 
-            int threadId = Thread.CurrentThread.ManagedThreadId;
-            Assert.AreEqual(threadId, threadInfo.ThreadId);
-            Assert.AreEqual(threadId, message1.ThreadId);
+            Assert.AreEqual(101, threadInfo.ThreadId);
+            Assert.AreEqual(101, message1.ThreadId);
             Assert.AreEqual("message 1", message1.Caption);
             Assert.LessOrEqual(message1.TimeStamp, DateTime.Now);
-            Assert.AreEqual(message2.ThreadId, threadId);
+            Assert.AreEqual(101, message2.ThreadId);
             Assert.AreEqual("message 2", message2.Caption);
             Assert.LessOrEqual(message1.TimeStamp, message2.TimeStamp);
-            Assert.AreEqual(message3.ThreadId, threadId);
+            Assert.AreEqual(101, message3.ThreadId);
             Assert.AreEqual("message 3", message3.Caption);
             Assert.LessOrEqual(message2.TimeStamp, message3.TimeStamp);
             Assert.AreEqual("message 1", message4.Caption);
@@ -179,5 +174,3 @@ namespace Loupe.Core.Serialization.UnitTests
         #endregion
     }
 }
-
-#endif
