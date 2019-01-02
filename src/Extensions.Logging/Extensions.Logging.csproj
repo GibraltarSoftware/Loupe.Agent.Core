@@ -17,6 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <FileVersion>4.6.1.0</FileVersion>
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
+    <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
