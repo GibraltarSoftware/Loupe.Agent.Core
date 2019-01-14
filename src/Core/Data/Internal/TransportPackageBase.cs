@@ -113,7 +113,9 @@ namespace Gibraltar.Data.Internal
         public void Send(ProgressMonitorStack progressMonitors)
         {
             Status = OnSend(progressMonitors);
+#if DEBUG
             Debug.Assert(Status != null);
+#endif
         }
 
 

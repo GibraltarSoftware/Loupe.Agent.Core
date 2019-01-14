@@ -60,8 +60,9 @@ namespace Gibraltar.Monitor.Internal
             //now we want to sort by our nice increasing sequence #
             int compareResult = Sequence.CompareTo(other.Sequence);
 
+#if DEBUG
             Debug.Assert(compareResult != 0); //no way we should ever get an equal at this point.
-
+#endif
             return compareResult;
         }
 

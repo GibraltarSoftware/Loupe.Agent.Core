@@ -41,8 +41,10 @@ namespace Gibraltar.Server.Client
         {
             string strRequestUrl = string.Format("/Hub/Hosts/{0}/Sessions/{1}/session.xml", ClientId, SessionHeader.id);
 
+#if DEBUG
             Debug.Assert(SessionHeader.sessionDetail.status != SessionStatusXml.running);
             Debug.Assert(SessionHeader.sessionDetail.status != SessionStatusXml.unknown);
+#endif
 
             //we can't encode using XmlSerializer because it will only work with public types, and we 
             //aren't public if we get ILMerged into something.

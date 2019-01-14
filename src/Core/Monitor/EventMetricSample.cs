@@ -256,8 +256,9 @@ namespace Gibraltar.Monitor
                         //We have a default value so we're going to return what it has - either null or a numerical value
                         int valueIndex = Metric.Definition.Values.IndexOf(defaultValueDefinition);
 
+#if DEBUG
                         Debug.Assert(valueIndex >= 0);  //it has to be because we got the object above, so I'm only doing an assert 
-
+#endif
                         //all trendable values are castable
                         if (Values[valueIndex] == null)
                         {

@@ -538,8 +538,9 @@ namespace Gibraltar.Messaging
 
         private void StampPacket(IMessengerPacket packet, DateTimeOffset defaultTimeStamp)
         {
+#if DEBUG
             Debug.Assert(defaultTimeStamp.Ticks > 0);
-            
+#endif            
             //we don't check dependencies on command packets, it'll fail (and they aren't written out)
             if ((packet is CommandPacket) == false)
             {
