@@ -10,10 +10,13 @@ namespace Loupe.Agent.Test.Configuration
     [TestFixture]
     public class JsonTests
     {
+        private string _configFileNamePath;
+
         [SetUp]
         public void CreateJsonFile()
         {
-            using (var writer = new StreamWriter(File.Create("loupe.json")))
+            _configFileNamePath = Path.GetFullPath("loupe.json");
+            using (var writer = new StreamWriter(File.Create(_configFileNamePath)))
             {
                 writer.Write(JsonSource);
             }
@@ -22,7 +25,7 @@ namespace Loupe.Agent.Test.Configuration
         [TearDown]
         public void DeleteJsonFile()
         {
-            File.Delete("loupe.json");
+            File.Delete(_configFileNamePath);
         }
 
         [Test]
@@ -123,10 +126,10 @@ namespace Loupe.Agent.Test.Configuration
             Assert.AreEqual("Bar", foo);
         }
 
-        private static AgentConfiguration Load()
+        private AgentConfiguration Load()
         {
             var builder = new ConfigurationBuilder();
-            builder.AddJsonFile("loupe.json");
+            builder.AddJsonFile(_configFileNamePath);
             var target = builder.Build();
             var actual = new AgentConfiguration();
             target.GetSection("Loupe").Bind(actual);
