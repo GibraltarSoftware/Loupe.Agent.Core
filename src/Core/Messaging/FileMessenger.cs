@@ -411,7 +411,7 @@ namespace Gibraltar.Messaging
 
             //we now have a unique file name, create the file.
             FileSystemTools.EnsurePathExists(fileNamePath);
-            m_CurrentFile = new FileStream(fileNamePath, FileMode.CreateNew, FileAccess.Write);
+            m_CurrentFile = new FileStream(fileNamePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
 
             //and open a serializer on it
             m_CurrentSerializer = new GLFWriter(m_CurrentFile, Publisher.SessionSummary, m_CurrentSessionFile, DateTimeOffset.Now);
@@ -438,6 +438,6 @@ namespace Gibraltar.Messaging
             return FileSystemTools.SanitizeFileName(fileName);
         }
 
-        #endregion
+#endregion
     }
 }

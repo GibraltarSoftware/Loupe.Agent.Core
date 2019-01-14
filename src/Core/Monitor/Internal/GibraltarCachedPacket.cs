@@ -123,8 +123,8 @@ namespace Gibraltar.Monitor.Internal
 #if DEBUG
             if (m_TimeStamp == DateTimeOffset.MinValue && Debugger.IsAttached)
                 Debugger.Break(); // Stop the debugger before the Assert
-#endif
             Debug.Assert(m_TimeStamp.Year > 1 ); //watch for timestamp being some variation of zero
+#endif
 
             packet.SetField("Sequence", m_Sequence);
             packet.SetField("TimeStamp", m_TimeStamp);

@@ -1147,8 +1147,7 @@ namespace Gibraltar.Monitor
 
                         try
                         {
-                            //sourceFile = new FileStream(fileFragment, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                            sourceFile = FileHelper.OpenFileStream(fileFragment.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+                            sourceFile = FileHelper.OpenFileStream(fileFragment.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                             if (sourceFile == null)
                             {
                                 if (m_LoggingEnabled) Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to Mark Session as Crashed", "Unable to completely convert session {0} from being marked as running to crashed in repository at '{1}' because the fragment '{2}' could not be opened",

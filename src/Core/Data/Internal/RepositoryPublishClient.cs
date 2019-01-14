@@ -484,9 +484,11 @@ namespace Gibraltar.Data.Internal
         {
             var sessionId = new Guid(sessionSummary.id);
 
+#if DEBUG
             Debug.Assert(!String.IsNullOrEmpty(sessionSummary.sessionDetail.productName));
             Debug.Assert(!String.IsNullOrEmpty(sessionSummary.sessionDetail.applicationName));
             Debug.Assert(!String.IsNullOrEmpty(sessionSummary.sessionDetail.applicationVersion));
+#endif
 
             //we consider a session complete (since we're the source repository) with just the header if there
             //is no session file.

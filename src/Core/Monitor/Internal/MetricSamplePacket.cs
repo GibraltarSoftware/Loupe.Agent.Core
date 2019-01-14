@@ -129,7 +129,9 @@ namespace Gibraltar.Monitor.Internal
             //now we want to sort by our nice increasing sequence #
             int compareResult = Sequence.CompareTo(other.Sequence);
 
+#if DEBUG
             Debug.Assert(compareResult != 0); //no way we should ever get an equal at this point.
+#endif
 
             return compareResult;
         }
@@ -228,7 +230,9 @@ namespace Gibraltar.Monitor.Internal
         IPacket[] IPacket.GetRequiredPackets()
         {
             //we depend on our metric
+#if DEBUG
             Debug.Assert(m_MetricPacket != null);
+#endif
             return new IPacket[] {m_MetricPacket};
         }
 

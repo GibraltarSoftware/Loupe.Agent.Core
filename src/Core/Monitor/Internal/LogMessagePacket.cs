@@ -344,7 +344,9 @@ namespace Gibraltar.Monitor.Internal
             //now we want to sort by our nice increasing sequence #
             int compareResult = Sequence.CompareTo(other.Sequence);
 
+#if DEBUG
             Debug.Assert(compareResult != 0); //no way we should ever get an equal at this point.
+#endif
 
             return compareResult;
         }
@@ -514,10 +516,11 @@ namespace Gibraltar.Monitor.Internal
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
-
             // We depend on the ThreadInfoPacket!
+#if DEBUG
             Debug.Assert(ThreadInfoPacket != null);
             Debug.Assert(ThreadInfoPacket.ThreadId == ThreadId);
+#endif
 
             packet.SetField("ID", m_ID);
             packet.SetField("Caption", m_Caption);

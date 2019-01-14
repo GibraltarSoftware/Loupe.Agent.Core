@@ -187,12 +187,28 @@ namespace Gibraltar.Data
 
         private static string GetLocalApplicationDataPath()
         {
-            return Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home");
+#if (NETCOREAPP1_1)
+            return Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "HOME");
+#else
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrWhiteSpace(path))
+                path = Environment.GetEnvironmentVariable("HOME");
+
+            return path;
+#endif
         }
 
         private static string GetCommonApplicationDataPath()
         {
-            return Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ProgramData" : "Home");
+#if (NETCOREAPP1_1)
+            return Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ProgramData" : "HOME");
+#else
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            if (string.IsNullOrWhiteSpace(path))
+                path = Environment.GetEnvironmentVariable("HOME");
+
+            return path;
+#endif
         }
     }
 }

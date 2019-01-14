@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
     <PackageId>Loupe.Agent.Core</PackageId>
-    <Version>4.6.1.0</Version>
+    <Version>4.7.0.0</Version>
     <Company>Gibraltar Software, Inc.</Company>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
-    <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
     <Description>The Loupe Agent for .NET Core - a black box for recording diagnostic information for your .NET Core application.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
@@ -16,8 +16,9 @@
     <AssemblyName>Loupe.Agent.NETCore</AssemblyName>
     <RootNamespace>Gibraltar.Agent</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <FileVersion>4.6.1.0</FileVersion>
+    <FileVersion>4.7.0.0</FileVersion>
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
+    <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

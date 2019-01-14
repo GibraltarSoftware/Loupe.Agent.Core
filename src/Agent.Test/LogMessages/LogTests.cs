@@ -80,11 +80,11 @@ namespace Loupe.Agent.Test.LogMessages
         public void WriteException()
         {
             Log.Warning(new AssertionException("This is our test assertion exception"),
-                        "Test.Agent.LogMessages.Write", "Test of logging exception attachement.", null);
+                        "Test.Agent.LogMessages.Write", "Test of logging exception attachment.", null);
 
             Log.Warning(new AssertionException("This is our top exception", new AssertionException("This is our middle exception",
                                                new AssertionException("This is our bottom exception"))),
-                      "Test.Agent.LogMessages.Write", "Test of logging exception attachement with nested exceptions.", null);
+                      "Test.Agent.LogMessages.Write", "Test of logging exception attachment with nested exceptions.", null);
         }
 
         /// <summary>

@@ -34,6 +34,8 @@ namespace Loupe.Core.Test
             Assert.AreEqual(1, testCollection.Count);
             primeZero = null;
             GC.Collect(); // And make sure GC kills it.
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Assert.AreEqual(0, testCollection.Pack()); // Confirm that it's gone.
             primeZero = GetTestString(0);
             Assert.AreEqual(1, testCollection.PackAndOrAdd(ref primeZero)); // Add it back.
@@ -45,10 +47,14 @@ namespace Loupe.Core.Test
 
             primeZero = null; // Remove the original reference.
             GC.Collect(); // And make sure GC kills it (but won't kill the new copy).
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Assert.AreEqual(1, testCollection.Pack());
 
             testZero = null; // Remove the new reference.
             GC.Collect(); // And make sure GC kills it.
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Assert.AreEqual(1, testCollection.PackAndOrAdd(ref primeOne));
 
             primeZero = GetTestString(0);
@@ -60,6 +66,8 @@ namespace Loupe.Core.Test
 
             primeOne = null; // Remove the original reference.
             GC.Collect(); // And make sure GC kills it.
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Assert.AreEqual(2, testCollection.PackAndOrAdd(ref primeTwo));
             primeOne = GetTestString(1);
             Assert.AreEqual(3, testCollection.PackAndOrAdd(ref primeOne));
@@ -74,6 +82,8 @@ namespace Loupe.Core.Test
             primeOne = null; // Remove the only reference.
             primeTwo = null; // Remove the only reference.
             GC.Collect(); // And make sure GC kills them.
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Assert.AreEqual(2, testCollection.Pack());
 
             primeZero = GetTestString(0);
