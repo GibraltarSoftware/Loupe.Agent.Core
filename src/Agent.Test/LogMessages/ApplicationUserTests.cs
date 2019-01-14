@@ -57,7 +57,7 @@ namespace Loupe.Agent.Test.LogMessages
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, "ApplicationUserAssignJustOnce", null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Assign Just Once", "This message should be attributed to ApplicationUserAssignJustOnce",
                     "And we should NOT get the resolution event following it.");
-                Assert.AreEqual(1, m_UserResolutionRequests, "We didn't get exactly one resolution after the second message");
+                Assert.AreEqual(1, m_UserResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
             }
             finally
             {
