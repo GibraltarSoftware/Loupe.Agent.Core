@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Gibraltar.Data;
 using Gibraltar.Monitor.Internal;
 using Loupe.Configuration;
@@ -162,6 +163,12 @@ namespace Gibraltar.Monitor
                 m_Packet.DnsDomainName = string.Empty;
             }
 
+#if (NETCOREAPP2_0 || NETSTANDARD2_0)
+            var os = System.Environment.OSVersion;
+            m_Packet.OSPlatformCode = (int) os.Platform; //we copied this enum for our value.
+            m_Packet.OSVersion = os.Version;
+            m_Packet.OSServicePack = os.ServicePack;
+#else
             var osDescription = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -181,6 +188,7 @@ namespace Gibraltar.Monitor
                 m_Packet.OSVersion = new Version(0, 0); // BUG
                 m_Packet.OSServicePack = string.Empty; // BUG
             }
+#endif
 
             try
             {
@@ -192,12 +200,41 @@ namespace Gibraltar.Monitor
                 m_Packet.CurrentUICultureName = CultureInfo.CurrentUICulture.ToString();
 
                 m_Packet.OSBootMode = OSBootMode.Normal;
-                m_Packet.RuntimeVersion = new Version(1, 1); // KM: PLACEHOLDER
 
                 m_Packet.Processors = System.Environment.ProcessorCount;
                 m_Packet.ProcessorCores = m_Packet.Processors; //BUG
+
+                try
+                {
+                    var frameworkDescription = RuntimeInformation.FrameworkDescription;
+
+                    //hopefully this has a version number in it...
+                    //Thanks to SO.. https://stackoverflow.com/questions/6618868/regular-expression-for-version-numbers
+                    var versionMatch = Regex.Match(frameworkDescription, @"\d+(?:\.\d+)+");
+                    if (versionMatch.Success)
+                    {
+                        if (Version.TryParse(versionMatch.Value, out var version))
+                        {
+                            m_Packet.RuntimeVersion = version;
+                        }
+                        else
+                        {
+                            m_Packet.RuntimeVersion = new Version(0, 0);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    m_Packet.RuntimeVersion = new Version(0, 0);
+                }
+
+
                 m_Packet.MemoryMB = 0; // BUG
-                m_Packet.UserInteractive = false; // Note: Mono always returns false.
+#if (NETCOREAPP2_0 || NETSTANDARD2_0)
+                m_Packet.UserInteractive = System.Environment.UserInteractive;
+#else
+                m_Packet.UserInteractive = false; 
+#endif
 
                 //find the active screen resolution
                 if (!Log.IsMonoRuntime || (m_AgentAppType == ApplicationType.Windows)) //this avoids problems on Mono where it fails if X is not available.
@@ -254,7 +291,7 @@ namespace Gibraltar.Monitor
             m_SessionStatus = SessionStatus.Unknown; //it should be set for us in a minute...
         }
 
-        #region Public Properties and Methods
+#region Public Properties and Methods
 
         /// <summary>
         /// Overrides the native recorded product and application information with the specified values to reflect the server rules.
@@ -756,9 +793,9 @@ namespace Gibraltar.Monitor
             return defaultCaption;
         }
 
-        #endregion
+#endregion
 
-        #region Internal Properties and Methods
+#region Internal Properties and Methods
 
         internal SessionSummaryPacket Packet => m_Packet;
 
@@ -799,9 +836,9 @@ namespace Gibraltar.Monitor
             m_WarningCount = 0;
         }
 
-        #endregion
+#endregion
 
-        #region Private Properties and Methods
+#region Private Properties and Methods
 
         private static Version GetAgentVersionSafe()
         {
@@ -953,7 +990,7 @@ namespace Gibraltar.Monitor
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
+#endregion
 
     }
 }
