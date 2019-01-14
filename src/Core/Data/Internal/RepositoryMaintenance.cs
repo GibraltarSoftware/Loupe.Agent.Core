@@ -526,7 +526,7 @@ namespace Gibraltar.Data.Internal
             try
             {
                 FileStream sourceFile = null;
-                using (sourceFile = FileHelper.OpenFileStream(sessionFileNamePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+                using (sourceFile = FileHelper.OpenFileStream(sessionFileNamePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     if (sourceFile == null)
                     {

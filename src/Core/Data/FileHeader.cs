@@ -139,8 +139,9 @@ namespace Gibraltar.Data
             }
 
             //we should have exactly filled our header to size.
+#if DEBUG
             Debug.Assert(curByteIndex == HeaderSize);
-
+#endif
             return rawData;
         }
 

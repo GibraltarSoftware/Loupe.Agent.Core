@@ -109,7 +109,9 @@ namespace Gibraltar
                 {
                     m_CompletedSteps = value;
 
+#if DEBUG
                     Debug.Assert(m_CompletedSteps <= m_MaxSteps);
+#endif
 
                     //and invalidate the cached percentage
                     m_PercentCompleteValid = false;

@@ -22,9 +22,10 @@ namespace Gibraltar.Monitor
         /// </summary>
         public SessionFileInfo(SessionHeader sessionHeader, T fileInfo, bool isNew)
         {
+#if DEBUG
             Debug.Assert(sessionHeader != null);
             Debug.Assert(fileInfo != null);
-
+#endif
             m_SessionId = sessionHeader.Id;
 
             //this will be our best session header since it's the first

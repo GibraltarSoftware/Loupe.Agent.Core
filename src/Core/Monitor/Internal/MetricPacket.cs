@@ -279,7 +279,9 @@ namespace Gibraltar.Monitor.Internal
         IPacket[] IPacket.GetRequiredPackets()
         {
             //a metric depends on its metric definition
+#if DEBUG
             Debug.Assert(m_MetricDefinitionPacket != null);
+#endif
             return new IPacket[] {m_MetricDefinitionPacket};
         }
 

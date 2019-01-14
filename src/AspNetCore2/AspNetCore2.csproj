@@ -5,11 +5,11 @@
     <AssemblyName>Loupe.Agent.AspNetCore</AssemblyName>
     <RootNamespace>Loupe.Agent.AspNetCore</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.6.1.0</Version>
+    <Version>4.7.0.0</Version>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
-    <Copyright>Copyright © 2008-2018 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>

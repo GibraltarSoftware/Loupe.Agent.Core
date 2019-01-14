@@ -339,7 +339,9 @@ namespace Gibraltar
                     if (m_ExtraCount <= 0 && (adding == false || nextPackIndex < 0))
                     {
                         // There's no array and we don't need to add one to the extras, so let's do this quick and exit.
+#if DEBUG
                         Debug.Assert(m_ExtraStrings == null); // Should always be the case if we clear it correctly down below.
+#endif
                         if (adding) // Are we adding or only packing?
                         {
                             m_FirstString = new WeakReference(newString);
