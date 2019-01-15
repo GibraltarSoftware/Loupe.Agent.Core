@@ -32,10 +32,8 @@ namespace Loupe.Agent.Test.Configuration
         public void ListenerValues()
         {
             var actual = Load();
-            Assert.False(actual.Listener.AutoTraceRegistration);
             Assert.False(actual.Listener.EnableConsole);
             Assert.False(actual.Listener.EnableNetworkEvents);
-            Assert.False(actual.Listener.EndSessionOnTraceClose);
         }
 
         [Test]
@@ -140,10 +138,8 @@ namespace Loupe.Agent.Test.Configuration
         private const string JsonSource = @"{
   ""Loupe"": {
     ""Listener"": {
-      ""AutoTraceRegistration"": false,
       ""EnableConsole"": false,
       ""EnableNetworkEvents"": false,
-      ""EndSessionOnTraceClose"": false
     },
     ""SessionFile"": {
       ""Enabled"": false,
