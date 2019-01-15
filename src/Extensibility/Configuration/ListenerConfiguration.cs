@@ -11,7 +11,7 @@
         public ListenerConfiguration()
         {
             AutoTraceRegistration = true;
-            EnableConsole = true;
+            EnableConsole = false; //this is nearly always duplicate information in .NET Core.
             EnableNetworkEvents = true;
             EndSessionOnTraceClose = true;
         }
@@ -29,7 +29,7 @@
         /// <summary>
         /// When true, anything written to the console out will be appended to the log.
         /// </summary>
-        /// <remarks>This setting has no effect if the trace listener is not enabled.</remarks>
+        /// <remarks>Disabled by default as ASP.NET Core applications send significant duplicate data to the console.</remarks>
         public bool EnableConsole { get; set; }
 
         /// <summary>
