@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Gibraltar.Server.Client.Data;
+using Gibraltar.Server.Client.Internal;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
@@ -708,7 +709,7 @@ namespace Gibraltar.Server.Client
                 {
                     //recursively try again.
                     channel.Dispose();
-                    connectionStatus = await Connect(configuration).ConfigureAwait(false);
+                    connectionStatus = await Connect(configurationXml.ToServerConfiguration()).ConfigureAwait(false);
                 }
                 else
                 {
