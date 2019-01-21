@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -18,11 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore2", "AspNetCore2\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore2.Sandbox", "AspNetCore2.Sandbox\AspNetCore2.Sandbox.csproj", "{EB3CCEFF-C63B-49DB-9DB7-91237FF3D2B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore2.Tests", "AspNetCore2.Tests\AspNetCore2.Tests.csproj", "{D5318EE0-E2D9-4BC3-8938-5CB7667139FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore2.Tests", "AspNetCore2.Tests\AspNetCore2.Tests.csproj", "{D5318EE0-E2D9-4BC3-8938-5CB7667139FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore2", "EFCore2\EFCore2.csproj", "{B8E3141B-FBF1-4704-850F-3DA65F166F8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore2", "EFCore2\EFCore2.csproj", "{B8E3141B-FBF1-4704-850F-3DA65F166F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{6462460C-6729-44FF-91A7-52270FBDDEBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{6462460C-6729-44FF-91A7-52270FBDDEBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentTest.Console", "AgentTest.Console\AgentTest.Console.csproj", "{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,6 +169,18 @@ Global
 		{6462460C-6729-44FF-91A7-52270FBDDEBD}.Release|x64.Build.0 = Release|Any CPU
 		{6462460C-6729-44FF-91A7-52270FBDDEBD}.Release|x86.ActiveCfg = Release|Any CPU
 		{6462460C-6729-44FF-91A7-52270FBDDEBD}.Release|x86.Build.0 = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|x64.Build.0 = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Debug|x86.Build.0 = Debug|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|x64.ActiveCfg = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|x64.Build.0 = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|x86.ActiveCfg = Release|Any CPU
+		{ABB4A19E-A0A7-4310-8EAF-B3A670CB5442}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
