@@ -214,9 +214,9 @@ namespace Loupe.Configuration
         public void Validate()
         {
             //check a special case:  There is NO configuration information to speak of.
-            if ((UseGibraltarService == false) 
-                && string.IsNullOrEmpty(ApplicationKey) 
-                && string.IsNullOrEmpty(CustomerName) 
+            if ((UseGibraltarService == false)
+                && string.IsNullOrEmpty(ApplicationKey)
+                && string.IsNullOrEmpty(CustomerName)
                 && string.IsNullOrEmpty(Server))
             {
                 //no way you even tried to configure the SDS.  lets use a different message.
@@ -225,7 +225,7 @@ namespace Loupe.Configuration
 
             if (UseGibraltarService)
             {
-                if (string.IsNullOrEmpty(ApplicationKey) 
+                if (string.IsNullOrEmpty(ApplicationKey)
                     && string.IsNullOrEmpty(CustomerName))
                     throw new InvalidOperationException("An application key or service name is required to use the Loupe Service,");
             }
@@ -303,5 +303,16 @@ namespace Loupe.Configuration
                 Enabled = false; //we can't be enabled because we aren't plausibly configured.
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            if (UseGibraltarService)
+                return string.Format("Loupe Cloud-Hosted Subscription '{0}'", CustomerName);
+
+            if (string.IsNullOrWhiteSpace(Repository))
+                return string.Format("Loupe Server '{0}'", Server);
+
+            return string.Format("Loupe Server '{0}' repository '{1}'", Server, Repository);
+        }
     }
 }

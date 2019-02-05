@@ -1,30 +1,32 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Gibraltar.Data.Internal;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Data.Internal
+namespace Gibraltar.Data
 {
     /// <summary>
     /// Performs constant, background publishing of sessions from the repository.
     /// </summary>
-    internal class RepositoryPublishEngine
+    public class RepositoryPublishEngine
     {
         private const string LogCategory = "Loupe.Repository.Publish";
         private const string BaseMultiprocessLockName = "repositoryPublish";
         private const string RepositoryPublishVersionName = "Repository Publish Version";
-        private const int BackgroundStartupDelay = 5000; //5 seconds
+        private int BackgroundStartupDelay = 5000; //5 seconds
         private const int ShortCheckIntervalSeconds = 60;
         private const int LongCheckIntervalSeconds = 1800;
         private const int ExpiredCheckIntervalSeconds = 3600;
 
         private readonly object m_SessionPublishThreadLock = new object();
-        private readonly Publisher m_Publisher;
-        private readonly AgentConfiguration m_Configuration;
+        private readonly string m_ProductName;
+        private readonly string m_ApplicationName;
+        private readonly ServerConfiguration m_Configuration;
         private readonly string m_RepositoryFolder;   //used to coordinate where to coordinate locks
         private readonly string m_MultiprocessLockName; //used to establish our unique publisher lock.
 
@@ -39,22 +41,56 @@ namespace Gibraltar.Data.Internal
         private TimeSpan m_MultiprocessLockCheckInterval = new TimeSpan(0, 5, 0);
         private int m_FailedAttempts; //PROTECTED BY THREADLOCK
 
-        public RepositoryPublishEngine(Publisher publisher, AgentConfiguration configuration)
+        internal RepositoryPublishEngine(Publisher publisher, AgentConfiguration configuration)
         {
-            m_Publisher = publisher;
-            m_Configuration = configuration;
+            m_ProductName = publisher.SessionSummary.Product;
+            m_ApplicationName = publisher.SessionSummary.Application;
+            m_Configuration = configuration.Server;
             m_SessionPublishThreadFailed = true;  //otherwise we won't start it when we need to.
 
             //find the repository path we're using.  We use the same logic that the FileMessenger users.
-            m_RepositoryFolder = LocalRepository.CalculateRepositoryPath(m_Publisher.SessionSummary.Product, configuration.SessionFile.Folder);
+            m_RepositoryFolder = LocalRepository.CalculateRepositoryPath(m_ProductName, configuration.SessionFile.Folder);
 
             //create the correct lock name for our scope.
-            ServerConfiguration config = m_Configuration.Server;
-            m_MultiprocessLockName = BaseMultiprocessLockName + "~" + m_Publisher.SessionSummary.Product + 
-                (config.SendAllApplications ? string.Empty : "~" + m_Publisher.SessionSummary.Application);
+            m_MultiprocessLockName = BaseMultiprocessLockName + "~" + m_ProductName + 
+                (m_Configuration.SendAllApplications ? string.Empty : "~" + m_ApplicationName);
 
             //we have to make sure the multiprocess lock doesn't have any unsafe characters.
             m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName);
+        }
+
+        /// <summary>
+        /// Create a repository publish engine for the specified local repository to the remote server.
+        /// </summary>
+        /// <param name="productName">Required. The product to restrict sending to.</param>
+        /// <param name="applicationName">Optional.  The application to restrict sending to.</param>
+        /// <param name="directory">Optional.  The base directory of the repository, overriding the system default.</param>
+        /// <param name="serverConfiguration">The server to publish to.</param>
+        public RepositoryPublishEngine(string productName, string applicationName, string directory,
+            ServerConfiguration serverConfiguration)
+        {
+            if (serverConfiguration == null)
+                throw new ArgumentNullException(nameof(serverConfiguration));
+
+            if (string.IsNullOrWhiteSpace(productName))
+                throw new ArgumentNullException(nameof(productName));
+
+            m_ProductName = productName;
+            m_ApplicationName = applicationName;
+            m_Configuration = serverConfiguration;
+            m_SessionPublishThreadFailed = true;  //otherwise we won't start it when we need to.
+
+            //find the repository path we're using.  We use the same logic that the FileMessenger users.
+            m_RepositoryFolder = LocalRepository.CalculateRepositoryPath(productName, directory);
+
+            //create the correct lock name for our scope.
+            m_MultiprocessLockName = BaseMultiprocessLockName + "~" + productName +
+                                     (string.IsNullOrEmpty(applicationName) ? string.Empty : "~" + applicationName);
+
+            //we have to make sure the multiprocess lock doesn't have any unsafe characters.
+            m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName);
+
+            BackgroundStartupDelay = 0;
         }
 
         #region Public Properties and Methods
@@ -114,6 +150,8 @@ namespace Gibraltar.Data.Internal
         {
             lock (m_SessionPublishThreadLock)
             {
+                if (!Log.SilentMode) Log.Write(LogMessageSeverity.Information, LogCategory, "Starting Repository Publisher", "Initializing a new publisher thread.");
+
                 //clear the dispatch thread failed flag so no one else tries to create our thread
                 m_SessionPublishThreadFailed = false;
 
@@ -133,7 +171,16 @@ namespace Gibraltar.Data.Internal
         {
             //before we get going, lets stall for a few seconds.  We aren't a critical operation, and I don't 
             //want to get in the way of the application starting up.
-            await Task.Delay(BackgroundStartupDelay).ConfigureAwait(false);
+            if (BackgroundStartupDelay > 0)
+            {
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Information, LogCategory,
+                        "Waiting for startup delay to start publisher",
+                        "To avoid competing against other startup activities we're going to delay for {0} before we start.",
+                        BackgroundStartupDelay);
+
+                await Task.Delay(BackgroundStartupDelay).ConfigureAwait(false);
+            }
 
             InterprocessLock backgroundLock = null; //we can't do our normal using trick in this situation.
             try
@@ -179,6 +226,8 @@ namespace Gibraltar.Data.Internal
 
                     System.Threading.Monitor.PulseAll(m_SessionPublishThreadLock);
                 }
+
+                if (!Log.SilentMode) Log.Write(LogMessageSeverity.Information, LogCategory, "Background session publisher thread has stopped", null);
             }
         }
 
@@ -217,7 +266,7 @@ namespace Gibraltar.Data.Internal
                         m_FailedAttempts = 0;
 
                         //perform one process cycle.  This is isolated so that whenever it needs to end it can just return and we'll sleep.  
-                        await m_Client.PublishSessions(false, m_Configuration.Server.PurgeSentSessions).ConfigureAwait(false);
+                        await m_Client.PublishSessions(false, m_Configuration.PurgeSentSessions).ConfigureAwait(false);
                     }
                     else
                     {
@@ -257,14 +306,25 @@ namespace Gibraltar.Data.Internal
                     try
                     {
                         //set up the repository client to work with the collection repository
-                        LocalRepository collection = Log.Repository;
+                        LocalRepository repository = Log.Repository;
 
-                        ServerConfiguration serverConfiguration = m_Configuration.Server;
-                        if ((serverConfiguration != null) && (serverConfiguration.Enabled))
+                        if (m_RepositoryFolder.Equals(repository.Name, StringComparison.OrdinalIgnoreCase) == false)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Information, LogCategory,
+                                    string.Format("Overriding repository for publishing from '{0}' to '{1}'",
+                                        repository.Name, m_RepositoryFolder), null);
+
+                            //we're using a different directory for our repository to monitor.. go ahead and create it.
+                            repository = new LocalRepository(m_ProductName, m_RepositoryFolder);
+                        }
+
+                        if (m_Configuration != null && m_Configuration.Enabled)
                         {
                             //We read the configuration to determine whether to pass in the application name or not.
-                            m_Client = new RepositoryPublishClient(collection, m_Publisher.SessionSummary.Product,
-                                                                    (serverConfiguration.SendAllApplications ? null : m_Publisher.SessionSummary.Application), serverConfiguration);
+                            m_Client = new RepositoryPublishClient(repository, m_ProductName,
+                                (m_Configuration.SendAllApplications ? null : m_ApplicationName),
+                                m_Configuration);
                         }
 
                         //finally!  We're good to go!

@@ -21,8 +21,8 @@ namespace Gibraltar.Server.Client
 
         private const string SessionTempFolder = "Session_Upload";
 
-        private const int SinglePassCutoffBytes = 300000; //about 300k.   
-        private const int DefaultSegmentSizeBytes = 100000; //about 100k
+        private const int SinglePassCutoffBytes = 3000000; //about 3MB.   
+        private const int DefaultSegmentSizeBytes = 1000000; //about 1MB.
 
         private bool m_Initialized;
         private bool m_PerformCleanup;

@@ -1,12 +1,16 @@
 ﻿using Gibraltar.Agent;
 using System;
 using System.Diagnostics;
+using Gibraltar.Data;
 using Loupe.Configuration;
+using SessionCriteria = Gibraltar.Agent.SessionCriteria;
 
 namespace Loupe.Packager
 {
     static class Program
     {
+        private const string LogCategory = "Loupe.Packager";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -27,7 +31,7 @@ namespace Loupe.Packager
                 }
                 catch (Exception ex)
                 {
-                    Log.RecordException(ex, "Startup", true);
+                    Log.RecordException(ex, LogCategory, true);
                 }
 
                 string productName = null;
@@ -49,7 +53,7 @@ namespace Loupe.Packager
                         string rawProcessId = commandArgs["w"];
                         if (int.TryParse(rawProcessId, out monitorProcessId) == false)
                         {
-                            Log.Error("Startup", "Unable to process command line",
+                            Log.Error(LogCategory, "Unable to process command line",
                                 "The command line argument for Process ID '{0}' could not be interpreted as a number.",
                                 rawProcessId);
                         }
@@ -60,7 +64,7 @@ namespace Loupe.Packager
                 if (string.IsNullOrEmpty(productName))
                 {
                     returnVal = ExitCodes.MissingProductName;
-                    Log.Error("Startup", "Unable to Start due to Configuration",
+                    Log.Error(LogCategory, "Unable to Start due to Configuration",
                         "There is no product name specified in the configuration so the packager can't start.");
                     Console.WriteLine("There is no product name specified so the packager can't start.");
                 }
@@ -77,7 +81,7 @@ namespace Loupe.Packager
                         }
                         catch (ArgumentException ex)
                         {
-                            Log.Verbose(ex, "Startup", "Unable to find the process to wait on",
+                            Log.Verbose(ex, LogCategory, "Unable to find the process to wait on",
                                 "When attempting to get the process object for the specified wait process Id '{0}' an exception was thrown:\r\n{1}",
                                 monitorProcessId, ex.Message);
                         }
@@ -85,14 +89,14 @@ namespace Loupe.Packager
                         var hasExited = true;
                         if (monitorProcess != null)
                         {
-                            Log.Information("Startup", "Waiting on calling process to exit",
+                            Log.Information(LogCategory, "Waiting on calling process to exit",
                                 "The wait option was specified with Process ID {0}, so the packager will wait for it to exit before continuing (up to 60 seconds).",
                                 monitorProcessId);
                             hasExited = monitorProcess
                                 .WaitForExit(60000); //we don't want to wait forever, it'll cause a problem.
                         }
 
-                        Log.Information("Startup", "Wait on process complete", hasExited
+                        Log.Information(LogCategory, "Wait on process complete", hasExited
                                 ? "The process we were waiting on (pid {0}) is no longer running so the packager can continue."
                                 : "The process we were waiting on (pid {0}) is still running but we've waited as long as we're willing to so we'll continue and package anyway.",
                             monitorProcessId);
@@ -102,7 +106,7 @@ namespace Loupe.Packager
                     if (string.IsNullOrEmpty(transmitMode))
                     {
                         returnVal = ExitCodes.MissingTransmitMode;
-                        Log.Error("Startup", "Unable to process command line",
+                        Log.Error(LogCategory, "Unable to process command line",
                             "There is no transmit mode (-m) specified so the packager can't start.");
                         Console.WriteLine("There is no transmit mode (-m) specified so the packager can't start.");
                     }
@@ -110,96 +114,125 @@ namespace Loupe.Packager
                     {
                         try
                         {
-                            using (var packager = new Gibraltar.Agent.Packager(productName, applicationName, folder))
+                            transmitMode = transmitMode.ToUpperInvariant();
+                            switch (transmitMode)
                             {
-                                transmitMode = transmitMode.ToUpperInvariant();
-                                switch (transmitMode)
-                                {
-                                    case "SERVER":
-                                        //We need all of the server-specific parameters
-                                        var configuration = new ServerConfiguration();
+                                case "SERVER":
+                                    //We need all of the server-specific parameters
+                                    var configuration = new ServerConfiguration();
 
-                                        configuration.CustomerName = commandArgs["customer"];
-                                        configuration.Server = commandArgs["server"];
-                                        configuration.ApplicationKey = commandArgs["key"];
+                                    configuration.CustomerName = commandArgs["customer"];
+                                    configuration.Server = commandArgs["server"];
+                                    configuration.ApplicationKey = commandArgs["key"];
 
-                                        if (string.IsNullOrEmpty(configuration.Server) == false)
+                                    if (string.IsNullOrEmpty(configuration.Server) == false)
+                                    {
+                                        if (int.TryParse(commandArgs["port"], out var sdsPort))
+                                            configuration.Port = sdsPort;
+
+                                        var sslRaw = commandArgs["ssl"];
+                                        if (string.IsNullOrEmpty(sslRaw) == false)
                                         {
-                                            if (int.TryParse(commandArgs["port"], out var sdsPort))
-                                                configuration.Port = sdsPort;
-
-                                            var sslRaw = commandArgs["ssl"];
-                                            if (string.IsNullOrEmpty(sslRaw) == false)
-                                            {
-                                                if (bool.TryParse(sslRaw, out var sdsUseSsl))
-                                                    configuration.UseSsl = sdsUseSsl;
-                                            }
-
-                                            configuration.ApplicationBaseDirectory = commandArgs["directory"];
-                                            configuration.Repository = commandArgs["repository"];
+                                            if (bool.TryParse(sslRaw, out var sdsUseSsl))
+                                                configuration.UseSsl = sdsUseSsl;
                                         }
 
-                                        string purgeRaw = commandArgs["purgeSentSessions"];
-                                        if (string.IsNullOrEmpty(purgeRaw) == false)
-                                        {
-                                            if (bool.TryParse(purgeRaw, out var purgeSentSessions))
-                                                configuration.PurgeSentSessions = purgeSentSessions;
-                                        }
+                                        configuration.ApplicationBaseDirectory = commandArgs["directory"];
+                                        configuration.Repository = commandArgs["repository"];
+                                    }
 
-                                        //careful - we have to make different calls depending on whether we want to override server info.
-                                        try
-                                        {
-                                            configuration.Validate();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            returnVal = ExitCodes.MissingServerInfo;
-                                            Log.Error(ex, "Startup", "Unable to process command line",
-                                                "There is insufficient server connection information to send to a server.\r\n{0}", ex.Message);
-                                            Console.WriteLine(
-                                                "There is insufficient server connection information to send to a server.\r\n{0}", ex.Message);
-                                            break;
-                                        }
+                                    string purgeRaw = commandArgs["purgeSentSessions"];
+                                    if (string.IsNullOrEmpty(purgeRaw) == false)
+                                    {
+                                        if (bool.TryParse(purgeRaw, out var purgeSentSessions))
+                                            configuration.PurgeSentSessions = purgeSentSessions;
+                                    }
 
-                                        packager.SendToServer(SessionCriteria.NewSessions, true, configuration.PurgeSentSessions, configuration);
-
+                                    //careful - we have to make different calls depending on whether we want to override server info.
+                                    try
+                                    {
+                                        configuration.Validate();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        returnVal = ExitCodes.MissingServerInfo;
+                                        Log.Error(ex, LogCategory, "Unable to process command line",
+                                            "There is insufficient server connection information to send to a server.\r\n{0}", ex.Message);
+                                        Console.WriteLine(
+                                            "There is insufficient server connection information to send to a server.\r\n{0}", ex.Message);
                                         break;
-                                    case "FILE":
-                                        string fullFileNamePath = commandArgs["d"];
+                                    }
 
-                                        if (string.IsNullOrEmpty(fullFileNamePath))
-                                        {
-                                            returnVal = ExitCodes.MissingFileInfo;
-                                            Log.Error("Startup", "Unable to process command line",
-                                                "There is no file name (-d) specified so the packager can't start.");
-                                            Console.WriteLine(
-                                                "There is no file name (-d) specified so the packager can't start.");
-                                        }
-                                        else
-                                        {
-                                            packager.SendToFile(SessionCriteria.NewSessions, true, fullFileNamePath);
-                                        }
+                                    bool runForever = (commandArgs["t"] != null);
 
-                                        break;
-                                    default:
-                                        returnVal = ExitCodes.InvalidTransmitMode;
-                                        Log.Error("Startup", "Unable to process command line",
-                                            "Unrecognized transmit mode: {0}.  Try server, email or file",
-                                            transmitMode);
-                                        Console.WriteLine("Unrecognized transmit mode: Try server, email or file");
-                                        break;
-                                }
+                                    if (runForever)
+                                    {
+                                        Log.Information(LogCategory, "Starting Publisher", "Restricting to Product: {0}, Application: {1}.\r\nServer: {2}", productName, applicationName??"any", configuration);
+                                        Console.WriteLine("Starting publisher..");
+                                        var publishEngine = new RepositoryPublishEngine(productName,
+                                            applicationName, folder, configuration);
+
+                                        publishEngine.Start();
+
+                                        Console.WriteLine("Sessions being published to {0}\r\nPress any key to stop.", configuration);
+                                        Console.ReadKey();
+
+                                        Console.WriteLine("Stopping publisher..");
+                                        publishEngine.Stop(true);
+                                        Console.WriteLine("Publishing stopped.");
+                                    }
+                                    else
+                                    {
+                                        using (var packager =
+                                            new Gibraltar.Agent.Packager(productName, applicationName, folder))
+                                        {
+                                            Console.WriteLine("Sending new sessions to {0}", configuration);
+                                            packager.SendToServer(SessionCriteria.NewSessions, true,
+                                                configuration.PurgeSentSessions, configuration);
+                                        }
+                                    }
+
+                                    break;
+                                case "FILE":
+                                    string fullFileNamePath = commandArgs["d"];
+
+                                    if (string.IsNullOrEmpty(fullFileNamePath))
+                                    {
+                                        returnVal = ExitCodes.MissingFileInfo;
+                                        Log.Error(LogCategory, "Unable to process command line",
+                                            "There is no file name (-d) specified so the packager can't start.");
+                                        Console.WriteLine(
+                                            "There is no file name (-d) specified so the packager can't start.");
+                                    }
+                                    else
+                                    {
+                                        using (var packager =
+                                            new Gibraltar.Agent.Packager(productName, applicationName, folder))
+                                        {
+                                            packager.SendToFile(SessionCriteria.NewSessions, true,
+                                                fullFileNamePath);
+                                        }
+                                    }
+
+                                    break;
+                                default:
+                                    returnVal = ExitCodes.InvalidTransmitMode;
+                                    Log.Error(LogCategory, "Unable to process command line",
+                                        "Unrecognized transmit mode: {0}.  Try server, email or file",
+                                        transmitMode);
+                                    Console.WriteLine("Unrecognized transmit mode: Try server, email or file");
+                                    break;
                             }
                         }
                         catch (Exception ex)
                         {
                             returnVal = ExitCodes.RuntimeException;
-                            Log.RecordException(ex, "Startup", false);
+                            Log.RecordException(ex, LogCategory, false);
                         }
                     }
                 }
 
-                return (int) returnVal;
+                return (int)returnVal;
             }
             finally
             {
