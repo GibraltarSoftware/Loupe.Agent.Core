@@ -17,6 +17,7 @@
     <Description>The Loupe Agent for ASP.NET Core - automatically record performance and diagnostic information for ASP.NET Core applications.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+    <PackageLicenseUrl>https://github.com/GibraltarSoftware/Loupe.Agent.Core/blob/master/LICENSE.txt</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\Loupe.Agent.AspNetCore.xml</DocumentationFile>

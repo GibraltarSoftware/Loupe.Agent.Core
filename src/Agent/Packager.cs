@@ -1,5 +1,6 @@
 using System;
 using Gibraltar.Agent.Internal;
+using Loupe.Configuration;
 
 namespace Gibraltar.Agent
 {
@@ -293,11 +294,12 @@ namespace Gibraltar.Agent
         /// <overloads>Send sessions to the Loupe Server</overloads>
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead)
+        public void SendToServer(SessionCriteria sessions, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, false, false, null, null, 0, false, null, null, false);
+            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -306,12 +308,13 @@ namespace Gibraltar.Agent
         /// <overloads>Send sessions to the Loupe Server</overloads>
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead)
+        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, false, false, null, null, 0, false, null, null, false);
+            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -321,11 +324,12 @@ namespace Gibraltar.Agent
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions)
+        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, false, false, null, null, 0, false, null, null, false);
+            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -335,172 +339,13 @@ namespace Gibraltar.Agent
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions)
+        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, false, false, null, null, 0, false, null, null, false);
-        }
-
-        /// <summary>
-        /// Send sessions to the Loupe Service using the specified customer
-        /// name.
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="customerName">The Loupe Service customer name.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, string customerName)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, true, customerName, null, 0, false, null, null, false);
-        }
-
-        /// <summary>
-        /// Send sessions to the Loupe Service using the specified customer
-        /// name.
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="customerName">The Loupe Service customer name.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string customerName)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, true, customerName, null, 0, false, null, null, false);
-        }
-
-        /// <summary>
-        /// Send sessions to the Loupe Service using the specified customer
-        /// name.
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="customerName">The Loupe Service customer name.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, string customerName)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, true, customerName, null, 0, false, null, null, false);
-        }
-
-        /// <summary>
-        /// Send sessions to the Loupe Service using the specified customer
-        /// name.
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="customerName">The Loupe Service customer name.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, string customerName)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, true, customerName, null, 0, false, null, null, false);
-        }
-
-        /// <summary>
-        /// Send sessions to a Loupe Server located at the specified web
-        /// address
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, false);
-        }
-
-        /// <summary>
-        /// Send sessions to a Loupe Server located at the specified web
-        /// address
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, false);
-        }
-
-        /// <summary>
-        /// Send sessions to a Loupe Server located at the specified web
-        /// address
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, false);
-        }
-
-        /// <summary>
-        /// Send sessions to a Loupe Server located at the specified web
-        /// address
-        /// </summary>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        /// <overloads>Send sessions to the Loupe Server</overloads>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
-        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, false);
+            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, false, serverConfiguration);
         }
 
         /// <summary>
@@ -508,11 +353,12 @@ namespace Gibraltar.Agent
         /// </summary>
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead)
+        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, false, false, null, null, 0, false, null, null, true);
+            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, serverConfiguration);
         }
 
         /// <summary>
@@ -520,12 +366,13 @@ namespace Gibraltar.Agent
         /// </summary>
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead)
+        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, false, false, null, null, 0, false, null, null, true);
+            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, serverConfiguration);
         }
 
         /// <summary>
@@ -534,11 +381,12 @@ namespace Gibraltar.Agent
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions)
+        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, false, false, null, null, 0, false, null, null, true);
+            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, serverConfiguration);
         }
 
         /// <summary>
@@ -547,140 +395,13 @@ namespace Gibraltar.Agent
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions)
+        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, false, false, null, null, 0, false, null, null, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to the Gibraltar Loupe Service using the specified customer name
-        /// </summary>
-        /// <param name="customerName">The Loupe Service customer name</param>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, string customerName)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, true, customerName, null, 0, false, null, null, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to the Gibraltar Loupe Service using the specified customer name
-        /// </summary>
-        /// <param name="customerName">The Loupe Service customer name</param>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string customerName)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, true, customerName, null, 0, false, null, null, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to the Gibraltar Loupe Service using the specified customer name
-        /// </summary>
-        /// <param name="customerName">The Loupe Service customer name</param>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, string customerName)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, true, customerName, null, 0, false, null, null, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to the Gibraltar Loupe Service using the specified customer name
-        /// </summary>
-        /// <param name="customerName">The Loupe Service customer name</param>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, string customerName)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, true, customerName, null, 0, false, null, null, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to a private Loupe Server located at the specified web address
-        /// </summary>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to a private Loupe Server located at the specified web address
-        /// </summary>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to a private Loupe Server located at the specified web address
-        /// </summary>
-        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, true);
-        }
-
-        /// <summary>
-        /// Asynchronously send sessions to a private Loupe Server located at the specified web address
-        /// </summary>
-        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
-        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
-        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="server">The full DNS name of the server where the service is located.</param>
-        /// <param name="port"> An optional port number override for the server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with Ssl.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.</param>
-        /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
-        /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, string server, int port, bool useSsl, string applicationBaseDirectory, string repository)
-        {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, false, null, server, port, useSsl, applicationBaseDirectory, repository, true);
+            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, serverConfiguration);
         }
 
         #endregion
