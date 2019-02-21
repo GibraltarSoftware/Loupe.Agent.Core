@@ -13,7 +13,7 @@ namespace Gibraltar.Monitor
     /// and a name that is unique within a session but is designed for comparison of the same metric between sessions.</remarks>
     public class MetricCollection : IMetricCollection
     {
-        private readonly Dictionary<string, IMetric> m_DictionaryByName = new Dictionary<string, IMetric>();
+        private readonly Dictionary<string, IMetric> m_DictionaryByName = new Dictionary<string, IMetric>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<Guid, IMetric> m_Dictionary = new Dictionary<Guid, IMetric>();
         private readonly List<IMetric> m_List = new List<IMetric>();
         private readonly object m_Lock = new object();

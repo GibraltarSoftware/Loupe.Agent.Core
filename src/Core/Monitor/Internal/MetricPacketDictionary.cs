@@ -8,7 +8,7 @@ namespace Gibraltar.Monitor.Internal
     /// </summary>
     internal class MetricPacketDictionary : IList<MetricPacket>
     {
-        private readonly Dictionary<string, MetricPacket> m_DictionaryByName = new Dictionary<string, MetricPacket>();
+        private readonly Dictionary<string, MetricPacket> m_DictionaryByName = new Dictionary<string, MetricPacket>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<Guid, MetricPacket> m_Dictionary = new Dictionary<Guid, MetricPacket>();
         private readonly List<MetricPacket> m_List = new List<MetricPacket>();
         private readonly object m_Lock = new object();

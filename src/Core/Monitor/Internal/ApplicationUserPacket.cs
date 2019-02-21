@@ -18,7 +18,7 @@ namespace Gibraltar.Monitor.Internal
         private string m_EmailAddress;
         private string m_Phone;
 
-        private readonly Dictionary<string, string> m_Properties = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> m_Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public ApplicationUserPacket() 
             : base(false)

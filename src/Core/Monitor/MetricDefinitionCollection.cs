@@ -17,7 +17,7 @@ namespace Gibraltar.Monitor
     public sealed class MetricDefinitionCollection : IMetricDefinitionCollection
     {
         private readonly Dictionary<Guid, IMetric> m_MetricById = new Dictionary<Guid, IMetric>();
-        private readonly Dictionary<string, IMetricDefinition> m_DictionaryByName = new Dictionary<string, IMetricDefinition>();
+        private readonly Dictionary<string, IMetricDefinition> m_DictionaryByName = new Dictionary<string, IMetricDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<Guid, IMetricDefinition> m_Dictionary = new Dictionary<Guid, IMetricDefinition>();
         private readonly List<IMetricDefinition> m_List = new List<IMetricDefinition>();
         private readonly object m_Lock = new object();

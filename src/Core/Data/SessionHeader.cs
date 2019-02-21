@@ -72,7 +72,7 @@ namespace Gibraltar.Data
         private string m_CommandLine;
 
         //App.Config properties
-        private readonly Dictionary<string, string> m_Properties = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> m_Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         //file specific information (for this file)
         private bool m_HasFileInfo;
