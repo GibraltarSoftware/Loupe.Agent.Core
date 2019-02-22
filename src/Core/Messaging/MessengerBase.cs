@@ -144,26 +144,27 @@ namespace Gibraltar.Messaging
                         System.Threading.Monitor.PulseAll(m_MessageQueueLock);
                     }
 
+                    MaintenanceModeRequest maintenanceRequested = MaintenanceModeRequest.None;
+
                     //We have a packet and have released the lock (so others can queue more packets while we're dispatching items.
                     if (currentPacket != null)
                     {
-                        MaintenanceModeRequest maintenanceRequested = MaintenanceModeRequest.None;
                         DispatchPacket(currentPacket, ref maintenanceRequested);
-
-                        // Did they request maintenance mode?  If so we really need to change our behavior.
-                        // But ignore regular maintenance requests if we're closing.  No sense in adding unnecessary work.
-                        // Unless the client app explicitly requested a maintenance rollover, which we'll do regardless.
-                        if (maintenanceRequested != MaintenanceModeRequest.None &&
-                            (m_Exiting == false || maintenanceRequested == MaintenanceModeRequest.Explicit))
-                        {
-                            EnterMaintenanceMode();
-                        }
                     }
 
                     // Do we need to do an auto-flush before we do the next packet?
                     if (AutoFlush && m_NextFlushDue <= DateTime.Now)
                     {
-                        ActionOnFlush();
+                        ActionOnFlush(ref maintenanceRequested);
+                    }
+
+                    // Did they request maintenance mode?  If so we really need to change our behavior.
+                    // But ignore regular maintenance requests if we're closing.  No sense in adding unnecessary work.
+                    // Unless the client app explicitly requested a maintenance rollover, which we'll do regardless.
+                    if (maintenanceRequested != MaintenanceModeRequest.None &&
+                        (m_Exiting == false || maintenanceRequested == MaintenanceModeRequest.Explicit))
+                    {
+                        EnterMaintenanceMode();
                     }
                 }
 
@@ -249,7 +250,7 @@ namespace Gibraltar.Messaging
                             m_Exiting = true; // Make double-sure that this got set.  It's our normal-exit state key.
                             m_Exited = true; // We have now processed the ExitMode command, if anyone cares.
 
-                            ActionOnFlush(); // Is this really necessary?  Probably can't hurt.
+                            ActionOnFlush(ref maintenanceRequested); // Is this really necessary?  Probably can't hurt.
 
                             //and call our exit event
                             ActionOnExit();
@@ -262,7 +263,7 @@ namespace Gibraltar.Messaging
                             ActionOnClose();
                             break;
                         case MessagingCommand.Flush:
-                            ActionOnFlush();
+                            ActionOnFlush(ref maintenanceRequested);
                             break;
                         default:
                             // Allow special handling by inheritors
@@ -385,7 +386,7 @@ namespace Gibraltar.Messaging
         /// <summary>
         /// Wraps calling the OnFlush() method that derived classes use to provide common exception handling.
         /// </summary>
-        private void ActionOnFlush()
+        private void ActionOnFlush(ref MaintenanceModeRequest maintenanceRequested)
         {
             //since we're starting the flush procedure, we'll assume that this is going to complete and there's no reason to autoflush
             if (AutoFlush)
@@ -395,7 +396,7 @@ namespace Gibraltar.Messaging
 
             try
             {
-                OnFlush();
+                OnFlush(ref maintenanceRequested);
             }
             catch (Exception ex)
             {
@@ -860,9 +861,10 @@ namespace Gibraltar.Messaging
         /// <summary>
         /// Inheritors should override this method to implement custom flush functionality.
         /// </summary>
+        /// <param name="maintenanceRequested">Specifies whether maintenance mode has been requested and the type (source) of that request.</param>
         /// <remarks>Code in this method is protected by a Queue Lock.        
         /// This method is called with the Message Dispatch thread exclusively.</remarks>
-        protected virtual void OnFlush()
+        protected virtual void OnFlush(ref MaintenanceModeRequest maintenanceRequested)
         {
             //we do nothing by default
         }

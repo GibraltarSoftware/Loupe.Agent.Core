@@ -148,7 +148,7 @@ namespace Gibraltar.Messaging
             m_CurrentSerializer.Write(packet);
 
             if (writeThrough)
-                OnFlush();
+                OnFlush(ref maintenanceRequested);
 
             //and do we need to request maintenance?
             if (m_CurrentFile.Length > m_MaxFileSizeBytes)
@@ -181,7 +181,7 @@ namespace Gibraltar.Messaging
         /// </summary>
         /// <remarks>Code in this method is protected by a Queue Lock.        
         /// This method is called with the Message Dispatch thread exclusively.</remarks>
-        protected override void OnFlush()
+        protected override void OnFlush(ref MaintenanceModeRequest maintenanceRequested)
         {
             //push the serializer to flush to disk
             if (m_CurrentSerializer != null)
@@ -190,7 +190,18 @@ namespace Gibraltar.Messaging
                 // serializer updates the session header we write to the index, so it must be done first.
                 m_CurrentSerializer.Flush();
             }
-            
+
+            //do we need to request maintenance?
+            //This is duplicated from the OnWrite so we can trigger roll over *even when there are no messages*
+            if (m_CurrentFile.Length > m_MaxFileSizeBytes)
+            {
+                maintenanceRequested = MaintenanceModeRequest.Regular;
+            }
+            else if (DateTime.Now > m_FileExpiration)
+            {
+                maintenanceRequested = MaintenanceModeRequest.Regular;
+            }
+
             //and do repository maintenance if it was requested.  It won't be requested if maintenance is disabled.
             //This is over here to ensure we DO it eventually but we can do it on a lazy schedule, 
             //and don't bother if we're Exiting (includes closing) or it's dangerous (we're in a debugger)

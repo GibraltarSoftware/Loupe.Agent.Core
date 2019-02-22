@@ -429,7 +429,7 @@ namespace Gibraltar.Messaging
             }
         }
 
-        protected override void OnFlush()
+        protected override void OnFlush(ref MaintenanceModeRequest maintenanceRequested)
         {
             AttemptRemoteConnectionAsync();
 
