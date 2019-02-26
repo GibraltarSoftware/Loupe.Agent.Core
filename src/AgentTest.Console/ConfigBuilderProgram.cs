@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Loupe.AgentTest.Console
 {
-    class Program
+    class ConfigBuilderProgram
     {
         static async Task Main(string[] args)
         {
