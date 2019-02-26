@@ -301,7 +301,8 @@ namespace Gibraltar.Server.Client
                     writer.Write(m_BytesWritten);
                     writer.Flush();
                 }
-            }            
+                sessionTrackingFileStream.SetLength(sessionTrackingFileStream.Position);
+            }
         }
 
         private void SafePurgeSession()
