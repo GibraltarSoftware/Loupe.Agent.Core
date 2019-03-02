@@ -29,10 +29,9 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Create a new instance of the user resolution notifier
         /// </summary>
-        public UserResolutionNotifier(bool anonymousMode)
+        public UserResolutionNotifier()
         {            
-            if (anonymousMode == false)
-                Publisher.MessageDispatching += PublisherOnMessageDispatching;
+            Publisher.MessageDispatching += PublisherOnMessageDispatching;
         }
 
         /// <summary>

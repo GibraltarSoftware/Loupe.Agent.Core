@@ -368,7 +368,7 @@ namespace Gibraltar.Monitor
                     lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
                     {
                         if (s_UserResolutionNotifier == null) // Double-check that it's actually still null.
-                            s_UserResolutionNotifier = new UserResolutionNotifier(s_RunningConfiguration.Publisher.EnableAnonymousMode);
+                            s_UserResolutionNotifier = new UserResolutionNotifier();
                     }
                 }
 
