@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
@@ -222,7 +222,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The raw metric sample packet
         /// </summary>
-        internal virtual MetricSamplePacket Packet { get { return m_MetricSamplePacket; } }
+        public virtual MetricSamplePacket Packet { get { return m_MetricSamplePacket; } }
 
         #endregion
 

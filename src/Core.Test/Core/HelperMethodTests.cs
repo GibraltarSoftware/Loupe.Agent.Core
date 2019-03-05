@@ -1,4 +1,4 @@
-﻿using Gibraltar.Monitor.Internal;
+﻿using Gibraltar.Monitor.Serialization;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core

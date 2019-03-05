@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using Gibraltar.Data;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 

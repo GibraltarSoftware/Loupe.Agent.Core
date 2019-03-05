@@ -5,7 +5,7 @@ using System.IO;
 using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Monitor;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 

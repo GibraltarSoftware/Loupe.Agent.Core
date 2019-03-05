@@ -29,7 +29,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <remarks>This dictionary is created automatically by the Metric Definition during its initialization.</remarks>
         /// <param name="metricDefinition"></param>
-        internal MetricCollection(MetricDefinition metricDefinition)
+        public MetricCollection(MetricDefinition metricDefinition)
         {
             if (metricDefinition == null)
             {
@@ -37,8 +37,6 @@ namespace Gibraltar.Monitor
             }
             m_MetricDefinition = metricDefinition;
         }
-
-        #region Private Properties and Methods
 
         /// <summary>
         /// Raises an event whenever our collection is changed to notify objects that want to know when we change.
@@ -55,18 +53,10 @@ namespace Gibraltar.Monitor
             }
         }
 
-        #endregion
-
-        #region Internal Properties and Methods
-        
         /// <summary>
         /// Object Change Locking object.
         /// </summary>
-        internal object Lock { get { return m_Lock; } }
-
-        #endregion
-
-        #region Public Properties and Methods
+        public object Lock { get { return m_Lock; } }
 
         /// <summary>
         /// Determines whether the collection contains an element with the specified key.
@@ -139,8 +129,6 @@ namespace Gibraltar.Monitor
                 return m_DictionaryByName.TryGetValue(trueKey, out value);
             }
         }
-
-        #endregion
 
         #region IEnumerable<MetricPacket> Members
 

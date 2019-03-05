@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Gibraltar.Data;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 

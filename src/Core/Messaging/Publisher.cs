@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Gibraltar.Monitor;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;

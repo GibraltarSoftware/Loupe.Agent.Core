@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Messaging;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;

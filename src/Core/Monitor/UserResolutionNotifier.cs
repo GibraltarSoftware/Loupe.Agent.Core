@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 using Gibraltar.Messaging;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 
 namespace Gibraltar.Monitor
 {

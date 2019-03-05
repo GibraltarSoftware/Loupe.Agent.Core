@@ -1,8 +1,7 @@
 ﻿
 using System;
 using System.Globalization;
-using Gibraltar.Monitor.Internal;
-
+using Gibraltar.Monitor.Serialization;
 
 
 namespace Gibraltar.Monitor

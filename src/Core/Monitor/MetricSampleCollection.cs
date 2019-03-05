@@ -22,7 +22,7 @@ namespace Gibraltar.Monitor
         /// Create a new sample collection for the specified metric object
         /// </summary>
         /// <param name="metric"></param>
-        internal MetricSampleCollection(Metric metric)
+        public MetricSampleCollection(Metric metric)
         {
             //store off the metric we're related to
             m_Metric = metric;
