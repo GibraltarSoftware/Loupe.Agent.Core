@@ -4,8 +4,16 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
+    /// <summary>
+    /// Provides methods to format parameter strings.
+    /// </summary>
     public static class ParameterStringFormat
     {
+        /// <summary>
+        /// Formats 0, 1 or n parameters as a readable string.
+        /// </summary>
+        /// <param name="actionDescriptorParameters">The action descriptor parameters.</param>
+        /// <returns>A formatted string.</returns>
         public static string FromList(IList<ParameterDescriptor> actionDescriptorParameters)
         {
             switch (actionDescriptorParameters.Count)
