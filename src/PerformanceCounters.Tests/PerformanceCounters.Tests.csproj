@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <AssemblyName>Loupe.PerformanceCounters.Tests</AssemblyName>
+
+    <RootNamespace>Loupe.PerformanceCounters.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Agent\Agent.csproj" />
+    <ProjectReference Include="..\PerformanceCounters\PerformanceCounters.csproj" />
+  </ItemGroup>
+
+</Project>

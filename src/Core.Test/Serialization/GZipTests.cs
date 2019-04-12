@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace Loupe.Core.Test.Serialization
 {
+    [Ignore("debugging test only")]
     [TestFixture]
     public class GZipTests
     {

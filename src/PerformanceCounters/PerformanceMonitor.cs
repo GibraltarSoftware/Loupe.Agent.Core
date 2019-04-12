@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
 
@@ -40,6 +41,9 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         public void Initialize(PerformanceConfiguration configuration)
         {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (isWindows == false)
+                return; 
 #if DEBUG
             //don't log during initialize in a lock, we will probably deadlock.
             Log.Write(LogMessageSeverity.Information, "Gibraltar.Agent", "Starting asynchronous performance monitoring initialization", null);
@@ -152,9 +156,6 @@ namespace Loupe.Agent.PerformanceCounters
 
         private void InitializeDiskCounters()
         {
-            if (Log.IsMonoRuntime)
-                return; // This set of counters don't seem to exist on Mono (and would probably be named differently when they ever do).
-
             //create a performance counter group for these guys
             m_DiskCounters = new PerfCounterCollection("Disk Counters", "System-wide disk performance counters (not specific to the process being monitored)");
 
@@ -243,16 +244,9 @@ namespace Loupe.Agent.PerformanceCounters
                     {
                         m_NetworkCounters.Add("Network Interface", "Bytes Received/sec", interfaceName);
                         m_NetworkCounters.Add("Network Interface", "Bytes Sent/sec", interfaceName);
-                        if (Log.IsMonoRuntime)
-                        {
-                            m_NetworkCounters.Add("Network Interface", "Bytes Total/sec", interfaceName);
-                        }
-                        else
-                        {
-                            m_NetworkCounters.Add("Network Interface", "Current Bandwidth", interfaceName);
-                            m_NetworkCounters.Add("Network Interface", "Packets Received Errors", interfaceName);
-                            m_NetworkCounters.Add("Network Interface", "Packets Outbound Errors", interfaceName);
-                        }
+                        m_NetworkCounters.Add("Network Interface", "Current Bandwidth", interfaceName);
+                        m_NetworkCounters.Add("Network Interface", "Packets Received Errors", interfaceName);
+                        m_NetworkCounters.Add("Network Interface", "Packets Outbound Errors", interfaceName);
                     }
                 }
             }
@@ -303,21 +297,11 @@ namespace Loupe.Agent.PerformanceCounters
             //register our favorite performance counters with the monitoring system
             try
             {
-                if (Log.IsMonoRuntime)
-                {
-                    //m_SystemCounters.Add("System", "Processor Queue Length"); // No Mono equivalent available?
-                    m_SystemCounters.Add("Processor", "% Processor Time", "_Total");
-                    //m_SystemCounters.Add("Mono Memory", "Total Physical Memory"); // Is this meaningful to collect?
-                    //m_SystemCounters.Add("Mono Memory", "Allocated Objects"); // No, apparently these aren't meaningful.
-                }
-                else
-                {
-                    m_SystemCounters.Add("System", "Processor Queue Length");
-                    m_SystemCounters.Add("Processor", "% Processor Time", "_Total");
-                    m_SystemCounters.Add("Memory", "Committed Bytes");
-                    m_SystemCounters.Add("Memory", "Available Bytes");
-                    m_SystemCounters.Add("Memory", "Pages/sec");
-                }
+                m_SystemCounters.Add("System", "Processor Queue Length");
+                m_SystemCounters.Add("Processor", "% Processor Time", "_Total");
+                m_SystemCounters.Add("Memory", "Committed Bytes");
+                m_SystemCounters.Add("Memory", "Available Bytes");
+                m_SystemCounters.Add("Memory", "Pages/sec");
             }
             catch (Exception exception)
             {
