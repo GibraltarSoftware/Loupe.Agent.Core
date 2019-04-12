@@ -11,18 +11,12 @@ namespace Gibraltar
     /// </summary>
     public static class CommonCentralLogic
     {
-        private static bool g_MonoRuntime = CheckForMono(); // Are we running in Mono or full .NET CLR?
         private static bool s_SilentMode = false;
-        volatile private static bool s_BreakPointEnable = false; // Can be changed in the debugger
+        private static volatile bool s_BreakPointEnable = false; // Can be changed in the debugger
 
         // Basic log implementation.
-        volatile private static bool g_SessionEnding; // Session end triggered. False until set to true.
-        volatile private static bool g_SessionEnded; // Session end completed. False until set to true.
-
-        /// <summary>
-        /// Indicates if the process is running under the Mono runtime or the full .NET CLR.
-        /// </summary>
-        public static bool IsMonoRuntime { get { return g_MonoRuntime; } }
+        private static volatile bool g_SessionEnding; // Session end triggered. False until set to true.
+        private static volatile bool g_SessionEnded; // Session end completed. False until set to true.
 
         /// <summary>
         /// Indicates if the logging system should be running in silent mode (for example when running in the agent).
@@ -157,15 +151,19 @@ namespace Gibraltar
                             break; // We're presumably off the end of the stack, bail out of the loop!
 
                         frameModule = method.Module.Name;
+                        var frameClass = method.DeclaringType?.FullName;
 
-                        if (frameModule.Equals("System.dll") || frameModule.Equals("mscorlib.dll"))
+                        if (((ReferenceEquals(frameClass, null) == false) 
+                             && (frameClass.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase)
+                             || frameClass.StartsWith("System.", StringComparison.OrdinalIgnoreCase)))
+                            || frameModule.Equals("System.dll")  //Doesn't apply in .NET Core
+                            || frameModule.Equals("mscorlib.dll")) //Doesn't apply in .NET Core
                         {
                             // Ahhh, a frame in the system libs... Next non-system frame will be our pick!
                             if (firstSystem == null) // ...unless we find no better candidate, so remember the first one.
                             {
                                 firstSystem = newFrame;
                             }
-
                         }
                         else
                         {
@@ -173,14 +171,16 @@ namespace Gibraltar
                             // We already got its corresponding method, above, to validate the module.
 
                             // Okay, it's not in the system libs, so it might be a good candidate,
-                            // but do we need to filter out Gibraltar or is this a deliberate local invocation?
-                            // And if it's something that called into system libs (e.g. Trace), take that regardless.
+                            // but do we need to filter out Loupe or is this a deliberate local invocation?
 
                             if (trustSkipFrames || (firstSystem != null))
                                 break;
 
-                            if (frameModule.Equals("Loupe.Agent.NETCore.dll") == false &&
-                                frameModule.Equals("Loupe.Core.NETCore.dll") == false)
+                            if ((ReferenceEquals(frameClass, null)
+                                 || (frameClass.StartsWith("Loupe.Agent.", StringComparison.OrdinalIgnoreCase) == false
+                                     && frameClass.StartsWith("Loupe.Core.", StringComparison.OrdinalIgnoreCase) == false))
+                                && frameModule.Equals("Loupe.Agent.NETCore.dll") == false //Doesn't apply in .NET Core
+                                && frameModule.Equals("Loupe.Core.NETCore.dll") == false) //Doesn't apply in .NET Core
                             {
                                 // This is the first frame which is not in our known ecosystem,
                                 // so this must be the client code calling us.

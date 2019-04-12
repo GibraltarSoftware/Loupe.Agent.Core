@@ -605,12 +605,6 @@ namespace Gibraltar.Data
             // We share ReadWrite so that we overlap with an open lock (unshared write) and other requests (open reads).
             FileShare fileShare = FileShare.ReadWrite;
 
-            if (CommonCentralLogic.IsMonoRuntime) // ...except on Mono that doesn't work properly.
-            {
-                lockFullFileNamePath += "req"; // We must use a separate file for lock requests on Mono.
-                fileShare = FileShare.Read; // Allow any other reads, but not writes.
-            }
-
             try
             {
                 // This is meant to overlap with other requestors, so it should never delete on close; others may still have it open.
@@ -648,16 +642,6 @@ namespace Gibraltar.Data
             FileAccess fileAccess = FileAccess.Read;
             FileShare fileShare = FileShare.Write;
             bool deleteOnClose = false; // This overlaps with holding a write lock, so don't delete the file when successful.
-
-            if (CommonCentralLogic.IsMonoRuntime) // ...except on Mono that doesn't work properly.
-            {
-                lockFullFileNamePath += "req"; // We use a separate file for lock requests on Mono.
-                fileAccess = FileAccess.Write; // Writes would be blocked by a request sharing only other reads.
-                fileShare = FileShare.None; // This would probably be okay to share, but doesn't hurt to err as cautious.
-                deleteOnClose = m_DeleteOnClose; // Separate file needs to be cleaned up, should we do it after success below?
-                if (File.Exists(lockFullFileNamePath) == false)
-                    return false; // Don't bother creating the request file if it doesn't exist:  No one can be waiting.
-            }
 
             try
             {
