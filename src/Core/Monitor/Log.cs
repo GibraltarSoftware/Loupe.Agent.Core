@@ -167,18 +167,6 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Indicates if the process is running under the Mono runtime or the full .NET CLR.
-        /// </summary>
-        public static bool IsMonoRuntime
-        {
-            get
-            {
-                return CommonCentralLogic.IsMonoRuntime;
-            }
-        }
-
-
-        /// <summary>
         /// Indicates if logging is active, performing initialization if necessary
         /// </summary>
         /// <returns>True if logging is active, false if it isn't at this time.</returns>
