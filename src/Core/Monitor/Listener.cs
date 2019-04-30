@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
+using System.Linq;
 using System.Threading;
+using Gibraltar.Messaging;
 using Gibraltar.Monitor.Net;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -15,6 +19,7 @@ namespace Gibraltar.Monitor
         private static readonly object m_ListenerLock = new object();
         private static readonly object m_ConfigLock = new object();
 
+        private static Publisher m_Publisher; //the active Agent publisher //LOCKED BY CONFIGLOCK
         private static AgentConfiguration m_AgentConfiguration; //the active Agent configuration //LOCKED BY CONFIGLOCK
         private static ListenerConfiguration m_Configuration; //the active listener configuration //LOCKED BY CONFIGLOCK
         private static bool m_PendingConfigChange; //LOCKED BY CONFIGLOCK
@@ -25,6 +30,7 @@ namespace Gibraltar.Monitor
         //our various listeners we're controlling
         private static bool m_ConsoleListenerRegistered; //LOCKED BY LISTENERLOCK
         private static CLRListener m_CLRListener; //LOCKED BY LISTENERLOCK
+        private static Dictionary<string, IMonitor> m_Monitors; //LOCKED BY LISTENERLOCK
 
         private static MetricSampleInterval m_SamplingInterval = MetricSampleInterval.Minute;
         private static DateTimeOffset m_PollingStarted;
@@ -33,6 +39,8 @@ namespace Gibraltar.Monitor
 
         static Listener()
         {
+            m_Monitors = new Dictionary<string, IMonitor>(StringComparer.OrdinalIgnoreCase);
+
             //create the background thread we need so we can respond to requests.
             CreateMonitorThread();
         }
@@ -45,12 +53,14 @@ namespace Gibraltar.Monitor
         /// <remarks>If calling initialization from a path that may have started with the trace listener,
         /// you must set suppressTraceInitialize to true to guarantee that the application will not deadlock
         /// or throw an unexpected exception.</remarks>
-        public static void Initialize(AgentConfiguration agentConfiguration, bool async)
+        public static void Initialize(Publisher publisher, AgentConfiguration agentConfiguration, bool async)
         {
-            ListenerConfiguration listenerConfiguration = agentConfiguration.Listener;
+            var listenerConfiguration = agentConfiguration.Listener;
             //get a configuration lock so we can update the configuration
-            lock(m_ConfigLock)
+            lock (m_ConfigLock)
             {
+                m_Publisher = publisher;
+
                 //and store the configuration; it's processed by the background thread.
                 m_AgentConfiguration = agentConfiguration; // Set the top config before the local Listener config.
                 m_Configuration = listenerConfiguration; // Monitor thread looks for this to be non-null before proceeding.
@@ -116,6 +126,9 @@ namespace Gibraltar.Monitor
                 {
                     //mark the start of our cycle
                     DateTimeOffset previousPollStart = DateTimeOffset.UtcNow; //this realy should be UTC - we aren't storing it.
+
+                    //poll our monitors
+                    PerformPoll();
 
                     //now we need to wait for the timer to expire, but the user can update it periodically so we don't want to just
                     //assume it is unchanged for the entire wait duration.
@@ -214,9 +227,11 @@ namespace Gibraltar.Monitor
             Log.ThreadIsInitializer = true;  //so if we wander back into Log.Initialize we won't block.
 
             //get the lock while we grab the configuration so we know it isn't changed out under us
+            List<IMonitorConfiguration> enabledMonitorsConfiguration;
             lock (m_ConfigLock)
             {
                 newConfiguration = m_Configuration;
+                enabledMonitorsConfiguration = m_AgentConfiguration.Monitors?.Where(m => m.Enabled).ToList();
 
                 System.Threading.Monitor.PulseAll(m_ConfigLock);
             }
@@ -224,6 +239,79 @@ namespace Gibraltar.Monitor
             //immediately reflect this change in our multithreaded event listeners
             InitializeConsoleListener(newConfiguration);
             InitializeCLRListener(newConfiguration);
+
+            //Create our necessary listeners
+            var existingMonitorNames = m_Monitors.Keys.ToList();
+            if (enabledMonitorsConfiguration != null)
+            {
+                foreach (var monitorConfiguration in enabledMonitorsConfiguration)
+                {
+                    //first, see if we already have it?
+                    if (!m_Monitors.TryGetValue(monitorConfiguration.MonitorTypeName, out var monitor))
+                    {
+                        //no, so we need to create this one.
+                        try
+                        {
+                            var monitorType = Type.GetType(monitorConfiguration.MonitorTypeName);
+
+                            if (monitorType != null)
+                            {
+                                var newMonitor = (IMonitor)Activator.CreateInstance(monitorType);
+
+                                newMonitor.Initialize(m_Publisher, monitorConfiguration);
+
+                                m_Monitors.Add(monitorConfiguration.MonitorTypeName, newMonitor);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, "Gibraltar.Agent",
+                                    "Error while Initializing Monitor due to " + ex.GetBaseException().GetType().Name,
+                                    "While attempting instantiate a monitor, an exception was thrown.\r\n" +
+                                    "The monitor will not be added.\r\nMonitor Type: {0}\r\nException: {1}", monitorConfiguration.MonitorTypeName, ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            monitor.ConfigurationUpdated(monitorConfiguration);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, "Gibraltar.Agent",
+                                    "Error while Initializing Monitor due to " +
+                                    ex.GetBaseException().GetType().Name,
+                                    "While attempting to do a routine initialization / re-initialization of a monitor, an exception was thrown.\r\n" +
+                                    "The monitor is in an unknown state.\r\nMonitor Type: {0}\r\nException: {1}",
+                                    monitorConfiguration.MonitorTypeName, ex.Message);
+                        }
+
+                        //since this is still enabled and we found it, remove it from our list of existing monitors so we don't purge it.
+                        existingMonitorNames.Remove(monitorConfiguration.MonitorTypeName);
+                    }
+                }
+            }
+
+            //and remove any that are no longer configured/enabled.  Anything left in our existing monitors list was disabled or missing.
+            foreach (var existingMonitorName in existingMonitorNames)
+            {
+                if (m_Monitors.TryGetValue(existingMonitorName, out var victim))
+                {
+                    try
+                    {
+                        victim.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        GC.KeepAlive(ex);
+                    }
+
+                    m_Monitors.Remove(existingMonitorName);
+                }
+            }
 
             lock (m_ConfigLock)
             {
@@ -248,7 +336,7 @@ namespace Gibraltar.Monitor
         {
             try
             {
-                lock(m_ListenerLock)
+                lock (m_ListenerLock)
                 {
                     //we can't register the console listener more than once, and it isn't designed for good register/unregister handling
                     //so we just have a simple bool to see if we did it.
@@ -261,11 +349,10 @@ namespace Gibraltar.Monitor
             }
             catch (Exception ex)
             {
-                GC.KeepAlive(ex);
-#if DEBUG
-                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, "Gibraltar.Agent", "Error while Initializing Console Listener", 
-                    "While attempting to do a routine initialization / re-initialization of the console listener, an exception was raised: {0}", ex.Message);
-#endif
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                        "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
+                        "While attempting to do a routine initialization / re-initialization of the console listener, an exception was raised: {0}", ex.Message);
             }
         }
 
@@ -273,7 +360,7 @@ namespace Gibraltar.Monitor
         {
             try
             {
-                lock(m_ListenerLock)
+                lock (m_ListenerLock)
                 {
                     if (m_CLRListener == null)
                     {
@@ -289,10 +376,35 @@ namespace Gibraltar.Monitor
             catch (Exception ex)
             {
                 GC.KeepAlive(ex);
-#if DEBUG
-                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, "Gibraltar.Agent", "Error while Initializing Common Language Runtime Listener",
-                    "While attempting to do a routine initialization / re-initialization of the CLR listener, an exception was raised: {0}", ex.Message);
-#endif
+
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                 "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
+                    "While attempting to do a routine initialization / re-initialization of the CLR listener, an exception was thrown: {0}", ex.Message);
+            }
+        }
+
+        private static void PerformPoll()
+        {
+            if (m_Monitors != null)
+            {
+                foreach (var monitor in m_Monitors.Values)
+                {
+                    try
+                    {
+                        monitor.Poll();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is ThreadAbortException)
+                            throw;
+
+                        if (!Log.SilentMode)
+                            Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent", 
+                                "Unable to poll monitor due to " + ex.GetBaseException().GetType().Name, 
+                                "While attempting to do a routine poll of a monitor, an exception was thrown: {0}", ex.Message);
+                    }
+                }
             }
         }
 

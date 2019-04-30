@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Gibraltar.Agent;
+using Loupe.Agent.PerformanceCounters;
 using Loupe.Configuration;
 using NUnit.Framework;
 
@@ -40,6 +41,8 @@ namespace Loupe.PerformanceCounters.Tests
             publisher.ApplicationDescription = "NUnit tests of the Loupe Agent PerformanceCounter Library";
 
             m_Configuration.SessionFile.EnableFilePruning = false;
+
+            m_Configuration.Monitors.Add(new PerformanceConfiguration());
 
             //force us to initialize logging
             Log.StartSession(m_Configuration);

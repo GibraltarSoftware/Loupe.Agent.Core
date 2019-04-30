@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Gibraltar.Messaging;
 using Gibraltar.Monitor;
+using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.PerformanceCounters
@@ -16,7 +18,7 @@ namespace Loupe.Agent.PerformanceCounters
     /// Registers a set of performance counters to be monitored and automatically polls them every interval
     /// of time to provide a clear picture of the system's performance while the application was running.
     /// </remarks>
-    public class PerformanceMonitor 
+    public class PerformanceMonitor : IMonitor
     {
         private readonly object m_Lock = new object();
 
@@ -36,10 +38,17 @@ namespace Loupe.Agent.PerformanceCounters
 
         #region Public Properties and Methods
 
+        string IMonitor.Caption => "Performance Monitor";
+
+        void IMonitor.ConfigurationUpdated(IMonitorConfiguration configuration)
+        {
+
+        }
+
         /// <summary>
         /// Initialize / reinitialize the performance monitor with the provided configuration
         /// </summary>
-        public void Initialize(PerformanceConfiguration configuration)
+        public void Initialize(Publisher publisher, IMonitorConfiguration configuration)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (isWindows == false)
@@ -49,26 +58,28 @@ namespace Loupe.Agent.PerformanceCounters
             Log.Write(LogMessageSeverity.Information, "Gibraltar.Agent", "Starting asynchronous performance monitoring initialization", null);
 #endif
 
+            var perfConfiguration = (PerformanceConfiguration) configuration;
+
             //we want to make sure anything that might want to mess with our data will wait until we're done initializing
             lock (m_Lock)
             {
-                if ((configuration.EnableDiskMetrics) && (m_DiskCounters == null))
+                if ((perfConfiguration.EnableDiskMetrics) && (m_DiskCounters == null))
                     InitializeDiskCounters();
 
-                if ((configuration.EnableNetworkMetrics) && (m_NetworkCounters == null))
+                if ((perfConfiguration.EnableNetworkMetrics) && (m_NetworkCounters == null))
                     InitializeNetworkCounters();
 
-                if ((configuration.EnableSystemMetrics) && (m_SystemCounters == null))
+                if ((perfConfiguration.EnableSystemMetrics) && (m_SystemCounters == null))
                     InitializeSystemCounters();
 
-                if ((configuration.EnableMemoryMetrics) && (m_MemoryCounters == null))
+                if ((perfConfiguration.EnableMemoryMetrics) && (m_MemoryCounters == null))
                     InitializeMemoryCounters();
 
                 //copy the configuration to ensure invariance...
-                m_EnableDiskCounters = configuration.EnableDiskMetrics;
-                m_EnableMemoryCounters = configuration.EnableMemoryMetrics;
-                m_EnableNetworkCounters = configuration.EnableNetworkMetrics;
-                m_EnableSystemCounters = configuration.EnableSystemMetrics;
+                m_EnableDiskCounters = perfConfiguration.EnableDiskMetrics;
+                m_EnableMemoryCounters = perfConfiguration.EnableMemoryMetrics;
+                m_EnableNetworkCounters = perfConfiguration.EnableNetworkMetrics;
+                m_EnableSystemCounters = perfConfiguration.EnableSystemMetrics;
 
                 //and now we're done initializing
                 m_Initialized = true;
@@ -148,6 +159,16 @@ namespace Loupe.Agent.PerformanceCounters
                     System.Threading.Monitor.PulseAll(m_Lock);
                 }
             }
+        }
+
+        bool IEquatable<IMonitor>.Equals(IMonitor other)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDisposable.Dispose()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -347,5 +368,6 @@ namespace Loupe.Agent.PerformanceCounters
         }
 
         #endregion
+
     }
 }

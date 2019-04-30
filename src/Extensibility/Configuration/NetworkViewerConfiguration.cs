@@ -49,14 +49,7 @@
         /// <remarks>This overrides the write through request flag for all published requests, acting
         /// as if they are set true.  This will slow down logging and change the degree of parallelism of 
         /// multithreaded applications since each log message will block until it is committed.</remarks>
-        bool IMessengerConfiguration.ForceSynchronous
-        {
-            get
-            {
-                return false; //this messenger isn't safe in synchronous mode.
-            }
-            set { }
-        }
+        bool IMessengerConfiguration.ForceSynchronous => false;
 
         /// <summary>
         /// Normalize configuration
@@ -68,5 +61,8 @@
             else if (MaxQueueLength > 50000)
                 MaxQueueLength = 50000;
         }
+
+        /// <inheritdoc />
+        string IMessengerConfiguration.MessengerTypeName => "Gibraltar.Messaging.NetworkMessenger";
     }
 }

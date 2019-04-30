@@ -9,8 +9,14 @@ namespace Gibraltar.Messaging
     /// <summary>
     /// Implement this interface to be a packet sink for the messaging system. 
     /// </summary>
-    internal interface IMessenger : IEquatable<IMessenger>, IDisposable
+    public interface IMessenger : IEquatable<IMessenger>, IDisposable
     {
+        /// <summary>
+        /// A name for this messenger
+        /// </summary>
+        /// <remarks>The name is unique and specified by the publisher during initialization.</remarks>
+        string Name { get; }
+
         /// <summary>
         /// A display caption for this messenger
         /// </summary>
@@ -36,12 +42,6 @@ namespace Gibraltar.Messaging
         /// <param name="publisher">The publisher that owns the messenger</param>
         /// <param name="configuration">The configuration block for this messenger</param>
         void Initialize(Publisher publisher, IMessengerConfiguration configuration);
-
-        /// <summary>
-        /// A name for this messenger
-        /// </summary>
-        /// <remarks>The name is unique and specified by the publisher during initialization.</remarks>
-        string Name { get; }
 
         /// <summary>
         /// Write the provided packet to this messenger.
