@@ -10,6 +10,10 @@ using ILoupeDiagnosticListener = Loupe.Agent.Core.Services.ILoupeDiagnosticListe
 namespace Loupe.Agent.EntityFrameworkCore
 {
     // ReSharper disable once ClassNeverInstantiated.Global
+    /// <summary>
+    /// Diagnostic listener for EF Core events.
+    /// </summary>
+    /// <seealso cref="Loupe.Agent.Core.Services.ILoupeDiagnosticListener" />
     internal class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
     {
         private readonly CommandMetricFactory _commandMetricFactory;
@@ -18,23 +22,41 @@ namespace Loupe.Agent.EntityFrameworkCore
         private readonly ConcurrentDictionary<Guid, ConnectionMetric> _openings = new ConcurrentDictionary<Guid, ConnectionMetric>();
         private readonly ConcurrentDictionary<Guid, ConnectionMetric> _closings = new ConcurrentDictionary<Guid, ConnectionMetric>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityFrameworkCoreDiagnosticListener"/> class.
+        /// </summary>
+        /// <param name="agent">The Loupe agent.</param>
         public EntityFrameworkCoreDiagnosticListener(LoupeAgent agent)
         {
             _commandMetricFactory = new CommandMetricFactory(agent.ApplicationName);
             _connectionMetricFactory = new ConnectionMetricFactory(agent.ApplicationName);
         }
 
+        /// <summary>
+        /// Returns the name of the <see cref="T:System.Diagnostics.DiagnosticSource" /> this implementation targets.
+        /// </summary>
         public string Name => "Microsoft.EntityFrameworkCore";
 
+        /// <summary>
+        /// Notifies the observer that the provider has finished sending push-based notifications.
+        /// </summary>
         public void OnCompleted()
         {
         }
 
+        /// <summary>
+        /// Notifies the observer that the provider has experienced an error condition.
+        /// </summary>
+        /// <param name="error">An object that provides additional information about the error.</param>
         public void OnError(Exception error)
         {
             Log.Error(error, LogWriteMode.Queued, "EntityFrameworkCoreDiagnosticListener", error.Message, "LoupeDiagnosticListener");
         }
 
+        /// <summary>
+        /// Provides the observer with new data.
+        /// </summary>
+        /// <param name="value">The current notification information.</param>
         public void OnNext(KeyValuePair<string, object> value)
         {
             switch (value.Value)
