@@ -1383,9 +1383,9 @@ namespace Gibraltar.Monitor
                         newPackager.EndSend += Packager_EndSend;
 
                         if (criteria.HasValue)
-                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, false, false, null, null, 0, false, null, null, asyncSend);
+                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, asyncSend);
                         else
-                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, false, false, null, null, 0, false, null, null, asyncSend);
+                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, asyncSend);
 
                         result = true;
                     }

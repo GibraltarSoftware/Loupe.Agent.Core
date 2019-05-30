@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Gibraltar.Agent;
+using Loupe.Configuration;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.Packaging
@@ -209,6 +210,9 @@ namespace Loupe.Agent.Test.Packaging
                 "Gibraltar\\Local Logs\\Loupe");
 
             var tempDir = Path.Combine(Path.GetTempPath(), "PackagerTests");
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir); //so we start from a known, blank position.
+
             Directory.CreateDirectory(tempDir);
             try
             {
@@ -248,38 +252,60 @@ namespace Loupe.Agent.Test.Packaging
         [Test]
         public void SendPackageViaServerOverrideCustomer()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = true,
+                CustomerName = ServerOverrideCustomerName
+            };
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, ServerOverrideCustomerName);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
             }
         }
 
         [Test]
         public void SendPackageViaServerOverrideServer()
         {
+            var server = new ServerConfiguration
+            {
+                Server = ServerOverrideServerName,
+                Repository = ServerOverrideRepository,
+                UseSsl = true
+            };
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, ServerOverrideServerName, 0, false, null, ServerOverrideRepository);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
             }
         }
 
         [Test]
         public void SendPackageViaServerOverrideServerAndRepository()
         {
+            var server = new ServerConfiguration
+            {
+                Server = "hub.gibraltarsoftware.com",
+                Repository = ServerOverrideRepository,
+                UseSsl = true
+            };
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, "hub.gibraltarsoftware.com", 0, true, null, ServerOverrideRepository);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
             }
         }
 
         [Test]
         public void SendPackageViaServerMissingArgsCustomerNull()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = true,
+                CustomerName = null
+            };
             Assert.Throws<ArgumentException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, null);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
                 }
             });
         }
@@ -287,11 +313,16 @@ namespace Loupe.Agent.Test.Packaging
         [Test]
         public void SendPackageViaServerMissingArgsCustomerEmpty()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = true,
+                CustomerName = String.Empty
+            };
             Assert.Throws<ArgumentException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, "");
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
                 }
             });
         }
@@ -299,11 +330,16 @@ namespace Loupe.Agent.Test.Packaging
         [Test]
         public void SendPackageViaServerMissingArgsServerNull()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = false,
+                Server = null
+            };
             Assert.Throws<ArgumentException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, null, 0, false, null, null);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
                 }
             });
         }
@@ -311,11 +347,16 @@ namespace Loupe.Agent.Test.Packaging
         [Test]
         public void SendPackageViaServerMissingArgsServerEmpty()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = false,
+                Server = string.Empty
+            };
             Assert.Throws<ArgumentException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, "", 0, false, null, null);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
                 }
             });
         }
@@ -323,11 +364,18 @@ namespace Loupe.Agent.Test.Packaging
         [Test]
         public void SendPackageViaServerBadArgsPortNegative()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = false,
+                Server = ServerOverrideServerName,
+                Port = -20,
+                ApplicationBaseDirectory = ServerOverrideBaseDirectory
+            };
             Assert.Throws<ArgumentException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, ServerOverrideServerName, -20, false, ServerOverrideBaseDirectory, null);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, server);
                 }
             });
         }

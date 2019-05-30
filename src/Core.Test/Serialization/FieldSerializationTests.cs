@@ -336,7 +336,7 @@ namespace Loupe.Core.Serialization.UnitTests
             MemoryStream buffer = new MemoryStream();
             IFieldWriter writer = new FieldWriter(buffer);
             IFieldReader reader = new FieldReader(buffer);
-            DateTime referenceTime = DateTime.Now; //we convert to UTC during serialization, we want local time.
+            var referenceTime = new DateTime(6, 25, 1973, 8, 30, 12, DateTimeKind.Local); //we convert to UTC during serialization, we want local time.
             buffer.Position = 0;
             writer.Write(referenceTime);
             Assert.AreEqual(12, buffer.Position);

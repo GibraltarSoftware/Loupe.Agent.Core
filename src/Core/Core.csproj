@@ -19,6 +19,7 @@
     <PackageId>Loupe.Agent.Core.Internal</PackageId>
     <AssemblyVersion>4.5.1.0</AssemblyVersion>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+    <PackageLicenseUrl>https://github.com/GibraltarSoftware/Loupe.Agent.Core/blob/master/LICENSE.txt</PackageLicenseUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

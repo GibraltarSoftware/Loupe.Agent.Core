@@ -12,6 +12,10 @@ namespace Loupe.Extensions.Logging
     {
         private readonly string _category;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoupeLogger"/> class.
+        /// </summary>
+        /// <param name="category">The category.</param>
         public LoupeLogger(string category)
         {
             _category = category;

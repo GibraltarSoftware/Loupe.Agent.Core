@@ -11,12 +11,22 @@ using Microsoft.AspNetCore.Routing;
 namespace Loupe.Agent.AspNetCore
 {
     // ReSharper disable once ClassNeverInstantiated.Global
+    /// <summary>
+    /// ASP.NET Core Middleware to time requests and track errors.
+    /// </summary>
     public class LoupeMiddleware
     {
         private readonly LoupeAgent _agent;
         private readonly RequestDelegate _next;
         private readonly EventMetric _requestMetric;
 
+        /// <summary>
+        /// Constructs and instance of <see cref="LoupeMiddleware"/>.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="agent"></param>
+        /// <param name="applicationLifetime"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public LoupeMiddleware(RequestDelegate next, LoupeAgent agent, IApplicationLifetime applicationLifetime)
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
@@ -30,6 +40,11 @@ namespace Loupe.Agent.AspNetCore
             _requestMetric = EventMetric.Register(requestMetricDefinition, null);
         }
 
+        /// <summary>
+        /// The automagically-called method that processes the request.
+        /// </summary>
+        /// <param name="context">The <see cref="HttpContext"/> instance for the current request.</param>
+        /// <returns>A <see cref="Task"/> that completes when the middleware has processed the request.</returns>
         public async Task Invoke(HttpContext context)
         {
             context.RequestAborted.Register(OnRequestAborted, context);

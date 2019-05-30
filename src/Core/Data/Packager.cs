@@ -14,7 +14,7 @@ using Loupe.Extensibility.Data;
 namespace Gibraltar.Data
 {
     /// <summary>
-    /// Packages up sessions collected on the local computer and sends them via email or file transport.
+    /// Packages up sessions collected on the local computer and sends them via server or file transport.
     /// </summary>
     public class Packager : IDisposable
     {
@@ -223,29 +223,20 @@ namespace Gibraltar.Data
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="overrideConfiguration">Indicates if any of the configuration information provided on this call should be used.</param>
-        /// <param name="useGibraltarService">Indicates if the Gibraltar Loupe Service should be used instead of a private server</param>
-        /// <param name="customerName">The unique customer name when using the Gibraltar Loupe Service</param>
-        /// <param name="server">The full DNS name of the server where the service is located.  Only applies to a private server.</param>
-        /// <param name="port"> An optional port number override for the server.  Only applies to a private server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with SSL.  Only applies to a private server.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the private service.  Only applies to a private server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.  Only applies to a private server.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, bool overrideConfiguration, bool useGibraltarService, string customerName, 
-            string server, int port, bool useSsl, string applicationBaseDirectory, string repository, bool asyncSend)
+        public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, bool asyncSend,
+            ServerConfiguration serverConfiguration = null)
         {
             if (sessions == SessionCriteria.None)
                 return;
 
-            var connectionOptions = new ServerConfiguration { UseGibraltarService = useGibraltarService, CustomerName = customerName, Server = server, Port = port, UseSsl = useSsl, ApplicationBaseDirectory = applicationBaseDirectory, Repository = repository };
-
             AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
-                new object[] { sessions, markAsRead, purgeSentSessions, overrideConfiguration, connectionOptions }, 
+                new object[] { sessions, markAsRead, purgeSentSessions, serverConfiguration }, 
                 asyncSend);
         }
 
@@ -255,29 +246,20 @@ namespace Gibraltar.Data
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="overrideConfiguration">Indicates if any of the configuration information provided on this call should be used.</param>
-        /// <param name="useGibraltarService">Indicates if the Gibraltar Loupe Service should be used instead of a private server</param>
-        /// <param name="customerName">The unique customer name when using the Gibraltar Loupe Service</param>
-        /// <param name="server">The full DNS name of the server where the service is located.  Only applies to a private server.</param>
-        /// <param name="port"> An optional port number override for the server.  Only applies to a private server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with SSL.  Only applies to a private server.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the private service.  Only applies to a private server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.  Only applies to a private server.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, bool overrideConfiguration, bool useGibraltarService, string customerName,
-            string server, int port, bool useSsl, string applicationBaseDirectory, string repository, bool asyncSend)
+        public void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, bool asyncSend,
+            ServerConfiguration serverConfiguration = null)
         {
             if (sessionMatchPredicate == null)
                 throw new ArgumentNullException(nameof(sessionMatchPredicate));
 
-            var connectionOptions = new ServerConfiguration { UseGibraltarService = useGibraltarService, CustomerName = customerName, Server = server, Port = port, UseSsl = useSsl, ApplicationBaseDirectory = applicationBaseDirectory, Repository = repository };
-
             AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
-                new object[] { sessionMatchPredicate, markAsRead, purgeSentSessions, overrideConfiguration, connectionOptions },
+                new object[] { sessionMatchPredicate, markAsRead, purgeSentSessions, serverConfiguration },
                 asyncSend);
         }
 
@@ -287,28 +269,19 @@ namespace Gibraltar.Data
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
-        /// <param name="overrideConfiguration">Indicates if any of the configuration information provided on this call should be used.</param>
-        /// <param name="useGibraltarService">Indicates if the Gibraltar Loupe Service should be used instead of a private server</param>
-        /// <param name="customerName">The unique customer name when using the Gibraltar Loupe Service</param>
-        /// <param name="server">The full DNS name of the server where the service is located.  Only applies to a private server.</param>
-        /// <param name="port"> An optional port number override for the server.  Only applies to a private server.</param>
-        /// <param name="useSsl">Indicates if the connection should be encrypted with SSL.  Only applies to a private server.</param>
-        /// <param name="applicationBaseDirectory">The virtual directory on the host for the private service.  Only applies to a private server.</param>
-        /// <param name="repository">The specific repository on the server for a private server.  Only applies to a private server.</param>
-        /// <param name="progressMonitors">The asynchronous progress monitoring stack.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
+        /// <param name="progressMonitors">Optional. The asynchronous progress monitoring stack.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
         /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid</exception>
-        public async Task<PackageSendEventArgs> SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, bool overrideConfiguration, bool useGibraltarService, 
-            string customerName, string server, int port, bool useSsl, string applicationBaseDirectory, string repository, ProgressMonitorStack progressMonitors)
+        public async Task<PackageSendEventArgs> SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions,
+            ServerConfiguration serverConfiguration = null, ProgressMonitorStack progressMonitors = null)
         {
             if (sessions == SessionCriteria.None)
                 return new PackageSendEventArgs(0, AsyncTaskResult.Success, "No sessions requested", null);
 
-            var connectionOptions = new ServerConfiguration { UseGibraltarService = useGibraltarService, CustomerName = customerName, Server = server, Port = port, UseSsl = useSsl, ApplicationBaseDirectory = applicationBaseDirectory, Repository = repository };
-
-            return await ActionSendToServer(new object[] { sessions, markAsRead, purgeSentSessions, overrideConfiguration, connectionOptions, progressMonitors }).ConfigureAwait(false);
+            return await ActionSendToServer(new object[] { sessions, markAsRead, purgeSentSessions, serverConfiguration, progressMonitors }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -896,12 +869,12 @@ namespace Gibraltar.Data
         /// <summary>
         /// Log the request information for a send to server request
         /// </summary>
-        private static void LogSendToServer(bool overrideConfiguration, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration)
+        private static void LogSendToServer(bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration)
         {
             StringBuilder message = new StringBuilder(1024);
 
             string hubConnectionParameters;
-            if (overrideConfiguration == false)
+            if (serverConfiguration == null)
             {
                 message.AppendLine("Sessions are being sent using application default Server settings.");
                 hubConnectionParameters = string.Empty;
@@ -1223,8 +1196,7 @@ namespace Gibraltar.Data
             bool purgeSentSessions;
             ProgressMonitorStack progressMonitors;
 
-            bool connectionSpecified; //if false we won't use anything below.
-            ServerConfiguration serverConfiguration;
+            ServerConfiguration serverConfiguration = null;
 
             //two ways that state may be:  We may be receiving an async task argument or an array of objects.
 
@@ -1242,8 +1214,7 @@ namespace Gibraltar.Data
                 }
                 markAsRead = (bool)arguments[1];
                 purgeSentSessions = (bool)arguments[2];
-                connectionSpecified = (bool)arguments[3];
-                serverConfiguration = (ServerConfiguration)arguments[4];
+                serverConfiguration = (ServerConfiguration)arguments[3];
                 progressMonitors = asyncTaskArguments.ProgressMonitors;
             }
             else
@@ -1260,15 +1231,14 @@ namespace Gibraltar.Data
                 }
                 markAsRead = (bool)arguments[1];
                 purgeSentSessions = (bool)arguments[2];
-                connectionSpecified = (bool)arguments[3];
-                serverConfiguration = (ServerConfiguration)arguments[4];
-                progressMonitors = (ProgressMonitorStack)arguments[5];
+                serverConfiguration = (ServerConfiguration)arguments[3];
+                progressMonitors = (ProgressMonitorStack)arguments[4];
             }
 
-            LogSendToServer(connectionSpecified, markAsRead, purgeSentSessions, serverConfiguration);
+            LogSendToServer(markAsRead, purgeSentSessions, serverConfiguration);
 
             //before we waste any time, lets see if we're going to be successful.
-            if (connectionSpecified)
+            if (serverConfiguration != null)
             {
                 //this is a little odd but we need to change exception types - this throws an invalid operation exception, we need an argument exception.
                 try
@@ -1307,7 +1277,7 @@ namespace Gibraltar.Data
                         innerMonitor.Update("Connecting to server...");
                         RepositoryPublishClient publishClient;
 
-                        if (connectionSpecified)
+                        if (serverConfiguration != null)
                         {
                             publishClient = new RepositoryPublishClient(m_Repository, serverConfiguration);
                         }
@@ -1459,8 +1429,8 @@ namespace Gibraltar.Data
             try //this is called from a background thread so exceptions would be fatal to the application.
             {
                 //we just wrapper our inner function
-                var task = ActionSendToServer(state);
-                task.Wait();
+                var task = Task.Run(() => ActionSendToServer(state));
+                var results = task.Result;
             }
             catch (Exception ex)
             {

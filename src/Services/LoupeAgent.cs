@@ -7,12 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Loupe.Agent.Core.Services
 {
+    /// <summary>
+    /// The main Loupe agent.
+    /// </summary>
     public sealed class LoupeAgent : IDisposable
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly AgentConfiguration _agentConfiguration;
         private readonly LoupeDiagnosticListener _diagnosticListener;
 
+        /// <summary>Initializes a new instance of the <see cref="LoupeAgent"/> class.</summary>
+        /// <param name="callback">A callback to modify configuration from code.</param>
+        /// <param name="configuration">The ASP.NET Core configuration instance.</param>
+        /// <param name="hostingEnvironment">The hosting environment.</param>
+        /// <param name="serviceProvider">The DI service provider.</param>
+        /// <param name="applicationLifetime">The application lifetime object.</param>
+        /// <exception cref="ArgumentNullException">callback
+        /// or
+        /// configuration
+        /// or
+        /// hostingEnvironment</exception>
         public LoupeAgent(LoupeAgentConfigurationCallback callback, IConfiguration configuration, IHostingEnvironment hostingEnvironment, IServiceProvider serviceProvider, IApplicationLifetime applicationLifetime)
         {
             if (callback == null) throw new ArgumentNullException(nameof(callback));
@@ -30,6 +44,7 @@ namespace Loupe.Agent.Core.Services
             applicationLifetime.ApplicationStopped.Register(() => End(SessionStatus.Normal, "ApplicationStopped"));
         }
 
+        /// <summary>Starts this Agent instance.</summary>
         public void Start()
         {
             Log.StartSession(_agentConfiguration);
@@ -40,16 +55,22 @@ namespace Loupe.Agent.Core.Services
             _diagnosticListener.Subscribe();
         }
 
+        /// <summary>Stops this Agent instance.</summary>
+        /// <param name="status">The session status.</param>
+        /// <param name="reason">The reason.</param>
         public void End(SessionStatus status, string reason)
         {
             Log.EndSession(status, reason);
         }
 
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
         public void Dispose()
         {
             _diagnosticListener.Dispose();
         }
 
+        /// <summary>Gets the name of the application.</summary>
+        /// <value>The name of the application.</value>
         public string ApplicationName { get; }
     }
 }
