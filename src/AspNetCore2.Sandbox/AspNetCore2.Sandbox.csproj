@@ -21,6 +21,7 @@
     <ProjectReference Include="..\AspNetCore2\AspNetCore2.csproj" />
     <ProjectReference Include="..\EFCore2\EFCore2.csproj" />
     <ProjectReference Include="..\Extensions.Logging\Extensions.Logging.csproj" />
+    <ProjectReference Include="..\PerformanceCounters\PerformanceCounters.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

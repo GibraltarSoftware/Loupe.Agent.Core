@@ -31,7 +31,7 @@ namespace Loupe.Agent.PerformanceCounters
         {
             if (newPerfCounterMetricSample == null)
             {
-                throw new ArgumentNullException("newPerfCounterMetricSample", "A new performance counter metric sample object must be provided to add it to the collection.");
+                throw new ArgumentNullException(nameof(newPerfCounterMetricSample), "A new performance counter metric sample object must be provided to add it to the collection.");
             }
             
             //our base object does all the work
@@ -46,7 +46,7 @@ namespace Loupe.Agent.PerformanceCounters
         {
             if (newMetricSamplePacket == null)
             {
-                throw new ArgumentNullException("newMetricSamplePacket", "A new performance counter metric sample packet object must be provided to add it to the collection.");
+                throw new ArgumentNullException(nameof(newMetricSamplePacket), "A new performance counter metric sample packet object must be provided to add it to the collection.");
             }
 
             //now we have to create a new sample object to wrap the provided packet
@@ -67,30 +67,23 @@ namespace Loupe.Agent.PerformanceCounters
         /// <returns></returns>
         public new PerfCounterMetricSample this[int index]
         {
-            get
-            {
-                return (PerfCounterMetricSample)base[index];
-            }
-            set
-            {
-                //we don't want to support setting an object by index, we are sorted.
-                throw new NotSupportedException();
-            }
+            get => (PerfCounterMetricSample)base[index];
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
         /// The metric this sample is for.
         /// </summary>
-        public new PerfCounterMetric Metric { get { return (PerfCounterMetric)base.Metric; } }
+        public new PerfCounterMetric Metric => (PerfCounterMetric)base.Metric;
 
         /// <summary>
         /// The first object in the collection
         /// </summary>
-        public new PerfCounterMetricSample First { get { return (PerfCounterMetricSample)base.First; } }
+        public new PerfCounterMetricSample First => (PerfCounterMetricSample)base.First;
 
         /// <summary>
         /// The last object in the collection
         /// </summary>
-        public new PerfCounterMetricSample Last { get { return (PerfCounterMetricSample)base.Last; } }
+        public new PerfCounterMetricSample Last => (PerfCounterMetricSample)base.Last;
     }
 }

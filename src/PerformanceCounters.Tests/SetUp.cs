@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Gibraltar.Agent;
+using Gibraltar.Monitor;
 using Loupe.Agent.PerformanceCounters;
 using Loupe.Configuration;
 using NUnit.Framework;
+using Log = Gibraltar.Agent.Log;
+using LogInitializingEventArgs = Gibraltar.Agent.LogInitializingEventArgs;
 
 namespace Loupe.PerformanceCounters.Tests
 {
@@ -42,7 +44,7 @@ namespace Loupe.PerformanceCounters.Tests
 
             m_Configuration.SessionFile.EnableFilePruning = false;
 
-            m_Configuration.Monitors.Add(new PerformanceConfiguration());
+            Listener.Subscribe(new PerformanceMonitor(new PerformanceConfiguration()));
 
             //force us to initialize logging
             Log.StartSession(m_Configuration);

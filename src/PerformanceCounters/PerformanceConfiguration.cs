@@ -5,7 +5,7 @@ namespace Loupe.Agent.PerformanceCounters
     /// <summary>
     /// Configuration information for performance monitoring
     /// </summary>
-    public class PerformanceConfiguration : IMonitorConfiguration
+    public class PerformanceConfiguration
     {
         public PerformanceConfiguration()
         {
@@ -21,9 +21,6 @@ namespace Loupe.Agent.PerformanceCounters
         /// Enable or disable loading the performance monitor
         /// </summary>
         public bool Enabled { get; set; }
-
-        /// <inheritdoc />
-        string IMonitorConfiguration.MonitorTypeName => typeof(PerformanceMonitor).AssemblyQualifiedName;
 
         /// <summary>
         /// When true, process performance information will be automatically captured for the current process

@@ -82,7 +82,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// The set of metrics that use this definition.
         /// </summary>
         /// <remarks>All metrics with the same definition are of the same object type.</remarks>
-        public new PerfCounterMetricCollection Metrics { get { return (PerfCounterMetricCollection)base.Metrics; } }
+        public new PerfCounterMetricCollection Metrics => (PerfCounterMetricCollection)base.Metrics;
 
 
         /// <summary>
@@ -90,26 +90,17 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         /// <remarks>Uses the Windows Performance Counter type. The counter type determines what math needs to be run
         /// to determine the correct value when comparing two samples.</remarks>
-        public PerformanceCounterType CounterType
-        {
-            get { return ((PerfCounterMetricDefinitionPacket)base.Packet).CounterType; }
-        }
+        public PerformanceCounterType CounterType => ((PerfCounterMetricDefinitionPacket)base.Packet).CounterType;
 
         /// <summary>
         /// Indicates whether a final value can be determined from just one sample or if two comparable samples are required.
         /// </summary>
-        public bool RequiresMultipleSamples { get { return m_RequiresMultipleSamples; } }
+        public bool RequiresMultipleSamples => m_RequiresMultipleSamples;
 
         /// <summary>
         /// Indicates if the performance counter is a percentage and will require downscaling (division by zero) to align with other metrics.
         /// </summary>
-        public bool IsPercentage
-        {
-            get
-            {
-                return m_IsPercentage;                
-            }
-        }
+        public bool IsPercentage => m_IsPercentage;
 
         #endregion
 
@@ -161,8 +152,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// The underlying packet 
         /// </summary>
-        internal new PerfCounterMetricDefinitionPacket Packet { get { return (PerfCounterMetricDefinitionPacket)base.Packet; } }
-        
+        internal new PerfCounterMetricDefinitionPacket Packet => (PerfCounterMetricDefinitionPacket)base.Packet;
 
         #endregion
 

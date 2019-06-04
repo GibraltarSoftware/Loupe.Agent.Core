@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Gibraltar;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Loupe.Configuration;
@@ -18,9 +19,11 @@ namespace Loupe.Agent.PerformanceCounters
     /// Registers a set of performance counters to be monitored and automatically polls them every interval
     /// of time to provide a clear picture of the system's performance while the application was running.
     /// </remarks>
-    public class PerformanceMonitor : IMonitor
+    public class PerformanceMonitor : ILoupeMonitor
     {
         private readonly object m_Lock = new object();
+
+        private readonly PerformanceConfiguration m_Configuration;
 
         private PerfCounterCollection m_DiskCounters;
         private PerfCounterCollection m_NetworkCounters;
@@ -38,17 +41,23 @@ namespace Loupe.Agent.PerformanceCounters
 
         #region Public Properties and Methods
 
-        string IMonitor.Caption => "Performance Monitor";
-
-        void IMonitor.ConfigurationUpdated(IMonitorConfiguration configuration)
+        public PerformanceMonitor()
+            : this(new PerformanceConfiguration())
         {
 
         }
 
+        public PerformanceMonitor(PerformanceConfiguration configuration)
+        {
+            m_Configuration = configuration;
+        }
+
+        string ILoupeMonitor.Caption => "Performance Monitor";
+
         /// <summary>
         /// Initialize / reinitialize the performance monitor with the provided configuration
         /// </summary>
-        public void Initialize(Publisher publisher, IMonitorConfiguration configuration)
+        public void Initialize(Publisher publisher)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (isWindows == false)
@@ -58,28 +67,26 @@ namespace Loupe.Agent.PerformanceCounters
             Log.Write(LogMessageSeverity.Information, "Gibraltar.Agent", "Starting asynchronous performance monitoring initialization", null);
 #endif
 
-            var perfConfiguration = (PerformanceConfiguration) configuration;
-
             //we want to make sure anything that might want to mess with our data will wait until we're done initializing
             lock (m_Lock)
             {
-                if ((perfConfiguration.EnableDiskMetrics) && (m_DiskCounters == null))
+                if ((m_Configuration.EnableDiskMetrics) && (m_DiskCounters == null))
                     InitializeDiskCounters();
 
-                if ((perfConfiguration.EnableNetworkMetrics) && (m_NetworkCounters == null))
+                if ((m_Configuration.EnableNetworkMetrics) && (m_NetworkCounters == null))
                     InitializeNetworkCounters();
 
-                if ((perfConfiguration.EnableSystemMetrics) && (m_SystemCounters == null))
+                if ((m_Configuration.EnableSystemMetrics) && (m_SystemCounters == null))
                     InitializeSystemCounters();
 
-                if ((perfConfiguration.EnableMemoryMetrics) && (m_MemoryCounters == null))
+                if ((m_Configuration.EnableMemoryMetrics) && (m_MemoryCounters == null))
                     InitializeMemoryCounters();
 
                 //copy the configuration to ensure invariance...
-                m_EnableDiskCounters = perfConfiguration.EnableDiskMetrics;
-                m_EnableMemoryCounters = perfConfiguration.EnableMemoryMetrics;
-                m_EnableNetworkCounters = perfConfiguration.EnableNetworkMetrics;
-                m_EnableSystemCounters = perfConfiguration.EnableSystemMetrics;
+                m_EnableDiskCounters = m_Configuration.EnableDiskMetrics;
+                m_EnableMemoryCounters = m_Configuration.EnableMemoryMetrics;
+                m_EnableNetworkCounters = m_Configuration.EnableNetworkMetrics;
+                m_EnableSystemCounters = m_Configuration.EnableSystemMetrics;
 
                 //and now we're done initializing
                 m_Initialized = true;
@@ -161,14 +168,24 @@ namespace Loupe.Agent.PerformanceCounters
             }
         }
 
-        bool IEquatable<IMonitor>.Equals(IMonitor other)
+        /// <inheritdoc />
+        public bool Equals(ILoupeMonitor monitor)
         {
-            throw new NotImplementedException();
+            return ReferenceEquals(this, monitor);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ProcessMonitor)obj);
         }
 
         void IDisposable.Dispose()
         {
-            throw new NotImplementedException();
+            //we don't really have anything to dispose.
         }
 
         #endregion
@@ -283,31 +300,40 @@ namespace Loupe.Agent.PerformanceCounters
 
         private void InitializeMemoryCounters()
         {
-            //create a performance counter group for these guys
-            m_MemoryCounters = new PerfCounterCollection(".NET Memory Counters", "Detailed memory utilization counters specific to .NET");
+            if (CommonCentralLogic.IsNetFramework)
+            {
+                //create a performance counter group for these guys
+                m_MemoryCounters = new PerfCounterCollection(".NET Memory Counters",
+                    "Detailed memory utilization counters specific to .NET");
 
-            //register our favorite performance counters with the monitoring system (These should all exist on Mono now, too)
-            try
-            {
-                m_MemoryCounters.Add(".NET CLR Memory", "# GC Handles", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "# Bytes in all Heaps", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "# Gen 0 Collections", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "# Gen 1 Collections", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "# Gen 2 Collections", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "Large Object Heap Size", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "Gen 0 heap size", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "Gen 1 heap size", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "Gen 2 heap size", PerfCounterInstanceAlias.CurrentProcess);
-                m_MemoryCounters.Add(".NET CLR Memory", "% Time in GC", PerfCounterInstanceAlias.CurrentProcess);
-            }
-            catch (Exception exception)
-            {
-                GC.KeepAlive(exception); //some warning prevention...
-                Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Gibraltar.Agent",
-                          "Unable to record performance information for .NET memory counters",
-                          "Specific exception: {0}\r\nException message: {1}",
-                          exception.GetType().FullName, exception.Message);
-            }
+                //register our favorite performance counters with the monitoring system (These should all exist on Mono now, too)
+                try
+                {
+                    m_MemoryCounters.Add(".NET CLR Memory", "# GC Handles", PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "# Bytes in all Heaps",
+                        PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "# Gen 0 Collections",
+                        PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "# Gen 1 Collections",
+                        PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "# Gen 2 Collections",
+                        PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "Large Object Heap Size",
+                        PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "Gen 0 heap size", PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "Gen 1 heap size", PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "Gen 2 heap size", PerfCounterInstanceAlias.CurrentProcess);
+                    m_MemoryCounters.Add(".NET CLR Memory", "% Time in GC", PerfCounterInstanceAlias.CurrentProcess);
+                }
+                catch (Exception exception)
+                {
+                    GC.KeepAlive(exception); //some warning prevention...
+                    Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Gibraltar.Agent",
+                        "Unable to record performance information for .NET memory counters",
+                        "Specific exception: {0}\r\nException message: {1}",
+                        exception.GetType().FullName, exception.Message);
+                }
+            }            
         }
 
         private void InitializeSystemCounters()

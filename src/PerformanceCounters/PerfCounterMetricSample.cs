@@ -49,13 +49,13 @@ namespace Loupe.Agent.PerformanceCounters
             {
                 if (baselineSample == null)
                 {
-                    throw new ArgumentNullException("baselineSample",
+                    throw new ArgumentNullException(nameof(baselineSample),
                                                     "A baseline metric sample is required and none was provided.");
                 }
 
                 if (baselineSample.Timestamp > Timestamp)
                 {
-                    throw new ArgumentOutOfRangeException("baselineSample", baselineSample.Timestamp,
+                    throw new ArgumentOutOfRangeException(nameof(baselineSample), baselineSample.Timestamp,
                                                           "The baseline sample must be for a date & time before this sample to be valid for comparison.");
                 }
 
@@ -97,32 +97,18 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// The underlying counter sample for this object
         /// </summary>
-        public CounterSample CounterSample
-        {
-            get
-            {
-                //create our counter sample from the raw packet
-                return Packet;
-            }
-        }
+        public CounterSample CounterSample => Packet;
 
         /// <summary>
         /// The performance counter metric this sample is for.
         /// </summary>
-        public new PerfCounterMetric Metric { get { return (PerfCounterMetric)base.Metric; } }
+        public new PerfCounterMetric Metric => (PerfCounterMetric)base.Metric;
 
         /// <summary>
         /// The raw value of this metric.  Depending on the metric definition, this may be meaningless and instead a 
         /// calculation may need to be performed.
         /// </summary>
-        public override double Value
-        {
-            get
-            {
-                //return our raw value.  
-                return Packet.CounterSample.RawValue;
-            }
-        }
+        public override double Value => Packet.CounterSample.RawValue;
 
         /// <summary>
         /// Compare this object to another.
@@ -150,7 +136,7 @@ namespace Loupe.Agent.PerformanceCounters
 
         #region Internal Properties and Methods
 
-        internal new PerfCounterMetricSamplePacket Packet { get { return (PerfCounterMetricSamplePacket)base.Packet; } }
+        internal new PerfCounterMetricSamplePacket Packet => (PerfCounterMetricSamplePacket)base.Packet;
 
         #endregion
     }

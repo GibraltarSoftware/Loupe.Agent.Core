@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Gibraltar
@@ -11,20 +12,42 @@ namespace Gibraltar
     /// </summary>
     public static class CommonCentralLogic
     {
-        private static bool s_SilentMode = false;
-        private static volatile bool s_BreakPointEnable = false; // Can be changed in the debugger
+        private readonly static bool g_IsNetFramework = false;
+        private readonly static bool g_IsNetNative = false;
+        private readonly static bool g_IsNetCore = false;
+
+        private static bool g_SilentMode = false;
+        private static volatile bool g_BreakPointEnable = false; // Can be changed in the debugger
 
         // Basic log implementation.
         private static volatile bool g_SessionEnding; // Session end triggered. False until set to true.
         private static volatile bool g_SessionEnded; // Session end completed. False until set to true.
+
+        static CommonCentralLogic()
+        {
+            var frameworkDescription = RuntimeInformation.FrameworkDescription;
+
+            if (frameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+            {
+                g_IsNetCore = true;
+            }
+            else if (frameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase))
+            {
+                g_IsNetFramework = true;
+            }
+            else if (frameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase))
+            {
+                g_IsNetNative = true;
+            }
+        }
 
         /// <summary>
         /// Indicates if the logging system should be running in silent mode (for example when running in the agent).
         /// </summary>
         public static bool SilentMode
         {
-            get { return s_SilentMode; }
-            set { s_SilentMode = value; }
+            get => g_SilentMode;
+            set => g_SilentMode = value;
         }
 
         /// <summary>
@@ -34,19 +57,35 @@ namespace Gibraltar
         /// to support multiple modes, assuming the basic usage works out.</remarks>
         public static bool BreakPointEnable
         {
-            get { return s_BreakPointEnable; }
-            set { s_BreakPointEnable = value; }
+            get => g_BreakPointEnable;
+            set => g_BreakPointEnable = value;
         }
 
         /// <summary>
         /// Reports whether EndSession() has been called to formally end the session.
         /// </summary>
-        public static bool IsSessionEnding { get { return g_SessionEnding; } }
+        public static bool IsSessionEnding => g_SessionEnding;
 
         /// <summary>
         /// Reports whether EndSession() has completed flushing the end-session command to the log.
         /// </summary>
-        public static bool IsSessionEnded { get { return g_SessionEnded; } }
+        public static bool IsSessionEnded => g_SessionEnded;
+
+        /// <summary>
+        /// True if the underlying runtime is the .NET Framework
+        /// </summary>
+        public static bool IsNetFramework => g_IsNetFramework;
+
+        /// <summary>
+        /// True if the underlying runtime is .NET Native
+        /// </summary>
+        public static bool IsNetNative => g_IsNetNative;
+
+        /// <summary>
+        /// True if the underlying runtime is .NET Core.
+        /// </summary>
+        public static bool IsNetCore => g_IsNetCore;
+
 
         /// <summary>
         /// Sets the SessionEnding flag to true.  (Can't be reversed once set.)
@@ -76,23 +115,11 @@ namespace Gibraltar
         [Conditional("DEBUG")]
         public static void DebugBreak()
         {
-            if (s_BreakPointEnable && Debugger.IsAttached)
+            if (g_BreakPointEnable && Debugger.IsAttached)
             {
                 Debugger.Break(); // Stop here only when debugging
                 // ...then Shift-F11 to step out to where it is getting called...
             }
-        }
-
-        /// <summary>
-        /// Check whether we are running in a Mono runtime environment rather than a normal .NET CLR.
-        /// </summary>
-        /// <returns>True if running in Mono.  False if .NET CLR.</returns>
-        private static bool CheckForMono()
-        {
-            Type monoRuntime = Type.GetType("Mono.Runtime"); // Detect if we're running under Mono runtime.
-            bool isMonoRuntime = (monoRuntime != null); // We'll cache the result so we don't have to waste time checking again.
-
-            return isMonoRuntime;
         }
 
         /// <summary>

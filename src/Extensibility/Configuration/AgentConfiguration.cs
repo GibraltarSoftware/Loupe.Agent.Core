@@ -63,7 +63,6 @@ namespace Loupe.Configuration
             // MR: We've traditionally created these by default so the app can just walk properties to get defaults, but 
             // is that conventional for .NET Core?  Or should we make them create them.
             Listener = new ListenerConfiguration();
-            Monitors = new List<IMonitorConfiguration>();
             NetworkViewer = new NetworkViewerConfiguration();
             Packager = new PackagerConfiguration();
             Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -80,7 +79,6 @@ namespace Loupe.Configuration
         public AgentConfiguration(AgentConfiguration configuration)
         {
             Listener = configuration.Listener;
-            Monitors = configuration.Monitors;
             NetworkViewer = configuration.NetworkViewer;
             Packager = configuration.Packager;
             Properties = configuration.Properties;
@@ -117,11 +115,6 @@ namespace Loupe.Configuration
         /// Configures real-time network log streaming
         /// </summary>
         public NetworkViewerConfiguration NetworkViewer { get; set; }
-
-        /// <summary>
-        /// A set of monitors to load into the agent.
-        /// </summary>
-        public IList<IMonitorConfiguration> Monitors { get; set; }
 
         /// <summary>
         /// Application defined properties

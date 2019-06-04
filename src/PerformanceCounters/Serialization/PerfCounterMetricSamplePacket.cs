@@ -120,13 +120,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         /// The Windows Counter Sample.
         /// </summary>
         /// <returns></returns>
-        public CounterSample CounterSample
-        {
-            get 
-            {
-                return m_Sample; 
-            }
-        }
+        public CounterSample CounterSample => m_Sample;
 
         #endregion
 

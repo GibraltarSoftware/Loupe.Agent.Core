@@ -12,6 +12,7 @@
         {
             EnableConsole = false; //this is nearly always duplicate information in .NET Core.
             EnableNetworkEvents = true;
+            EnableGCEvents = true;
         }
 
         /// <summary>
@@ -24,5 +25,10 @@
         /// When true, network events (such as reconfiguration and disconnection) will be logged automatically.
         /// </summary>
         public bool EnableNetworkEvents { get; set; }
+
+        /// <summary>
+        /// When true, metrics are recorded for Garbage Collector (GC) events.
+        /// </summary>
+        public bool EnableGCEvents { get; set; }
     }
 }

@@ -15,6 +15,7 @@ using Gibraltar.Agent;
 using Loupe.Agent.AspNetCore;
 using Loupe.Agent.Core.Services;
 using Loupe.Agent.EntityFrameworkCore;
+using Loupe.Agent.PerformanceCounters;
 using Loupe.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,8 @@ namespace AspNetCore2.Sandbox
             //Add Loupe and connect it to ASP.NET Core & EF Core.
             services.AddLoupe()
                 .AddAspNetCoreDiagnostics() //From Loupe.Agent.AspNetCore
-                .AddEntityFrameworkCoreDiagnostics(); //From Loupe.Agent.EntityFrameworkCore
+                .AddEntityFrameworkCoreDiagnostics() //From Loupe.Agent.EntityFrameworkCore
+                .AddPerformanceCounters(); //From Loupe.Agent.PerformanceCounters
 
             //add Loupe as a logger as well
             services.AddLogging(builder =>

@@ -93,12 +93,12 @@ namespace Loupe.Agent.PerformanceCounters
             //make sure we have all of the variables we require
             if (string.IsNullOrEmpty(categoryName))
             {
-                throw new ArgumentNullException("categoryName", "No category name was provided and one is required.");
+                throw new ArgumentNullException(nameof(categoryName), "No category name was provided and one is required.");
             }
 
             if (string.IsNullOrEmpty(counterName))
             {
-                throw new ArgumentNullException("counterName", "No counter name was provided and one is required.");
+                throw new ArgumentNullException(nameof(counterName), "No counter name was provided and one is required.");
             }
 
             //Go ahead and make the windows counter
@@ -122,12 +122,12 @@ namespace Loupe.Agent.PerformanceCounters
             //make sure we have all of the variables we require
             if (string.IsNullOrEmpty(categoryName))
             {
-                throw new ArgumentNullException("categoryName", "No category name was provided and one is required.");
+                throw new ArgumentNullException(nameof(categoryName), "No category name was provided and one is required.");
             }
 
             if (string.IsNullOrEmpty(counterName))
             {
-                throw new ArgumentNullException("counterName", "No counter name was provided and one is required.");
+                throw new ArgumentNullException(nameof(counterName), "No counter name was provided and one is required.");
             }
 
             //Go ahead and make the windows counter
@@ -218,8 +218,8 @@ namespace Loupe.Agent.PerformanceCounters
         /// to determine whether to log failures or not (only transitions from valid to invalid are logged)</remarks>
         public PerfCounterPollingState PollingState
         {
-            get { return m_PollingState; }
-            set { m_PollingState = value; }
+            get => m_PollingState;
+            set => m_PollingState = value;
         }
 
 
@@ -249,7 +249,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// The definition of this metric object.
         /// </summary>
-        public new PerfCounterMetricDefinition Definition { get { return (PerfCounterMetricDefinition)base.Definition; } }
+        public new PerfCounterMetricDefinition Definition => (PerfCounterMetricDefinition)base.Definition;
 
         #endregion
 
@@ -267,7 +267,7 @@ namespace Loupe.Agent.PerformanceCounters
                     instanceName = GetCurrentProcessInstanceName();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("alias");
+                    throw new ArgumentOutOfRangeException(nameof(alias));
             }
 
             return instanceName;
@@ -308,12 +308,12 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// The underlying packet 
         /// </summary>
-        internal new PerfCounterMetricPacket Packet { get { return (PerfCounterMetricPacket)base.Packet; } }
+        internal new PerfCounterMetricPacket Packet => (PerfCounterMetricPacket)base.Packet;
 
         /// <summary>
         /// The set of raw samples for this metric
         /// </summary>
-        internal new PerfCounterMetricSampleCollection Samples { get { return (PerfCounterMetricSampleCollection)base.Samples; } }
+        internal new PerfCounterMetricSampleCollection Samples => (PerfCounterMetricSampleCollection)base.Samples;
 
         #endregion
 

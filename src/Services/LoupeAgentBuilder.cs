@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Gibraltar.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -16,12 +17,17 @@ namespace Loupe.Agent.Core.Services
             _services = services;
         }
 
-        /// <summary>Adds a <see cref="DiagnosticSource"/> listener.</summary>
-        /// <typeparam name="T">The type of the listener, which must implement <see cref="ILoupeDiagnosticListener"/>.</typeparam>
-        /// <returns>The builder instance.</returns>
+        /// <inheritdoc />
         public ILoupeAgentBuilder AddListener<T>() where T : class, ILoupeDiagnosticListener
         {
             _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoupeDiagnosticListener, T>());
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ILoupeAgentBuilder AddMonitor<T>() where T : class, ILoupeMonitor
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoupeMonitor, T>());
             return this;
         }
     }

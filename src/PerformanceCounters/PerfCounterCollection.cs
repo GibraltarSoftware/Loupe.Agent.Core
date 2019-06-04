@@ -69,7 +69,7 @@ namespace Loupe.Agent.PerformanceCounters
 
             if (newPerformanceCounter == null)
             {
-                throw new ArgumentNullException("newPerformanceCounter", "A performance counter object must be provided to add it to the collection.");
+                throw new ArgumentNullException(nameof(newPerformanceCounter), "A performance counter object must be provided to add it to the collection.");
             }
 
             //make sure we don't already have it
@@ -81,7 +81,7 @@ namespace Loupe.Agent.PerformanceCounters
             {
                 if(m_CounterMetricDictionary.ContainsKey(key))
                 {
-                    throw new ArgumentException("The specified performance counter is already in the collection.", "newPerformanceCounter");
+                    throw new ArgumentException("The specified performance counter is already in the collection.", nameof(newPerformanceCounter));
                 }
 
                 //OK, now go and get the metric we need for this.
@@ -114,12 +114,12 @@ namespace Loupe.Agent.PerformanceCounters
             //we can't have a null category our counter.
             if (string.IsNullOrEmpty(categoryName))
             {
-                throw new ArgumentNullException("categoryName");
+                throw new ArgumentNullException(nameof(categoryName));
             }
 
             if (string.IsNullOrEmpty(counterName))
             {
-                throw new ArgumentNullException("counterName");
+                throw new ArgumentNullException(nameof(counterName));
             }
 
             //see if the performance counter metric already exists.  It quite probably does.
@@ -140,12 +140,12 @@ namespace Loupe.Agent.PerformanceCounters
             //we can't have a null category our counter.
             if (string.IsNullOrEmpty(categoryName))
             {
-                throw new ArgumentNullException("categoryName");
+                throw new ArgumentNullException(nameof(categoryName));
             }
 
             if (string.IsNullOrEmpty(counterName))
             {
-                throw new ArgumentNullException("counterName");
+                throw new ArgumentNullException(nameof(counterName));
             }
 
             //see if the performance counter metric already exists.  It quite probably does.
@@ -160,8 +160,8 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         public string Caption
         {
-            get { return m_Caption; }
-            set { m_Caption = value.Trim(); }
+            get => m_Caption;
+            set => m_Caption = value?.Trim();
         }
 
         /// <summary>
@@ -169,8 +169,8 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         public string Description
         {
-            get { return m_Description; }
-            set { m_Description = value.Trim(); }
+            get => m_Description;
+            set => m_Description = value?.Trim();
         }
 
         /// <summary>
@@ -228,15 +228,15 @@ namespace Loupe.Agent.PerformanceCounters
                 CopyTo(curMetrics, 0);
             }
 
-            foreach (PerfCounterMetric curMetric in curMetrics)
+            foreach (var curMetric in curMetrics)
             {
                 //sample this counter
                 try
                 {
-                    PerformanceCounter curCounter = curMetric.GetPerformanceCounter();
+                    var curCounter = curMetric.GetPerformanceCounter();
 
                     //when we create the sample packet, it queries the underlying performance counter value.
-                    PerfCounterMetricSample curSample = new PerfCounterMetricSample(curMetric, new PerfCounterMetricSamplePacket(curCounter, curMetric));
+                    var curSample = new PerfCounterMetricSample(curMetric, new PerfCounterMetricSamplePacket(curCounter, curMetric));
 
                     //and add it to our collection
                     samples.Add(curSample);
@@ -386,11 +386,7 @@ namespace Loupe.Agent.PerformanceCounters
                     return m_CounterMetricList.Values[index];
                 }
             }
-            set
-            {
-                //we don't want to support setting an object by index, we are sorted.
-                throw new NotSupportedException();
-            }
+            set => throw new NotSupportedException();
         }
 
         #endregion
@@ -405,7 +401,7 @@ namespace Loupe.Agent.PerformanceCounters
         {
             if (item == null)
             {
-                throw new ArgumentNullException("item", "An existing performance counter metric item must be provided to add it to the collection.");
+                throw new ArgumentNullException(nameof(item), "An existing performance counter metric item must be provided to add it to the collection.");
             }
 
             //we're about to modify the collection, get a lock.  We don't want the lock to cover the changed event since
@@ -414,7 +410,7 @@ namespace Loupe.Agent.PerformanceCounters
             {
                 if(m_CounterMetricDictionary.ContainsKey(item.Name))
                 {
-                    throw new ArgumentException("The specified performance counter metric item is already in the collection.", "item");
+                    throw new ArgumentException("The specified performance counter metric item is already in the collection.", nameof(item));
                 }
 
                 //add it to our collections.
@@ -494,10 +490,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// Returns false, this collection is not read only.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Remove the specified PerfCounterMetric item.  If the PerfCounterMetric isn't in the collection, no exception is thrown.
@@ -509,7 +502,7 @@ namespace Loupe.Agent.PerformanceCounters
 
             if (item == null)
             {
-                throw new ArgumentNullException("item", "A performance counter metric item must be provided to remove it from the collection.");
+                throw new ArgumentNullException(nameof(item), "A performance counter metric item must be provided to remove it from the collection.");
             }
 
             lock (m_Lock)

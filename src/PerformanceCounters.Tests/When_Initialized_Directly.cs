@@ -15,9 +15,7 @@ namespace Loupe.PerformanceCounters.Tests
         {
             _PerformanceMonitor = new PerformanceMonitor();
 
-            var configuration = new PerformanceConfiguration();
-
-            _PerformanceMonitor.Initialize(null, configuration);
+            _PerformanceMonitor.Initialize(null);
         }
 
         [Test]

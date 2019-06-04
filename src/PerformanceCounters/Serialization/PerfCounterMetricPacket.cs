@@ -28,7 +28,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
             //it tries to walk a null pointer.
             if (counter == null)
             {
-                throw new ArgumentNullException("counter", "No performance counter object was provided and one is required.");
+                throw new ArgumentNullException(nameof(counter), "No performance counter object was provided and one is required.");
             }
         }
 

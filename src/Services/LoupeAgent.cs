@@ -1,9 +1,11 @@
 ﻿using System;
 using Gibraltar.Agent;
+using Gibraltar.Monitor;
 using Loupe.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Log = Gibraltar.Agent.Log;
 
 namespace Loupe.Agent.Core.Services
 {
@@ -53,6 +55,11 @@ namespace Loupe.Agent.Core.Services
                 _diagnosticListener.Add(listener);
             }
             _diagnosticListener.Subscribe();
+
+            foreach (var monitor in _serviceProvider.GetServices<ILoupeMonitor>())
+            {
+                Listener.Subscribe(monitor);
+            }
         }
 
         /// <summary>Stops this Agent instance.</summary>

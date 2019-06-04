@@ -7,6 +7,11 @@ namespace Loupe.Agent.PerformanceCounters
 {
     public static class Extensions
     {
-        public static ILoupeAgentBuilder AddPerformanceCounters(this ILoupeAgentBuilder builder) => builder.AddListener<PerformanceMonitor>();
+        /// <summary>
+        /// Add performance counter monitoring to the Loupe Agent
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns>The Loupe Agent Builder</returns>
+        public static ILoupeAgentBuilder AddPerformanceCounters(this ILoupeAgentBuilder builder) => builder.AddMonitor<PerformanceMonitor>();
     }
 }

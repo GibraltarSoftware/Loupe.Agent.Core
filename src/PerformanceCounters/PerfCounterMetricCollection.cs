@@ -35,7 +35,7 @@ namespace Loupe.Agent.PerformanceCounters
             //just do the null check - everything else we do in the base object add
             if (newPerfCounter == null)
             {
-                throw new ArgumentNullException("newPerfCounter", "A performance counter object must be provided to add it to the collection.");
+                throw new ArgumentNullException(nameof(newPerfCounter), "A performance counter object must be provided to add it to the collection.");
             }
 
             //we first need to go waltz off and find the definition for this guy
@@ -44,7 +44,7 @@ namespace Loupe.Agent.PerformanceCounters
             //if this key doesn't match our key then we have a problem - it isn't for our collection
             if (base.Definition.Name != key)
             {
-                throw new ArgumentOutOfRangeException("newPerfCounter");
+                throw new ArgumentOutOfRangeException(nameof(newPerfCounter));
             }
 
             //New object - go ahead and create it for us.
@@ -102,7 +102,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// <summary>
         /// The definition of all of the metrics in this collection.
         /// </summary>
-        public new PerfCounterMetricDefinition Definition { get { return (PerfCounterMetricDefinition)base.Definition; } }
+        public new PerfCounterMetricDefinition Definition => (PerfCounterMetricDefinition)base.Definition;
 
         /// <summary>
         /// Retrieve an item from the collection by its key if present.  If not present, the default value of the object is returned.
@@ -151,15 +151,8 @@ namespace Loupe.Agent.PerformanceCounters
         /// <returns></returns>
         public new PerfCounterMetric this[int index]
         {
-            get
-            {
-                return (PerfCounterMetric)base[index];
-            }
-            set
-            {
-                //we don't want to support setting an object by index, we are sorted.
-                throw new NotSupportedException();
-            }
+            get => (PerfCounterMetric)base[index];
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -167,26 +160,14 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public new PerfCounterMetric this[Guid Id]
-        {
-            get
-            {
-                return (PerfCounterMetric)base[Id];
-            }
-        }
+        public new PerfCounterMetric this[Guid Id] => (PerfCounterMetric)base[Id];
 
         /// <summary>
         /// Retrieve custom sampled metric object by its name
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public new PerfCounterMetric this[string key]
-        {
-            get
-            {
-                return (PerfCounterMetric)base[key];
-            }
-        }
+        public new PerfCounterMetric this[string key] => (PerfCounterMetric)base[key];
 
         #endregion
     }
