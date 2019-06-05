@@ -9,6 +9,7 @@ using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Microsoft.Extensions.Options;
 
 namespace Loupe.Agent.PerformanceCounters
 {
@@ -50,6 +51,15 @@ namespace Loupe.Agent.PerformanceCounters
         public PerformanceMonitor(PerformanceConfiguration configuration)
         {
             m_Configuration = configuration;
+        }
+
+        /// <summary>
+        /// Create a PerformanceMonitor from the DI Container
+        /// </summary>
+        /// <param name="agentConfiguration"></param>
+        public PerformanceMonitor(IOptions<AgentConfiguration> agentConfiguration)
+        {
+            m_Configuration = agentConfiguration.Value?.Performance ?? new PerformanceConfiguration();
         }
 
         string ILoupeMonitor.Caption => "Performance Monitor";
