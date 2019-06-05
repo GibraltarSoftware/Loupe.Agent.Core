@@ -44,7 +44,7 @@ namespace Loupe.PerformanceCounters.Tests
 
             m_Configuration.SessionFile.EnableFilePruning = false;
 
-            Listener.Subscribe(new PerformanceMonitor(new PerformanceConfiguration()));
+            Monitor.Subscribe(new PerformanceMonitor(new PerformanceConfiguration()));
 
             //force us to initialize logging
             Log.StartSession(m_Configuration);

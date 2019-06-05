@@ -3,15 +3,16 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor.Net;
+using Loupe.Agent.PerformanceCounters;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor
 {
     /// <summary>
-    /// The central listener that manages the configuration of the individual listeners
+    /// The central monitor that manages the configuration of the individual monitors
     /// </summary>
-    public static class Listener
+    public static class Monitor
     {
         private const string LogCategory = "Loupe.Monitor";
 
@@ -20,8 +21,7 @@ namespace Gibraltar.Monitor
         private static readonly object m_ConfigLock = new object();
 
         private static Publisher m_Publisher; //the active Agent publisher //LOCKED BY CONFIGLOCK
-        private static AgentConfiguration m_AgentConfiguration; //the active Agent configuration //LOCKED BY CONFIGLOCK
-        private static ListenerConfiguration m_Configuration; //the active listener configuration //LOCKED BY CONFIGLOCK
+        private static AgentConfiguration m_Configuration; //the active Agent configuration //LOCKED BY CONFIGLOCK
         private static bool m_PendingConfigChange; //LOCKED BY CONFIGLOCK
         private static bool m_Initialized; //LOCKED BY CONFIGLOCK; (update only)
 
@@ -39,8 +39,9 @@ namespace Gibraltar.Monitor
         private static DateTimeOffset m_PollingStarted;
         private static bool m_EventsInitialized;
         private static bool m_SuppressAlerts;
+        private static bool m_ProcessMonitorRegistered;
 
-        static Listener()
+        static Monitor()
         {
             m_PendingMonitors = new ConcurrentQueue<ILoupeMonitor>();
             m_Monitors = new ConcurrentDictionary<ILoupeMonitor, ILoupeMonitor>();
@@ -57,17 +58,15 @@ namespace Gibraltar.Monitor
         /// <remarks>If calling initialization from a path that may have started with the trace listener,
         /// you must set suppressTraceInitialize to true to guarantee that the application will not deadlock
         /// or throw an unexpected exception.</remarks>
-        public static void Initialize(Publisher publisher, AgentConfiguration agentConfiguration, bool async)
+        internal static void Initialize(Publisher publisher, AgentConfiguration agentConfiguration, bool async)
         {
-            var listenerConfiguration = agentConfiguration.Listener;
             //get a configuration lock so we can update the configuration
             lock (m_ConfigLock)
             {
                 m_Publisher = publisher;
 
                 //and store the configuration; it's processed by the background thread.
-                m_AgentConfiguration = agentConfiguration; // Set the top config before the local Listener config.
-                m_Configuration = listenerConfiguration; // Monitor thread looks for this to be non-null before proceeding.
+                m_Configuration = agentConfiguration; // Set the top config before the local Listener config.
                 m_PendingConfigChange = true;
 
                 //wait for our events to initialize always on our background thread
@@ -89,10 +88,10 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Indicates if the listeners have been initialized the first time yet.
         /// </summary>
-        public static bool Initialized { get { return m_Initialized; } }
+        public static bool Initialized => m_Initialized;
 
         /// <summary>
-        /// Add the specified monitor to the listener, which should already be configured.
+        /// Add the specified monitor, which should already be configured.
         /// </summary>
         /// <remarks>The monitor may be polled immediately after it is subscribed so it should be
         /// configured.</remarks>
@@ -103,7 +102,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Remove the specified monitor from the listener
+        /// Remove the specified monitor.
         /// </summary>
         /// <remarks>If the monitor object isn't subscribed no error is raised.  If the object is being polled
         /// there may be a short delay before it is unregistered.</remarks>
@@ -112,8 +111,6 @@ namespace Gibraltar.Monitor
         {
             return m_Monitors.TryRemove(monitor, out var storedMonitor);
         }
-
-        #region Private Properties and Methods
 
         private static void CreateMonitorThread()
         {
@@ -142,9 +139,6 @@ namespace Gibraltar.Monitor
 
                     System.Threading.Monitor.PulseAll(m_ConfigLock);
                 }
-
-                //KM: BUGBUG
-                Subscribe(new ProcessMonitor());
 
                 //we now have our first configuration - go for it.  This interacts with Config lock internally as it goes.
                 UpdateMonitorConfiguration();
@@ -270,13 +264,15 @@ namespace Gibraltar.Monitor
         private static void UpdateMonitorConfiguration()
         {
             ListenerConfiguration newConfiguration;
+            PerformanceConfiguration newPerformanceConfiguration;
 
             Log.ThreadIsInitializer = true;  //so if we wander back into Log.Initialize we won't block.
 
             //get the lock while we grab the configuration so we know it isn't changed out under us
             lock (m_ConfigLock)
             {
-                newConfiguration = m_Configuration;
+                newConfiguration = m_Configuration.Listener;
+                newPerformanceConfiguration = m_Configuration.Performance;
 
                 System.Threading.Monitor.PulseAll(m_ConfigLock);
             }
@@ -285,6 +281,7 @@ namespace Gibraltar.Monitor
             InitializeConsoleListener(newConfiguration);
             InitializeCLRListener(newConfiguration);
             InitializeGCEventListener(newConfiguration);
+            InitializeProcessMonitor(newPerformanceConfiguration);
 
             lock (m_ConfigLock)
             {
@@ -374,6 +371,31 @@ namespace Gibraltar.Monitor
                         "While attempting to do a routine initialization / re-initialization of the CLR listener, an exception was thrown: {0}", ex.Message);
             }
         }
+
+        private static void InitializeProcessMonitor(PerformanceConfiguration configuration)
+        {
+            try
+            {
+                lock (m_ListenerLock)
+                {
+                    //we can't register the console listener more than once, and it isn't designed for good register/unregister handling
+                    //so we just have a simple bool to see if we did it.
+                    if ((m_ProcessMonitorRegistered == false) && (configuration.EnableProcessMetrics))
+                    {
+                        Subscribe(new ProcessMonitor());
+                        m_ProcessMonitorRegistered = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                        "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
+                        "While attempting to do a routine initialization / re-initialization of the console listener, an exception was raised: {0}", ex.Message);
+            }
+        }
+
         private static void PerformPoll()
         {
             if (m_Monitors != null)
@@ -453,7 +475,5 @@ namespace Gibraltar.Monitor
 
             return milliseconds;
         }
-
-        #endregion
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Loupe.Agent.PerformanceCounters;
 
 namespace Loupe.Configuration
 {
@@ -65,6 +66,7 @@ namespace Loupe.Configuration
             Listener = new ListenerConfiguration();
             NetworkViewer = new NetworkViewerConfiguration();
             Packager = new PackagerConfiguration();
+            Performance = new PerformanceConfiguration();
             Properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Publisher = new PublisherConfiguration();
             Server = new ServerConfiguration();
@@ -81,6 +83,7 @@ namespace Loupe.Configuration
             Listener = configuration.Listener;
             NetworkViewer = configuration.NetworkViewer;
             Packager = configuration.Packager;
+            Performance = configuration.Performance;
             Properties = configuration.Properties;
             Publisher = configuration.Publisher;
             Server = configuration.Server;
@@ -115,6 +118,8 @@ namespace Loupe.Configuration
         /// Configures real-time network log streaming
         /// </summary>
         public NetworkViewerConfiguration NetworkViewer { get; set; }
+
+        public PerformanceConfiguration Performance { get; set; }
 
         /// <summary>
         /// Application defined properties

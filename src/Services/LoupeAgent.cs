@@ -58,7 +58,7 @@ namespace Loupe.Agent.Core.Services
 
             foreach (var monitor in _serviceProvider.GetServices<ILoupeMonitor>())
             {
-                Listener.Subscribe(monitor);
+                Monitor.Subscribe(monitor);
             }
         }
 

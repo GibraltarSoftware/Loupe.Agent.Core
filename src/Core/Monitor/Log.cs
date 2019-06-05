@@ -1953,7 +1953,7 @@ namespace Gibraltar.Monitor
             Write(s_SessionStartInfo.Packet);
             
             //initialize the listener architecture.
-            Listener.Initialize(s_Publisher, s_RunningConfiguration, true);
+            Monitor.Initialize(s_Publisher, s_RunningConfiguration, true);
 
             //and we need to load up the session publisher if it's enabled.
             StartPublishEngine(); //this checks to see if it can start based on configuration
