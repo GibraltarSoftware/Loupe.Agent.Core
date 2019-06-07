@@ -1,5 +1,6 @@
 ﻿using System;
 using Loupe.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -18,7 +19,7 @@ namespace Loupe.Agent.Core.Services
         /// <returns>An instance of <see cref="ILoupeAgentBuilder"/> for further customization.</returns>
         public static ILoupeAgentBuilder AddLoupe(this IServiceCollection services, Action<AgentConfiguration> configure)
         {
-            services.AddSingleton(_ => new LoupeAgentConfigurationCallback(configure));
+            AddOptions(services, configure);
             services.AddSingleton<IHostedService, LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
             return new LoupeAgentBuilder(services);
@@ -31,10 +32,39 @@ namespace Loupe.Agent.Core.Services
         /// <returns>An instance of <see cref="ILoupeAgentBuilder"/> for further customization.</returns>
         public static ILoupeAgentBuilder AddLoupe(this IServiceCollection services)
         {
-            services.AddSingleton(_ => new LoupeAgentConfigurationCallback());
+            AddOptions(services);
             services.AddSingleton<IHostedService, LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
             return new LoupeAgentBuilder(services);
+        }
+
+        private static void AddOptions(IServiceCollection services, Action<AgentConfiguration> configure = null)
+        {
+            // Set up a configuration callback
+            if (configure == null)
+            {
+                services.AddSingleton(_ => new LoupeAgentConfigurationCallback());
+            }
+            else
+            {
+                services.AddSingleton(_ => new LoupeAgentConfigurationCallback(configure));
+            }
+
+            // Set up options for AgentConfiguration with callback and default ApplicationName from IHostingEnvironment
+            services.AddOptions<AgentConfiguration>().Configure<IConfiguration, IHostingEnvironment, LoupeAgentConfigurationCallback>(
+                (options, configuration, hostingEnvironment, callback) =>
+                {
+                    configuration.Bind("Loupe", options);
+                    callback?.Invoke(options);
+                    if (options.Packager == null)
+                    {
+                        options.Packager = new PackagerConfiguration {ApplicationName = hostingEnvironment.ApplicationName};
+                    }
+                    else if (options.Packager.ApplicationName == null)
+                    {
+                        options.Packager.ApplicationName = hostingEnvironment.ApplicationName;
+                    }
+                });
         }
     }
 }
