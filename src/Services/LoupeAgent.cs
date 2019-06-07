@@ -3,9 +3,9 @@ using Gibraltar.Agent;
 using Gibraltar.Monitor;
 using Loupe.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Log = Gibraltar.Agent.Log;
+using Microsoft.Extensions.Options;
 
 namespace Loupe.Agent.Core.Services
 {
@@ -19,9 +19,7 @@ namespace Loupe.Agent.Core.Services
         private readonly LoupeDiagnosticListener _diagnosticListener;
 
         /// <summary>Initializes a new instance of the <see cref="LoupeAgent"/> class.</summary>
-        /// <param name="callback">A callback to modify configuration from code.</param>
-        /// <param name="configuration">The ASP.NET Core configuration instance.</param>
-        /// <param name="hostingEnvironment">The hosting environment.</param>
+        /// <param name="options"><see cref="AgentConfiguration"/> options.</param>
         /// <param name="serviceProvider">The DI service provider.</param>
         /// <param name="applicationLifetime">The application lifetime object.</param>
         /// <exception cref="ArgumentNullException">callback
@@ -29,17 +27,12 @@ namespace Loupe.Agent.Core.Services
         /// configuration
         /// or
         /// hostingEnvironment</exception>
-        public LoupeAgent(LoupeAgentConfigurationCallback callback, IConfiguration configuration, IHostingEnvironment hostingEnvironment, IServiceProvider serviceProvider, IApplicationLifetime applicationLifetime)
+        public LoupeAgent(IOptions<AgentConfiguration> options, IServiceProvider serviceProvider, IApplicationLifetime applicationLifetime)
         {
-            if (callback == null) throw new ArgumentNullException(nameof(callback));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
-            _serviceProvider = serviceProvider;
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
-            _agentConfiguration =
-                new AgentConfiguration {Packager = {ApplicationName = hostingEnvironment.ApplicationName}};
-            configuration.Bind("Loupe", _agentConfiguration);
-            callback.Invoke(_agentConfiguration);
+            _serviceProvider = serviceProvider;
+            _agentConfiguration = options.Value;
             ApplicationName = _agentConfiguration.Packager.ApplicationName;
             _diagnosticListener = new LoupeDiagnosticListener();
             applicationLifetime.ApplicationStarted.Register(Start);
