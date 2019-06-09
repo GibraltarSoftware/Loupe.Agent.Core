@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Loupe.Packager</AssemblyName>
     <RootNamespace>Loupe.Packager</RootNamespace>
-    <Version>4.7.0.0</Version>
+    <Version>4.7.1.0</Version>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
