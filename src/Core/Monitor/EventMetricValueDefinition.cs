@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 

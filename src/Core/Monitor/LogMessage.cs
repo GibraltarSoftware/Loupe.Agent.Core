@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor

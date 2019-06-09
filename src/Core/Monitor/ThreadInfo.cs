@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 
 #pragma warning disable 1591
 namespace Gibraltar.Monitor

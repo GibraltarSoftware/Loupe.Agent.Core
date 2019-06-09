@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor
@@ -25,7 +25,7 @@ namespace Gibraltar.Monitor
         /// <remarks>The new metric will automatically be added to the metric definition's metrics collection.</remarks>
         /// <param name="definition">The object that defines this metric</param>
         /// <param name="packet">The raw data packet</param>
-        internal SampledMetric(SampledMetricDefinition definition, SampledMetricPacket packet)
+        public SampledMetric(SampledMetricDefinition definition, SampledMetricPacket packet)
             : base(definition, packet)
         {
             m_MetricDefinition = definition;
@@ -331,7 +331,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The underlying packet 
         /// </summary>
-        internal new SampledMetricPacket Packet { get { return (SampledMetricPacket)base.Packet; } }
+        public new SampledMetricPacket Packet { get { return (SampledMetricPacket)base.Packet; } }
 
         #endregion
 

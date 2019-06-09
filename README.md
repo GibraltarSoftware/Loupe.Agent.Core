@@ -1,13 +1,13 @@
 # Loupe Agent for .NET Core #
 
 The Loupe Agent provides a generic facility for capturing log messages, exceptions, and metrics
-from .NET applications.  This repository is for a minimized .NET Core 1.1 version of the Loupe Agent.
+from .NET applications.  This repository is for the .NET Standard 2.1 version of the Loupe Agent.
 Until 2017 the Loupe Agent was a closed source library developed by [Gibraltar Software.](https://onloupe.com)  This is the
 first major step in open sourcing this library.  It is supported by Gibraltar Software and is compatible
 with the primary [Loupe Agent.](https://www.nuget.org/packages/Gibraltar.Agent/)
 
-To work with .NET Core 1.1, this agent has reduced functionality compared to the primary Loupe Agent and
-is therefore only recommended for .NET Core 1.1 and 2.0 applications.
+To work with .NET Standard, this agent has reduced functionality compared to the primary Loupe Agent and
+is therefore only recommended for scenarios where .NET Standard is required.
 
 ## How do I use Loupe with my Application? ##
 
@@ -36,6 +36,7 @@ The following NuGet packages live here:
 * Loupe.Extensions.Logging: An implementation of Microsoft.Extensions.Logging.Abstractions to interface with common .NET Core libraries.
 * Loupe.Agent.AspNetCore: The primary agent for ASP.NET Core applications.
 * Loupe.Agent.EntityFrameworkCore: Performance and diagnostic information for EF Core 2.
+* Loupe.Agent.PerformanceCounters: Performance counter and process metrics.
 
 Each of these packages maps to a single project in the repository. Other projects, primarily for unit testing, are not
 included in the packages.

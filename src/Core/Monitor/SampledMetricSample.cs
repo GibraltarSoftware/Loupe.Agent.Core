@@ -1,4 +1,4 @@
-﻿using Gibraltar.Monitor.Internal;
+﻿using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
@@ -23,7 +23,7 @@ namespace Gibraltar.Monitor
         /// <param name="metric">The metric object this sample applies to.</param>
         /// <param name="metricSamplePacket">The raw sample data packet.</param>
         /// <param name="requiresMultipleSamples">Indicates whether more than one sample is required to calculate an effective metric value.</param>
-        internal SampledMetricSample(SampledMetric metric, SampledMetricSamplePacket metricSamplePacket, bool requiresMultipleSamples)
+        public SampledMetricSample(SampledMetric metric, SampledMetricSamplePacket metricSamplePacket, bool requiresMultipleSamples)
             : base(metric, metricSamplePacket)
         {
             m_RequiresMultipleSamples = requiresMultipleSamples;

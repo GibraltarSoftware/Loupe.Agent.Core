@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Gibraltar.Data;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
@@ -237,7 +237,7 @@ namespace Gibraltar.Monitor
 #endif
 
                 //find the active screen resolution
-                if (!Log.IsMonoRuntime || (m_AgentAppType == ApplicationType.Windows)) //this avoids problems on Mono where it fails if X is not available.
+                if (m_AgentAppType == ApplicationType.Windows)
                 {
                     //We don't know if we can reliably get these on .NET Core.
                     m_Packet.TerminalServer = false;

@@ -16,6 +16,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyVersion>4.6.0.0</AssemblyVersion>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+    <PackageLicenseUrl>https://github.com/GibraltarSoftware/Loupe.Agent.Core/blob/master/LICENSE.txt</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>

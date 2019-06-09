@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using System.Runtime.InteropServices;
 
 
 namespace Gibraltar.Data
@@ -19,6 +19,7 @@ namespace Gibraltar.Data
 
         private FileStream m_FileStream;
         private bool m_HaveStream;
+        private bool m_IsWindows;
 
         private FileLock(string fileName, FileMode creationMode, FileAccess fileAccess, FileShare fileShare, bool manualDeleteOnClose)
         {
@@ -27,6 +28,7 @@ namespace Gibraltar.Data
             m_FileShare = fileShare;
             m_FileAccess = fileAccess;
             m_DeleteOnClose = manualDeleteOnClose;
+            m_IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
         internal FileLock(FileStream fileStream, string fileName, FileMode creationMode, FileAccess fileAccess, FileShare fileShare, bool manualDeleteOnClose)
@@ -34,6 +36,7 @@ namespace Gibraltar.Data
         {
             m_FileStream = fileStream;
             m_HaveStream = (m_FileStream != null);
+            m_IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
 #if DEBUG
@@ -64,7 +67,8 @@ namespace Gibraltar.Data
         /// </summary>
         public void Dispose()
         {
-            if (m_DeleteOnClose && CommonCentralLogic.IsMonoRuntime)
+            //On non-windows systems, locks are on the file not the directory so we need to delete the file before we release it.
+            if (m_DeleteOnClose && m_IsWindows == false)
             {
                 // For Mono, delete it while we still have it open (exclusively) to avoid a race condition.
                 FileHelper.SafeDeleteFile(m_FileName); // Opens don't stop deletes!
@@ -77,7 +81,7 @@ namespace Gibraltar.Data
             m_FileStream = null;
 
             //and now we try to delete it if we were supposed to.
-            if (m_DeleteOnClose && CommonCentralLogic.IsMonoRuntime == false)
+            if (m_DeleteOnClose && m_IsWindows)
             {
                 // Not Mono, we can only delete it after we have closed it.
                 FileHelper.SafeDeleteFile(m_FileName); // Delete will fail if anyone else has it open.  That's okay.

@@ -75,7 +75,7 @@ namespace Loupe.Agent.AspNetCore
             sample.SetValue("duration", elapsed);
             if (ex != null)
             {
-                sample.SetValue("error", ex.Message);
+                sample.SetValue("error", ex.GetBaseException().GetType().Name);
             }
             sample.Write();
         }
@@ -87,13 +87,13 @@ namespace Loupe.Agent.AspNetCore
 
         private void OnApplicationStopping()
         {
-            _agent.End(SessionStatus.Normal, "ApplicationStopping");
+            _agent.End(SessionStatus.Normal, "Application Stopping");
         }
 
         private static void OnRequestAborted(object obj)
         {
             var context = (HttpContext) obj;
-            Log.Warning(LogWriteMode.Queued, "HttpContext", "RequestAborted", $"{context.Request.Path}");
+            Log.Warning(LogWriteMode.Queued, "HttpContext", "Request Aborted", $"{context.Request.Path}");
         }
 
         private static EventMetricDefinition DefineRequestMetric(string applicationName)

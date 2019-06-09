@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Messaging;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -165,18 +165,6 @@ namespace Gibraltar.Monitor
             get { return CommonCentralLogic.SilentMode; }
             set { CommonCentralLogic.SilentMode = value; }
         }
-
-        /// <summary>
-        /// Indicates if the process is running under the Mono runtime or the full .NET CLR.
-        /// </summary>
-        public static bool IsMonoRuntime
-        {
-            get
-            {
-                return CommonCentralLogic.IsMonoRuntime;
-            }
-        }
-
 
         /// <summary>
         /// Indicates if logging is active, performing initialization if necessary
@@ -368,7 +356,7 @@ namespace Gibraltar.Monitor
                     lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
                     {
                         if (s_UserResolutionNotifier == null) // Double-check that it's actually still null.
-                            s_UserResolutionNotifier = new UserResolutionNotifier(s_RunningConfiguration.Publisher.EnableAnonymousMode);
+                            s_UserResolutionNotifier = new UserResolutionNotifier();
                     }
                 }
 
@@ -1395,9 +1383,9 @@ namespace Gibraltar.Monitor
                         newPackager.EndSend += Packager_EndSend;
 
                         if (criteria.HasValue)
-                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, false, false, null, null, 0, false, null, null, asyncSend);
+                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, asyncSend);
                         else
-                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, false, false, null, null, 0, false, null, null, asyncSend);
+                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, asyncSend);
 
                         result = true;
                     }
@@ -1965,7 +1953,7 @@ namespace Gibraltar.Monitor
             Write(s_SessionStartInfo.Packet);
             
             //initialize the listener architecture.
-            Listener.Initialize(s_RunningConfiguration, true);
+            Monitor.Initialize(s_Publisher, s_RunningConfiguration, true);
 
             //and we need to load up the session publisher if it's enabled.
             StartPublishEngine(); //this checks to see if it can start based on configuration

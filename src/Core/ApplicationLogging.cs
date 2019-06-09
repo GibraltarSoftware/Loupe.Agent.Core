@@ -3,7 +3,7 @@
 namespace Gibraltar
 {
     /// <summary>
-    /// Loupe applciation logging factory
+    /// Loupe application logging factory
     /// </summary>
     public static class ApplicationLogging
     {

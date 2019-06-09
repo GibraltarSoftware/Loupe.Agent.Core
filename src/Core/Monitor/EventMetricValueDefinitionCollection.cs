@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
@@ -14,7 +14,7 @@ namespace Gibraltar.Monitor
     /// <remarks>This object is automatically created by the Event Metric Definition and is accessible through the Values property.</remarks>
     public class EventMetricValueDefinitionCollection : IEventMetricValueDefinitionCollection
     {
-        private readonly Dictionary<string , IEventMetricValueDefinition> m_Dictionary = new Dictionary<string, IEventMetricValueDefinition>();
+        private readonly Dictionary<string , IEventMetricValueDefinition> m_Dictionary = new Dictionary<string, IEventMetricValueDefinition>(StringComparer.OrdinalIgnoreCase);
         private readonly List<IEventMetricValueDefinition> m_List = new List<IEventMetricValueDefinition>();
         private readonly EventMetricDefinition m_Definition;
 

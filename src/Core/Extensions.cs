@@ -30,5 +30,23 @@ namespace Gibraltar
                     throw new ArgumentOutOfRangeException(nameof(architecture), architecture, null);
             }
         }
+
+        /// <summary>
+        /// Dispose an object, catching any exceptions (and handling a null object)
+        /// </summary>
+        public static void SafeDispose(this IDisposable disposable)
+        {
+            if (disposable != null)
+            {
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    GC.KeepAlive(ex);
+                }
+            }
+        }
     }
 }

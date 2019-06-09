@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Gibraltar.Server.Client.Data;
+using Gibraltar.Server.Client.Internal;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
@@ -20,8 +21,9 @@ namespace Gibraltar.Server.Client
         public const string SHA1HashHeader = "X-Gibraltar-Hash";
 
         internal const string LogCategory = "Loupe.Repository.Hub";
-        internal const string SdsServerName = "hub.gibraltarsoftware.com";
-        private const string SdsEntryPath = "Customers/{0}";
+        internal const string LoupeServiceServerName = "hub.gibraltarsoftware.com";
+        private const string LoupeServiceEntryPath = "Customers/{0}";
+        private const string ApplicationKeyEntryPath = "Agent/{0}/";
 
         /// <summary>
         /// The version number for the new Gibraltar 3.0 features
@@ -708,7 +710,7 @@ namespace Gibraltar.Server.Client
                 {
                     //recursively try again.
                     channel.Dispose();
-                    connectionStatus = await Connect(configuration).ConfigureAwait(false);
+                    connectionStatus = await Connect(configurationXml.ToServerConfiguration()).ConfigureAwait(false);
                 }
                 else
                 {
@@ -834,12 +836,17 @@ namespace Gibraltar.Server.Client
 
             if (configuration.UseGibraltarService)
             {
-                channel = new WebChannel(Logger, true, SdsServerName, String.Format(SdsEntryPath, configuration.CustomerName), ClientProtocolVersion);
+                string entryPath = string.IsNullOrEmpty(configuration.ApplicationKey)
+                    ? string.Format(LoupeServiceEntryPath, configuration.CustomerName)
+                    : string.Format(ApplicationKeyEntryPath, configuration.ApplicationKey);
+
+
+                channel = new WebChannel(Logger, true, LoupeServiceServerName, entryPath, ClientProtocolVersion);
             }
             else
             {
                 //we need to create the right application base directory to get into Hub.
-                string entryPath = EffectiveApplicationBaseDirectory(configuration.ApplicationBaseDirectory, configuration.Repository);
+                string entryPath = EffectiveApplicationBaseDirectory(configuration.ApplicationKey, configuration.ApplicationBaseDirectory, configuration.Repository);
 
                 //and now we can actually create the channel!  Yay!
                 channel = new WebChannel(Logger, configuration.UseSsl, configuration.Server, configuration.Port, entryPath, ClientProtocolVersion);
@@ -851,11 +858,11 @@ namespace Gibraltar.Server.Client
         /// <summary>
         /// Combines application base directory (if not null) and repository (if not null) into one merged path.
         /// </summary>
-        private static string EffectiveApplicationBaseDirectory(string applicationBaseDirectory, string repository)
+        private static string EffectiveApplicationBaseDirectory(string applicationKey, string applicationBaseDirectory, string repository)
         {
-            string effectivePath = applicationBaseDirectory ?? String.Empty;
+            string effectivePath = applicationBaseDirectory ?? string.Empty;
 
-            if (String.IsNullOrEmpty(effectivePath) == false)
+            if (string.IsNullOrEmpty(effectivePath) == false)
             {
                 //check for whether we need to Extension a slash.
                 if (effectivePath.EndsWith("/") == false)
@@ -864,14 +871,20 @@ namespace Gibraltar.Server.Client
                 }
             }
 
-            if (String.IsNullOrEmpty(repository) == false)
+            if (string.IsNullOrEmpty(applicationKey) == false)
+            {
+                //we have an app key for that effective path which gets priority over any repository.
+                effectivePath += string.Format(ApplicationKeyEntryPath, applicationKey);
+            }
+            else if (string.IsNullOrEmpty(repository) == false)
             {
                 //we want a specific repository - which was created for Loupe Service so it assumes everyone's a "customer".  Oh well.
-                effectivePath += String.Format(SdsEntryPath, repository);
+                effectivePath += string.Format(LoupeServiceEntryPath, repository);
             }
 
             return effectivePath;
         }
+
 
         /// <summary>
         /// Indicates if we're on the original configured server (the "root") or have been redirected.
@@ -894,13 +907,13 @@ namespace Gibraltar.Server.Client
             {
                 if (m_RootConfiguration.UseGibraltarService)
                 {
-                    if (hostName.Equals(SdsServerName, StringComparison.OrdinalIgnoreCase) == false)
+                    if (hostName.Equals(LoupeServiceServerName, StringComparison.OrdinalIgnoreCase) == false)
                     {
                         //it's the wrong server.
                         isSameHub = false;
                     }
 
-                    string entryPath = String.Format(SdsEntryPath, m_RootConfiguration.CustomerName);
+                    string entryPath = String.Format(LoupeServiceEntryPath, m_RootConfiguration.CustomerName);
 
                     if (String.Equals(entryPath, applicationBaseDirectory) == false)
                     {
@@ -921,7 +934,7 @@ namespace Gibraltar.Server.Client
                     else
                     {
                         //application base directory is more complicated - we have to take into account if we have a repository set or not.
-                        var entryPath = EffectiveApplicationBaseDirectory(m_RootConfiguration.ApplicationBaseDirectory, m_RootConfiguration.Repository);
+                        var entryPath = EffectiveApplicationBaseDirectory(m_RootConfiguration.ApplicationKey, m_RootConfiguration.ApplicationBaseDirectory, m_RootConfiguration.Repository);
 
                         if (String.Equals(entryPath, applicationBaseDirectory) == false)
                         {

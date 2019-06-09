@@ -7,7 +7,7 @@ using System.Threading;
 using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Messaging;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 

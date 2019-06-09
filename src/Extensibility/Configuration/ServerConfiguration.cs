@@ -126,7 +126,6 @@ namespace Loupe.Configuration
             UseGibraltarService = false;
             UseSsl = false;
             Port = 0;
-
         }
 
         /// <summary>
@@ -158,6 +157,14 @@ namespace Loupe.Configuration
         /// </summary>
         /// <remarks>Defaults to false.  Requires that AutoSendSessions is enabled.</remarks>
         public bool PurgeSentSessions { get; set; }
+
+        /// <summary>
+        /// The application key to use to communicate with the Loupe Server
+        /// </summary>
+        /// <remarks>Application keys identify the specific repository and optionally an application environment service
+        /// for this session's data to be associated with.  The server administrator can determine by application key
+        /// whether to accept the session data or not.</remarks>
+        public string ApplicationKey { get; set; }
 
         /// <summary>
         /// The unique customer name when using the Gibraltar Loupe Service
@@ -207,7 +214,10 @@ namespace Loupe.Configuration
         public void Validate()
         {
             //check a special case:  There is NO configuration information to speak of.
-            if ((UseGibraltarService == false) && (String.IsNullOrEmpty(CustomerName)) && (String.IsNullOrEmpty(Server)))
+            if ((UseGibraltarService == false)
+                && string.IsNullOrEmpty(ApplicationKey)
+                && string.IsNullOrEmpty(CustomerName)
+                && string.IsNullOrEmpty(Server))
             {
                 //no way you even tried to configure the SDS.  lets use a different message.
                 throw new InvalidOperationException("No server connection configuration could be found");
@@ -215,13 +225,14 @@ namespace Loupe.Configuration
 
             if (UseGibraltarService)
             {
-                if (String.IsNullOrEmpty(CustomerName))
-                    throw new InvalidOperationException("A valid customer name is required to use the Gibraltar Hub Service,");
+                if (string.IsNullOrEmpty(ApplicationKey)
+                    && string.IsNullOrEmpty(CustomerName))
+                    throw new InvalidOperationException("An application key or service name is required to use the Loupe Service,");
             }
             else
             {
-                if (String.IsNullOrEmpty(Server))
-                    throw new InvalidOperationException("When using a private Hub a full server name is required");
+                if (string.IsNullOrEmpty(Server))
+                    throw new InvalidOperationException("When using a self-hosted Loupe server a full server name is required");
 
                 if (Port < 0)
                     throw new InvalidOperationException("When overriding the connection port, a positive number must be specified.  Use zero to accept the default port.");
@@ -292,5 +303,16 @@ namespace Loupe.Configuration
                 Enabled = false; //we can't be enabled because we aren't plausibly configured.
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            if (UseGibraltarService)
+                return string.Format("Loupe Cloud-Hosted Subscription '{0}'", CustomerName);
+
+            if (string.IsNullOrWhiteSpace(Repository))
+                return string.Format("Loupe Server '{0}'", Server);
+
+            return string.Format("Loupe Server '{0}' repository '{1}'", Server, Repository);
+        }
     }
 }

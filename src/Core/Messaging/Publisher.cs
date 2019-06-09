@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Gibraltar.Monitor;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -14,7 +14,7 @@ namespace Gibraltar.Messaging
     /// The central publisher for messaging
     /// </summary>
     /// <remarks></remarks>
-    internal class Publisher
+    public class Publisher
     {
         private readonly SessionSummary m_SessionSummary;
         private readonly object m_MessageQueueLock = new object();
@@ -149,6 +149,7 @@ namespace Gibraltar.Messaging
 
                 m_MessageDispatchThread = new Thread(MessageDispatchMain);
                 m_MessageDispatchThread.Name = "Loupe Publisher"; //name our thread so we can isolate it out of metrics and such
+
                 // We generally WANT to keep the app alive as a foreground thread so we make sure logs get flushed.
                 // But once we have processed the exit command, we want to switch to a background thread
                 // to process anything left (which will be forced to use writeThrough blocking), letting the
@@ -412,7 +413,7 @@ namespace Gibraltar.Messaging
                 {
                     if (m_Configuration.SessionFile.Enabled)
                     {
-                        AddMessenger(m_Configuration.SessionFile, typeof(FileMessenger));
+                        AddMessenger(m_Configuration.SessionFile);
                     }
                 }
                 catch (Exception)
@@ -423,7 +424,7 @@ namespace Gibraltar.Messaging
                 {
                     if (m_Configuration.NetworkViewer.Enabled)
                     {
-                        AddMessenger(m_Configuration.NetworkViewer, typeof(NetworkMessenger));
+                        AddMessenger(m_Configuration.NetworkViewer);
                     }
                 }
                 catch (Exception)
@@ -435,12 +436,17 @@ namespace Gibraltar.Messaging
             }
         }
 
-        private void AddMessenger(IMessengerConfiguration configuration, Type messengerType)
+        private void AddMessenger(IMessengerConfiguration configuration)
         {
             IMessenger newMessenger = null;
             try
             {
-                newMessenger = (IMessenger)Activator.CreateInstance(messengerType);
+                var messengerType = Type.GetType(configuration.MessengerTypeName);
+
+                if (messengerType != null)
+                {
+                    newMessenger = (IMessenger) Activator.CreateInstance(messengerType);
+                }
             }
             catch (Exception)
             {

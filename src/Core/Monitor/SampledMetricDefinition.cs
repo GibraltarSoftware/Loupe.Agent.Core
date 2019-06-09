@@ -1,4 +1,4 @@
-﻿using Gibraltar.Monitor.Internal;
+﻿using Gibraltar.Monitor.Serialization;
 
 namespace Gibraltar.Monitor
 {
@@ -20,7 +20,7 @@ namespace Gibraltar.Monitor
         /// <remarks>The metric definition <b>will</b> be automatically added to the provided collection.</remarks>
         /// <param name="definitions">The definitions dictionary this definition is a part of.</param>
         /// <param name="packet">The packet to create a definition from.</param>
-        internal SampledMetricDefinition(MetricDefinitionCollection definitions, SampledMetricDefinitionPacket packet)
+        public SampledMetricDefinition(MetricDefinitionCollection definitions, SampledMetricDefinitionPacket packet)
             : base(definitions, packet)
         {
             // After the base constructor, auto-add ourself to the definition collection

@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using Gibraltar.Data;
 using Gibraltar.Messaging.Net;
 using Gibraltar.Monitor;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Gibraltar.Server.Client;
 using Loupe.Extensibility.Data;
 

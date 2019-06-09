@@ -34,13 +34,12 @@ namespace Gibraltar.Data
         }
 
         /// <summary>
-        /// Delete a file with no exception being thrown. Uses DeleteFile method if not running under Mono.
+        /// Delete a file with no exception being thrown.
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
         public static bool SafeDeleteFile(string fileName)
         {
-            // It's Mono, so we can't P/Invoke (except maybe on Windows).  So Just use the .NET functionality and try/catch.
             bool fileDeleted = false;
             try
             {

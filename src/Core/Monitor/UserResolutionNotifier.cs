@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 using Gibraltar.Messaging;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 
 namespace Gibraltar.Monitor
 {
@@ -29,10 +29,9 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Create a new instance of the user resolution notifier
         /// </summary>
-        public UserResolutionNotifier(bool anonymousMode)
+        public UserResolutionNotifier()
         {            
-            if (anonymousMode == false)
-                Publisher.MessageDispatching += PublisherOnMessageDispatching;
+            Publisher.MessageDispatching += PublisherOnMessageDispatching;
         }
 
         /// <summary>

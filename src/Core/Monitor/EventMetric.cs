@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
@@ -229,7 +229,7 @@ namespace Gibraltar.Monitor
         /// This is used during object construction, so implementations should treat it as a static method.</remarks>
         /// <param name="packet">The metric sample packet being deserialized</param>
         /// <returns>The metric sample-compatible object.</returns>
-        internal override MetricSample OnMetricSampleRead(MetricSamplePacket packet)
+        protected override MetricSample OnMetricSampleRead(MetricSamplePacket packet)
         {
             //create a custom sampled metric sample object
             return new EventMetricSample(this, (EventMetricSamplePacket)packet);

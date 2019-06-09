@@ -52,7 +52,7 @@ namespace Loupe.Core.Test
 
             //now we want to wait for our performance monitor to initialize before we proceed.
             DateTime perfMonitorInitStart = DateTime.Now;
-            while ((Listener.Initialized == false) 
+            while ((Gibraltar.Monitor.Monitor.Initialized == false) 
                 && ((DateTime.Now - perfMonitorInitStart).TotalMilliseconds < 5000))
             {
                 //just wait for it...
@@ -60,7 +60,7 @@ namespace Loupe.Core.Test
             }
 
             //if we exited the while loop and it isn't done yet, it didn't get done fast enough.
-            if (Listener.Initialized == false)
+            if (Gibraltar.Monitor.Monitor.Initialized == false)
             {
                 Log.Write(LogMessageSeverity.Warning, "Unit Tests", "Performance Monitor Initialization Failed", "Performance Monitor failed to complete its initialization after we waited {0} milliseconds.", 
                           (DateTime.Now - perfMonitorInitStart).TotalMilliseconds);

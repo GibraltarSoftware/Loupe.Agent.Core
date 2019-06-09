@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor
@@ -525,7 +525,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The underlying packet 
         /// </summary>
-        internal MetricDefinitionPacket Packet { get { return m_Packet; } }
+        public MetricDefinitionPacket Packet { get { return m_Packet; } }
 
         #endregion
     }

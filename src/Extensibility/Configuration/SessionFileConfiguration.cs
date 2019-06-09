@@ -1,4 +1,6 @@
-﻿namespace Loupe.Configuration
+﻿using System;
+
+namespace Loupe.Configuration
 {
     /// <summary>
     /// File Messenger Configuration
@@ -159,5 +161,8 @@
             else if (MaxQueueLength > 50000)
                 MaxQueueLength = 50000;
         }
+
+        /// <inheritdoc />
+        string IMessengerConfiguration.MessengerTypeName => "Gibraltar.Messaging.FileMessenger";
     }
 }

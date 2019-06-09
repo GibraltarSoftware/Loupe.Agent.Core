@@ -6,6 +6,7 @@ using Gibraltar;
 using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Monitor;
+using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
 
@@ -143,7 +144,7 @@ namespace Loupe.Core.Test.Data
                 using (Packager newPackager = new Packager())
                 {
                     //we are saying don't override config,then basically sending default values for all of the config overrides (there is no overload that skips them)
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, false, false, false, null, null, 0, false, null, null, false);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, false, false);
                 }
             });
         }
@@ -151,9 +152,14 @@ namespace Loupe.Core.Test.Data
         [Test]
         public void SendPackageViaWebOverrideCustomer()
         {
+            var server = new ServerConfiguration
+                {
+                    UseGibraltarService = true,
+                    CustomerName = RepositoryName
+                };
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, true, RepositoryName, null, 0, false, null, null, false);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, false, server);
             }
         }
 
@@ -161,20 +167,26 @@ namespace Loupe.Core.Test.Data
         [Test]
         public void SendPackageToLocalWebServer()
         {
+            var server = new ServerConfiguration { Server = "localhost", Port = 58330 };
             using (Packager newPackager = new Packager())
             {
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, false, null, "localhost", 58330, false, null, null, false);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, false, server);
             }
         }
 
         [Test]
         public void SendPackageViaWebFail()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = true,
+                CustomerName = "BogusNonexistantCustomer"
+            };
             Assert.Throws<GibraltarException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {
-                    newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, true, "BogusNonexistantCustomer", null, 0, false, null, null, false);
+                    newPackager.SendToServer(SessionCriteria.AllSessions, false, false, false, server);
                 }
             });
         }
@@ -182,12 +194,17 @@ namespace Loupe.Core.Test.Data
         [Test]
         public void SendPackageViaWebAsyncFail()
         {
+            var server = new ServerConfiguration
+            {
+                UseGibraltarService = true,
+                CustomerName = "BogusNonexistantCustomer"
+            };
             using (Packager newPackager = new Packager())
             {
                 m_EndSendReceived = false;
                 m_EndSendResult = null;
                 newPackager.EndSend += Packager_EndSend;
-                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, true, "BogusNonexistantCustomer", null, 0, false, null, null, true);
+                newPackager.SendToServer(SessionCriteria.AllSessions, false, false, true, server);
 
                 while (m_EndSendReceived == false)
                 {

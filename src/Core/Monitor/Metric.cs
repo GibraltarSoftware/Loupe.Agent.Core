@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using Gibraltar.Monitor.Internal;
+using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
@@ -556,7 +556,7 @@ namespace Gibraltar.Monitor
         /// This is used during object construction, so implementations should treat it as a static method.</remarks>
         /// <param name="packet">The metric sample packet being deserialized</param>
         /// <returns>The metric sample-compatible object.</returns>
-        internal abstract MetricSample OnMetricSampleRead(MetricSamplePacket packet);
+        protected abstract MetricSample OnMetricSampleRead(MetricSamplePacket packet);
 
         #endregion
 
