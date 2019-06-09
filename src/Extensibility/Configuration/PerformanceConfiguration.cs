@@ -7,6 +7,9 @@ namespace Loupe.Agent.PerformanceCounters
     /// </summary>
     public class PerformanceConfiguration
     {
+        /// <summary>
+        /// Initialize a default performance monitoring configuration
+        /// </summary>
         public PerformanceConfiguration()
         {
             Enabled = true;

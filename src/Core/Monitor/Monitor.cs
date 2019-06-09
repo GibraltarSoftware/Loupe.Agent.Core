@@ -53,8 +53,9 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Apply the provided listener configuration
         /// </summary>
-        /// <param name="agentConfiguration"></param>
-        /// <param name="async"></param>
+        /// <param name="publisher">The publisher to record events to</param>
+        /// <param name="agentConfiguration">The active agent configuration</param>
+        /// <param name="async">True to initialize asynchronously</param>
         /// <remarks>If calling initialization from a path that may have started with the trace listener,
         /// you must set suppressTraceInitialize to true to guarantee that the application will not deadlock
         /// or throw an unexpected exception.</remarks>

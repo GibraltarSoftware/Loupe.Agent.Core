@@ -119,6 +119,9 @@ namespace Loupe.Configuration
         /// </summary>
         public NetworkViewerConfiguration NetworkViewer { get; set; }
 
+        /// <summary>
+        /// Performance monitoring options
+        /// </summary>
         public PerformanceConfiguration Performance { get; set; }
 
         /// <summary>
