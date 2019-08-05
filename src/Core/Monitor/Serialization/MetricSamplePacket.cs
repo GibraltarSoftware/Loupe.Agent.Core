@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Security.Principal;
+using Gibraltar.Messaging;
 using Gibraltar.Serialization;
 #pragma warning disable 1591
 
@@ -12,7 +14,7 @@ namespace Gibraltar.Monitor.Serialization
     /// <remarks>A metric sample packet is the persistable form of a single metric sample.
     /// This is the base class; inherit from either SampledMetricSamplePacket for a sampled metric or EventMetricSamplePacket for an event metric, or
     /// a further downstream object as appropriate.</remarks>
-    public abstract class MetricSamplePacket : GibraltarPacket, IPacket, IPacketObjectFactory<MetricSample, Metric>, IComparable<MetricSamplePacket>, IEquatable<MetricSamplePacket>, IDisplayable
+    public abstract class MetricSamplePacket : GibraltarPacket, IUserPacket, IPacket, IPacketObjectFactory<MetricSample, Metric>, IComparable<MetricSamplePacket>, IEquatable<MetricSamplePacket>, IDisplayable
     {
         private MetricPacket m_MetricPacket;
         private Guid m_ID;
@@ -73,6 +75,15 @@ namespace Gibraltar.Monitor.Serialization
             get { return m_MetricPacket.Description; }
         }
 
+        /// <summary>
+        /// Optional.  Extended user information related to this message
+        /// </summary>
+        public ApplicationUserPacket UserPacket { get; set; }
+
+        /// <summary>
+        /// Optional.  The raw user principal, used for deferred user lookup
+        /// </summary>
+        public IPrincipal Principal { get; set; }
 
         /// <summary>
         /// The unique Id of the metric we are associated with.

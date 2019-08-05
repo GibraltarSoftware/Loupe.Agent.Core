@@ -53,6 +53,23 @@ namespace Loupe.Agent.Core.Services
             {
                 Monitor.Subscribe(monitor);
             }
+
+            foreach (var filter in _serviceProvider.GetServices<ILoupeFilter>())
+            {
+                Gibraltar.Monitor.Log.RegisterFilter(filter);
+            }
+
+            var principalResolver = _serviceProvider.GetService<IPrincipalResolver>();
+            if (principalResolver != null)
+            {
+                Log.PrincipalResolver = principalResolver;
+            }
+
+            var userResolver = _serviceProvider.GetService<IApplicationUserResolver>();
+            if (userResolver != null)
+            {
+                Log.ApplicationUserResolver = userResolver;
+            }
         }
 
         /// <summary>Stops this Agent instance.</summary>

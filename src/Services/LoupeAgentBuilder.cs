@@ -30,5 +30,26 @@ namespace Loupe.Agent.Core.Services
             _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoupeMonitor, T>());
             return this;
         }
+
+        /// <inheritdoc />
+        public ILoupeAgentBuilder AddFilter<T>() where T : class, ILoupeFilter
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoupeFilter, T>());
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ILoupeAgentBuilder AddPrincipalResolver<T>() where T : class, IPrincipalResolver
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IPrincipalResolver, T>());
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ILoupeAgentBuilder AddApplicationUserResolver<T>() where T : class, IApplicationUserResolver
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserResolver, T>());
+            return this;
+        }
     }
 }

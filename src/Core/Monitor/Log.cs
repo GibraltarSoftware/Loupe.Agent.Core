@@ -77,6 +77,8 @@ namespace Gibraltar.Monitor
         private static RepositoryPublishEngine s_PublishEngine; //We have zero or one publish engine
         private static Packager s_ActivePackager; //PROTECTED BY LOCK
         private static LocalRepository s_Repository;
+        private static IApplicationUserResolver s_ApplicationUserResolver; //PROTECTED BY LOCK
+        private static IPrincipalResolver s_PrincipalResolver; //PROTECTED BY LOCK
 
         private static readonly MetricDefinitionCollection s_Metrics = new MetricDefinitionCollection();
 
@@ -98,7 +100,6 @@ namespace Gibraltar.Monitor
 
         private static Notifier s_MessageAlertNotifier; // PROTECTED BY NOTIFIERLOCK (weak check outside lock allowed)
         private static Notifier s_MessageNotifier; // PROTECTED BY NOTIFIERLOCK (weak check outside lock allowed)
-        private static UserResolutionNotifier s_UserResolutionNotifier;
 
         // A thread-specific static flag for each thread to identify if this thread is the current initialize
         [ThreadStatic]
@@ -345,23 +346,53 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Get the official user resolution notifier instance.  Will create it if it doesn't already exist.
+        /// An implementation of IApplicationUserResolver to capture Application User details from an IPrinciple
         /// </summary>
-        public static UserResolutionNotifier UserResolutionNotifier
+        public static IApplicationUserResolver ApplicationUserResolver
         {
-            get
+            get { lock (s_SyncObject) { return s_ApplicationUserResolver; } }
+            set
             {
-                if (s_UserResolutionNotifier == null)
+                lock (s_SyncObject)
                 {
-                    lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
-                    {
-                        if (s_UserResolutionNotifier == null) // Double-check that it's actually still null.
-                            s_UserResolutionNotifier = new UserResolutionNotifier();
-                    }
+                    s_ApplicationUserResolver = value;
+                    s_Publisher?.RegisterApplicationUserResolver(value);
                 }
-
-                return s_UserResolutionNotifier; // It's never altered again once created, so we can just read it now.
             }
+        }
+
+        /// <summary>
+        /// An implementation of IPrincipalResolver to determine the IPrinciple for each log message and metric sample
+        /// </summary>
+        public static IPrincipalResolver PrincipalResolver
+        {
+            get { lock(s_SyncObject) {return s_PrincipalResolver;} }
+            set
+            {
+                lock (s_SyncObject)
+                {
+                    s_PrincipalResolver = value;
+                    s_Publisher?.RegisterPrincipalResolver(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add an implementation of IFilter to inspect and modify data recorded by Loupe.
+        /// </summary>
+        /// <param name="filter">A new filter</param>
+        public static void RegisterFilter(ILoupeFilter filter)
+        {
+            s_Publisher?.RegisterFilter(filter);
+        }
+
+        /// <summary>
+        /// Remove the specified IFilter implementation from the set of filters.
+        /// </summary>
+        /// <param name="filter">The filter to remove</param>
+        public static void UnregisterFilter(ILoupeFilter filter)
+        {
+            s_Publisher?.UnregisterFilter(filter);
         }
 
         /// <summary>
@@ -1058,7 +1089,7 @@ namespace Gibraltar.Monitor
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="sourceProvider">An IMessageSourceProvider object which supplies the source information
         /// about this log message.</param>
-        /// <param name="userName">The effective username associated with the execution task which
+        /// <param name="principal">The effective user principal associated with the execution task which
         /// issued the log message.</param>
         /// <param name="exception">An Exception object attached to this log message, or null if none.</param>
         /// <param name="detailsXml">Optional.  An XML document with extended details about the message.  Can be null.</param>
@@ -1066,13 +1097,13 @@ namespace Gibraltar.Monitor
         /// <param name="description">Optional.  A multi-line description to use which can be a format string for the arguments.  Can be null.</param>
         /// <param name="args">Optional.  A variable number of arguments to insert into the formatted description string.</param>
         public static void WriteMessage(LogMessageSeverity severity, LogWriteMode writeMode, string logSystem,
-                                        string categoryName, IMessageSourceProvider sourceProvider, string userName,
+                                        string categoryName, IMessageSourceProvider sourceProvider, IPrincipal principal,
                                         Exception exception, string detailsXml, string caption, string description, params object[] args)
         {
             if (s_Initialized == false)
                 return;
 
-            IMessengerPacket packet = MakeLogPacket(severity, logSystem, categoryName, sourceProvider, userName,
+            IMessengerPacket packet = MakeLogPacket(severity, logSystem, categoryName, sourceProvider, principal,
                                                     exception, detailsXml, caption, description, args);
             Write(new[] {packet}, writeMode); // Write the assembled packet to our queue
         }
@@ -1150,7 +1181,7 @@ namespace Gibraltar.Monitor
 
             // Make a packet to mark the end of the current log file and why it ended there.
             IMessengerPacket endPacket = MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
-                                                       sourceProvider, string.Empty, null, null,
+                                                       sourceProvider, null, null, null,
                                                        string.Format(endFormat, formatArg0, formatArg1), null);
 
             // Make a command packet to trigger the actual file close.
@@ -1158,7 +1189,7 @@ namespace Gibraltar.Monitor
 
             // Make a packet to force a new file open, mark why it rolled over, and key off of for completion.
             IMessengerPacket newPacket = MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
-                                                       sourceProvider, string.Empty, null, null,
+                                                       sourceProvider, null, null, null,
                                                        string.Format(newFormat, formatArg0, formatArg1), null);
 
             // Now send them as a batch to enforce back-to-back processing, and wait for the last one to commit to disk.
@@ -1559,7 +1590,7 @@ namespace Gibraltar.Monitor
         /// <param name="description">Optional.  A multi-line description to use which can be a format string for the arguments.  Can be null.</param>
         /// <param name="args">A variable number of arguments to insert into the formatted description string.</param>
         internal static IMessengerPacket MakeLogPacket(LogMessageSeverity severity, string logSystem, string category,
-                                                       IMessageSourceProvider sourceProvider, string userName, Exception exception,
+                                                       IMessageSourceProvider sourceProvider, IPrincipal principal, Exception exception,
                                                        string detailsXml, string caption, string description, params object[] args)
         {
             if (s_Initialized == false)
@@ -1585,62 +1616,7 @@ namespace Gibraltar.Monitor
 
             if (s_RunningConfiguration.Publisher.EnableAnonymousMode)
             {
-                userName = string.Empty; // For now blank all user name data in anonymous mode.
-            }
-            else
-            {
-                var userPrincipal = ClaimsPrincipal.Current;
-                if (string.IsNullOrEmpty(userName))
-                {
-                    try
-                    {
-                        // These are wrapped in a try/catch because supposedly they could throw an exception.
-                        var threadIdentity = (userPrincipal != null) ? userPrincipal.Identity : null;
-                        if (threadIdentity != null)
-                        {
-                            userName = threadIdentity.Name;
-                        }
-                        else
-                        {
-                            // Passing true means we get nothing if not actually impersonating (fast?).
-                            WindowsIdentity windowsIdentity;
-                            try
-                            {
-                                windowsIdentity = WindowsIdentity.GetCurrent(true); // Note: May not work in Mono?
-                            }
-                            catch
-                            {
-                                windowsIdentity = null;
-                            }
-
-                            if (windowsIdentity != null)
-                            {
-                                userName = windowsIdentity.Name;
-                            }
-                        }
-                    }
-                    catch (System.Security.SecurityException)
-                    {
-                        userName = null;
-                    }
-                }
-
-                if (string.IsNullOrEmpty(userName))
-                {
-                    // Get from session info.
-                    userName = s_SessionStartInfo.FullyQualifiedUserName;
-                }
-
-                //if our principal and our explicit user name don't agree then ditch the principal, it won't be valid.
-                if ((ReferenceEquals(userPrincipal, null) == false)
-                    && (ReferenceEquals(userPrincipal.Identity, null) == false))
-                {
-                    userPrincipal = string.Equals(userName, userPrincipal.Identity.Name, StringComparison.OrdinalIgnoreCase)
-                        ? userPrincipal
-                        : null;
-                }
-
-                packet.UserPrincipal = userPrincipal;
+                principal = null; // blank all user name data in anonymous mode.
             }
 
             string formattedDescription;
@@ -1660,7 +1636,7 @@ namespace Gibraltar.Monitor
             packet.Severity = severity;
             packet.LogSystem = logSystem;
             packet.CategoryName = category;
-            packet.UserName = userName;
+            packet.Principal = principal;
             packet.Caption = caption;
             packet.Description = formattedDescription;
             packet.Details = detailsXml;

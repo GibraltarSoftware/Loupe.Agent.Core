@@ -46,9 +46,6 @@ namespace AspNetCore2.Sandbox
                 builder.AddLoupe(); //from Loupe.Extensions.Logging
             });
 
-            //Tell Loupe about your application users if you're using authentication
-            Log.ResolveApplicationUser += OnResolveApplicationUser;
-
             //ASP.NET Core Auth Configuration
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -90,19 +87,6 @@ namespace AspNetCore2.Sandbox
             app.UseAuthentication();
 
             app.UseMvc();
-        }
-
-
-        /// <summary>
-        /// Loupe extended user information delegate
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnResolveApplicationUser(object sender, ApplicationUserResolutionEventArgs e)
-        {
-            if (e.Principal == null) return;
-
-            var user = e.Principal;
         }
     }
 }
