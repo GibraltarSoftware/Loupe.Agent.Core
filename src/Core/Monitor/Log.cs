@@ -383,6 +383,8 @@ namespace Gibraltar.Monitor
         /// <param name="filter">A new filter</param>
         public static void RegisterFilter(ILoupeFilter filter)
         {
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
+
             s_Publisher?.RegisterFilter(filter);
         }
 
@@ -392,6 +394,8 @@ namespace Gibraltar.Monitor
         /// <param name="filter">The filter to remove</param>
         public static void UnregisterFilter(ILoupeFilter filter)
         {
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
+
             s_Publisher?.UnregisterFilter(filter);
         }
 

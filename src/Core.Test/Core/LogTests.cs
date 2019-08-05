@@ -238,16 +238,16 @@ namespace Loupe.Core.Test.Core
 
         private class ResolveUserJustOnceResolver : IApplicationUserResolver
         {
-            private int m_UserResolutionRequests;
+            private volatile int _ResolutionRequests;
 
             public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
             {
-                Interlocked.Increment(ref m_UserResolutionRequests);
+                Interlocked.Increment(ref _ResolutionRequests);
 
                 return userFactory();
             }
 
-            public int ResolutionRequests => m_UserResolutionRequests;
+            public int ResolutionRequests => _ResolutionRequests;
         }
         #endregion
 
