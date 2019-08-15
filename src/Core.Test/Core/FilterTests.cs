@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor;
@@ -68,7 +66,7 @@ namespace Loupe.Core.Test.Core
         }
 
         [Test]
-        public void Can_Filter_Log_Message()
+        public void Can_Rewrite_Log_Message()
         {
             string findValue = "the";
             string replaceValue = "{REPLACED}";
@@ -79,7 +77,7 @@ namespace Loupe.Core.Test.Core
             {
                 Log.RegisterFilter(filter);
 
-                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.Filter.Add/Remove Filter",
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.Filter.Replace Word Filter",
                     null, null, null, null, "This caption should show " + replaceValue + " here: " + findValue,
                     "This description should show {0} here: {1}\r\nAnd here: {1}\r\n{1} <-- And here", replaceValue, findValue);
             }
@@ -104,7 +102,6 @@ namespace Loupe.Core.Test.Core
         }
 
         #endregion
-
 
         #region Private Class ReplaceWordFilter
 
@@ -138,5 +135,71 @@ namespace Loupe.Core.Test.Core
         }
 
         #endregion
+
+        [Test]
+        public void Can_Rewrite_Log_Message_With_Lambda()
+        {
+            var findValue = "the";
+            var replaceValue = "{REPLACED}";
+
+            var filter = new DelegateLoupeFilter((packet) =>
+            {
+                if (packet is LogMessagePacket logMessagePacket)
+                {
+                    logMessagePacket.Caption = logMessagePacket.Caption?.Replace(findValue, replaceValue);
+                    logMessagePacket.Description = logMessagePacket.Description?.Replace(findValue, replaceValue);
+                    logMessagePacket.Details = logMessagePacket.Details?.Replace(findValue, replaceValue);
+                    if (logMessagePacket.HasException)
+                    {
+                        foreach (var exception in logMessagePacket.Exceptions.Cast<ExceptionInfoPacket>())
+                        {
+                            exception.Message = exception.Message?.Replace(findValue, replaceValue);
+                        }
+                    }
+                }
+            });
+
+            try
+            {
+                Log.RegisterFilter(filter);
+
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.Filter.Lambda Filter",
+                    null, null, null, null, "This caption should show " + replaceValue + " here: " + findValue,
+                    "This description should show {0} here: {1}\r\nAnd here: {1}\r\n{1} <-- And here", replaceValue, findValue);
+            }
+            finally
+            {
+                Log.UnregisterFilter(filter);
+            }
+        }
+
+        [Test]
+        public void Can_Filter_Log_Message_With_Lambda()
+        {
+            var filter = new DelegateLoupeFilter((packet) =>
+            {
+                if (packet is LogMessagePacket logMessagePacket)
+                {
+                    logMessagePacket.Caption = "This message should not be in the log";
+                    return false;
+                }
+
+                return true;
+            });
+
+            try
+            {
+                Log.RegisterFilter(filter);
+
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.Filter.Lambda Filter",
+                    null, null, null, null, "This message should be suppressed by the filter",
+                    null);
+            }
+            finally
+            {
+                Log.UnregisterFilter(filter);
+            }
+        }
+
     }
 }
