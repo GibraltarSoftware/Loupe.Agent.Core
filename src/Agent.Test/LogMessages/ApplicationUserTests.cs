@@ -34,17 +34,17 @@ namespace Loupe.Agent.Test.LogMessages
 
         private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
             {
                 //this is really a quite poor set of data for a user - you wouldn't want to touch the environment
                 //and naturally these details wouldn't be hard-coded.
-                applicationUser = userFactory();
-                applicationUser.Caption = Environment.GetEnvironmentVariable("USERNAME");
-                applicationUser.Organization = "Unit test";
-                applicationUser.EmailAddress = "support@gibraltarsoftware.com";
-                applicationUser.Phone = "443 738-0680";
-                applicationUser.Properties.Add("Customer Key", "1234-5678-90");
-                applicationUser.Properties.Add("License Check", null);
+                var newUser = applicationUser.Value;
+                newUser.Caption = Environment.GetEnvironmentVariable("USERNAME");
+                newUser.Organization = "Unit test";
+                newUser.EmailAddress = "support@gibraltarsoftware.com";
+                newUser.Phone = "443 738-0680";
+                newUser.Properties.Add("Customer Key", "1234-5678-90");
+                newUser.Properties.Add("License Check", null);
 
                 return true;
             }
@@ -62,7 +62,7 @@ namespace Loupe.Agent.Test.LogMessages
 
                 var principal = new GenericPrincipal(new GenericIdentity(Guid.NewGuid().ToString()), null); //we want a unique, but consistent, principal.
 
-                var justOnceResolver = new ResolveUserJustOnceResolver();
+                var justOnceResolver = new ResolveUserJustOnceProvider();
                 Log.ApplicationUserProvider = justOnceResolver;
                 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, principal, null,
@@ -85,15 +85,15 @@ namespace Loupe.Agent.Test.LogMessages
 
         #region Private Class ResolveUserJustOnceResolver 
 
-        private class ResolveUserJustOnceResolver : IApplicationUserProvider
+        private class ResolveUserJustOnceProvider : IApplicationUserProvider
         {
             private volatile int m_ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 
-                applicationUser = userFactory();
+                var user = applicationUser.Value;
 
                 return true;
             }
@@ -204,7 +204,7 @@ namespace Loupe.Agent.Test.LogMessages
         {
             private volatile int m_ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 
@@ -213,7 +213,7 @@ namespace Loupe.Agent.Test.LogMessages
                     "This message was logged during an IApplicationUserProvider Resolve method",
                     "It should not have an application user.");
 
-                applicationUser = userFactory();
+                var user = applicationUser.Value;
                 return true;
             }
 

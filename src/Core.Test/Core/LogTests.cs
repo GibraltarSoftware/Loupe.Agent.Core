@@ -185,18 +185,16 @@ namespace Loupe.Core.Test.Core
 
         private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
             {
                 var identity = principal.Identity;
-                var newUser = userFactory();
+                var newUser = applicationUser.Value;
                 newUser.Key = identity.Name;
                 newUser.Organization = "Unit test";
                 newUser.EmailAddress = "support@gibraltarsoftware.com";
                 newUser.Phone = "443 738-0680";
                 newUser.Properties.Add("Customer Key", "1234-5678-90");
                 newUser.Properties.Add("License Check", null);
-
-                applicationUser = newUser;
 
                 return true;
             }
@@ -242,11 +240,11 @@ namespace Loupe.Core.Test.Core
         {
             private volatile int _ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref _ResolutionRequests);
 
-                applicationUser = userFactory();
+                var user = applicationUser.Value;
                 return true;
             }
 

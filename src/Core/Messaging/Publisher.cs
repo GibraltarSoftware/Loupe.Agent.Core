@@ -482,19 +482,21 @@ namespace Gibraltar.Messaging
                 try
                 {
                     t_ThreadMustNotResolveApplicationUser = true;
-                    if (resolver.TryGetApplicationUser(packet.Principal, () =>
+
+                    //we use lazy initialization to avoid the expense of stamping, etc. if they
+                    //aren't going to use it.  Even better would be to lazy this object too.
+                    var lazyApplicationUser = new Lazy<ApplicationUser>(delegate
                     {
                         var userPacket = new ApplicationUserPacket {FullyQualifiedUserName = userName};
                         StampPacket(userPacket, DateTimeOffset.Now);
                         return new ApplicationUser(userPacket);
-                    }, out applicationUser))
+                    }, true);
+
+                    if (resolver.TryGetApplicationUser(packet.Principal, lazyApplicationUser) 
+                        && lazyApplicationUser.IsValueCreated)
                     {
                         //cache this so we don't keep going after it.
-                        applicationUser = m_ApplicationUsers.TrySetValue(applicationUser);
-                    }
-                    else
-                    {
-                        applicationUser = null; //in case they didn't follow the interface definition..
+                        applicationUser = m_ApplicationUsers.TrySetValue(lazyApplicationUser.Value);
                     }
                 }
                 catch (Exception ex)
