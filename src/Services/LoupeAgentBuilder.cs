@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Security.Principal;
+using Gibraltar.Agent;
 using Gibraltar.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -46,9 +49,23 @@ namespace Loupe.Agent.Core.Services
         }
 
         /// <inheritdoc />
+        public ILoupeAgentBuilder AddPrincipalResolver(Func<IPrincipal> func)
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IPrincipalResolver, DelegatePrincipalResolver>(resolver => new DelegatePrincipalResolver(func)));
+            return this;
+        }
+
+        /// <inheritdoc />
         public ILoupeAgentBuilder AddApplicationUserProvider<T>() where T : class, IApplicationUserProvider
         {
             _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserProvider, T>());
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func)
+        {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserProvider, DelegateApplicationUserProvider>(provider => new DelegateApplicationUserProvider(func)));
             return this;
         }
     }

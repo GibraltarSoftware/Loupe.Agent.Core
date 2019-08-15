@@ -31,6 +31,7 @@ namespace Loupe.Agent.Test.LogMessages
             }
         }
 
+        #region Private Class ResolveUserForCurrentPrincipal
 
         private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
@@ -49,6 +50,8 @@ namespace Loupe.Agent.Test.LogMessages
                 return true;
             }
         }
+
+        #endregion
 
         [Test]
         public void ApplicationUserAssignJustOnce()
@@ -221,5 +224,69 @@ namespace Loupe.Agent.Test.LogMessages
         }
 
         #endregion
+
+        [Test]
+        public void Can_Use_Lambda_For_Principal_Resolver()
+        {
+            try
+            {
+                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our event handler.
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Principal Resolver", "Flushing message queue prior to doing resolve once test",
+                    "We should get no resolution as we shouldn't have the resolver bound yet.");
+
+                Log.PrincipalResolver = new DelegatePrincipalResolver(() => new GenericPrincipal(new GenericIdentity("Can_Use_Lambda_For_Principal_Resolver"), null));
+                var justOnceResolver = new ResolveUserJustOnceProvider();
+                Log.ApplicationUserProvider = justOnceResolver;
+
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Principal Resolver",
+                    "This message should be attributed to user Can_Use_Lambda_For_Principal_Resolver",
+                    "And we should get the resolution event following it.");
+                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We didn't get exactly one resolution after the first message");
+
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Principal Resolver",
+                    "This message should be attributed to user Can_Use_Lambda_For_Principal_Resolver",
+                    "And we should NOT get the resolution event following it.");
+                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
+            }
+            finally
+            {
+                Log.PrincipalResolver = null;
+                Log.ApplicationUserProvider = null;
+            }
+        }
+
+        [Test]
+        public void Can_Use_Lambda_For_Application_User_Provider()
+        {
+            try
+            {
+                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our event handler.
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Application User Provider",
+                    "Flushing message queue prior to doing resolve once test",
+                    "We should get no resolution as we shouldn't have the resolver bound yet.");
+
+                Log.PrincipalResolver = new RandomPrincipalResolver();
+                Log.ApplicationUserProvider = new DelegateApplicationUserProvider(((principal, lazy) =>
+                {
+                    var user = lazy.Value;
+                    user.Caption = "Can_Use_Lambda_For_Application_User_Provider";
+                    return true;
+                }));
+
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Application User Provider",
+                    "This message should be attributed to user caption Can_Use_Lambda_For_Application_User_Provider",
+                    "And we should get the resolution event following it.");
+            }
+            finally
+            {
+                Log.PrincipalResolver = null;
+                Log.ApplicationUserProvider = null;
+            }
+        }
     }
 }

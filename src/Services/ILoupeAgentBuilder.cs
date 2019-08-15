@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Security.Principal;
 using Gibraltar.Monitor;
 
@@ -38,10 +39,23 @@ namespace Loupe.Agent.Core.Services
         ILoupeAgentBuilder AddPrincipalResolver<T>() where T : class, IPrincipalResolver;
 
         /// <summary>
-        /// Specify the Application User Resolver for the current application.
+        /// Specify the <see cref="IPrincipal"/> resolver function for the current application.
         /// </summary>
-        /// <typeparam name="T">The type of the resolver, which must implement <see cref="IApplicationUserProvider" />.</typeparam>
+        /// <returns>The builder instance.</returns>
+        ILoupeAgentBuilder AddPrincipalResolver(Func<IPrincipal> func);
+
+        /// <summary>
+        /// Specify the Application User Provider for the current application.
+        /// </summary>
+        /// <typeparam name="T">The type of the provider, which must implement <see cref="IApplicationUserProvider" />.</typeparam>
         /// <returns>The builder instance.</returns>
         ILoupeAgentBuilder AddApplicationUserProvider<T>() where T : class, IApplicationUserProvider;
+
+        /// <summary>
+        /// Specify the Application User Provider function for the current application.
+        /// </summary>
+        /// <returns>The builder instance.</returns>
+        ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func);
+
     }
 }
