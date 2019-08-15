@@ -259,9 +259,11 @@ namespace Loupe.Core.Test.Core
         /// </summary>
         private class RandomPrincipalResolver : IPrincipalResolver
         {
-            public IPrincipal ResolveCurrentPrincipal()
+            /// <<inheritdoc/>
+            public bool TryResolveCurrentPrincipal(out IPrincipal principal)
             {
-                return new GenericPrincipal(new GenericIdentity(DateTime.UtcNow.ToLongTimeString()), null);
+                principal = new GenericPrincipal(new GenericIdentity(DateTime.UtcNow.ToLongTimeString()), null);
+                return true;
             }
         }
 

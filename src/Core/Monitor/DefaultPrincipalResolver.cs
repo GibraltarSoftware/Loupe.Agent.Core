@@ -19,11 +19,11 @@ namespace Gibraltar.Monitor
         }
 
         /// <inheritdoc />
-        public IPrincipal ResolveCurrentPrincipal()
+        public bool TryResolveCurrentPrincipal(out IPrincipal principal)
         {
-            var userPrincipal = ClaimsPrincipal.Current;
+            principal = ClaimsPrincipal.Current;
 
-            if (userPrincipal == null && IsWindows)
+            if (principal == null && IsWindows)
             {
                 //fall back to the windows identity..
                 WindowsIdentity windowsIdentity;
@@ -38,12 +38,11 @@ namespace Gibraltar.Monitor
 
                 if (windowsIdentity != null)
                 {
-                    userPrincipal = new WindowsPrincipal(windowsIdentity);
+                    principal = new WindowsPrincipal(windowsIdentity);
                 }
             }
 
-
-            return userPrincipal;
+            return (principal != null);
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Principal;
-using System.Text;
+﻿using System.Security.Principal;
 using Gibraltar.Monitor;
 using Microsoft.AspNetCore.Http;
 
@@ -24,12 +21,17 @@ namespace Loupe.Agent.AspNetCore
         }
 
         /// <inheritdoc />
-        public IPrincipal ResolveCurrentPrincipal()
+        public bool TryResolveCurrentPrincipal(out IPrincipal principal)
         {
-            var principal = _contextAccessor.HttpContext?.User;
+            principal = _contextAccessor.HttpContext?.User;
 
             //If we got a principal, great - otherwise ask the default resolver to give us the default.
-            return principal ?? _defaultPrincipalResolver.ResolveCurrentPrincipal();
+            if (principal != null)
+            {
+                return true;
+            }
+
+            return _defaultPrincipalResolver.TryResolveCurrentPrincipal(out principal);
         }
     }
 }

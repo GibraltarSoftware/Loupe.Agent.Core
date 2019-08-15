@@ -53,8 +53,10 @@ namespace Gibraltar.Messaging
         [ThreadStatic] private static bool t_ThreadMustNotBlock;
         // A thread-specific static flag so we can disable notification loops for Notifier threads
         [ThreadStatic] private static bool t_ThreadMustNotNotify;
+        /// A thread-specific static flag so we can prevent recursion in an IPrincipalResolver
+        [ThreadStatic] private static bool t_ThreadMustNotResolvePrincipal;
         // A thread-specific static flag so we can prevent recursion in the application user resolver
-        [ThreadStatic] private static bool t_InResolveUserEvent;
+        [ThreadStatic] private static bool t_ThreadMustNotResolveApplicationUser;
 
 
         internal static event PacketEventHandler MessageDispatching;
@@ -470,16 +472,16 @@ namespace Gibraltar.Messaging
             if (string.IsNullOrEmpty(userName))
                 return;
 
-            //prevent infinite recursion
-            if (t_InResolveUserEvent)
-                return;
-
             if (m_ApplicationUsers.TryFindUserName(userName, out var applicationUser) == false)
             {
+                //prevent infinite recursion
+                if (t_ThreadMustNotResolveApplicationUser)
+                    return;
+
                 //since we have a miss we want to give our resolver a shot..
                 try
                 {
-                    t_InResolveUserEvent = true;
+                    t_ThreadMustNotResolveApplicationUser = true;
                     applicationUser = resolver.ResolveApplicationUser(packet.Principal, () =>
                     {
                         var userPacket = new ApplicationUserPacket {FullyQualifiedUserName = userName};
@@ -494,7 +496,7 @@ namespace Gibraltar.Messaging
                 }
                 finally
                 {
-                    t_InResolveUserEvent = false;
+                    t_ThreadMustNotResolveApplicationUser = false;
                 }
 
                 if (applicationUser != null)
@@ -850,14 +852,24 @@ namespace Gibraltar.Messaging
                     //we only want to resolve the principal once per block, even if there are multiple messages.
                     if (principal == null)
                     {
-                        try
+                        //before we resolve the principal make sure our thread isn't *currently* trying to resolve a principal.
+                        if (!t_ThreadMustNotResolvePrincipal)
                         {
-                            principal = resolver.ResolveCurrentPrincipal();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.DebugBreak();
-                            GC.KeepAlive(ex);
+                            try
+                            {
+                                t_ThreadMustNotResolvePrincipal = true;
+                                var resolved = resolver.TryResolveCurrentPrincipal(out principal);
+                                if (resolved == false) principal = null; //in case they broke the contract..
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.DebugBreak();
+                                GC.KeepAlive(ex);
+                            }
+                            finally
+                            {
+                                t_ThreadMustNotResolvePrincipal = false;
+                            }
                         }
 
                         if (principal == null)
