@@ -172,6 +172,7 @@ namespace Gibraltar.Monitor
             {
                 return null;
             }
+
             for (int i = 0; i < args.Length; i++)
             {
                 Exception exception = args[i] as Exception;
@@ -180,6 +181,7 @@ namespace Gibraltar.Monitor
                     return exception;
                 }
             }
+
             return null;
         }
             

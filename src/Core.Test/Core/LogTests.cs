@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Security.Principal;
 using System.Threading;
 using Gibraltar;
 using Gibraltar.Monitor;
@@ -168,7 +169,7 @@ namespace Loupe.Core.Test.Core
         [Test]
         public void ApplicationUserAssignForCurrentPrincipal()
         {
-            Log.UserResolutionNotifier.ResolveUser += OnResolveUserForCurrentPrincipal;
+            Log.ApplicationUserProvider = new ResolveUserForCurrentPrincipal();
             try
             {
                 Log.Write(LogMessageSeverity.Information, "LogTests.ApplicationUser.Assign For Current Principal", "This message should be attributed to the current user", 
@@ -176,53 +177,98 @@ namespace Loupe.Core.Test.Core
             }
             finally
             {
-                Log.UserResolutionNotifier.ResolveUser -= OnResolveUserForCurrentPrincipal;
+                Log.ApplicationUserProvider = null;
             }
         }
 
-        private void OnResolveUserForCurrentPrincipal(object sender, ResolveUserEventArgs e)
+        #region Private Application User Resolver
+
+        private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            var identity = e.Principal.Identity;
-            var newUser = e.GetUser();
-            newUser.Packet.Key = identity.Name;
-            newUser.Packet.Organization = "Unit test";
-            newUser.Packet.EmailAddress = "support@gibraltarsoftware.com";
-            newUser.Packet.Phone = "443 738-0680";
-            newUser.Packet.Properties.Add("Customer Key", "1234-5678-90");
-            newUser.Packet.Properties.Add("License Check", null);
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            {
+                var identity = principal.Identity;
+                var newUser = applicationUser.Value;
+                newUser.Key = identity.Name;
+                newUser.Organization = "Unit test";
+                newUser.EmailAddress = "support@gibraltarsoftware.com";
+                newUser.Phone = "443 738-0680";
+                newUser.Properties.Add("Customer Key", "1234-5678-90");
+                newUser.Properties.Add("License Check", null);
+
+                return true;
+            }
         }
+
+        #endregion
 
         [Test]
         public void ApplicationUserAssignJustOnce()
         {
-            Log.UserResolutionNotifier.ResolveUser += OnResolveUserJustOnce;
             try
             {
-                m_UserResolutionRequests = 0;
-                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.ApplicationUser.Assign Just Once", null, "ApplicationUserAssignJustOnce",
-                    null, null, "This message should be attributed to ApplicationUserAssignJustOnce",
-                    "And we should get the resolution event following it.");
-                Assert.AreEqual(1, m_UserResolutionRequests, "We didn't get exactly one resolution");
+                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our event handler.
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.ApplicationUser.Assign Just Once", 
+                    null, null, null, null, "Flushing message queue prior to doing resolve once test",
+                    "We should get no resolution as we shouldn't have the resolver bound yet.");
 
-                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.ApplicationUser.Assign Just Once", null, "ApplicationUserAssignJustOnce",
-                    null, null, "This message should be attributed to ApplicationUserAssignJustOnce",
+                var justOnceResolver = new ResolveUserJustOnceResolver();
+
+                Log.ApplicationUserProvider = justOnceResolver;
+                Log.PrincipalResolver = new RandomPrincipalResolver();
+
+
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.ApplicationUser.Assign Just Once", 
+                    null, null, null, null, "This message should be attributed to ApplicationUserAssignJustOnce",
+                    "And we should get the resolution event following it.");
+                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We didn't get exactly one resolution");
+
+                Log.WriteMessage(LogMessageSeverity.Information, LogWriteMode.WaitForCommit, "Loupe", "LogTests.ApplicationUser.Assign Just Once", 
+                    null, null, null, null, "This message should be attributed to ApplicationUserAssignJustOnce",
                     "And we should NOT get the resolution event following it.");
-                Assert.AreEqual(1, m_UserResolutionRequests, "We didn't get exactly one resolution");
+                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We didn't get exactly one resolution");
             }
             finally
             {
-                Log.UserResolutionNotifier.ResolveUser -= OnResolveUserJustOnce;
-            }            
+                Log.ApplicationUserProvider = null;
+            }
         }
 
-        private void OnResolveUserJustOnce(object sender, ResolveUserEventArgs e)
+        #region Private Class ResolveUserJustOnceResolver 
+
+        private class ResolveUserJustOnceResolver : IApplicationUserProvider
         {
-            m_UserResolutionRequests++;
+            private volatile int _ResolutionRequests;
 
-            //all I have to do to lock in the user is get it..
-            var newUser = e.GetUser();
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            {
+                Interlocked.Increment(ref _ResolutionRequests);
+
+                var user = applicationUser.Value;
+                return true;
+            }
+
+            public int ResolutionRequests => _ResolutionRequests;
+        }
+        #endregion
+
+
+        #region Private Class RandomPrincipalResolver
+
+        /// <summary>
+        /// Create a unique principle for each request to force user name resolution.
+        /// </summary>
+        private class RandomPrincipalResolver : IPrincipalResolver
+        {
+            /// <<inheritdoc/>
+            public bool TryResolveCurrentPrincipal(out IPrincipal principal)
+            {
+                principal = new GenericPrincipal(new GenericIdentity(DateTime.UtcNow.ToLongTimeString()), null);
+                return true;
+            }
         }
 
-        private int m_UserResolutionRequests;
+        #endregion
+
     }
 }

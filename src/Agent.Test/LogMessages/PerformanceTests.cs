@@ -91,13 +91,13 @@ namespace Loupe.Agent.Test.LogMessages
             {
                 string caption = string.Format("Test Message {0} Caption", curMessage);
                 string description = string.Format("Test Message {0} Description, with some content added to it's at least the size you'd expect a normal description to be of a message", curMessage);
-                Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, "UnitTest", null, LogWriteMode.Queued, null,
+                Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, null, null, LogWriteMode.Queued, null,
                     "Test.Agent.LogMessages.Performance", caption, description);
             }
             DateTimeOffset messageEndTime = DateTimeOffset.UtcNow;
 
             //one wait for commit message to force the buffer to flush.
-            Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, "UnitTest", null, LogWriteMode.WaitForCommit, null,
+            Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, null, null, LogWriteMode.WaitForCommit, null,
                 "Test.Agent.LogMessages.Performance", "Committing performance test", null);
 
             //and store off our time
@@ -126,12 +126,12 @@ namespace Loupe.Agent.Test.LogMessages
             {
                 string caption = string.Format("Test Message {0} Caption", curMessage);
                 string description = string.Format("Test Message {0} Description, with some content added to it's at least the size you'd expect a normal description to be of a message", curMessage);
-                Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, "UnitTest", null, LogWriteMode.WaitForCommit, null,
+                Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, null, null, LogWriteMode.WaitForCommit, null,
                     "Test.Agent.LogMessages.Performance", caption, description);
             }
 
             //one more message to match our async case.
-            Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, "UnitTest", null, LogWriteMode.WaitForCommit, null,
+            Log.Write(LogMessageSeverity.Verbose, "NUnit", ourMessageSource, null, null, LogWriteMode.WaitForCommit, null,
                 "Test.Agent.LogMessages.Performance", "Committing performance test", null);
 
             //and store off our time
