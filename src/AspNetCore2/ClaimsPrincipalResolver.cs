@@ -14,6 +14,10 @@ namespace Loupe.Agent.AspNetCore
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IPrincipalResolver _defaultPrincipalResolver;
 
+        /// <summary>
+        /// Create a new principal resolver
+        /// </summary>
+        /// <param name="contextAccessor"></param>
         public ClaimsPrincipalResolver(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;

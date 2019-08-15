@@ -14,6 +14,7 @@ namespace Loupe.Agent.AspNetCore
         /// <param name="builder">The <see cref="ILoupeAgentBuilder"/> instance.</param>
         /// <returns>The <see cref="ILoupeAgentBuilder"/> instance.</returns>
         public static ILoupeAgentBuilder AddAspNetCoreDiagnostics(this ILoupeAgentBuilder builder) => builder.AddListener<ActionDiagnosticListener>()
-            .AddPrincipalResolver<ClaimsPrincipalResolver>();
+            .AddPrincipalResolver<ClaimsPrincipalResolver>()
+            .AddApplicationUserProvider<ClaimsPrincipalApplicationUserProvider>();
     }
 }
