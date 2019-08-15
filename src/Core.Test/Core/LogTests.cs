@@ -169,7 +169,7 @@ namespace Loupe.Core.Test.Core
         [Test]
         public void ApplicationUserAssignForCurrentPrincipal()
         {
-            Log.ApplicationUserResolver = new ResolveUserForCurrentPrincipal();
+            Log.ApplicationUserProvider = new ResolveUserForCurrentPrincipal();
             try
             {
                 Log.Write(LogMessageSeverity.Information, "LogTests.ApplicationUser.Assign For Current Principal", "This message should be attributed to the current user", 
@@ -177,15 +177,15 @@ namespace Loupe.Core.Test.Core
             }
             finally
             {
-                Log.ApplicationUserResolver = null;
+                Log.ApplicationUserProvider = null;
             }
         }
 
         #region Private Application User Resolver
 
-        private class ResolveUserForCurrentPrincipal : IApplicationUserResolver
+        private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
+            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
             {
                 var identity = principal.Identity;
                 var newUser = userFactory();
@@ -196,7 +196,9 @@ namespace Loupe.Core.Test.Core
                 newUser.Properties.Add("Customer Key", "1234-5678-90");
                 newUser.Properties.Add("License Check", null);
 
-                return newUser;
+                applicationUser = newUser;
+
+                return true;
             }
         }
 
@@ -214,7 +216,7 @@ namespace Loupe.Core.Test.Core
 
                 var justOnceResolver = new ResolveUserJustOnceResolver();
 
-                Log.ApplicationUserResolver = justOnceResolver;
+                Log.ApplicationUserProvider = justOnceResolver;
                 Log.PrincipalResolver = new RandomPrincipalResolver();
 
 
@@ -230,21 +232,22 @@ namespace Loupe.Core.Test.Core
             }
             finally
             {
-                Log.ApplicationUserResolver = null;
+                Log.ApplicationUserProvider = null;
             }
         }
 
         #region Private Class ResolveUserJustOnceResolver 
 
-        private class ResolveUserJustOnceResolver : IApplicationUserResolver
+        private class ResolveUserJustOnceResolver : IApplicationUserProvider
         {
             private volatile int _ResolutionRequests;
 
-            public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
+            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
             {
                 Interlocked.Increment(ref _ResolutionRequests);
 
-                return userFactory();
+                applicationUser = userFactory();
+                return true;
             }
 
             public int ResolutionRequests => _ResolutionRequests;

@@ -46,7 +46,7 @@ namespace Gibraltar.Messaging
         private long m_PacketSequence; //a monotonically increasing sequence number for packets as they get queued. LOCKED BY QUEUELOCK
         private bool m_Disposed;
 
-        private IApplicationUserResolver m_ApplicationUserResolver; //LOCKED BY CONFIGLOCK
+        private IApplicationUserProvider m_ApplicationUserProvider; //LOCKED BY CONFIGLOCK
         private volatile IPrincipalResolver m_PrincipalResolver; //not locked for performance
 
         // A thread-specific static flag so we can disable blocking for Publisher and Messenger threads
@@ -155,11 +155,11 @@ namespace Gibraltar.Messaging
             m_PrincipalResolver = resolver;
         }
 
-        internal void RegisterApplicationUserResolver(IApplicationUserResolver resolver)
+        internal void RegisterApplicationUserProvider(IApplicationUserProvider resolver)
         {
             lock (m_ConfigLock)
             {
-                m_ApplicationUserResolver = resolver;
+                m_ApplicationUserProvider = resolver;
             }
         }
 
@@ -389,7 +389,7 @@ namespace Gibraltar.Messaging
                     //resolve the application user if feasible..
                     if (packet is IUserPacket userPacket && userPacket.Principal != null)
                     {
-                        var userResolver = m_ApplicationUserResolver;
+                        var userResolver = m_ApplicationUserProvider;
                         if (userResolver != null)
                         {
                             ResolveApplicationUser(userResolver, userPacket);
@@ -464,7 +464,7 @@ namespace Gibraltar.Messaging
             }
         }
 
-        private void ResolveApplicationUser(IApplicationUserResolver resolver, IUserPacket packet)
+        private void ResolveApplicationUser(IApplicationUserProvider resolver, IUserPacket packet)
         {
             var userName = packet.Principal?.Identity?.Name;
 
@@ -482,12 +482,20 @@ namespace Gibraltar.Messaging
                 try
                 {
                     t_ThreadMustNotResolveApplicationUser = true;
-                    applicationUser = resolver.ResolveApplicationUser(packet.Principal, () =>
+                    if (resolver.TryGetApplicationUser(packet.Principal, () =>
                     {
                         var userPacket = new ApplicationUserPacket {FullyQualifiedUserName = userName};
                         StampPacket(userPacket, DateTimeOffset.Now);
                         return new ApplicationUser(userPacket);
-                    });
+                    }, out applicationUser))
+                    {
+                        //cache this so we don't keep going after it.
+                        applicationUser = m_ApplicationUsers.TrySetValue(applicationUser);
+                    }
+                    else
+                    {
+                        applicationUser = null; //in case they didn't follow the interface definition..
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -497,12 +505,6 @@ namespace Gibraltar.Messaging
                 finally
                 {
                     t_ThreadMustNotResolveApplicationUser = false;
-                }
-
-                if (applicationUser != null)
-                {
-                    //cache this so we don't keep going after it.
-                    applicationUser = m_ApplicationUsers.TrySetValue(applicationUser);
                 }
             }
 

@@ -77,7 +77,7 @@ namespace Gibraltar.Monitor
         private static RepositoryPublishEngine s_PublishEngine; //We have zero or one publish engine
         private static Packager s_ActivePackager; //PROTECTED BY LOCK
         private static LocalRepository s_Repository;
-        private static IApplicationUserResolver s_ApplicationUserResolver; //PROTECTED BY LOCK
+        private static IApplicationUserProvider s_ApplicationUserProvider; //PROTECTED BY LOCK
         private static IPrincipalResolver s_PrincipalResolver; //PROTECTED BY LOCK
 
         private static readonly MetricDefinitionCollection s_Metrics = new MetricDefinitionCollection();
@@ -346,17 +346,17 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// An implementation of IApplicationUserResolver to capture Application User details from an IPrinciple
+        /// An implementation of IApplicationUserProvider to capture Application User details from an IPrinciple
         /// </summary>
-        public static IApplicationUserResolver ApplicationUserResolver
+        public static IApplicationUserProvider ApplicationUserProvider
         {
-            get { lock (s_SyncObject) { return s_ApplicationUserResolver; } }
+            get { lock (s_SyncObject) { return s_ApplicationUserProvider; } }
             set
             {
                 lock (s_SyncObject)
                 {
-                    s_ApplicationUserResolver = value;
-                    s_Publisher?.RegisterApplicationUserResolver(value);
+                    s_ApplicationUserProvider = value;
+                    s_Publisher?.RegisterApplicationUserProvider(value);
                 }
             }
         }

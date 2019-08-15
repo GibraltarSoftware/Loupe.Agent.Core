@@ -40,8 +40,8 @@ namespace Loupe.Agent.Core.Services
         /// <summary>
         /// Specify the Application User Resolver for the current application.
         /// </summary>
-        /// <typeparam name="T">The type of the resolver, which must implement <see cref="IApplicationUserResolver" />.</typeparam>
+        /// <typeparam name="T">The type of the resolver, which must implement <see cref="IApplicationUserProvider" />.</typeparam>
         /// <returns>The builder instance.</returns>
-        ILoupeAgentBuilder AddApplicationUserResolver<T>() where T : class, IApplicationUserResolver;
+        ILoupeAgentBuilder AddApplicationUserProvider<T>() where T : class, IApplicationUserProvider;
     }
 }

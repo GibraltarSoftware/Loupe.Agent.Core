@@ -344,12 +344,12 @@ namespace Gibraltar.Agent
         }
 
         /// <summary>
-        /// An implementation of IApplicationUserResolver to capture Application User details from an IPrinciple
+        /// An implementation of IApplicationUserProvider to capture Application User details from an IPrinciple
         /// </summary>
-        public static IApplicationUserResolver ApplicationUserResolver
+        public static IApplicationUserProvider ApplicationUserProvider
         {
-            get => Monitor.Log.ApplicationUserResolver;
-            set => Monitor.Log.ApplicationUserResolver = value;
+            get => Monitor.Log.ApplicationUserProvider;
+            set => Monitor.Log.ApplicationUserProvider = value;
         }
 
         /// <summary>

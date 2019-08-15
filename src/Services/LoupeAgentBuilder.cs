@@ -46,9 +46,9 @@ namespace Loupe.Agent.Core.Services
         }
 
         /// <inheritdoc />
-        public ILoupeAgentBuilder AddApplicationUserResolver<T>() where T : class, IApplicationUserResolver
+        public ILoupeAgentBuilder AddApplicationUserProvider<T>() where T : class, IApplicationUserProvider
         {
-            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserResolver, T>());
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserProvider, T>());
             return this;
         }
     }

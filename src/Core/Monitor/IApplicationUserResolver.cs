@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Principal;
-using System.Text;
 
 namespace Gibraltar.Monitor
 {
     /// <summary>
-    /// Implemented to translate an IPrincipal to a Loupe ApplicationUser
+    /// Implemented to translate an <see cref="IPrincipal">IPrincipal</see> to a Loupe <see cref="ApplicationUser">ApplicationUser</see>.
     /// </summary>
-    public interface IApplicationUserResolver
+    public interface IApplicationUserProvider
     {
         /// <summary>
         /// Determine the application user for the provided principal
         /// </summary>
         /// <param name="principal">The Principal being resolved</param>
         /// <param name="userFactory">Function for creating a new user</param>
-        /// <returns>Null if the user can't be resolved, an ApplicationUser otherwise.</returns>
-        ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory);
+        /// <param name="applicationUser">Optional.  The application user if it could be provided</param>
+        /// <returns>True if the application user could be provided, false otherwise.</returns>
+        bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser);
     }
 }

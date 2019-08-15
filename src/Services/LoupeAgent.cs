@@ -65,10 +65,10 @@ namespace Loupe.Agent.Core.Services
                 Log.PrincipalResolver = principalResolver;
             }
 
-            var userResolver = _serviceProvider.GetService<IApplicationUserResolver>();
+            var userResolver = _serviceProvider.GetService<IApplicationUserProvider>();
             if (userResolver != null)
             {
-                Log.ApplicationUserResolver = userResolver;
+                Log.ApplicationUserProvider = userResolver;
             }
         }
 

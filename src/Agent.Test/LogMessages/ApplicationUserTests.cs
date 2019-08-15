@@ -17,7 +17,7 @@ namespace Loupe.Agent.Test.LogMessages
         public void ApplicationUserAssignForCurrentPrincipal()
         {
             Log.PrincipalResolver = new DefaultPrincipalResolver();
-            Log.ApplicationUserResolver = new ResolveUserForCurrentPrincipal();
+            Log.ApplicationUserProvider = new ResolveUserForCurrentPrincipal();
             try
             {
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
@@ -27,26 +27,26 @@ namespace Loupe.Agent.Test.LogMessages
             finally
             {
                 Log.PrincipalResolver = null;
-                Log.ApplicationUserResolver = null;
+                Log.ApplicationUserProvider = null;
             }
         }
 
 
-        private class ResolveUserForCurrentPrincipal : IApplicationUserResolver
+        private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
+            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
             {
                 //this is really a quite poor set of data for a user - you wouldn't want to touch the environment
                 //and naturally these details wouldn't be hard-coded.
-                var newUser = userFactory();
-                newUser.Caption = Environment.GetEnvironmentVariable("USERNAME");
-                newUser.Organization = "Unit test";
-                newUser.EmailAddress = "support@gibraltarsoftware.com";
-                newUser.Phone = "443 738-0680";
-                newUser.Properties.Add("Customer Key", "1234-5678-90");
-                newUser.Properties.Add("License Check", null);
+                applicationUser = userFactory();
+                applicationUser.Caption = Environment.GetEnvironmentVariable("USERNAME");
+                applicationUser.Organization = "Unit test";
+                applicationUser.EmailAddress = "support@gibraltarsoftware.com";
+                applicationUser.Phone = "443 738-0680";
+                applicationUser.Properties.Add("Customer Key", "1234-5678-90");
+                applicationUser.Properties.Add("License Check", null);
 
-                return newUser;
+                return true;
             }
         }
 
@@ -63,7 +63,7 @@ namespace Loupe.Agent.Test.LogMessages
                 var principal = new GenericPrincipal(new GenericIdentity(Guid.NewGuid().ToString()), null); //we want a unique, but consistent, principal.
 
                 var justOnceResolver = new ResolveUserJustOnceResolver();
-                Log.ApplicationUserResolver = justOnceResolver;
+                Log.ApplicationUserProvider = justOnceResolver;
                 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, principal, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Assign Just Once",
@@ -79,21 +79,23 @@ namespace Loupe.Agent.Test.LogMessages
             }
             finally
             {
-                Log.ApplicationUserResolver = null;
+                Log.ApplicationUserProvider = null;
             }
         }
 
         #region Private Class ResolveUserJustOnceResolver 
 
-        private class ResolveUserJustOnceResolver : IApplicationUserResolver
+        private class ResolveUserJustOnceResolver : IApplicationUserProvider
         {
             private volatile int m_ResolutionRequests;
 
-            public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
+            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 
-                return userFactory();
+                applicationUser = userFactory();
+
+                return true;
             }
 
             public int ResolutionRequests => m_ResolutionRequests;
@@ -182,7 +184,7 @@ namespace Loupe.Agent.Test.LogMessages
 
                 var userResolver = new LoggingUserResolver();
                 Log.PrincipalResolver = new RandomPrincipalResolver();
-                Log.ApplicationUserResolver = userResolver;
+                Log.ApplicationUserProvider = userResolver;
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Logging Doesn't Deadlock",
@@ -192,26 +194,27 @@ namespace Loupe.Agent.Test.LogMessages
             finally
             {
                 Log.PrincipalResolver = null;
-                Log.ApplicationUserResolver = null;
+                Log.ApplicationUserProvider = null;
             }
         }
 
         #region Private Class LoggingUserResolver 
 
-        private class LoggingUserResolver : IApplicationUserResolver
+        private class LoggingUserResolver : IApplicationUserProvider
         {
             private volatile int m_ResolutionRequests;
 
-            public ApplicationUser ResolveApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory)
+            public bool TryGetApplicationUser(IPrincipal principal, Func<ApplicationUser> userFactory, out ApplicationUser applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Logging User",
-                    "This message was logged during an IApplicationUserResolver Resolve method",
+                    "This message was logged during an IApplicationUserProvider Resolve method",
                     "It should not have an application user.");
 
-                return userFactory();
+                applicationUser = userFactory();
+                return true;
             }
 
             public int ResolutionRequests => m_ResolutionRequests;
