@@ -5,9 +5,9 @@
     <AssemblyName>Loupe.Agent.PerformanceCounters</AssemblyName>
     <RootNamespace>Loupe.Agent.PerformanceCounters</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>4.7.1.0</AssemblyVersion>
-    <FileVersion>4.7.1.0</FileVersion>
-    <Version>4.7.1.0</Version>
+    <Version>4.8.0.0</Version>
+    <FileVersion>4.8.0.0</FileVersion>
+    <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>The Loupe Agent for Windows Performance Counters - automatically record key performance counters to Loupe for analysis along with the rest of your session's data.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

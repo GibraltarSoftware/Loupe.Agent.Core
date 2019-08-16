@@ -4,7 +4,9 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
     <RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
-    <Version>4.7.1.0</Version>
+    <Version>4.8.0.0</Version>
+    <FileVersion>4.8.0.0</FileVersion>
+    <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
@@ -14,9 +16,8 @@
     <RepositoryType>git</RepositoryType>
     <Description>The Loupe Agent for Entity Framework Core - automatically record performance and diagnostic information for EF Core data access.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>4.7.1.0</AssemblyVersion>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
-    <PackageLicenseUrl>https://github.com/GibraltarSoftware/Loupe.Agent.Core/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>

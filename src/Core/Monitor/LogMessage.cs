@@ -5,7 +5,7 @@ using Loupe.Extensibility.Data;
 namespace Gibraltar.Monitor
 {
     /// <summary>
-    /// A Gibraltar log message encapsulation.
+    /// A Loupe log message.
     /// </summary>
     /// <remarks>This class pulls together references to a Session, ThreadInfo, and DataExtension associated
     /// with a specific LogMessagePacket.</remarks>

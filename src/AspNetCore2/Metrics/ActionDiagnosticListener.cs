@@ -20,7 +20,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <param name="agent">The Loupe agent.</param>
         public ActionDiagnosticListener(LoupeAgent agent)
         {
-            _actionMetricFactory = new ActionMetricFactory(agent.ApplicationName);
+            _actionMetricFactory = new ActionMetricFactory();
         }
 
         /// <summary>

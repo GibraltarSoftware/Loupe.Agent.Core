@@ -2,6 +2,9 @@
 
 namespace Gibraltar.Monitor.Serialization
 {
+    /// <summary>
+    /// String parsing utility methods.
+    /// </summary>
     public static class TextParse
     {
         /// <summary>
@@ -24,6 +27,12 @@ namespace Gibraltar.Monitor.Serialization
             return SplitStringWithTrim(className);
         }
 
+        /// <summary>
+        /// Splits a dot-delimited string trimming each entry and eliminating empty entries.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="additionalIgnoreCharacters"></param>
+        /// <returns></returns>
         public static string[] SplitStringWithTrim(string source, char[] additionalIgnoreCharacters = null)
         {
             if (source == null)

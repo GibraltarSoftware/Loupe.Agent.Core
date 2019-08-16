@@ -225,6 +225,7 @@ namespace Gibraltar.Monitor
                 }
                 catch (Exception ex)
                 {
+                    GC.KeepAlive(ex);
                     m_Packet.RuntimeVersion = new Version(0, 0);
                 }
 

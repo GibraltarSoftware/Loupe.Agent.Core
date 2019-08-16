@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
@@ -27,13 +29,16 @@ namespace Gibraltar.Messaging
         private readonly Queue<PacketEnvelope> m_MessageQueue;
         private readonly Queue<PacketEnvelope> m_MessageOverflowQueue;
         private readonly List<IMessenger> m_Messengers; // LOCKED BY CONFIGLOCK
+        private readonly List<ILoupeFilter> m_Filters; //LOCKED BY CONFIGLOCK
+        private readonly ApplicationUserCollection m_ApplicationUsers = new ApplicationUserCollection(); //lockless
+
         private readonly string m_SessionName;
 
         private AgentConfiguration m_Configuration;
         private Thread m_MessageDispatchThread; //LOCKED BY THREADLOCK
         private volatile bool m_MessageDispatchThreadFailed; //LOCKED BY THREADLOCK (and volatile to allow quick reading outside the lock)
         private int m_MessageQueueMaxLength = 2000; //LOCKED BY QUEUELOCK
-        private bool m_ForceWriteThrough; 
+        private bool m_ForceWriteThrough;
         private bool m_Initialized; //designed to enable us to do our initialization in the background. LOCKED BY THREADLOCK
         private bool m_ExitingMode; //forces writeThrough behavior when application is exiting LOCKED BY QUEUELOCK
         private bool m_ExitMode; //switch to background thread mode when application is exiting LOCKED BY QUEUELOCK
@@ -41,12 +46,17 @@ namespace Gibraltar.Messaging
         private long m_PacketSequence; //a monotonically increasing sequence number for packets as they get queued. LOCKED BY QUEUELOCK
         private bool m_Disposed;
 
-        // A thread-specific static flag for each thread, so we can disable blocking for Publisher and Messenger threads
-        [ThreadStatic] private static bool t_ThreadMustNotBlock; // false by default for each thread
-        // A thread-specific static flag for each thread, so we can disable notification loops for Notifier threads
-        [ThreadStatic] private static bool t_ThreadMustNotNotify; // false by default for each thread
+        private IApplicationUserProvider m_ApplicationUserProvider; //LOCKED BY CONFIGLOCK
+        private volatile IPrincipalResolver m_PrincipalResolver; //not locked for performance
 
-        internal static event PacketEventHandler MessageDispatching;
+        // A thread-specific static flag so we can disable blocking for Publisher and Messenger threads
+        [ThreadStatic] private static bool t_ThreadMustNotBlock;
+        // A thread-specific static flag so we can disable notification loops for Notifier threads
+        [ThreadStatic] private static bool t_ThreadMustNotNotify;
+        /// A thread-specific static flag so we can prevent recursion in an IPrincipalResolver
+        [ThreadStatic] private static bool t_ThreadMustNotResolvePrincipal;
+        // A thread-specific static flag so we can prevent recursion in the application user resolver
+        [ThreadStatic] private static bool t_ThreadMustNotResolveApplicationUser;
 
         internal static event LogMessageNotifyEventHandler LogMessageNotify;
 
@@ -84,14 +94,15 @@ namespace Gibraltar.Messaging
             m_CachedTypes = new PacketDefinitionList();
             m_PacketCache = new PacketCache();
             m_Messengers = new List<IMessenger>();
+            m_Filters = new List<ILoupeFilter>();
 
             m_MessageQueueMaxLength = Math.Max(configuration.Publisher.MaxQueueLength, 1); //make sure there's no way to get it below 1.
+
+            m_PrincipalResolver = new DefaultPrincipalResolver();
 
             //create the thread we use for dispatching messages
             CreateMessageDispatchThread();
         }
-
-        #region Internal Properties and Methods
 
         /// <summary>
         /// Permanently disable blocking when queuing messages from this thread.
@@ -136,9 +147,34 @@ namespace Gibraltar.Messaging
         }
 
 
-        #endregion
+        internal void RegisterPrincipalResolver(IPrincipalResolver resolver)
+        {
+            m_PrincipalResolver = resolver;
+        }
 
-        #region Private Properties and Methods
+        internal void RegisterApplicationUserProvider(IApplicationUserProvider resolver)
+        {
+            lock (m_ConfigLock)
+            {
+                m_ApplicationUserProvider = resolver;
+            }
+        }
+
+        internal void RegisterFilter(ILoupeFilter filter)
+        {
+            lock (m_ConfigLock)
+            {
+                m_Filters.Add(filter);
+            }
+        }
+
+        internal void UnregisterFilter(ILoupeFilter filter)
+        {
+            lock (m_ConfigLock)
+            {
+                m_Filters.Remove(filter);
+            }
+        }
 
         private void CreateMessageDispatchThread()
         {
@@ -254,7 +290,7 @@ namespace Gibraltar.Messaging
                     CreateMessageDispatchThread(); // Recreate one as a background thread, if we aren't shut down.
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 lock (m_MessageDispatchThreadLock)
                 {
@@ -268,6 +304,8 @@ namespace Gibraltar.Messaging
                 }
 
                 OnThreadAbort();
+
+                GC.KeepAlive(ex);
             }
         }
 
@@ -294,7 +332,7 @@ namespace Gibraltar.Messaging
                     envelope.IsPending = false;
                     envelope.IsCommitted = true;
                 }
-            
+
                 System.Threading.Monitor.PulseAll(m_MessageQueueLock);
             }
         }
@@ -315,7 +353,7 @@ namespace Gibraltar.Messaging
                 if (envelope.IsCommand)
                 {
                     //this is a command packet, we process it as a command instead of just a data message
-                    CommandPacket commandPacket = (CommandPacket) packet;
+                    CommandPacket commandPacket = (CommandPacket)packet;
 
                     // Is this our exit or shutdown packet?  We need to handle those here.
                     if (commandPacket.Command == MessagingCommand.ExitMode)
@@ -344,17 +382,41 @@ namespace Gibraltar.Messaging
                         //this is a gibraltar packet so lets go ahead and fix the data in place now that we're on the background thread.
                         gibraltarPacket.FixData();
                     }
-                    
-                    //and now fire our MessageDispatching event.
-                    try
+
+                    //resolve the application user if feasible..
+                    if (packet is IUserPacket userPacket && userPacket.Principal != null)
                     {
-                        PacketEventHandler messageDispatching = MessageDispatching; // Snapshot our subscribers.
-                        if (messageDispatching != null)
-                            messageDispatching(this, new PacketEventArgs(packet));
+                        var userResolver = m_ApplicationUserProvider;
+                        if (userResolver != null)
+                        {
+                            ResolveApplicationUser(userResolver, userPacket);
+                        }
                     }
-                    catch (Exception)
+
+                    //and finally run it through our filters..
+                    var cancel = false;
+                    var filters = m_Filters;
+                    if (filters != null)
                     {
-                        Log.DebugBreak(); // Catch this in the debugger, but otherwise swallow any errors.
+                        foreach (var filter in filters)
+                        {
+                            try
+                            {
+                                filter.Process(packet, ref cancel);
+                                if (cancel) break;
+                            }
+                            catch (Exception)
+                            {
+                                Log.DebugBreak(); // Catch this in the debugger, but otherwise swallow any errors.
+                            }
+                        }
+                    }
+
+                    //if a filter canceled then we can't write out this packet.
+                    if (cancel)
+                    {
+                        envelope.IsCommitted = true; //so people waiting on us don't stall..
+                        return;
                     }
                 }
 
@@ -363,7 +425,7 @@ namespace Gibraltar.Messaging
                 //(Better to pull the packet forward than to risk having it in an older stream but not a newer stream)
                 if (envelope.IsHeader)
                 {
-                    lock (m_HeaderPacketsLock) //MS doc inconclusive on thread safety of ToArray, so we guarantee add/ToArray safety.
+                    lock (m_HeaderPacketsLock)
                     {
                         m_HeaderPackets.Add((ICachedMessengerPacket)packet);
                         System.Threading.Monitor.PulseAll(m_HeaderPacketsLock);
@@ -392,10 +454,62 @@ namespace Gibraltar.Messaging
             QueueToNotifier(packet);
 
             //we only need to do this here if the session file writer is disabled; otherwise it's doing it at the best boundary.
-            if ((m_Configuration.SessionFile.Enabled == false) 
+            if ((m_Configuration.SessionFile.Enabled == false)
                 && (packet.Sequence % 8192 == 0))
             {
                 StringReference.Pack();
+            }
+        }
+
+        private void ResolveApplicationUser(IApplicationUserProvider resolver, IUserPacket packet)
+        {
+            var userName = packet.Principal?.Identity?.Name;
+
+            //if we don't have a user name at all then there's nothing to do
+            if (string.IsNullOrEmpty(userName))
+                return;
+
+            if (m_ApplicationUsers.TryFindUserName(userName, out var applicationUser) == false)
+            {
+                //prevent infinite recursion
+                if (t_ThreadMustNotResolveApplicationUser)
+                    return;
+
+                //since we have a miss we want to give our resolver a shot..
+                try
+                {
+                    t_ThreadMustNotResolveApplicationUser = true;
+
+                    //we use lazy initialization to avoid the expense of stamping, etc. if they
+                    //aren't going to use it.  Even better would be to lazy this object too.
+                    var lazyApplicationUser = new Lazy<ApplicationUser>(delegate
+                    {
+                        var userPacket = new ApplicationUserPacket {FullyQualifiedUserName = userName};
+                        StampPacket(userPacket, DateTimeOffset.Now);
+                        return new ApplicationUser(userPacket);
+                    }, true);
+
+                    if (resolver.TryGetApplicationUser(packet.Principal, lazyApplicationUser) 
+                        && lazyApplicationUser.IsValueCreated)
+                    {
+                        //cache this so we don't keep going after it.
+                        applicationUser = m_ApplicationUsers.TrySetValue(lazyApplicationUser.Value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //we can't log this because that would create an infinite loop (ignoring our protection for same)
+                    GC.KeepAlive(ex);
+                }
+                finally
+                {
+                    t_ThreadMustNotResolveApplicationUser = false;
+                }
+            }
+
+            if (applicationUser != null)
+            {
+                packet.UserPacket = applicationUser.Packet;
             }
         }
 
@@ -445,12 +559,12 @@ namespace Gibraltar.Messaging
 
                 if (messengerType != null)
                 {
-                    newMessenger = (IMessenger) Activator.CreateInstance(messengerType);
+                    newMessenger = (IMessenger)Activator.CreateInstance(messengerType);
                 }
             }
             catch (Exception)
             {
-            }            
+            }
 
             //next step: initialize it
             if (newMessenger != null)
@@ -488,7 +602,7 @@ namespace Gibraltar.Messaging
 
                     System.Threading.Monitor.PulseAll(m_MessageDispatchThreadLock);
                 }
-            }            
+            }
         }
 
         private void QueueToNotifier(IMessengerPacket packet)
@@ -514,7 +628,7 @@ namespace Gibraltar.Messaging
 
             //wrap it in a packet envelope and indicate we're in write through mode.
             PacketEnvelope packetEnvelope = new PacketEnvelope(packet, writeThrough);
-            
+
             //But what queue do we put the packet in?
             if ((m_MessageOverflowQueue.Count > 0) || (m_MessageQueue.Count > m_MessageQueueMaxLength))
             {
@@ -646,10 +760,6 @@ namespace Gibraltar.Messaging
             return requiredPackets;
         }
 
-        #endregion
-
-        #region Public Properties and Methods
-
         /// <summary>
         /// The central configuration of the publisher
         /// </summary>
@@ -695,7 +805,7 @@ namespace Gibraltar.Messaging
                     if (m_Shutdown == false)
                     {
                         // We need to create and queue a close-messenger packet, and wait until it's processed.
-                        Publish(new [] { new CommandPacket(MessagingCommand.CloseMessenger) }, true);
+                        Publish(new[] { new CommandPacket(MessagingCommand.CloseMessenger) }, true);
                     }
                 }
                 // Free native resources here (alloc's, etc).
@@ -732,6 +842,44 @@ namespace Gibraltar.Messaging
             if (lastIndex < 0)
                 return; // An array of only null packets (or empty), just quick bail.  Don't bother with the lock.
 
+            //resolve users...
+            var resolver = m_PrincipalResolver;
+            IPrincipal principal = null;
+            if (resolver != null)
+            {
+                //and set that user to each packet that wants to track the current user
+                foreach (var packet in packetArray.AsEnumerable().OfType<IUserPacket>())
+                {
+                    //we only want to resolve the principal once per block, even if there are multiple messages.
+                    if (principal == null)
+                    {
+                        //before we resolve the principal make sure our thread isn't *currently* trying to resolve a principal.
+                        if (!t_ThreadMustNotResolvePrincipal)
+                        {
+                            try
+                            {
+                                t_ThreadMustNotResolvePrincipal = true;
+                                var resolved = resolver.TryResolveCurrentPrincipal(out principal);
+                                if (resolved == false) principal = null; //in case they broke the contract..
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.DebugBreak();
+                                GC.KeepAlive(ex);
+                            }
+                            finally
+                            {
+                                t_ThreadMustNotResolvePrincipal = false;
+                            }
+                        }
+
+                        if (principal == null)
+                            break; //no point in keeping trying if we filed to resolve the principal..
+                    }
+                    packet.Principal = principal;
+                }
+            }
+
             PacketEnvelope lastPacketEnvelope = null;
 
             bool effectiveWriteThrough;
@@ -739,15 +887,15 @@ namespace Gibraltar.Messaging
             int queuedCount = 0;
 
             // Get the queue lock.
-            lock(m_MessageQueueLock)
+            lock (m_MessageQueueLock)
             {
                 if (m_Shutdown) // If we're already shut down, just bail.  We'll never process it anyway.
                     return;
 
                 // Check to see if either the overall force write through or the local write through are set...
                 // or if we are in ExitingMode.  In those cases, we'll want to block until the packet is committed.
-                effectiveWriteThrough  = (m_ForceWriteThrough || writeThrough || m_ExitingMode);
-                for (int i=0; i<count; i++)
+                effectiveWriteThrough = (m_ForceWriteThrough || writeThrough || m_ExitingMode);
+                for (int i = 0; i < count; i++)
                 {
                     IMessengerPacket packet = packetArray[i];
 
@@ -765,7 +913,7 @@ namespace Gibraltar.Messaging
 
                             if (!m_ExitMode && packetEnvelope.IsCommand)
                             {
-                                CommandPacket commandPacket = (CommandPacket) packet;
+                                CommandPacket commandPacket = (CommandPacket)packet;
                                 if (commandPacket.Command == MessagingCommand.ExitMode)
                                 {
                                     // Once we *receive* an ExitMode command, all subsequent messages queued
@@ -776,7 +924,7 @@ namespace Gibraltar.Messaging
                                     m_ExitingMode = true; // Force writeThrough blocking from now on.
 
                                     // Set the ending status, if it needs to be (probably won't).
-                                    SessionStatus endingStatus = (SessionStatus) commandPacket.State;
+                                    SessionStatus endingStatus = (SessionStatus)commandPacket.State;
                                     if (m_SessionSummary.Status < endingStatus)
                                         m_SessionSummary.Status = endingStatus;
                                 }
@@ -840,8 +988,8 @@ namespace Gibraltar.Messaging
         /// the same second.</remarks>
         public string SessionName
         {
-            get 
-            { 
+            get
+            {
                 return m_SessionName;
             }
         }
@@ -865,15 +1013,13 @@ namespace Gibraltar.Messaging
 
                 lock (m_HeaderPacketsLock) //MS doc inconclusive on thread safety of ToArray, so we guarantee add/ToArray safety.
                 {
-                    returnVal =  m_HeaderPackets.ToArray();
+                    returnVal = m_HeaderPackets.ToArray();
                     System.Threading.Monitor.PulseAll(m_HeaderPacketsLock);
                 }
 
                 return returnVal;
             }
         }
-
-        #endregion
     }
 
     internal delegate void PacketEventHandler(object sender, PacketEventArgs e);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Principal;
+using Gibraltar.Messaging;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 
@@ -10,7 +11,7 @@ using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor.Serialization
 {
-    public class LogMessagePacket : GibraltarPacket, IPacket, ILogMessage, IComparable<LogMessagePacket>, IEquatable<LogMessagePacket>
+    public class LogMessagePacket : GibraltarPacket, IUserPacket, IPacket, ILogMessage, IComparable<LogMessagePacket>, IEquatable<LogMessagePacket>
     {
         private readonly ISessionPacketCache m_SessionPacketCache; //used for rehydration
 
@@ -33,10 +34,10 @@ namespace Gibraltar.Monitor.Serialization
 
         //the following are generated fields and are not persisted
         private string m_Message; //a concatenated caption & description for GLV.
+        private IPrincipal m_Principal;
 
         public LogMessagePacket()
         {
-            //we aren't a cachable packet so we have our own GUID
             Id = Guid.NewGuid();
             m_SuppressNotification = Gibraltar.Messaging.Publisher.QueryThreadMustNotNotify();
         }
@@ -52,7 +53,6 @@ namespace Gibraltar.Monitor.Serialization
         {
             if (sourceProvider != null)
             {
-                // Note: Should we map null strings to empty strings here?
                 MethodName = sourceProvider.MethodName;
                 ClassName = sourceProvider.ClassName;
                 FileName = sourceProvider.FileName;
@@ -79,7 +79,15 @@ namespace Gibraltar.Monitor.Serialization
         /// <summary>
         /// Optional.  The raw user principal, used for deferred user lookup
         /// </summary>
-        internal IPrincipal UserPrincipal { get; set; }
+        public IPrincipal Principal
+        {
+            get => m_Principal;
+            set
+            {
+                m_Principal = value;
+                m_UserName = m_Principal?.Identity?.Name ?? m_UserName; 
+            }
+        }
 
         public string MethodName { get { return m_MethodName; } set { m_MethodName = value; } }
 

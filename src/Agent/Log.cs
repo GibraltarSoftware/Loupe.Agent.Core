@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Gibraltar.Agent.Internal;
 using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 using IServerAuthenticationProvider = Gibraltar.Agent.Net.IServerAuthenticationProvider;
 using MessageSourceProvider=Gibraltar.Agent.Internal.MessageSourceProvider;
 using MetricDefinitionCollection=Gibraltar.Agent.Metrics.Internal.MetricDefinitionCollection;
@@ -179,9 +181,6 @@ namespace Gibraltar.Agent
         private static event MessageFilterEventHandler s_MessageFilterEvent;
         private static readonly object s_MessageEventLock = new object(); // Locks add/remove of Message event subscriptions.
 
-        private static ResolveApplicationUserEventHandler s_ResolveUserEvent;
-        private static readonly object s_ResolveApplicationUserLock = new object(); //locks add/remove of ResolveApplicationUser event subscriptions.
-
         // Disable the never-used warning
 #pragma warning disable 169
         // Initialize the real log object (this causes listeners to register, all kinds of stuff).
@@ -320,57 +319,6 @@ namespace Gibraltar.Agent
             }
         }
 
-        /// <summary>
-        /// Handler delegate for the Resolve Application User event.
-        /// </summary>
-        /// <param name="sender">The sender of this event.</param>
-        /// <param name="e">The Application User information</param>
-        public delegate void ResolveApplicationUserEventHandler(object sender, ApplicationUserResolutionEventArgs e);
-
-        /// <summary>
-        /// Raised whenever a new user name is encountered in the log data to allow additional user information to be specified
-        /// </summary>
-        /// <remarks>This event is raised by Loupe when a log message is attributed to a user name that doesn't yet have
-        /// application user information provided.  By subscribing to this event you can fill in missing information such as 
-        /// the email address, display name, organization, and other custom properties.  This information is then carried through 
-        /// to the Loupe Server to improve user matching and analysis.</remarks>
-        public static event ResolveApplicationUserEventHandler ResolveApplicationUser
-        {
-            add
-            {
-                if (value == null)
-                    return;
-
-                lock (s_ResolveApplicationUserLock)
-                {
-                    if (s_ResolveUserEvent == null)
-                    {
-                        Monitor.Log.UserResolutionNotifier.ResolveUser += LogOnResolveUser;
-                    }
-
-                    s_ResolveUserEvent += value;
-                }
-            }
-            remove
-            {
-                if (value == null)
-                    return;
-
-                lock (s_ResolveApplicationUserLock)
-                {
-                    if (s_ResolveUserEvent == null)
-                        return; // Already empty, no subscriptions to remove.
-
-                    s_ResolveUserEvent -= value;
-
-                    if (s_ResolveUserEvent == null)
-                    {
-                        Monitor.Log.UserResolutionNotifier.ResolveUser -= LogOnResolveUser;
-                    }
-                }
-            }
-        }
-
         static Log()
         {
             //we have to bind to the internal log event and create the object.
@@ -394,6 +342,24 @@ namespace Gibraltar.Agent
                 
                 return s_SessionSummary;
             }
+        }
+
+        /// <summary>
+        /// An implementation of IApplicationUserProvider to capture Application User details from an IPrinciple
+        /// </summary>
+        public static IApplicationUserProvider ApplicationUserProvider
+        {
+            get => Monitor.Log.ApplicationUserProvider;
+            set => Monitor.Log.ApplicationUserProvider = value;
+        }
+
+        /// <summary>
+        /// An implementation of IPrincipalResolver to determine the IPrinciple for each log message and metric sample
+        /// </summary>
+        public static IPrincipalResolver PrincipalResolver
+        {
+            get => Monitor.Log.PrincipalResolver;
+            set => Monitor.Log.PrincipalResolver = value;
         }
 
         /// <summary>
@@ -2092,7 +2058,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,string,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2148,7 +2114,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,string,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2205,7 +2171,7 @@ namespace Gibraltar.Agent
         /// <param name="logSystem">The name of the originating log system (e.g. "Log4Net").</param>
         /// <param name="sourceProvider">An IMessageSourceProvider object which supplies the source information
         /// about this log message.</param>
-        /// <param name="userName">The effective user name associated with the execution task which issued the log message.
+        /// <param name="principal">The effective user principal associated with the execution task which issued the log message.
         /// (If null, Loupe will determine the user name automatically.)</param>
         /// <param name="exception">An Exception object attached to this log message, or null if none.</param>
         /// <param name="writeMode">A LogWriteMode enum value indicating whether to simply queue the log message
@@ -2217,7 +2183,7 @@ namespace Gibraltar.Agent
         /// <param name="description">Additional multi-line descriptive message (or may be null) which can be a format string followed by corresponding args.</param>
         /// <param name="args">A variable number of arguments referenced by the formatted description string (or no arguments to skip formatting).</param>
         public static void Write(LogMessageSeverity severity, string logSystem, IMessageSourceProvider sourceProvider,
-                                 string userName, Exception exception, LogWriteMode writeMode, string detailsXml,
+                                 IPrincipal principal, Exception exception, LogWriteMode writeMode, string detailsXml,
                                  string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
@@ -2225,7 +2191,7 @@ namespace Gibraltar.Agent
                 return;
 
             Monitor.Log.WriteMessage((Loupe.Extensibility.Data.LogMessageSeverity)severity, (Monitor.LogWriteMode)writeMode, logSystem,
-                category, (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), userName, exception,
+                category, (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), principal, exception,
                 detailsXml, caption, description, args);
         }
 
@@ -2856,7 +2822,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, false).ConfigureAwait(false);
+            return await Monitor.Log.SendSessions(criteria, null, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2907,7 +2873,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, true).ConfigureAwait(false);
+            return await Monitor.Log.SendSessions(criteria, null, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -3033,17 +2999,6 @@ namespace Gibraltar.Agent
                 }
 
                 System.Threading.Monitor.PulseAll(s_SyncLock);
-            }
-        }
-
-        private static void LogOnResolveUser(object sender, ResolveUserEventArgs e)
-        {
-            var eventHandler = s_ResolveUserEvent;
-
-            if (eventHandler != null)
-            {
-                var eventArgs = new ApplicationUserResolutionEventArgs(e);
-                eventHandler(null, eventArgs);
             }
         }
 

@@ -27,8 +27,5 @@ namespace Gibraltar.Monitor
         /// Should return the line within the file at which the log message was issued.
         /// </summary>
         int LineNumber { get; }
-
-        // ToDo: Assembly and method Signature info?
-
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
 
-
-
-
-namespace Gibraltar.Agent
+namespace Loupe.Extensibility.Data
 {
     /// <summary>
     /// Selection criteria for session inclusion in a session package

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Gibraltar.Agent;
 using Loupe.Agent.Test.LogMessages;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 using ApplicationType = Loupe.Extensibility.Data.ApplicationType;
 
 namespace Loupe.AgentTest.Console

@@ -1,6 +1,7 @@
 using System;
 using Gibraltar.Agent.Internal;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Agent
 {
@@ -234,7 +235,7 @@ namespace Gibraltar.Agent
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFile(SessionCriteria sessions, bool markAsRead, string fullFileNamePath)
         {
-            m_Packager.SendToFile((Gibraltar.Data.SessionCriteria)sessions, markAsRead, fullFileNamePath, false);
+            m_Packager.SendToFile(sessions, markAsRead, fullFileNamePath, false);
         }
 
         /// <summary>
@@ -268,7 +269,7 @@ namespace Gibraltar.Agent
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFileAsync(SessionCriteria sessions, bool markAsRead, string fullFileNamePath)
         {
-            m_Packager.SendToFile((Gibraltar.Data.SessionCriteria)sessions, markAsRead, fullFileNamePath, true);
+            m_Packager.SendToFile(sessions, markAsRead, fullFileNamePath, true);
         }
 
         /// <summary>
@@ -299,7 +300,7 @@ namespace Gibraltar.Agent
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(SessionCriteria sessions, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, false, serverConfiguration);
+            m_Packager.SendToServer(sessions, markAsRead, false, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -329,7 +330,7 @@ namespace Gibraltar.Agent
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, false, serverConfiguration);
+            m_Packager.SendToServer(sessions, markAsRead, purgeSentSessions, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -358,7 +359,7 @@ namespace Gibraltar.Agent
         /// sent one by one, they will be individually marked as read once sent.</remarks>
         public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, false, true, serverConfiguration);
+            m_Packager.SendToServer(sessions, markAsRead, false, true, serverConfiguration);
         }
 
         /// <summary>
@@ -386,7 +387,7 @@ namespace Gibraltar.Agent
         /// sent one by one, they will be individually marked as read once sent.</remarks>
         public void SendToServerAsync(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            m_Packager.SendToServer((Gibraltar.Data.SessionCriteria)sessions, markAsRead, purgeSentSessions, true, serverConfiguration);
+            m_Packager.SendToServer(sessions, markAsRead, purgeSentSessions, true, serverConfiguration);
         }
 
         /// <summary>

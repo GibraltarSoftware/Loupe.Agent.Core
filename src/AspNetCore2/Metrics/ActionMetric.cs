@@ -4,9 +4,13 @@ using System.Linq;
 using Gibraltar.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+#pragma warning disable 1591
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
+    /// <summary>
+    /// Metric for an ASP.NET Action invocation
+    /// </summary>
     public class ActionMetric
     {
         private static readonly double TickResolution = Stopwatch.Frequency / 1000d;
