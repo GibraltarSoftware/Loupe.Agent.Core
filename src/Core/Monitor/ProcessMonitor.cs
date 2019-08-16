@@ -219,6 +219,12 @@ namespace Gibraltar.Monitor
             return Equals((ProcessMonitor)obj);
         }
 
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         #endregion
 
         #region Protected Properties and Methods

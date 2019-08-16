@@ -2,6 +2,7 @@
 using Gibraltar.Agent;
 using Gibraltar.Monitor;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Log = Gibraltar.Agent.Log;

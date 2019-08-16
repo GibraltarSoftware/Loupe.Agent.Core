@@ -58,9 +58,6 @@ namespace Gibraltar.Messaging
         // A thread-specific static flag so we can prevent recursion in the application user resolver
         [ThreadStatic] private static bool t_ThreadMustNotResolveApplicationUser;
 
-
-        internal static event PacketEventHandler MessageDispatching;
-
         internal static event LogMessageNotifyEventHandler LogMessageNotify;
 
         /// <summary>

@@ -1586,8 +1586,7 @@ namespace Gibraltar.Monitor
         /// which can be a dot-delimited hierarchy (e.g. the logger name in log4net).</param>
         /// <param name="sourceProvider">An IMessageSourceProvider object which supplies the source information
         /// about this log message.</param>
-        /// <param name="userName">The effective username associated with the execution task which
-        /// issued the log message.</param>
+        /// <param name="principal">Optional.  The IPrincipal responsible for the log message.</param>
         /// <param name="exception">An Exception object attached to this log message, or null if none.</param>
         /// <param name="detailsXml">Optional.  An XML document with extended details about the message.  Can be null.</param>
         /// <param name="caption">A single line display caption.</param>

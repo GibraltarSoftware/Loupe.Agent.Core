@@ -6,6 +6,7 @@ using Gibraltar.Agent.Internal;
 using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 using IServerAuthenticationProvider = Gibraltar.Agent.Net.IServerAuthenticationProvider;
 using MessageSourceProvider=Gibraltar.Agent.Internal.MessageSourceProvider;
 using MetricDefinitionCollection=Gibraltar.Agent.Metrics.Internal.MetricDefinitionCollection;
@@ -2057,7 +2058,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,string,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2113,7 +2114,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,string,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2821,7 +2822,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, false).ConfigureAwait(false);
+            return await Monitor.Log.SendSessions(criteria, null, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2872,7 +2873,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions((Gibraltar.Data.SessionCriteria)criteria, null, true).ConfigureAwait(false);
+            return await Monitor.Log.SendSessions(criteria, null, true).ConfigureAwait(false);
         }
 
         /// <summary>

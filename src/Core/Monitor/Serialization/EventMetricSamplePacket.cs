@@ -174,6 +174,9 @@ namespace Gibraltar.Monitor.Serialization
             m_ValueDefinitions = (EventMetricValueDefinitionCollection)((EventMetric)ourMetric).Definition.Values;
         }
 
+        /// <summary>
+        /// The type name to use for the dynamic packet storing this sample.
+        /// </summary>
         public string DynamicTypeName { get; set; }
 
         #endregion

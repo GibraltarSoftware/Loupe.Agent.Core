@@ -11,6 +11,9 @@
         /// </summary>
         ThreadInfoCollection Threads { get; }
 
+        /// <summary>
+        /// The set of application users for the current session.
+        /// </summary>
         ApplicationUserCollection Users { get; }
     }
 }

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
+    /// <summary>
+    /// Factory to create action metrics for requests as they start
+    /// </summary>
     public class ActionMetricFactory
     {
         private const string MetricCategory = "Web Site.Requests";
@@ -12,15 +15,21 @@ namespace Loupe.Agent.AspNetCore.Metrics
         private const string MetricSystem = "Gibraltar";
 
         private readonly EventMetric _metric;
-        private string _applicationName;
 
-        public ActionMetricFactory(string applicationName)
+        /// <summary>
+        /// Create a new action metric factory fur the current applciation
+        /// </summary>
+        public ActionMetricFactory()
         {
-            _applicationName = applicationName;
             var definition = GetMetricDefinition();
             _metric = EventMetric.Register(definition, null);
         }
 
+        /// <summary>
+        /// Start a new action metric for the current request
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public ActionMetric Start(HttpContext context)
         {
             return new ActionMetric(_metric, context);

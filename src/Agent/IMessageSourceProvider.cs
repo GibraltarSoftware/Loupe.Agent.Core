@@ -1,4 +1,5 @@
 using System;
+using System.Security.Principal;
 
 namespace Gibraltar.Agent
 {
@@ -10,7 +11,7 @@ namespace Gibraltar.Agent
     /// <remarks>
     /// 	<para>Any field that isn't available can safely return null.</para>
     /// 	<para>
-    ///         This interface is intended for use with the <see cref="Log.Write(LogMessageSeverity, string, IMessageSourceProvider, string, Exception, LogWriteMode, string, string, string, string, object[])">
+    ///         This interface is intended for use with the <see cref="Log.Write(LogMessageSeverity, string, IMessageSourceProvider, IPrincipal, Exception, LogWriteMode, string, string, string, string, object[])">
     ///         Log.Write</see> method when forwarding data from another logging
     ///         system that has already determined the correct origin of a logging statement.
     ///         If this information is not available then you can either use the alternate
@@ -39,7 +40,7 @@ namespace Gibraltar.Agent
     ///     one object that is passed for every call.</para>
     /// </remarks>
     /// <seealso cref="Log">Log Class</seealso>
-    /// <seealso cref="Log.Write(LogMessageSeverity, string, IMessageSourceProvider, string, Exception, LogWriteMode, string, string, string, string, object[])">Write Method (Gibraltar.Agent.Log)</seealso>
+    /// <seealso cref="Log.Write(LogMessageSeverity, string, IMessageSourceProvider, IPrincipal, Exception, LogWriteMode, string, string, string, string, object[])">Write Method (Gibraltar.Agent.Log)</seealso>
     public interface IMessageSourceProvider
     {
         // Note: We don't support passing the originating threadId and rely on receiving log messages still on the same thread.

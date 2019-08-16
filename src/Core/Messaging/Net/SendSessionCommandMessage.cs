@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Gibraltar.Data;
-
+using Loupe.Extensibility.Data;
 
 
 namespace Gibraltar.Messaging.Net

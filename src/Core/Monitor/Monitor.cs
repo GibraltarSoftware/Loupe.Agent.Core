@@ -38,7 +38,6 @@ namespace Gibraltar.Monitor
         private static MetricSampleInterval m_SamplingInterval = MetricSampleInterval.Minute;
         private static DateTimeOffset m_PollingStarted;
         private static bool m_EventsInitialized;
-        private static bool m_SuppressAlerts;
         private static bool m_ProcessMonitorRegistered;
 
         static Monitor()

@@ -193,10 +193,17 @@ namespace Loupe.Agent.PerformanceCounters
             return Equals((ProcessMonitor)obj);
         }
 
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         void IDisposable.Dispose()
         {
             //we don't really have anything to dispose.
         }
+
 
         #endregion
 

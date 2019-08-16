@@ -11,11 +11,14 @@ namespace Gibraltar.Monitor
     /// </summary>
     public class DefaultPrincipalResolver : IPrincipalResolver
     {
-        private readonly bool IsWindows;
+        private readonly bool _IsWindows;
 
+        /// <summary>
+        /// Create a new default principal resolver
+        /// </summary>
         public DefaultPrincipalResolver()
         {
-            IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            _IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
         /// <inheritdoc />
@@ -23,7 +26,7 @@ namespace Gibraltar.Monitor
         {
             principal = ClaimsPrincipal.Current;
 
-            if (principal == null && IsWindows)
+            if (principal == null && _IsWindows)
             {
                 //fall back to the windows identity..
                 WindowsIdentity windowsIdentity;

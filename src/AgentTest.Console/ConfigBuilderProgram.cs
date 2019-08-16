@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Gibraltar.Agent;
 using Loupe.Agent.Test.LogMessages;
 using Loupe.Configuration;
+using Loupe.Extensibility.Data;
 using Microsoft.Extensions.Configuration;
 
 namespace Loupe.AgentTest.Console

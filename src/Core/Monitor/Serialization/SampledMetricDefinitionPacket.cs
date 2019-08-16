@@ -48,6 +48,7 @@ namespace Gibraltar.Monitor.Serialization
 
         #region Public Properties and Methods
 
+        /// <inheritdoc />
         public int CompareTo(SampledMetricDefinitionPacket other)
         {
             //we just gateway to our base object.

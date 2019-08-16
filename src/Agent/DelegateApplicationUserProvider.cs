@@ -33,6 +33,7 @@ namespace Gibraltar.Agent
             }
             catch (Exception ex)
             {
+                GC.KeepAlive(ex);
                 return false;
             }
         }

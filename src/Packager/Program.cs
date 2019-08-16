@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using Gibraltar.Data;
 using Loupe.Configuration;
-using SessionCriteria = Gibraltar.Agent.SessionCriteria;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Packager
 {

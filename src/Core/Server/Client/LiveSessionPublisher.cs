@@ -104,7 +104,9 @@ namespace Gibraltar.Server.Client
                     else if (sendSessionCommand != null)
                     {
                         //send to server baby!
+#pragma warning disable 4014
                         m_Messenger.SendToServer((SendSessionCommandMessage)nextPacket);
+#pragma warning restore 4014
                     }
                 }
 

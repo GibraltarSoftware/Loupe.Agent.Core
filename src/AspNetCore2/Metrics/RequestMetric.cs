@@ -14,6 +14,9 @@ using Microsoft.Extensions.ObjectPool;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
+    /// <summary>
+    /// Tracking metric for an ASP.NET controller request
+    /// </summary>
     [EventMetric("Loupe", "Web Site.Requests", "Controller Hit", Caption = "Controller Hit", Description = "Performance data for every call to an MVC controller or Web API controller in the application")]
     public class RequestMetric : IMessageSourceProvider
     {
@@ -96,6 +99,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
             }
         }
 
+        /// <summary>
+        /// Timestamp the request started
+        /// </summary>
         [EventMetricValue("startTimestamp", SummaryFunction.Count, null, Caption = "Started", Description = "Timestamp the request started")]
         public DateTimeOffset StartTimestamp { get; set; }
 
@@ -176,6 +182,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
         [EventMetricValue("SessionId", SummaryFunction.Count, null, Caption = "SessionId", Description = "Session Id associated with action being performed")]
         public string SessionId { get; set; }
 
+        /// <summary>
+        /// Id from JavaScript agent for session
+        /// </summary>
         [EventMetricValue("AgentSessionId", SummaryFunction.Count, null, Caption = "AgentSessionId", Description = "Id from JavaScript agent for session")]
         public string AgentSessionId { get; set; }
 
@@ -201,12 +210,16 @@ namespace Loupe.Agent.AspNetCore.Metrics
             Record();
         }
 
+        /// <inheritdoc />
         public string MethodName { get; set; }
 
+        /// <inheritdoc />
         public string ClassName { get; set; }
 
+        /// <inheritdoc />
         public string FileName { get; set; }
 
+        /// <inheritdoc />
         public int LineNumber { get; set; }
 
     }
