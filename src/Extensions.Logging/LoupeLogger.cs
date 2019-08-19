@@ -1,5 +1,7 @@
 ﻿using System;
 using Gibraltar.Agent;
+using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Loupe.Extensions.Logging
@@ -47,7 +49,7 @@ namespace Loupe.Extensions.Logging
                         severity = LogMessageSeverity.Critical;
                         break;
                     case LogLevel.None:
-                        severity = LogMessageSeverity.None;
+                        severity = LogMessageSeverity.Unknown;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);

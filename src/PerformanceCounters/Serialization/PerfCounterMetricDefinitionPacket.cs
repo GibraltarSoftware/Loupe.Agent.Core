@@ -143,8 +143,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
             {
                 unitCaption = "Time";
             }
-
-                //Now lets go after things we know we can match to just count.
+            //Now lets go after things we know we can match to just count.
             else if (counterName.Contains("Packets"))
             {
                 unitCaption = "Count";
@@ -210,8 +209,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
             switch (definition.Version)
             {
                 case 1:
-                    int rawCounterType;
-                    packet.GetField("counterType", out rawCounterType);
+                    packet.GetField("counterType", out int rawCounterType);
                     CounterType = (PerformanceCounterType)rawCounterType;
                     break;
             }

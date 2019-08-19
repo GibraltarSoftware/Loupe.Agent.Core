@@ -1,6 +1,7 @@
 ﻿using System;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Server.Client
 {

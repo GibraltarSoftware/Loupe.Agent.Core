@@ -5,6 +5,8 @@ using System.IO;
 using Gibraltar.Data;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
+
 #pragma warning disable 1591
 
 namespace Gibraltar.Monitor.Serialization
@@ -91,8 +93,7 @@ namespace Gibraltar.Monitor.Serialization
                             {
                                 // The new serialized version of LMP adds a ThreadIndex field.  Older versions will set this
                                 // field from the ThreadId field, so we can rely on ThreadIndex in any case.
-                                ThreadInfo threadInfo;
-                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out threadInfo) == false)
+                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out var threadInfo) == false)
                                 {
                                     // Uh-oh.  This should never happen.
                                     threadInfo = null; // We couldn't find the ThreadInfo for this log message!

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Threading;
 using Gibraltar.Monitor;
+using Loupe.Metrics;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core
@@ -17,28 +18,28 @@ namespace Loupe.Core.Test.Core
 
             CustomSampledMetricDefinition newMetric;
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "IncrementalCount",
-                                              MetricSampleType.IncrementalCount);
+                                              SamplingType.IncrementalCount);
             newMetric.Description = "Unit test sampled metric using the incremental count calculation routine";
 
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "IncrementalFraction",
-                                              MetricSampleType.IncrementalFraction);
+                                              SamplingType.IncrementalFraction);
             newMetric.Description = "Unit test sampled metric using the incremental fraction calculation routine.  Rare, but fun.";
 
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "TotalCount",
-                                              MetricSampleType.TotalCount);
+                                              SamplingType.TotalCount);
             newMetric.Description = "Unit test sampled metric using the Total Count calculation routine.  Very common.";
 
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "TotalFraction",
-                                              MetricSampleType.TotalFraction);
+                                              SamplingType.TotalFraction);
             newMetric.Description = "Unit test sampled metric using the Total Fraction calculation routine.  Rare, but rounds us out.";
 
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "RawCount",
-                                              MetricSampleType.RawCount);
+                                              SamplingType.RawCount);
             newMetric.Description = "Unit test sampled metric using the Raw Count calculation routine, which we will then average to create sample intervals.";
 
 
             newMetric = new CustomSampledMetricDefinition(Log.Metrics, "GenerateMetricData", "Unit Test Data", "RawFraction",
-                                              MetricSampleType.RawFraction);
+                                              SamplingType.RawFraction);
             newMetric.Description = "Unit test sampled metric using the Raw Fraction calculation routine.  Fraction types aren't common.";
 
             //we should have added six new metric definitions
@@ -98,17 +99,17 @@ namespace Loupe.Core.Test.Core
         {
             Log.Trace("Defining new metric definitions");
             //create one sampled metric definition using the "make a definition for the current log set" override
-            CustomSampledMetricDefinition temperatureTracking = new CustomSampledMetricDefinition( "SimpleMetricUsage", "Temperature", "Experiment Temperature", MetricSampleType.RawCount );
+            CustomSampledMetricDefinition temperatureTracking = new CustomSampledMetricDefinition( "SimpleMetricUsage", "Temperature", "Experiment Temperature", SamplingType.RawCount );
             temperatureTracking.Description = "This is an example from iControl where we want to track the temperature of a reaction or some such thing.";
 
             //create a set of METRICS (definition + metric) using the static add metric capability
             Log.Trace( "defining new metrics" );
-            CustomSampledMetric incrementalCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "IncrementalCount", MetricSampleType.IncrementalCount, null);
-            CustomSampledMetric incrementalFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "IncrementalFraction", MetricSampleType.IncrementalFraction, null);
-            CustomSampledMetric deltaCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "TotalCount", MetricSampleType.TotalCount, null);
-            CustomSampledMetric deltaFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "TotalFraction", MetricSampleType.TotalFraction, null);
-            CustomSampledMetric rawCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "RawCount", MetricSampleType.RawCount, null);
-            CustomSampledMetric rawFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "RawFraction", MetricSampleType.RawFraction, null);            
+            CustomSampledMetric incrementalCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "IncrementalCount", SamplingType.IncrementalCount, null);
+            CustomSampledMetric incrementalFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "IncrementalFraction", SamplingType.IncrementalFraction, null);
+            CustomSampledMetric deltaCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "TotalCount", SamplingType.TotalCount, null);
+            CustomSampledMetric deltaFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "TotalFraction", SamplingType.TotalFraction, null);
+            CustomSampledMetric rawCountMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "RawCount", SamplingType.RawCount, null);
+            CustomSampledMetric rawFractionMetric = CustomSampledMetric.AddOrGet("SimpleMetricUsage", "Unit Test Data", "RawFraction", SamplingType.RawFraction, null);            
 
             //lets add 10 values, a few milliseconds apart
             Log.Trace("And now lets log data");

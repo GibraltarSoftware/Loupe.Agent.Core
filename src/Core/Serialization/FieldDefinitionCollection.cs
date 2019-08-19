@@ -72,6 +72,8 @@ namespace Gibraltar.Serialization
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
         public void Add(FieldDefinition item)
         {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
             lock(m_Lock)
             {
                 //make sure it isn't already here by name
@@ -110,6 +112,8 @@ namespace Gibraltar.Serialization
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
         public bool Contains(FieldDefinition item)
         {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
             return m_DefinitionsByName.ContainsKey(item.Name);
         }
 
@@ -154,6 +158,8 @@ namespace Gibraltar.Serialization
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
         public bool Remove(FieldDefinition item)
         {
+            if (item == null) return false;
+
             bool itemRemoved = false;
             lock(m_Lock)
             {

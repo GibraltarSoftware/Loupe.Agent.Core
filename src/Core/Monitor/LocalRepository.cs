@@ -10,6 +10,7 @@ using Gibraltar.Messaging;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Monitor
 {
@@ -273,8 +274,7 @@ namespace Gibraltar.Monitor
                     if (m_SessionCache != null)
                     {
                         //we have already loaded our cache so we have to poke this into it to be sure we're immediately current
-                        SessionFileInfo<FileInfo> sessionFileInfo;
-                        if (m_SessionCache.TryGetValue(sessionHeader.Id, out sessionFileInfo))
+                        if (m_SessionCache.TryGetValue(sessionHeader.Id, out var sessionFileInfo))
                         {
                             //add this file fragment to the existing session info
                             sessionFileInfo.AddFragment(sessionHeader, new FileInfo(fileNamePath), true);
@@ -318,8 +318,7 @@ namespace Gibraltar.Monitor
             {
                 EnsureCacheLoaded();
 
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo)) //we want the not found exception
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo)) //we want the not found exception
                 {
                     var loadingCollection = new SessionCollection();
 
@@ -355,8 +354,7 @@ namespace Gibraltar.Monitor
             {
                 EnsureCacheLoaded();
 
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo)) //we want the not found exception
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo)) //we want the not found exception
                 {
                     foreach (var fragment in sessionFileInfo.Fragments)
                     {
@@ -420,8 +418,7 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                Stream existingFile;
-                if (TryLoadSessionFileStream(sessionId, fileId, out existingFile))
+                if (TryLoadSessionFileStream(sessionId, fileId, out var existingFile))
                 {
                     using (existingFile)
                     {
@@ -452,8 +449,7 @@ namespace Gibraltar.Monitor
             stream = null;
             lock (m_Lock)
             {
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo) == false)
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
                     return false;
                 }
@@ -481,8 +477,7 @@ namespace Gibraltar.Monitor
 
             lock (m_Lock)
             {
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo))
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo))
                 {
                     sessionHeader = sessionFileInfo.Header;
                     sessionFragments = sessionFileInfo.Fragments;
@@ -654,8 +649,7 @@ namespace Gibraltar.Monitor
 
                 FileInfo fragmentFileInfo = null;
 
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo))
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo))
                 {
                     fragmentFileInfo = FindFragment(sessionFileInfo, fileId);
                 }
@@ -689,8 +683,7 @@ namespace Gibraltar.Monitor
             {
                 EnsureCacheLoaded();
 
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo))
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo))
                 {
                     return sessionFileInfo.IsRunning;
                 }
@@ -1030,8 +1023,7 @@ namespace Gibraltar.Monitor
             var runningSessionCache = new Dictionary<Guid, bool>();
             foreach (var sessionFileInfo in sessions.Values)
             {
-                bool isRunning;
-                if (runningSessionCache.TryGetValue(sessionFileInfo.Id, out isRunning) == false)
+                if (runningSessionCache.TryGetValue(sessionFileInfo.Id, out var isRunning) == false)
                 {
                     runningSessionCache.Add(sessionFileInfo.Id, IsSessionRunning(sessionFileInfo.Id));
                 }
@@ -1087,8 +1079,7 @@ namespace Gibraltar.Monitor
                 }
                 else
                 {
-                    SessionFileInfo<FileInfo> sessionFileInfo;
-                    if (sessions.TryGetValue(sessionHeader.Id, out sessionFileInfo))
+                    if (sessions.TryGetValue(sessionHeader.Id, out var sessionFileInfo))
                     {
                         //add this file fragment to the existing session info
                         sessionFileInfo.AddFragment(sessionHeader, sessionFragment, isNew);
@@ -1240,8 +1231,7 @@ namespace Gibraltar.Monitor
         private bool SetSessionNew(string destinationDirectory, Guid sessionId, bool isNew)
         {
             bool modifiedAnyFile = false;
-            SessionFileInfo<FileInfo> sessionFileInfo;
-            if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo))
+            if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo))
             {
                 foreach (var fragment in sessionFileInfo.Fragments)
                 {

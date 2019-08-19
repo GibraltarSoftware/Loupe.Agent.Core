@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Gibraltar.Agent.Metrics;
+using Loupe.Metrics;
 
 #pragma warning disable 3003
 
@@ -47,7 +48,7 @@ namespace Loupe.Agent.Test.Metrics
         {
             bool trendable = false;
 
-            //we're using Is so we can check for compatibile types, not just base types.
+            //we're using Is so we can check for compatible types, not just base types.
             if ((type == typeof(short)) || (type == typeof(ushort)) || (type == typeof(int)) || (type == typeof(uint)) || (type == typeof(long)) || (type == typeof(ulong)) ||
                 (type == typeof(decimal)) || (type == typeof(double)) || (type == typeof(float)))
             {

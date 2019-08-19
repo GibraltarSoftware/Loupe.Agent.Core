@@ -13,7 +13,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Create a new result arguments object from the provided information
         /// </summary>
-        /// <param name="fileSize">The number of bytes in the package, if sent succesfully.</param>
+        /// <param name="fileSize">The number of bytes in the package, if sent successfully.</param>
         /// <param name="result">The final status of the task</param>
         /// <param name="message">Optional. A display message to complement the result.</param>
         /// <param name="exception">Optional. An exception object to allow the caller to do its own interpretation of an exception.</param>
@@ -24,7 +24,7 @@ namespace Gibraltar.Data
         }
 
         /// <summary>
-        /// The number of bytes in the package, if sent succesfully.
+        /// The number of bytes in the package, if sent successfully.
         /// </summary>
         public int FileSize { get; private set; }
     }

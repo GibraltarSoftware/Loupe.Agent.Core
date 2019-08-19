@@ -5,6 +5,8 @@ using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
 using Loupe.Agent.Core.Services;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
+using Loupe.Metrics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

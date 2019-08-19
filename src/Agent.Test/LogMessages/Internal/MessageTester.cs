@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using Gibraltar.Agent;
-using Gibraltar.Agent.Data;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.Test.LogMessages.Internal
 {
@@ -93,6 +93,10 @@ namespace Loupe.Agent.Test.LogMessages.Internal
         public void WaitForMessages()
         {
             Gibraltar.Monitor.Log.Flush();
+
+            //since the notifier we use is asynchronous we can't actually bank on the flush
+            //delay getting things to us.  Really need to redesign that.
+            Thread.Sleep(100);
         }
 
         /// <summary>

@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Text;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Logging;
+using Loupe.Metrics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;

@@ -495,12 +495,10 @@ namespace Gibraltar.Monitor.Serialization
             packet.GetField("ProductName", out m_ProductName);
             packet.GetField("ApplicationName", out m_ApplicationName);
 
-            string applicationVersionRaw;
-            packet.GetField("ApplicationVersion", out applicationVersionRaw);
+            packet.GetField("ApplicationVersion", out string applicationVersionRaw);
             m_ApplicationVersion = new Version(applicationVersionRaw);
 
-            int applicationTypeRaw;
-            packet.GetField("ApplicationType", out applicationTypeRaw);
+            packet.GetField("ApplicationType", out int applicationTypeRaw);
             m_ApplicationType = (ApplicationType) applicationTypeRaw;
 
             packet.GetField("ApplicationDescription", out m_ApplicationDescription);
@@ -508,8 +506,7 @@ namespace Gibraltar.Monitor.Serialization
             packet.GetField("TimeZoneCaption", out m_TimeZoneCaption);
             packet.GetField("EndDateTime", out m_EndDateTime);
 
-            string agentVersionRaw;
-            packet.GetField("AgentVersion", out agentVersionRaw);
+            packet.GetField("AgentVersion", out string agentVersionRaw);
             m_AgentVersion = new Version(agentVersionRaw);
 
             packet.GetField("UserName", out m_UserName);
@@ -519,30 +516,25 @@ namespace Gibraltar.Monitor.Serialization
 
             //Read back session details stuff
             packet.GetField("OSPlatformCode", out m_OSPlatformCode);
-            string osVersionRaw;
-            packet.GetField("OSVersion", out osVersionRaw);
+            packet.GetField("OSVersion", out string osVersionRaw);
             m_OSVersion = new Version(osVersionRaw);
 
             packet.GetField("OSServicePack", out m_OSServicePack);
             packet.GetField("OSCultureName", out m_OSCultureName);
 
-            int osArchitectureRaw;
-            packet.GetField("OSArchitecture", out osArchitectureRaw);
+            packet.GetField("OSArchitecture", out int osArchitectureRaw);
             m_OSArchitecture = ((ProcessorArchitecture) osArchitectureRaw);
 
-            int osBootModeRaw;
-            packet.GetField("OSBootMode", out osBootModeRaw);
+            packet.GetField("OSBootMode", out int osBootModeRaw);
             m_OSBootMode = (OSBootMode) osBootModeRaw;
 
             packet.GetField("OSSuiteMaskCode", out m_OSSuiteMaskCode);
             packet.GetField("OSProductTypeCode", out m_OSProductTypeCode);
 
-            string runtimeVersionRaw;
-            packet.GetField("RuntimeVersion", out runtimeVersionRaw);
+            packet.GetField("RuntimeVersion", out string runtimeVersionRaw);
             m_RuntimeVersion = new Version(runtimeVersionRaw);
 
-            int runtimeArchitectureRaw;
-            packet.GetField("RuntimeArchitecture", out runtimeArchitectureRaw);
+            packet.GetField("RuntimeArchitecture", out int runtimeArchitectureRaw);
             m_RuntimeArchitecture = ((ProcessorArchitecture) runtimeArchitectureRaw);
 
             packet.GetField("CurrentCultureName", out m_CurrentCultureName);
@@ -578,8 +570,7 @@ namespace Gibraltar.Monitor.Serialization
             for (int i = baseFields; i < definition.Fields.Count; i++)
             {
                 FieldDefinition fieldDefinition = definition.Fields[i];
-                string fieldValue;
-                packet.GetField(fieldDefinition.Name, out fieldValue);
+                packet.GetField(fieldDefinition.Name, out string fieldValue);
                 m_Properties.Add(fieldDefinition.Name, fieldValue);
             }
         }
@@ -638,8 +629,7 @@ namespace Gibraltar.Monitor.Serialization
                 foreach (KeyValuePair<string, string> property in m_Properties)
                 {
                     //does the comparable one exist?
-                    string otherValue;
-                    if (other.Properties.TryGetValue(property.Key, out otherValue))
+                    if (other.Properties.TryGetValue(property.Key, out var otherValue))
                     {
                         isEqual = property.Value.Equals(otherValue);
                     }

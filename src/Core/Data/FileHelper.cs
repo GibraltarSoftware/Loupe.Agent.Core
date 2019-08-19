@@ -76,7 +76,7 @@ namespace Gibraltar.Data
             }
 
             if (fileStream != null)
-                fileLock = new FileLock(fileStream, fileName, creationMode, fileAccess, fileShare, false); //if they wanted delete, they had to use the explict option...
+                fileLock = new FileLock(fileStream, fileName, creationMode, fileAccess, fileShare, false); //if they wanted delete, they had to use the explicit option...
 
             return fileLock;
 

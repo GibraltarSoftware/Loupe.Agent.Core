@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Loupe.Agent.PerformanceCounters;
 
 namespace Loupe.Configuration
 {

@@ -58,8 +58,7 @@ namespace Gibraltar.Messaging.Net
         {
             BinarySerializer.DeserializeValue(stream, out m_SessionId);
 
-            int rawCriteria;
-            BinarySerializer.DeserializeValue(stream, out rawCriteria);
+            BinarySerializer.DeserializeValue(stream, out int rawCriteria);
             m_Criteria = (SessionCriteria)rawCriteria;
         }
     }

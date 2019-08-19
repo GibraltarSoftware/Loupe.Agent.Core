@@ -6,6 +6,7 @@ using System.Threading;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Data.Internal
 {
@@ -167,10 +168,10 @@ namespace Gibraltar.Data.Internal
         /// <summary>
         /// Run the maintenance cycle.
         /// </summary>
-        /// <param name="asyncronous">True to have maintenance performed on a background thread, allowing the current process to continue.</param>
-        public void PerformMaintenance(bool asyncronous)
+        /// <param name="asynchronous">True to have maintenance performed on a background thread, allowing the current process to continue.</param>
+        public void PerformMaintenance(bool asynchronous)
         {
-            QueueAsyncMaintenance(AsyncPerformMaintenance, asyncronous);
+            QueueAsyncMaintenance(AsyncPerformMaintenance, asynchronous);
         }
 
         #endregion
@@ -304,8 +305,7 @@ namespace Gibraltar.Data.Internal
                     if ((string.IsNullOrEmpty(ApplicationName) == false) && (Log.IsSessionEnding == false))
                     {
                         //find out if there is any maintenance to do - we start by age and it'll let us know if we have anything else to do.
-                        bool capacityPruningRequired;
-                        bool sessionsRemoved = ProcessPruneForAge(maxAgeDays, maxSizeMegabytes, out capacityPruningRequired);
+                        bool sessionsRemoved = ProcessPruneForAge(maxAgeDays, maxSizeMegabytes, out var capacityPruningRequired);
                         collectionChanged = (collectionChanged || sessionsRemoved);
 
                         //make sure capacity pruning is enabled.

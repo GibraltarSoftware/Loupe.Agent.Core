@@ -6,6 +6,7 @@ using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Agent.PerformanceCounters.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Loupe.Agent.PerformanceCounters
 {

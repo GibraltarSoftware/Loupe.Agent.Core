@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using Gibraltar.Messaging;
+using Loupe.Metrics;
 
 namespace Gibraltar.Monitor
 {
@@ -259,62 +260,62 @@ namespace Gibraltar.Monitor
                 //register our process-wide metrics
                 CustomSampledMetricDefinition curSampledMetricDefinition;
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterTotalProcessorTime, MetricSampleType.TotalFraction);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterTotalProcessorTime, SamplingType.TotalFraction);
                 curSampledMetricDefinition.Description = "The percentage of processor capacity used by the process.";
                 curSampledMetricDefinition.UnitCaption = "%";
                 m_ProcessPercentProcessorTime = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterUserProcessorTime, MetricSampleType.TotalFraction);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterUserProcessorTime, SamplingType.TotalFraction);
                 curSampledMetricDefinition.Description = "The percentage of processor capacity used by the process for non-privileged tasks.";
                 curSampledMetricDefinition.UnitCaption = "%";
                 m_ProcessPercentUserProcessorTime = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterPrivilegedProcessorTime, MetricSampleType.TotalFraction);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Processor", CounterPrivilegedProcessorTime, SamplingType.TotalFraction);
                 curSampledMetricDefinition.Description = "The percentage of processor capacity used by the process for privileged tasks.";
                 curSampledMetricDefinition.UnitCaption = "%";
                 m_ProcessPercentPrivilegedProcessorTime = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterNonpagedSystemMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterNonpagedSystemMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of nonpaged system memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessNonpagedSystemMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPagedMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPagedMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of paged memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPagedMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPagedSystemMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPagedSystemMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of pageable system memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPagedSystemMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakPagedMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakPagedMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The maximum amount of memory in the virtual memory paging file for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPeakPagedMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakVirtualMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakVirtualMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The maximum amount of virtual memory used for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPeakVirtualMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakWorkingSet, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPeakWorkingSet, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The maximum amount of physical memory used for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPeakWorkingSet = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPrivateMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterPrivateMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of private memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessPrivateMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterVirtualMemorySize, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterVirtualMemorySize, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of virtual memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessVirtualMemorySize = curSampledMetricDefinition.Metrics.Add(null);
 
-                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterWorkingSet, MetricSampleType.RawCount);
+                curSampledMetricDefinition = new CustomSampledMetricDefinition(Log.Metrics, ProcessMetricType, "Process.Memory", CounterWorkingSet, SamplingType.RawCount);
                 curSampledMetricDefinition.Description = "The amount of physical memory allocated for the process.";
                 curSampledMetricDefinition.UnitCaption = "Bytes";
                 m_ProcessWorkingSet = curSampledMetricDefinition.Metrics.Add(null);

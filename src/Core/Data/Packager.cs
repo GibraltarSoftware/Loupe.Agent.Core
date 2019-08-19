@@ -10,6 +10,7 @@ using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Data
 {
@@ -827,9 +828,7 @@ namespace Gibraltar.Data
                 int userNameCount = Math.Min(userNameList.Count, UserListMaxCount);
                 string effectiveUserName = string.Format(UserListFormat[userNameCount], userNameList.ToArray());
 
-                int sessions, problemSessions, files;
-                long bytes;
-                newPackage.GetStats(out sessions, out problemSessions, out files, out bytes);
+                newPackage.GetStats(out var sessions, out var problemSessions, out var files, out var bytes);
 
                 //now we can figure out the right caption & description
                 string sessionPlural = "s"; // Assume usually plural...
@@ -1062,8 +1061,7 @@ namespace Gibraltar.Data
                 FileTransportPackage fileTransportPackage = null;
                 try //so we can be sure we dispose the file transport package
                 {
-                    bool hasProblemSessions;
-                    var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out hasProblemSessions)
+                    var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out var hasProblemSessions)
                         : FindPackageSessions(sessionPredicate, progressMonitors, out hasProblemSessions);
 
                     //see if there's anything to actually package...
@@ -1261,8 +1259,7 @@ namespace Gibraltar.Data
             {
                 ourMonitor.Update("Finding sessions...", 0);
 
-                bool hasProblemSessions;
-                var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out hasProblemSessions)
+                var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out var hasProblemSessions)
                     : FindPackageSessions(sessionPredicate, progressMonitors, out hasProblemSessions);
 
                 //see if there's anything to actually package...

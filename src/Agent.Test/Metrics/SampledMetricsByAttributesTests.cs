@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Threading;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Logging;
+using Loupe.Metrics;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.Metrics
@@ -41,7 +43,7 @@ namespace Loupe.Agent.Test.Metrics
 
             private const float RoomTemperature = 20; // 20 C (68 F), our air-conditioned "room temperature".
             private float m_TemperatureDelta; // How far above "room temperature" the device temperature was after last operation.
-            private DateTime m_LastOperation; // When the most recent opperation occurred, for temperature simulation.
+            private DateTime m_LastOperation; // When the most recent operation occurred, for temperature simulation.
             private bool m_EndThread; // A flag to tell our polling thread when to stop.
             private Thread m_PollingThread;
 

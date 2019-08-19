@@ -49,9 +49,8 @@ namespace Gibraltar.Agent.Metrics
             }
 
             //look up the value in the definition so we can find its offset into the array
-            EventMetricValueDefinition curValueDefinition;
 
-            if (Metric.Definition.ValueCollection.TryGetValue(name, out curValueDefinition) == false)
+            if (Metric.Definition.ValueCollection.TryGetValue(name, out var curValueDefinition) == false)
             {
 #if DEBUG
                 //if we're compiled in debug mode, tell the user they blew it.
@@ -179,7 +178,7 @@ namespace Gibraltar.Agent.Metrics
         public bool Equals(EventMetricSample other)
         {
             //We're really just a type cast, refer to our base object
-            return WrappedSample.Equals(other.WrappedSample);
+            return WrappedSample.Equals(other?.WrappedSample);
         }
 
         /*

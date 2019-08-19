@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Gibraltar.Agent;
 using Loupe.Agent.Core.Services;
+using Loupe.Logging;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using ILoupeDiagnosticListener = Loupe.Agent.Core.Services.ILoupeDiagnosticListener;

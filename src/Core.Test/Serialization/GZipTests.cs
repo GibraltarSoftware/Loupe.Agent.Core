@@ -102,7 +102,7 @@ namespace Loupe.Core.Test.Serialization
             if (!Debugger.IsAttached)
                 Assert.Fail("This test is only valid if the debugger is attached");
 
-            // Temp file will be automatically delated as part of dispose
+            // Temp file will be automatically deleted as part of dispose
             using (var tempFile = new TempFile("GzipTest", true))
             {
                 using (var gzipWriterStream = new GZipStream(tempFile.Stream, CompressionMode.Compress))

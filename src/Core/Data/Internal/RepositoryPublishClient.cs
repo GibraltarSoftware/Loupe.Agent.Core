@@ -8,6 +8,7 @@ using Gibraltar.Server.Client;
 using Gibraltar.Server.Client.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Data.Internal
 {
@@ -398,9 +399,7 @@ namespace Gibraltar.Data.Internal
             else
             {
                 //it's a bit more complicated:  We need to update each file they don't have.  
-                SessionHeader sessionHeader;
-                IList<FileInfo> sessionFragments;
-                m_SourceRepository.LoadSessionFiles(sessionId, out sessionHeader, out sessionFragments);
+                m_SourceRepository.LoadSessionFiles(sessionId, out var sessionHeader, out var sessionFragments);
 
                 foreach (var sessionFragment in sessionFragments)
                 {

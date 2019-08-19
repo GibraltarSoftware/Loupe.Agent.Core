@@ -48,7 +48,7 @@
         public bool IsHeader { get { return m_IsHeader; } }
 
         /// <summary>
-        /// True if the packet has been commited, false otherwise
+        /// True if the packet has been committed, false otherwise
         /// </summary>
         /// <remarks>This property is thread safe and will pulse waiting threads when it is set to true.
         /// This property functions as a latch and can't be set false once it has been set to true.</remarks>

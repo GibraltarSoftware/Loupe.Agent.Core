@@ -151,6 +151,7 @@ namespace Gibraltar.Monitor
         /// <param name="item">The object to locate in the dictionary.</param>
         public bool Contains(SessionFragment item)
         {
+            if (item == null) return false;
             lock (m_Lock)
             {
                 return m_SessionFilesById.ContainsKey(item.Id);
@@ -198,6 +199,8 @@ namespace Gibraltar.Monitor
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
         public bool Remove(SessionFragment item)
         {
+            if (item == null) return false;
+
             bool itemRemoved = false;
             lock (m_Lock)
             {

@@ -1,4 +1,5 @@
 ﻿using Gibraltar.Agent.Metrics;
+using Loupe.Metrics;
 
 namespace Loupe.Agent.Test.Metrics
 {

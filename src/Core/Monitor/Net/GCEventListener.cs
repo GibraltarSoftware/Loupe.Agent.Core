@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
+using Loupe.Metrics;
 
 namespace Gibraltar.Monitor.Net
 {
@@ -40,55 +42,55 @@ namespace Gibraltar.Monitor.Net
             EventMetricValueDefinition valueDefinition;
             var valueDefinitions = (EventMetricValueDefinitionCollection)newEventMetricDefinition.Values;
             valueDefinition = valueDefinitions.Add(GenerationSize0Field, typeof(ulong), "Gen 0 Heap Size", "The size, in bytes, of generation 0 memory");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(TotalPromotedSize0Field, typeof(ulong), "Total Promoted Size 0", "The size, in bytes, of generation 0 memory");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(GenerationSize1Field, typeof(ulong), "Gen 1 Heap Size", "The size, in bytes, of generation 1 memory");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(TotalPromotedSize1Field, typeof(ulong), "Total Promoted Size 1", "The number of bytes that are promoted from generation 1 to generation 2.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(GenerationSize2Field, typeof(ulong), "Gen 2 Heap Size", "The size, in bytes, of generation 2 memory.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(TotalPromotedSize2Field, typeof(ulong), "Total Promoted Size 2", "The number of bytes that survived in generation 2 after the last collection.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(GenerationSize3Field, typeof(ulong), "Gen 3 Heap Size", "The size, in bytes, of the large object heap.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(TotalPromotedSize3Field, typeof(ulong), "Total Promoted Size 3", "The number of bytes that survived in the large object heap after the last collection.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(FinalizationPromotedSizeField, typeof(ulong), "Finalization Promoted Size", "The total size, in bytes, of the objects that are ready for finalization.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Bytes";
 
             valueDefinition = valueDefinitions.Add(FinalizationPromotedCountField, typeof(ulong), "Finalization Promoted Count", "The number of objects that are ready for finalization.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Objects";
 
             valueDefinition = valueDefinitions.Add(PinnedObjectCountField, typeof(uint), "Pinned Object Count", "The number of pinned (unmovable) objects.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Objects";
 
             valueDefinition = valueDefinitions.Add(SinkBlockCountField, typeof(uint), "Sink Block Count", "The number of synchronization blocks in use.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Locks";
 
             valueDefinition = valueDefinitions.Add(GCHandleCountField, typeof(uint), "GC Handle Count", "The number of garbage collection handles in use.");
-            valueDefinition.DefaultTrend = EventMetricValueTrend.Average;
+            valueDefinition.DefaultTrend = SummaryFunction.Average;
             valueDefinition.UnitCaption = "Handles";
 
             valueDefinition = valueDefinitions.Add(ClrInstanceIDField, typeof(ushort), "CLR Instance Id", "Unique ID for the instance of CLR or CoreCLR.");

@@ -4,6 +4,7 @@ using System.IO.Compression;
 using Gibraltar.Monitor;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Data
 {
@@ -88,8 +89,7 @@ namespace Gibraltar.Data
         /// <returns></returns>
         public static bool IsGLF(Stream fileStream)
         {
-            FileHeader fileHeader;
-            return IsGLF(fileStream, out fileHeader);
+            return IsGLF(fileStream, out var fileHeader);
         }
 
         /// <summary>

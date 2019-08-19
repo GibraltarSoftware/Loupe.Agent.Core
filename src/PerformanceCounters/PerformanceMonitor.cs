@@ -9,6 +9,7 @@ using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Loupe.Agent.PerformanceCounters

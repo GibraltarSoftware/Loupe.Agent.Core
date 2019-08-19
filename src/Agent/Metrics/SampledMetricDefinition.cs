@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using Gibraltar.Agent.Metrics.Internal;
+using Loupe.Metrics;
 
 namespace Gibraltar.Agent.Metrics
 {
@@ -56,7 +57,7 @@ namespace Gibraltar.Agent.Metrics
         /// <param name="metricCaption">A displayable caption for this sampled metric counter.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
         internal SampledMetricDefinition(string metricsSystem, string categoryName, string counterName, SamplingType samplingType, string unitCaption, string metricCaption, string description)
-            : this(new Monitor.CustomSampledMetricDefinition(metricsSystem, categoryName, counterName, (Monitor.MetricSampleType)samplingType, unitCaption, description))
+            : this(new Monitor.CustomSampledMetricDefinition(metricsSystem, categoryName, counterName, samplingType, unitCaption, description))
         {
             m_WrappedDefinition.Caption = metricCaption; // ToDo: Add metricCaption parameter to Monitor.CSMD constructor.
         }
@@ -110,8 +111,7 @@ namespace Gibraltar.Agent.Metrics
             // We need to lock the collection while we check for an existing definition and maybe add a new one to it.
             lock (Log.MetricDefinitions.Lock)
             {
-                IMetricDefinition rawDefinition;
-                if (Log.MetricDefinitions.TryGetValue(metricsSystem, categoryName, counterName, out rawDefinition) == false)
+                if (Log.MetricDefinitions.TryGetValue(metricsSystem, categoryName, counterName, out var rawDefinition) == false)
                 {
                     // There isn't already one by that Key.  Great!  Make one from our parameters.
                     newCreation = true;
@@ -499,13 +499,12 @@ namespace Gibraltar.Agent.Metrics
                                 //cast it and test
                                 if (curDivisorAttribute != null)
                                 {
-                                    IMetricDefinition existingMetricDefinition;
                                     string divisorCounterName = curDivisorAttribute.CounterName;
                                     if (string.IsNullOrEmpty(divisorCounterName))
                                     {
                                     }
                                     else if (Log.MetricDefinitions.TryGetValue(metricsSystem, metricCategoryName, divisorCounterName,
-                                                                               out existingMetricDefinition))
+                                                                               out var existingMetricDefinition))
                                     {
                                         SampledMetricDefinition sampledMetricDefinition = existingMetricDefinition as SampledMetricDefinition;
                                         if (sampledMetricDefinition == null)
@@ -579,9 +578,8 @@ namespace Gibraltar.Agent.Metrics
                                     {
                                         //System.Threading.Monitor.Enter(metricDefinitionsLock);
 
-                                        IMetricDefinition rawMetricDefinition;
                                         if (Log.MetricDefinitions.TryGetValue(metricsSystem, metricCategoryName, metricCounterName,
-                                                                              out rawMetricDefinition))
+                                                                              out var rawMetricDefinition))
                                         {
                                             SampledMetricDefinition sampledMetricDefinition = rawMetricDefinition as SampledMetricDefinition;
                                             if (sampledMetricDefinition == null)
@@ -613,8 +611,7 @@ namespace Gibraltar.Agent.Metrics
                                         }
                                         else
                                         {
-                                            MemberInfo divisorInfo;
-                                            if (divisors.TryGetValue(metricCounterName, out divisorInfo))
+                                            if (divisors.TryGetValue(metricCounterName, out var divisorInfo))
                                             {
                                                 // We found a divisor attribute for this counter name earlier.
                                                 // Does this counter actually need one?
@@ -840,7 +837,7 @@ namespace Gibraltar.Agent.Metrics
         public int CompareTo(SampledMetricDefinition other)
         {
             //we let our base object do the compare, we're really just casting things
-            return WrappedDefinition.CompareTo(other.WrappedDefinition);
+            return WrappedDefinition.CompareTo(other?.WrappedDefinition);
         }
 
         /// <summary>
@@ -851,7 +848,7 @@ namespace Gibraltar.Agent.Metrics
         public bool Equals(SampledMetricDefinition other)
         {
             //We're really just a type cast, refer to our base object
-            return WrappedDefinition.Equals(other.WrappedDefinition);
+            return WrappedDefinition.Equals(other?.WrappedDefinition);
         }
 
 
@@ -1373,7 +1370,7 @@ namespace Gibraltar.Agent.Metrics
 
         bool IEquatable<IMetricDefinition>.Equals(IMetricDefinition other)
         {
-            return WrappedDefinition.Equals(other.WrappedDefinition);
+            return WrappedDefinition.Equals(other?.WrappedDefinition);
         }
 
         #endregion
@@ -1438,10 +1435,8 @@ namespace Gibraltar.Agent.Metrics
         /// registered with the given Id, or throws an exception if the registered definition is not a SampledMetricDefinition.</returns>
         public static bool TryGetValue(Guid id, out SampledMetricDefinition value)
         {
-            IMetricDefinition definition;
-
             //gateway to our internal collection TryGetValue()
-            bool foundValue = s_Definitions.TryGetValue(id, out definition);
+            bool foundValue = s_Definitions.TryGetValue(id, out var definition);
             value = foundValue ? definition as SampledMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1474,10 +1469,8 @@ namespace Gibraltar.Agent.Metrics
                 throw new ArgumentNullException(nameof(key));
             }
 
-            IMetricDefinition definition;
-
             //gateway to our inner dictionary try get value
-            bool foundValue = s_Definitions.TryGetValue(key.Trim(), out definition);
+            bool foundValue = s_Definitions.TryGetValue(key.Trim(), out var definition);
             value = foundValue ? definition as SampledMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1505,10 +1498,8 @@ namespace Gibraltar.Agent.Metrics
         /// <exception cref="ArgumentException">The metric definition found for the specified key is not a sampled metric definition.</exception>
         public static bool TryGetValue(string metricsSystem, string categoryName, string counterName, out SampledMetricDefinition value)
         {
-            IMetricDefinition definition;
-
             //gateway to our inner dictionary try get value
-            bool foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out definition);
+            bool foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out var definition);
             value = foundValue ? definition as SampledMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1564,12 +1555,11 @@ namespace Gibraltar.Agent.Metrics
                     "The specified counter name is empty which is not allowed, so no metrics can be found for it.");
             }
 
-            List<SampledMetricDefinition> definitionList;
             bool foundValue = false; // Haven't found the actual definition yet.
             // We shouldn't need a lock because we aren't changing the dictionary, just doing a single read check.
             lock (s_DictionaryLock) // But apparently Dictionaries are not internally threadsafe.
             {
-                if (s_DefinitionsMap.TryGetValue(userObjectType, out definitionList)) // Fast lookup???, for efficiency.
+                if (s_DefinitionsMap.TryGetValue(userObjectType, out var definitionList)) // Fast lookup???, for efficiency.
                 {
                     if (definitionList != null && definitionList.Count > 0)
                     {
@@ -1600,10 +1590,8 @@ namespace Gibraltar.Agent.Metrics
                     string metricsSystem = sampledMetricAttribute.MetricsSystem;
                     string categoryName = sampledMetricAttribute.MetricCategoryName;
 
-                    IMetricDefinition definition;
-
                     //gateway to our inner dictionary try get value
-                    foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out definition);
+                    foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out var definition);
                     value = foundValue ? definition as SampledMetricDefinition : null;
                     if (foundValue && value == null)
                     {

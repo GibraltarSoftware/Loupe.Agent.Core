@@ -5,6 +5,7 @@ using Gibraltar.Messaging;
 using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core

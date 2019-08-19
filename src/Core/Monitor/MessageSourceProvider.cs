@@ -1,6 +1,6 @@
 ﻿
 using System.Runtime.CompilerServices;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar.Monitor

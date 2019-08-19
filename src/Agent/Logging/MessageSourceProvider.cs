@@ -1,6 +1,6 @@
 ﻿
 using System.Runtime.CompilerServices;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar.Agent.Logging
@@ -36,7 +36,7 @@ namespace Gibraltar.Agent.Logging
         /// <param name="className">The full name of the class (with namespace) whose method issued the log message.</param>
         /// <param name="methodName">The simple name of the method which issued the log message.</param>
         /// <remarks>This constructor is used only for the convenience of the Log class when it needs to generate
-        /// an IMessageSoruceProvider for construction of internally-generated packets without going through the
+        /// an IMessageSourceProvider for construction of internally-generated packets without going through the
         /// usual direct PublishToLog() mechanism.</remarks>
         public MessageSourceProvider(string className, string methodName)
         {
@@ -54,7 +54,7 @@ namespace Gibraltar.Agent.Logging
         /// <param name="fileName">The name of the file containing the method which issued the log message.</param>
         /// <param name="lineNumber">The line within the file at which the log message was issued.</param>
         /// <remarks>This constructor is used only for the convenience of the Log class when it needs to generate
-        /// an IMessageSoruceProvider for construction of internally-generated packets without going through the
+        /// an IMessageSourceProvider for construction of internally-generated packets without going through the
         /// usual direct PublishToLog() mechanism.</remarks>
         public MessageSourceProvider(string className, string methodName, string fileName, int lineNumber)
         {
@@ -68,7 +68,7 @@ namespace Gibraltar.Agent.Logging
         /// Creates a MessageSourceProvider object to be used as an IMessageSourceProvider.
         /// </summary>
         /// <remarks>This constructor is used only for the convenience of the Log class when it needs to generate
-        /// an IMessageSoruceProvider for construction of internally-generated packets without going through the
+        /// an IMessageSourceProvider for construction of internally-generated packets without going through the
         /// usual direct PublishToLog() mechanism.</remarks>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
         /// identified as the source of the log message.</param>

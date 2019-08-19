@@ -154,8 +154,7 @@ namespace Gibraltar.Monitor.Serialization
                     for (int valueIndex = 0; valueIndex < definition.Fields.Count; valueIndex++)
                     {
                         FieldDefinition fieldDefinition = definition.Fields[valueIndex];
-                        object fieldValue;
-                        packet.GetField(fieldDefinition.Name, out fieldValue);
+                        packet.GetField(fieldDefinition.Name, out object fieldValue);
                         Values[valueIndex] = fieldValue;
                     }
 
@@ -165,8 +164,7 @@ namespace Gibraltar.Monitor.Serialization
             }
 
             //Now we need to go off and find our value definition so we can be serialized out gain
-            IMetric ourMetric;
-            if (Session.MetricDefinitions.TryGetMetricValue(MetricId, out ourMetric) == false)
+            if (Session.MetricDefinitions.TryGetMetricValue(MetricId, out var ourMetric) == false)
             {
                 //BIG problems- no metric for our metric ID?
                 throw new ArgumentException("Unable to read event metric sample because the associated metric couldn't be found.");

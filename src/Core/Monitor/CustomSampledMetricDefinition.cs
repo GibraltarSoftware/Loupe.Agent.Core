@@ -2,54 +2,10 @@
 using System.Reflection;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 
 namespace Gibraltar.Monitor
 {
-    /// <summary>
-    /// Determines what the raw data for a given sampled metric is, and how it has to be processed to produce final values.
-    /// </summary>
-    /// <remarks>In many cases it is necessary to store raw facts that are translated into the final display value during
-    /// the display process so that they work regardless of time resolution.  For example, to determine the percentage of processor time
-    /// used for an activity, you need to know a time interval to look across (say per second, per hour, etc.), how many units of work
-    /// were possible during that interval (time slices of the processor) and how many were used by the process.  By specifying
-    /// the TotalFraction type, the metric display system will automatically inspect the raw and baseline values then translate them into 
-    /// a percentage.
-    /// This enumeration is conceptually similar to the Performance Counter Type enumeration provided by the runtime, but has been 
-    /// simplified for easier use.</remarks>
-    public enum MetricSampleType
-    {
-        /// <summary>
-        /// Each sample value is in final form for display as of the timestamp of the sample.
-        /// </summary>
-        RawCount = 0,
-
-        /// <summary>
-        /// Each sample value has the numerator and denominator of a fraction for display as of the timestamp of the sample. 
-        /// </summary>
-        RawFraction,
-
-        /// <summary>
-        /// Each sample is the incremental change since the prior sample as of the timestamp of the sample.
-        /// </summary>
-        IncrementalCount,
-
-        /// <summary>
-        /// Each sample has the numerator and denominator expressed as the incremental change since the prior sample as of the timestamp of the sample.
-        /// </summary>
-        IncrementalFraction,
-
-        /// <summary>
-        /// Each sample value is the cumulative total up to the timestamp of the sample
-        /// </summary>
-        TotalCount,
-
-        /// <summary>
-        /// Each sample value has the numerator and denominator expressed as the total up to the timestamp of the sample.
-        /// </summary>
-        TotalFraction
-    }
-
-
     /// <summary>
     /// The definition of a user-defined sampled metric
     /// </summary>
@@ -76,7 +32,7 @@ namespace Gibraltar.Monitor
         /// <param name="categoryName">The name of the category with which this definition is associated.</param>
         /// <param name="counterName">The name of the definition within the category.</param>
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
-        public CustomSampledMetricDefinition(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType)
+        public CustomSampledMetricDefinition(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType)
             : base(Log.Metrics, new CustomSampledMetricDefinitionPacket(metricTypeName, categoryName, counterName, metricSampleType))
         {
             m_RequiresMultipleSamples = SampledMetricTypeRequiresMultipleSamples(metricSampleType);
@@ -94,7 +50,7 @@ namespace Gibraltar.Monitor
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="unitCaption">The display caption for the calculated values captured under this metric.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
-        public CustomSampledMetricDefinition(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string unitCaption, string description)
+        public CustomSampledMetricDefinition(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string unitCaption, string description)
             : base(Log.Metrics, new CustomSampledMetricDefinitionPacket(metricTypeName, categoryName, counterName, metricSampleType, unitCaption, description))
         {
             m_RequiresMultipleSamples = SampledMetricTypeRequiresMultipleSamples(metricSampleType);
@@ -111,7 +67,7 @@ namespace Gibraltar.Monitor
         /// <param name="categoryName">The name of the category with which this definition is associated.</param>
         /// <param name="counterName">The name of the definition within the category.</param>
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
-        public CustomSampledMetricDefinition(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType)
+        public CustomSampledMetricDefinition(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType)
             : base(definitions, new CustomSampledMetricDefinitionPacket(metricTypeName, categoryName, counterName, metricSampleType))
         {
             m_RequiresMultipleSamples = SampledMetricTypeRequiresMultipleSamples(metricSampleType);
@@ -130,7 +86,7 @@ namespace Gibraltar.Monitor
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="unitCaption">The display caption for the calculated values captured under this metric.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
-        public CustomSampledMetricDefinition(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string unitCaption, string description)
+        public CustomSampledMetricDefinition(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string unitCaption, string description)
             : base(definitions, new CustomSampledMetricDefinitionPacket(metricTypeName, categoryName, counterName, metricSampleType, unitCaption, description))
         {
             m_RequiresMultipleSamples = SampledMetricTypeRequiresMultipleSamples(metricSampleType);
@@ -162,7 +118,7 @@ namespace Gibraltar.Monitor
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="unitCaption">The display caption for the calculated values captured under this metric.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
-        public static CustomSampledMetricDefinition AddOrGet(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string unitCaption, string description)
+        public static CustomSampledMetricDefinition AddOrGet(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string unitCaption, string description)
         {
             //we must have a definitions collection, or we have a problem
             if (definitions == null)
@@ -206,7 +162,7 @@ namespace Gibraltar.Monitor
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="unitCaption">The display caption for the calculated values captured under this metric.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
-        public static CustomSampledMetricDefinition AddOrGet(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string unitCaption, string description)
+        public static CustomSampledMetricDefinition AddOrGet(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string unitCaption, string description)
         {
             //just forward into our call that requires the definition to be specified
             return AddOrGet(Log.Metrics, metricTypeName, categoryName, counterName, metricSampleType, unitCaption, description);
@@ -215,7 +171,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The intended method of interpreting the sampled counter value.
         /// </summary>
-        public MetricSampleType MetricSampleType
+        public SamplingType MetricSampleType
         {
             get { return ((CustomSampledMetricDefinitionPacket)base.Packet).MetricSampleType; }
         }
@@ -416,15 +372,15 @@ namespace Gibraltar.Monitor
         /// Many sample types require multiple samples to determine an output value because they work with 
         /// the change between two points.
         /// </remarks>
-        internal static bool SampledMetricTypeRequiresMultipleSamples(MetricSampleType metricSampleType)
+        internal static bool SampledMetricTypeRequiresMultipleSamples(SamplingType metricSampleType)
         {
             bool multipleRequired;
 
             //based purely on the counter type, according to Microsoft documentation
             switch (metricSampleType)
             {
-                case MetricSampleType.RawFraction:
-                case MetricSampleType.RawCount:
+                case SamplingType.RawFraction:
+                case SamplingType.RawCount:
                     //these just require one sample
                     multipleRequired = false;
                     break;

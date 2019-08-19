@@ -40,9 +40,7 @@ namespace Loupe.Agent.Test
 
             if (fileVersionAttributes != null)
             {
-                AssemblyFileVersionAttribute leadAttribute = fileVersionAttributes.FirstOrDefault() as AssemblyFileVersionAttribute;
-
-                if (leadAttribute != null)
+                if (fileVersionAttributes.FirstOrDefault() is AssemblyFileVersionAttribute leadAttribute)
                 {
                     publisher.ApplicationVersion = new Version(leadAttribute.Version);
                 }
@@ -51,6 +49,7 @@ namespace Loupe.Agent.Test
             publisher.ApplicationDescription = "NUnit tests of the Loupe Agent Library";
 
             m_Configuration.SessionFile.EnableFilePruning = false;
+            m_Configuration.Listener.EnableConsole = true;
 
             //if we need email server information set that
 #if CONFIGURE_EMAIL

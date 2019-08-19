@@ -7,8 +7,8 @@ using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using IServerAuthenticationProvider = Gibraltar.Agent.Net.IServerAuthenticationProvider;
-using MessageSourceProvider=Gibraltar.Agent.Internal.MessageSourceProvider;
 using MetricDefinitionCollection=Gibraltar.Agent.Metrics.Internal.MetricDefinitionCollection;
 
 namespace Gibraltar.Agent
@@ -168,7 +168,7 @@ namespace Gibraltar.Agent
         private const string ThisLogSystem = Monitor.Log.ThisLogSystem;
         private const string Category = Monitor.Log.Category;
         private const string ExceptionCategory = Monitor.Log.ExceptionCategory;
-        private const Monitor.LogWriteMode Queued = Monitor.LogWriteMode.Queued;
+        private const LogWriteMode Queued = LogWriteMode.Queued;
 
         private static readonly object s_SyncLock = new object();
 
@@ -178,7 +178,6 @@ namespace Gibraltar.Agent
 
         private static event MessageEventHandler s_MessageEvent;
         private static event MessageAlertEventHandler s_MessageAlertEvent;
-        private static event MessageFilterEventHandler s_MessageFilterEvent;
         private static readonly object s_MessageEventLock = new object(); // Locks add/remove of Message event subscriptions.
 
         // Disable the never-used warning
@@ -211,13 +210,6 @@ namespace Gibraltar.Agent
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public delegate void MessageEventHandler(object sender, LogMessageEventArgs e);
-
-        /// <summary>
-        /// Handler type for a message filter event.
-        /// </summary>
-        /// <param name="sender">The sender of this event (the LiveLogViewer control instance or null for the main Loupe Live Viewer)</param>
-        /// <param name="e">The Message Filter Event Args.</param>
-        public delegate void MessageFilterEventHandler(object sender, LogMessageFilterEventArgs e);
 
         /// <summary>
         /// Handler type for a message alert event.
@@ -424,7 +416,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -461,7 +453,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -498,8 +490,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+                writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -541,8 +533,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+                writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -568,7 +560,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -599,7 +591,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -626,8 +618,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+                writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -659,8 +651,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+                writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -694,7 +686,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -731,7 +723,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -768,8 +760,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+                writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -811,8 +803,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+                writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -838,7 +830,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -869,7 +861,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -896,8 +888,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+                writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -929,8 +921,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+                writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -964,7 +956,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1001,7 +993,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1038,8 +1030,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+                writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1081,8 +1073,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+                writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1108,7 +1100,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1139,7 +1131,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1166,8 +1158,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+                writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1199,8 +1191,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+                writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1234,7 +1226,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1271,7 +1263,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1309,7 +1301,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1346,8 +1338,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1389,8 +1381,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1433,8 +1425,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1460,7 +1452,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1491,7 +1483,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1523,7 +1515,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1550,8 +1542,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1583,8 +1575,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1617,8 +1609,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+                writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1652,7 +1644,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1689,7 +1681,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1727,7 +1719,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1764,8 +1756,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1807,8 +1799,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1851,8 +1843,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
+            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -1878,7 +1870,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1909,7 +1901,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1941,7 +1933,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1968,8 +1960,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -2001,8 +1993,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -2035,8 +2027,8 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
-                (Monitor.LogWriteMode)writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+                writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
         }
@@ -2058,7 +2050,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,Loupe.Logging.IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2090,8 +2082,8 @@ namespace Gibraltar.Agent
             if (skipFrames < 0)
                 skipFrames = 0; // Make sure they don't pass us a negative, it would attribute it here to us.
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((Loupe.Extensibility.Data.LogMessageSeverity)severity,
-                (Monitor.LogWriteMode)writeMode, logSystem, category, skipFrames + 1, exception, false, detailsXml, caption,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((LogMessageSeverity)severity,
+                writeMode, logSystem, category, skipFrames + 1, exception, false, detailsXml, caption,
                 description, args);
 
             logMessage.PublishToLog();
@@ -2114,7 +2106,7 @@ namespace Gibraltar.Agent
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
         /// Loupe should use the other overload of
-        /// <see cref="Write(LogMessageSeverity,string,IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
+        /// <see cref="Write(LogMessageSeverity,string,Loupe.Logging.IMessageSourceProvider,IPrincipal,Exception,LogWriteMode,string,string,string,string,object[])">Write</see>,
         /// passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
@@ -2149,8 +2141,8 @@ namespace Gibraltar.Agent
             if (skipFrames < 0)
                 skipFrames = 0; // Make sure they don't pass us a negative, it would attribute it here to us.
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((Loupe.Extensibility.Data.LogMessageSeverity)severity,
-                (Monitor.LogWriteMode)writeMode, logSystem, category, skipFrames + 1, exception, attributeToException, detailsXml, caption,
+            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((LogMessageSeverity)severity,
+                writeMode, logSystem, category, skipFrames + 1, exception, attributeToException, detailsXml, caption,
                 description, args);
 
             logMessage.PublishToLog();
@@ -2163,7 +2155,7 @@ namespace Gibraltar.Agent
         /// log system, user name, and a customized message source provider to be specified.  These parameters allow
         /// bridge logic to support interfacing to Loupe from third-party logging systems like log4net,
         /// including from your own in-house system.</para>
-        /// <para>The <see cref="IMessageSourceProvider">sourceProvider</see> is expected to remain valid for this message
+        /// <para>The <see cref="Loupe.Logging.IMessageSourceProvider">sourceProvider</see> is expected to remain valid for this message
         /// until this call returns, after which the values have been read and copied.  Loupe does not keep a reference
         /// to the sourceProvider object after this call returns, so it may then be discarded, reused, or altered however
         /// your implementation requires.</para></remarks>
@@ -2190,8 +2182,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.Log.WriteMessage((Loupe.Extensibility.Data.LogMessageSeverity)severity, (Monitor.LogWriteMode)writeMode, logSystem,
-                category, (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), principal, exception,
+            Monitor.Log.WriteMessage(severity, writeMode, logSystem, category, sourceProvider, principal, exception,
                 detailsXml, caption, description, args);
         }
 
@@ -2262,7 +2253,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2289,7 +2280,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Verbose,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2311,7 +2302,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2338,7 +2329,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Information,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2360,7 +2351,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2387,7 +2378,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Warning,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2409,7 +2400,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2436,7 +2427,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Error,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2458,7 +2449,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2485,7 +2476,7 @@ namespace Gibraltar.Agent
             if (Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(Loupe.Extensibility.Data.LogMessageSeverity.Critical,
+            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2563,8 +2554,7 @@ namespace Gibraltar.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void EndSession(SessionStatus endingStatus, IMessageSourceProvider sourceProvider, string reason)
         {
-            Monitor.Log.EndSession((Loupe.Extensibility.Data.SessionStatus)endingStatus,
-                (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), reason);
+            Monitor.Log.EndSession(endingStatus, sourceProvider, reason);
         }
 
         /// <summary>
@@ -2728,7 +2718,7 @@ namespace Gibraltar.Agent
         /// started.  All calls to the agent are safe whether it has been activated or not.</remarks>
         public static void StartSession(IMessageSourceProvider sourceProvider, string reason)
         {
-            Monitor.Log.StartSession(null, (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), reason);
+            Monitor.Log.StartSession(null, sourceProvider, reason);
         }
 
         /// <summary>
@@ -2797,7 +2787,7 @@ namespace Gibraltar.Agent
             if (ReferenceEquals(configuration, null))
                 throw new ArgumentNullException(nameof(configuration));
 
-            Monitor.Log.StartSession(configuration, (sourceProvider == null) ? null : new MessageSourceProvider(sourceProvider), reason);
+            Monitor.Log.StartSession(configuration, sourceProvider, reason);
         }
 
         /// <summary>
@@ -3021,17 +3011,6 @@ namespace Gibraltar.Agent
             {
                 var eventArgs = new LogMessageEventArgs(e);
                 eventHandler(null, eventArgs);
-            }
-        }
-
-        private static void LiveViewerOnMessageFilter(object sender, Monitor.MessageFilterEventArgs e)
-        {
-            var eventHandler = s_MessageFilterEvent;
-
-            if (eventHandler != null)
-            {
-                LogMessageFilterEventArgs eventArgs = new LogMessageFilterEventArgs(e);
-                eventHandler(sender, eventArgs);
             }
         }
 

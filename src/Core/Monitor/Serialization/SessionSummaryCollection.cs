@@ -168,8 +168,7 @@ namespace Gibraltar.Monitor.Serialization
                 throw new ArgumentNullException(nameof(item));
 
             //we want to be sure we remove any item with this key, not just this exact obect to preserve collection symmetry.
-            ISessionSummary ourCopy;
-            if (m_Dictionary.TryGetValue(item.Id, out ourCopy))
+            if (m_Dictionary.TryGetValue(item.Id, out var ourCopy))
             {
                 m_Dictionary.Remove(item.Id);
                 m_List.Remove(item);
@@ -263,9 +262,8 @@ namespace Gibraltar.Monitor.Serialization
         {
             lock (m_Lock)
             {
-                ISessionSummary victim;
                 bool foundItem = false;
-                if (m_Dictionary.TryGetValue(key, out victim))
+                if (m_Dictionary.TryGetValue(key, out var victim))
                 {
                     foundItem = true;
                     m_Dictionary.Remove(key);

@@ -1589,7 +1589,7 @@ namespace Gibraltar.Data
             if (source.Length != target.Length)
                 return false;
 
-            //now we know they have the same nubmer of elements and neither are null.  we can compare individual elements.
+            //now we know they have the same number of elements and neither are null.  we can compare individual elements.
             for(int curItemIndex = 0; curItemIndex < source.Length; curItemIndex++)
             {
                 if (source[curItemIndex].Equals(target[curItemIndex]) == false)
@@ -1674,8 +1674,7 @@ namespace Gibraltar.Data
 
             if (FileHeader.SupportsComputerId(m_MajorVersion, m_MinorVersion))
             {
-                Guid rawValue;
-                BinarySerializer.DeserializeValue(rawData, out rawValue);
+                BinarySerializer.DeserializeValue(rawData, out Guid rawValue);
                 m_ComputerId = rawValue;
             }
 
@@ -1688,8 +1687,7 @@ namespace Gibraltar.Data
                 BinarySerializer.DeserializeValue(rawData, out m_PromotionLevelName);
             }
 
-            string applicationVersionRaw;
-            BinarySerializer.DeserializeValue(rawData, out applicationVersionRaw);
+            BinarySerializer.DeserializeValue(rawData, out string applicationVersionRaw);
             m_ApplicationVersion = new Version(applicationVersionRaw);
 
             BinarySerializer.DeserializeValue(rawData, out m_ApplicationTypeName);
@@ -1702,8 +1700,7 @@ namespace Gibraltar.Data
             BinarySerializer.DeserializeValue(rawData, out m_SessionStartDateTime);
             BinarySerializer.DeserializeValue(rawData, out m_SessionEndDateTime);
 
-            string agentVersionRaw;
-            BinarySerializer.DeserializeValue(rawData, out agentVersionRaw);
+            BinarySerializer.DeserializeValue(rawData, out string agentVersionRaw);
             m_AgentVersion = new Version(agentVersionRaw);
 
             BinarySerializer.DeserializeValue(rawData, out m_UserName);
@@ -1717,30 +1714,25 @@ namespace Gibraltar.Data
 
             //The session Details
             BinarySerializer.DeserializeValue(rawData, out m_OSPlatformCode);
-            string rawOSVersion;
-            BinarySerializer.DeserializeValue(rawData, out rawOSVersion);
+            BinarySerializer.DeserializeValue(rawData, out string rawOSVersion);
             m_OSVersion = new Version(rawOSVersion);
 
             BinarySerializer.DeserializeValue(rawData, out m_OSServicePack);
             BinarySerializer.DeserializeValue(rawData, out m_OSCultureName);
 
-            string osArchitectureRaw;
-            BinarySerializer.DeserializeValue(rawData, out osArchitectureRaw);
+            BinarySerializer.DeserializeValue(rawData, out string osArchitectureRaw);
             m_OSArchitecture = (ProcessorArchitecture)Enum.Parse(typeof(ProcessorArchitecture), osArchitectureRaw, true);
 
-            string osBootModeRaw;
-            BinarySerializer.DeserializeValue(rawData, out osBootModeRaw);
+            BinarySerializer.DeserializeValue(rawData, out string osBootModeRaw);
             m_OSBootMode = (OSBootMode)Enum.Parse(typeof(OSBootMode), osBootModeRaw, true);
 
             BinarySerializer.DeserializeValue(rawData, out m_OSSuiteMaskCode);
             BinarySerializer.DeserializeValue(rawData, out m_OSProductTypeCode);
 
-            string rawRuntimeVersion;
-            BinarySerializer.DeserializeValue(rawData, out rawRuntimeVersion);
+            BinarySerializer.DeserializeValue(rawData, out string rawRuntimeVersion);
             m_RuntimeVersion = new Version(rawRuntimeVersion);
 
-            string runtimeArchitectureRaw;
-            BinarySerializer.DeserializeValue(rawData, out runtimeArchitectureRaw);
+            BinarySerializer.DeserializeValue(rawData, out string runtimeArchitectureRaw);
             m_RuntimeArchitecture = (ProcessorArchitecture)Enum.Parse(typeof(ProcessorArchitecture), runtimeArchitectureRaw, true);
 
             BinarySerializer.DeserializeValue(rawData, out m_CurrentCultureName);
@@ -1756,15 +1748,12 @@ namespace Gibraltar.Data
             BinarySerializer.DeserializeValue(rawData, out m_CommandLine);
 
             //now the application properties
-            int numberOfProperties;
-            BinarySerializer.DeserializeValue(rawData, out numberOfProperties);
+            BinarySerializer.DeserializeValue(rawData, out int numberOfProperties);
 
             for (int curProperty = 0; curProperty < numberOfProperties; curProperty++)
             {
-                string name, value;
-
-                BinarySerializer.DeserializeValue(rawData, out name);
-                BinarySerializer.DeserializeValue(rawData, out value);
+                BinarySerializer.DeserializeValue(rawData, out string name);
+                BinarySerializer.DeserializeValue(rawData, out string value);
                 m_Properties.Add(name, value);
             }
 

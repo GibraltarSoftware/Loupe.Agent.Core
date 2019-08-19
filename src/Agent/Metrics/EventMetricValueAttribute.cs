@@ -1,6 +1,6 @@
 ﻿
 using System;
-
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Agent.Metrics

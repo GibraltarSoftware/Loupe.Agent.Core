@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using Gibraltar.Monitor.Serialization;
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Monitor
@@ -50,7 +51,7 @@ namespace Gibraltar.Monitor
             }
 
             //Now lets do some math!  The math we have to do depends on the sampled metric type.
-            MetricSampleType metricType = Metric.Definition.MetricSampleType;
+            SamplingType metricType = Metric.Definition.MetricSampleType;
 
             //First, eliminate the values that don't need math at all
             if (RequiresMultipleSamples == false)
@@ -62,12 +63,12 @@ namespace Gibraltar.Monitor
             double calculatedResult;
             CustomSampledMetricSamplePacket baselineSamplePacket = (CustomSampledMetricSamplePacket) baselineSample.Packet;
 
-            if (metricType == MetricSampleType.TotalCount)
+            if (metricType == SamplingType.TotalCount)
             {
                 //here we want to calculate the difference between the start and end of our sampled period, ignoring interim samples.
                 calculatedResult = Packet.RawValue - baselineSamplePacket.RawValue;
             }
-            else if (metricType == MetricSampleType.TotalFraction)
+            else if (metricType == SamplingType.TotalFraction)
             {
                 double valueDelta = Packet.RawValue - baselineSamplePacket.RawValue;
                 double baseDelta = Packet.BaseValue - baselineSamplePacket.BaseValue;
@@ -80,12 +81,12 @@ namespace Gibraltar.Monitor
 
                 calculatedResult = valueDelta / baseDelta;
             }
-            else if (metricType == MetricSampleType.IncrementalCount) 
+            else if (metricType == SamplingType.IncrementalCount) 
             {
                 //The new value is just the total at the end, so we just get the value property which knows enough to sum things.
                 calculatedResult = Value;
             }
-            else if (metricType == MetricSampleType.IncrementalFraction)
+            else if (metricType == SamplingType.IncrementalFraction)
             {
                 double value = Value;
                 double baseValue = BaseValue;
@@ -102,16 +103,16 @@ namespace Gibraltar.Monitor
             {
                 // This is dumb, but FxCop doesn't seem to notice that the duplicate casts are in non-overlapping code paths.
                 // So to make it happy, moving the cast outside these last two if's (now nested instead of chained).
-                // Note: This will throw an exception if it fails to cast, before we check the MetricSampleType enum.
+                // Note: This will throw an exception if it fails to cast, before we check the SamplingType enum.
                 CustomSampledMetricSample customSample = (CustomSampledMetricSample)baselineSample;
-                if (metricType == MetricSampleType.RawCount)
+                if (metricType == SamplingType.RawCount)
                 {
                     //we need to do a weighted average of the values in the range
                     //now life gets more fun - we have to do a weighted average of everything in between the baseline sample and this sample.
                     CustomSampledMetricSample[] samples = SampleRange(customSample);
                     calculatedResult = CalculateWeightedAverageValue(samples);
                 }
-                else if (metricType == MetricSampleType.RawFraction)
+                else if (metricType == SamplingType.RawFraction)
                 {
                     //we do a weighted average of the values in the range, then divide
                     CustomSampledMetricSample[] samples = SampleRange(customSample);
@@ -175,14 +176,14 @@ namespace Gibraltar.Monitor
                 //how we calculate base value depends on what our type is.  In many cases, it's meaningless.
                 switch(Metric.Definition.MetricSampleType)
                 {
-                    case MetricSampleType.RawCount:
-                    case MetricSampleType.IncrementalCount:
-                    case MetricSampleType.TotalCount:
+                    case SamplingType.RawCount:
+                    case SamplingType.IncrementalCount:
+                    case SamplingType.TotalCount:
                         //not valid - these don't use baseline
                         throw new ArgumentException("Base values are not available for metrics that are not fractions.");
-                    case MetricSampleType.RawFraction:
-                    case MetricSampleType.IncrementalFraction:
-                    case MetricSampleType.TotalFraction:
+                    case SamplingType.RawFraction:
+                    case SamplingType.IncrementalFraction:
+                    case SamplingType.TotalFraction:
                         //we're good.
                         break;
                     default:
@@ -227,8 +228,8 @@ namespace Gibraltar.Monitor
                 //how we calculate base value depends on what our type is.  In many cases, it's meaningless.
                 switch (Metric.Definition.MetricSampleType)
                 {
-                    case MetricSampleType.IncrementalCount:
-                    case MetricSampleType.IncrementalFraction:
+                    case SamplingType.IncrementalCount:
+                    case SamplingType.IncrementalFraction:
                         //now we go ahead and sum up everything up through ourself.
                         if (m_Value == null)
                         {
@@ -254,14 +255,14 @@ namespace Gibraltar.Monitor
                         returnVal = (double)m_Value;
                         break;
 
-                    case MetricSampleType.RawCount:
-                    case MetricSampleType.RawFraction:
+                    case SamplingType.RawCount:
+                    case SamplingType.RawFraction:
                         //it is what it is
                         returnVal = Packet.RawValue;
                         break;
 
-                    case MetricSampleType.TotalCount:
-                    case MetricSampleType.TotalFraction:
+                    case SamplingType.TotalCount:
+                    case SamplingType.TotalFraction:
                         //it's the difference between this one and the prior one.
                         if (m_Value == null)
                         {

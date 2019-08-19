@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Gibraltar.Agent.Data;
-
+using System.Linq;
+using Loupe.Extensibility.Data;
 
 
 namespace Gibraltar.Agent.Internal
@@ -61,6 +61,12 @@ namespace Gibraltar.Agent.Internal
         public void RemoveAt(int index)
         {
             ((IList<ILogMessage>)this).RemoveAt(index);
+        }
+
+        /// <inheritdocs/>
+        public ILogMessage this[Guid key]
+        {
+            get { return this.FirstOrDefault(l => l.Id == key); }
         }
     }
 }

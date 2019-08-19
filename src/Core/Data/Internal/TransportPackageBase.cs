@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar.Data.Internal
@@ -71,7 +71,7 @@ namespace Gibraltar.Data.Internal
 
                 if (allSessions.Count == 0)
                 {
-                    if (!Log.SilentMode) Log.Write(LogMessageSeverity.Verbose, Packager.LogCategory, "No Sessions to Mark Read", "There are unexpectedly no sessions in the working package, so none can be marked as read.  We shouldn't have gotten to this point if tehre are no sessions in the package.");
+                    if (!Log.SilentMode) Log.Write(LogMessageSeverity.Verbose, Packager.LogCategory, "No Sessions to Mark Read", "There are unexpectedly no sessions in the working package, so none can be marked as read.  We shouldn't have gotten to this point if there are no sessions in the package.");
                 }
                 else
                 {

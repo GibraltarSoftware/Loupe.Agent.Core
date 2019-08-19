@@ -211,8 +211,7 @@ namespace Gibraltar.Serialization
 
         public static bool IsSerializeableType(Type candidateType)
         {
-            FieldType throwAwayMapping;
-            return TryGetSerializableType(candidateType, out throwAwayMapping);
+            return TryGetSerializableType(candidateType, out var throwAwayMapping);
         }
 
         public string TypeName { get { return m_TypeName; } }
@@ -289,9 +288,7 @@ namespace Gibraltar.Serialization
         /// <remarks>If no lossless type is found, an exception will be thrown.</remarks>
         public static FieldType GetSerializableType(Type type)
         {
-            FieldType bestType;
-
-            if (TryGetSerializableType(type, out bestType) == false)
+            if (TryGetSerializableType(type, out var bestType) == false)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), type.FullName, "The provided type isn't supported for lossless serialization.");
             }
@@ -653,6 +650,8 @@ namespace Gibraltar.Serialization
         /// </summary>
         public bool Equals(PacketDefinition other)
         {
+            if (other == null) return false;
+
             // Verify that base packets are equivalent
             if (BasePacket == null)
             {

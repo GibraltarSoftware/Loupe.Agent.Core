@@ -1021,18 +1021,4 @@ namespace Gibraltar.Messaging
             }
         }
     }
-
-    internal delegate void PacketEventHandler(object sender, PacketEventArgs e);
-
-    internal class PacketEventArgs : EventArgs
-    {
-        private readonly IMessengerPacket m_Packet;
-
-        internal PacketEventArgs(IMessengerPacket packet)
-        {
-            m_Packet = packet;
-        }
-
-        internal IMessengerPacket Packet { get { return m_Packet; } }
-    }
 }

@@ -86,8 +86,7 @@ namespace Gibraltar.Messaging
         private void Read(FileStream source)
         {
             source.Position = 0;
-            int value;
-            BinarySerializer.DeserializeValue(source, out value);
+            BinarySerializer.DeserializeValue(source, out int value);
             ProcessId = value;
             BinarySerializer.DeserializeValue(source, out value);
             PublisherPort = value;
@@ -128,7 +127,7 @@ namespace Gibraltar.Messaging
                     }
                     catch (Exception ex)
                     {
-                        //any exception but an argument exception we want to catch, but shoudln't assume it means the process isn't running.
+                        //any exception but an argument exception we want to catch, but shouldn't assume it means the process isn't running.
                         if (ex is ArgumentException)
                             isAlive = false;
                     }

@@ -60,9 +60,7 @@ namespace Gibraltar.Serialization.Internal
 
         public IPacketFactory GetPacketFactory(string typeName)
         {
-            IPacketFactory factory;
-
-            if (m_PacketFactories.TryGetValue(typeName, out factory))
+            if (m_PacketFactories.TryGetValue(typeName, out var factory))
                 return factory;
 
             return m_GenericFactory;

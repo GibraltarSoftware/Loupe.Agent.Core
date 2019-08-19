@@ -1,5 +1,7 @@
 ﻿using System;
 using Gibraltar.Serialization;
+using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 
 namespace Gibraltar.Monitor.Serialization
 {
@@ -8,7 +10,7 @@ namespace Gibraltar.Monitor.Serialization
     /// </summary>
     public class CustomSampledMetricDefinitionPacket : SampledMetricDefinitionPacket, IPacket, IPacketObjectFactory<MetricDefinition, MetricDefinitionCollection>, IComparable<CustomSampledMetricDefinitionPacket>, IEquatable<CustomSampledMetricDefinitionPacket>
     {
-        private MetricSampleType m_MetricSampleType;
+        private SamplingType m_MetricSampleType;
 
         /// <summary>
         /// Create a new custom sampled metric definition packet from the provided information
@@ -18,7 +20,7 @@ namespace Gibraltar.Monitor.Serialization
         /// <param name="categoryName">The name of the category with which this definition is associated.</param>
         /// <param name="counterName">The name of the definition within the category.</param>
         /// <param name="metricSampleType">The specific unit representation of the data being captured for this metric</param>
-        public CustomSampledMetricDefinitionPacket(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType)
+        public CustomSampledMetricDefinitionPacket(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType)
             : base(metricTypeName, categoryName, counterName)
         {
             m_MetricSampleType = metricSampleType;
@@ -34,7 +36,7 @@ namespace Gibraltar.Monitor.Serialization
         /// <param name="metricSampleType">The specific unit representation of the data being captured for this metric</param>
         /// <param name="unitCaption">The display caption for the calculated values captured under this metric.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
-        public CustomSampledMetricDefinitionPacket(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string unitCaption, string description)
+        public CustomSampledMetricDefinitionPacket(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string unitCaption, string description)
             : base(metricTypeName, categoryName, counterName, unitCaption, description)
         {
             m_MetricSampleType = metricSampleType;
@@ -109,7 +111,7 @@ namespace Gibraltar.Monitor.Serialization
         /// </summary>
         /// <remarks>The counter type determines what math needs to be run
         /// to determine the correct value when comparing two samples.</remarks>
-        public MetricSampleType MetricSampleType
+        public SamplingType MetricSampleType
         {
             get { return m_MetricSampleType; }
             protected set { m_MetricSampleType = value; }
@@ -120,28 +122,28 @@ namespace Gibraltar.Monitor.Serialization
         /// </summary>
         /// <param name="metricSampleType">The sample metric type to make a caption for</param>
         /// <returns>An end-user display caption</returns>
-        public static string SampledMetricTypeCaption(MetricSampleType metricSampleType)
+        public static string SampledMetricTypeCaption(SamplingType metricSampleType)
         {
             string returnVal;
 
             switch(metricSampleType)
             {
-                case MetricSampleType.TotalCount:
+                case SamplingType.TotalCount:
                     returnVal = "Count of Items";
                     break;
-                case MetricSampleType.TotalFraction:
+                case SamplingType.TotalFraction:
                     returnVal = "Percentage";
                     break;
-                case MetricSampleType.IncrementalCount:
+                case SamplingType.IncrementalCount:
                     returnVal = "Count of Items";
                     break;
-                case MetricSampleType.IncrementalFraction:
+                case SamplingType.IncrementalFraction:
                     returnVal = "Percentage";
                     break;
-                case MetricSampleType.RawCount:
+                case SamplingType.RawCount:
                     returnVal = "Count of Items";
                     break;
-                case MetricSampleType.RawFraction:
+                case SamplingType.RawFraction:
                     returnVal = "Percentage";
                     break;
                 default:
@@ -200,9 +202,8 @@ namespace Gibraltar.Monitor.Serialization
             switch (definition.Version)
             {
                 case 1:
-                    int rawSampleType;
-                    packet.GetField("metricSampleType", out rawSampleType);
-                    m_MetricSampleType = (MetricSampleType)rawSampleType;
+                    packet.GetField("metricSampleType", out int rawSampleType);
+                    m_MetricSampleType = (SamplingType)rawSampleType;
                     break;
                 default:
                     throw new GibraltarPacketVersionException(definition.Version);

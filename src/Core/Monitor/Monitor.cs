@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Threading;
 using Gibraltar.Messaging;
 using Gibraltar.Monitor.Net;
-using Loupe.Agent.PerformanceCounters;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Monitor
 {

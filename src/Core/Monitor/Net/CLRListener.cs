@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Monitor.Net
 {
@@ -365,9 +366,7 @@ namespace Gibraltar.Monitor.Net
                     if ((adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                         && (adapter.NetworkInterfaceType != NetworkInterfaceType.Tunnel))
                     {
-                        NetworkState previousState;
-
-                        if (m_NetworkStates.TryGetValue(adapter.Id, out previousState) == false)
+                        if (m_NetworkStates.TryGetValue(adapter.Id, out var previousState) == false)
                         {
                             //it's brand new - need to add it and record it as new.
                             previousState = new NetworkState(adapter);

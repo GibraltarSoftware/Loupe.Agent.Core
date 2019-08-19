@@ -3,9 +3,10 @@ using System.Security.Principal;
 using System.Threading;
 using Gibraltar.Agent;
 using Gibraltar.Monitor;
+using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using NUnit.Framework;
 using Log = Gibraltar.Agent.Log;
-using LogWriteMode = Gibraltar.Agent.LogWriteMode;
 
 namespace Loupe.Agent.Test.LogMessages
 {

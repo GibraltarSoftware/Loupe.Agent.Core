@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Gibraltar.Agent.Metrics.Internal;
 using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 using Microsoft.Extensions.Logging;
 using IMetricDefinition = Gibraltar.Agent.Metrics.Internal.IMetricDefinition;
 
@@ -415,8 +416,7 @@ namespace Gibraltar.Agent.Metrics
                     // We'll just hold the collection lock the whole time since we don't have to wait on arbitrary client code.
                     lock (Log.MetricDefinitions.Lock)
                     {
-                        IMetricDefinition existingMetricDefinition;
-                        if (Log.MetricDefinitions.TryGetValue(metricsSystem, metricCategoryName, metricCounterName, out existingMetricDefinition))
+                        if (Log.MetricDefinitions.TryGetValue(metricsSystem, metricCategoryName, metricCounterName, out var existingMetricDefinition))
                         {
                             //eh, we already had a definition.  We want to go no further.
                             newMetricDefinition = existingMetricDefinition as EventMetricDefinition;
@@ -727,8 +727,7 @@ namespace Gibraltar.Agent.Metrics
                 // We need to lock the collection while we check for an existing definition and maybe add this one to it.
                 lock (Log.MetricDefinitions.Lock)
                 {
-                    IMetricDefinition rawDefinition;
-                    if (Log.MetricDefinitions.TryGetValue(MetricsSystem, CategoryName, CounterName, out rawDefinition) == false)
+                    if (Log.MetricDefinitions.TryGetValue(MetricsSystem, CategoryName, CounterName, out var rawDefinition) == false)
                     {
                         // There isn't already one by that Key.  Great!  Register ourselves.
                         m_WrappedDefinition.SetReadOnly(); // Mark the internal definition as completed.
@@ -756,8 +755,7 @@ namespace Gibraltar.Agent.Metrics
                     IEventMetricValueDefinitionCollection officialValues = officialDefinition.WrappedDefinition.Values;
                     foreach (Monitor.EventMetricValueDefinition ourValue in WrappedDefinition.Values)
                     {
-                        IEventMetricValueDefinition officialValue;
-                        if (officialValues.TryGetValue(ourValue.Name, out officialValue) == false)
+                        if (officialValues.TryGetValue(ourValue.Name, out var officialValue) == false)
                         {
                             // It doesn't have one of our value columns!
                             throw new ArgumentException(
@@ -814,7 +812,7 @@ namespace Gibraltar.Agent.Metrics
         public int CompareTo(EventMetricDefinition other)
         {
             //we let our base object do the compare, we're really just casting things
-            return WrappedDefinition.CompareTo(other.WrappedDefinition);
+            return WrappedDefinition.CompareTo(other?.WrappedDefinition);
         }
 
         /// <summary>
@@ -825,7 +823,7 @@ namespace Gibraltar.Agent.Metrics
         public bool Equals(EventMetricDefinition other)
         {
             //We're really just a type cast, refer to our base object
-            return WrappedDefinition.Equals(other.WrappedDefinition);
+            return WrappedDefinition.Equals(other?.WrappedDefinition);
         }
 
 
@@ -1389,7 +1387,7 @@ namespace Gibraltar.Agent.Metrics
 
         bool IEquatable<IMetricDefinition>.Equals(IMetricDefinition other)
         {
-            return WrappedDefinition.Equals(other.WrappedDefinition);
+            return WrappedDefinition.Equals(other?.WrappedDefinition);
         }
 
         #endregion
@@ -1452,10 +1450,8 @@ namespace Gibraltar.Agent.Metrics
         /// registered with the given Id, or throws an exception if the registered definition is not an EventMetricDefinition.</returns>
         public static bool TryGetValue(Guid id, out EventMetricDefinition value)
         {
-            IMetricDefinition definition;
-
             //gateway to our internal collection TryGetValue()
-            bool foundValue = s_Definitions.TryGetValue(id, out definition);
+            bool foundValue = s_Definitions.TryGetValue(id, out var definition);
             value = foundValue ? definition as EventMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1486,10 +1482,8 @@ namespace Gibraltar.Agent.Metrics
                 throw new ArgumentNullException(nameof(key));
             }
 
-            IMetricDefinition definition;
-
             //gateway to our inner dictionary try get value
-            bool foundValue = s_Definitions.TryGetValue(key.Trim(), out definition);
+            bool foundValue = s_Definitions.TryGetValue(key.Trim(), out var definition);
             value = foundValue ? definition as EventMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1515,10 +1509,8 @@ namespace Gibraltar.Agent.Metrics
         /// registered with the given Key, or throws an exception if the registered definition is not an EventMetricDefinition.</returns>
         public static bool TryGetValue(string metricsSystem, string categoryName, string counterName, out EventMetricDefinition value)
         {
-            IMetricDefinition definition;
-
             //gateway to our inner dictionary try get value
-            bool foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out definition);
+            bool foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out var definition);
             value = foundValue ? definition as EventMetricDefinition : null;
             if (foundValue && value == null)
             {
@@ -1580,10 +1572,8 @@ namespace Gibraltar.Agent.Metrics
                     string categoryName = eventMetricAttribute.MetricCategoryName;
                     string counterName = eventMetricAttribute.CounterName;
 
-                    IMetricDefinition definition;
-
                     //gateway to our inner dictionary try get value
-                    foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out definition);
+                    foundValue = s_Definitions.TryGetValue(metricsSystem, categoryName, counterName, out var definition);
                     value = foundValue ? definition as EventMetricDefinition : null;
                     if (foundValue && value == null)
                     {

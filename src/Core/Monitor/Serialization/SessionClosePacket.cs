@@ -166,8 +166,7 @@ namespace Gibraltar.Monitor.Serialization
                     packet.GetField("Id", out m_Id);
 
                     // Hmmm, it's tricky to handle the enum with an out parameter; use a temporary int and cast it.
-                    int status;
-                    packet.GetField("Status", out status);
+                    packet.GetField("Status", out int status);
                     m_EndingStatus = (SessionStatus)status;
                     break;
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 
 namespace Gibraltar.Monitor
 {
@@ -65,7 +66,7 @@ namespace Gibraltar.Monitor
         /// <param name="counterName">The name of the definition within the category.</param>
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="instanceName">The unique name of this instance within the metric's collection.</param>
-        public static CustomSampledMetric AddOrGet(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string instanceName)
+        public static CustomSampledMetric AddOrGet(MetricDefinitionCollection definitions, string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string instanceName)
         {
             //we must have a definitions collection, or we have a problem
             if (definitions == null)
@@ -122,7 +123,7 @@ namespace Gibraltar.Monitor
         /// <param name="counterName">The name of the definition within the category.</param>
         /// <param name="metricSampleType">The type of data captured for each metric under this definition.</param>
         /// <param name="instanceName">The unique name of this instance within the metric's collection.</param>
-        public static CustomSampledMetric AddOrGet(string metricTypeName, string categoryName, string counterName, MetricSampleType metricSampleType, string instanceName)
+        public static CustomSampledMetric AddOrGet(string metricTypeName, string categoryName, string counterName, SamplingType metricSampleType, string instanceName)
         {
             //just forward into our call that requires the definition to be specified
             return AddOrGet(Log.Metrics, metricTypeName, categoryName, counterName, metricSampleType, instanceName);

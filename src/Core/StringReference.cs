@@ -196,8 +196,7 @@ namespace Gibraltar
                     //and now kill off our dead nodes.
                     foreach (int deadNodeKey in deadNodes)
                     {
-                        WeakStringCollection currentNode;
-                        if (s_StringReferences.TryGetValue(deadNodeKey, out currentNode))
+                        if (s_StringReferences.TryGetValue(deadNodeKey, out var currentNode))
                         {
                             if (currentNode != null)
                             {

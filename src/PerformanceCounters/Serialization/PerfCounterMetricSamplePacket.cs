@@ -144,7 +144,6 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-
             string typeName = MethodBase.GetCurrentMethod().DeclaringType.Name;
             PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
             definition.Fields.Add("baseValue", FieldType.Int64);
@@ -177,25 +176,18 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
             switch (definition.Version)
             {
                 case 1:
-                    long baseValue;
-                    long counterTimeStamp;
-                    long counterFrequency;
-                    long systemFrequency;
-                    long timeStamp;
-                    long timeStamp100nSec;
 
-                    packet.GetField("baseValue", out baseValue);
-                    packet.GetField("counterTimeStamp", out counterTimeStamp);
-                    packet.GetField("counterFrequency", out counterFrequency);
-                    packet.GetField("systemFrequency", out systemFrequency);
-                    packet.GetField("timeStamp", out timeStamp);
-                    packet.GetField("timeStamp100nSec", out timeStamp100nSec);
+                    packet.GetField("baseValue", out long baseValue);
+                    packet.GetField("counterTimeStamp", out long counterTimeStamp);
+                    packet.GetField("counterFrequency", out long counterFrequency);
+                    packet.GetField("systemFrequency", out long systemFrequency);
+                    packet.GetField("timeStamp", out long timeStamp);
+                    packet.GetField("timeStamp100nSec", out long timeStamp100nSec);
 
                     //conceptually we shouldn't persist this - it's always the same and it's always on our metric, however
                     //we need it here for deserialization purposes because our metric packet object isn't available during
                     //the deserialization process.
-                    int rawCounterType;
-                    packet.GetField("counterType", out rawCounterType);
+                    packet.GetField("counterType", out int rawCounterType);
                     PerformanceCounterType counterType = (PerformanceCounterType)rawCounterType;
 
                     //Now, create our sample object from this data

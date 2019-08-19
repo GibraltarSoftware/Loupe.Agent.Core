@@ -235,8 +235,7 @@ namespace Gibraltar.Monitor
             bool itemRemoved = false;
             lock (m_Lock)
             {
-                Session victim;
-                if (TryGetValue(sessionId, out victim))
+                if (TryGetValue(sessionId, out var victim))
                 {
                     //just try to remove it from the two collections, you never know.
                     if (m_SessionsList.Remove(victim))

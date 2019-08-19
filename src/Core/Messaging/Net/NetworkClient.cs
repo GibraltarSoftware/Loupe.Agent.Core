@@ -11,6 +11,7 @@ using Gibraltar.Monitor;
 using Gibraltar.Serialization;
 using Gibraltar.Server.Client;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Messaging.Net
 {
@@ -451,8 +452,7 @@ namespace Gibraltar.Messaging.Net
                 if (nextPacket == null)
                 {
                     //go into a blocking wait on the socket..  we'll loop until we get the whole buffer into the stream.
-                    byte[] buffer;
-                    var newDataLength = ReadSocket(out buffer);
+                    var newDataLength = ReadSocket(out var buffer);
 
                     if (newDataLength == 0)
                     {
@@ -485,7 +485,7 @@ namespace Gibraltar.Messaging.Net
                 //register our packet factories we need
                 OnPacketFactoryRegister(m_PacketReader);
 
-                //before we jump in we need to transfer any buffeNetworkClientr remnant from the network serializer that
+                //before we jump in we need to transfer any buffer remnant from the network serializer that
                 //represents data the writer has already put into the pipeline
                 if (m_NetworkSerializer != null)
                 {
@@ -569,8 +569,7 @@ namespace Gibraltar.Messaging.Net
                 if (nextPacket == null) //at this point we know we've exhausted the read buffer and haven't found a valid packet.
                 {
                     //go into a blocking wait on the socket..  we'll loop until we get the whole buffer into the stream.
-                    byte[] buffer;
-                    int newDataLength = ReadSocket(out buffer);
+                    int newDataLength = ReadSocket(out var buffer);
 
                     if (newDataLength == 0)
                     {
@@ -810,18 +809,18 @@ namespace Gibraltar.Messaging.Net
         /// <summary>
         /// Appends to our packet stream the provided buffer of data, preserving stream position
         /// </summary>
-        /// <param name="seeekableStream"></param>
+        /// <param name="seekableStream"></param>
         /// <param name="buffer"></param>
         /// <param name="length"></param>
-        private void AppendToStream(Stream seeekableStream, byte[] buffer, int length)
+        private void AppendToStream(Stream seekableStream, byte[] buffer, int length)
         {
             if (length <= 0)
                 return;
 
-            long originalPosition = seeekableStream.Position;
-            seeekableStream.Position = seeekableStream.Length;
-            seeekableStream.Write(buffer, 0, length);
-            seeekableStream.Position = originalPosition;
+            long originalPosition = seekableStream.Position;
+            seekableStream.Position = seekableStream.Length;
+            seekableStream.Write(buffer, 0, length);
+            seekableStream.Position = originalPosition;
         }
 
         /// <summary>
@@ -876,7 +875,7 @@ namespace Gibraltar.Messaging.Net
         /// <summary>
         /// sets our status to disconnected and fires the appropriate event.
         /// </summary>
-        /// <remarks>This is separate from the overrideable OnDisonnected to ensure our critical state management gets done even if inheritor messes up.</remarks>
+        /// <remarks>This is separate from the overrideable OnDisconnected to ensure our critical state management gets done even if inheritor messes up.</remarks>
         private void ActionOnDisconnected()
         {
             bool raiseEvent = false;
@@ -969,7 +968,7 @@ namespace Gibraltar.Messaging.Net
         /// <summary>
         /// sets our status to disconnected and fires the appropriate event.
         /// </summary>
-        /// <remarks>This is separate from the overrideable OnDisonnected to ensure our critical state management gets done even if inheritor messes up.</remarks>
+        /// <remarks>This is separate from the overrideable OnDisconnected to ensure our critical state management gets done even if inheritor messes up.</remarks>
         private void ActionOnFailed(string message)
         {
             bool raiseEvent = false;

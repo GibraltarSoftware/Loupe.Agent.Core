@@ -10,6 +10,7 @@ using Gibraltar.Data;
 using Gibraltar.Data.Internal;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Server.Client
 {

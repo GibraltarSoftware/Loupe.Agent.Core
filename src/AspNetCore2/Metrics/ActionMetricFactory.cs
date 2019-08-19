@@ -17,7 +17,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         private readonly EventMetric _metric;
 
         /// <summary>
-        /// Create a new action metric factory fur the current applciation
+        /// Create a new action metric factory fur the current application
         /// </summary>
         public ActionMetricFactory()
         {

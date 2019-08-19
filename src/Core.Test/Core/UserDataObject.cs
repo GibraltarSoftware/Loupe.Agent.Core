@@ -41,7 +41,7 @@ namespace Loupe.Core.Test.Core
             {
                 trendable = true;
             }
-                //Now check object types
+            //Now check object types
             else if ((type == typeof(DateTime)) || (type == typeof(TimeSpan)))
             {
                 trendable = true;

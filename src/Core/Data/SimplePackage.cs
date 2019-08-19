@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Data
 {
@@ -312,8 +313,7 @@ namespace Gibraltar.Data
             Session requestedSession = null;
             lock (m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionId, out sessionFileInfo) == false)
+                if (m_Sessions.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
                     throw new ArgumentOutOfRangeException(nameof(sessionId), "There is no session in the package with the provided id");
                 }
@@ -353,8 +353,7 @@ namespace Gibraltar.Data
         {
             lock(m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionId, out sessionFileInfo) == false)
+                if (m_Sessions.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
                     throw new ArgumentOutOfRangeException(nameof(sessionId), "There is no session in the package with the provided id");
                 }
@@ -432,8 +431,7 @@ namespace Gibraltar.Data
         {
             lock (m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionHeader.Id, out sessionFileInfo))
+                if (m_Sessions.TryGetValue(sessionHeader.Id, out var sessionFileInfo))
                 {
                     //add this file fragment to the existing session info
                     sessionFileInfo.AddFragment(sessionHeader, sessionFragment, true);

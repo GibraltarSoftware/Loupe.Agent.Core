@@ -95,8 +95,7 @@ namespace Gibraltar
             {
                 int charCount = fileName.Length - maskLength;
                 string suffix = fileName.Substring(startIndex, charCount);
-                int thisCounter;
-                int.TryParse(suffix, out thisCounter);
+                int.TryParse(suffix, out var thisCounter);
                 if (thisCounter > counter)
                     counter = thisCounter;
             }
@@ -174,8 +173,7 @@ namespace Gibraltar
         /// <returns>An open read-write FileStream which is set to delete on close.</returns>
         public static FileStream GetTempFileStream()
         {
-            string fileName;
-            return GetTempFileStream(out fileName, true);
+            return GetTempFileStream(out var fileName, true);
         }
 
         /// <summary>
@@ -213,8 +211,7 @@ namespace Gibraltar
         /// <returns>An open read-write FileStream which is set to delete on close with a copy of the contentStream.</returns>
         public static FileStream GetTempFileStreamCopy(Stream contentStream)
         {
-            string fileName;
-            return GetTempFileStreamCopy(contentStream, out fileName, true);
+            return GetTempFileStreamCopy(contentStream, out var fileName, true);
         }
 
         /// <summary>

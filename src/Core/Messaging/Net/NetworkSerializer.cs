@@ -60,7 +60,7 @@ namespace Gibraltar.Messaging.Net
         /// <summary>
         /// The number of additional bytes required to create the next packet.
         /// </summary>
-        public int BytesRequred { get { return m_BytesRequired; } }
+        public int BytesRequired { get { return m_BytesRequired; } }
 
 
         /// <summary>
@@ -92,10 +92,7 @@ namespace Gibraltar.Messaging.Net
             {
                 //now lets figure out if we have one or more packets    
                 NetworkMessage nextPacket = null;
-                Version version;
-                NetworkMessageTypeCode typeCode;
-                int packetLength;
-                if ((NetworkMessage.ReadHeader(m_Stream, out packetLength, out typeCode, out version))
+                if ((NetworkMessage.ReadHeader(m_Stream, out var packetLength, out var typeCode, out var version))
                     && ((m_Stream.Length - m_Stream.Position) >= packetLength))
                 {
                     //we have enough data to read a packet

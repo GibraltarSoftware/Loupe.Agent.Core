@@ -188,6 +188,8 @@ namespace Gibraltar.Monitor
         /// <returns>The zero based index of the object within the dictionary or -1 if not found.</returns>
         public int IndexOf(IEventMetricValueDefinition item)
         {
+            if (item == null) return -1;
+
             if (m_Definition.IsReadOnly) // && ReferenceEquals(item.Definition, Definition))
             {
                 int index = ((EventMetricValueDefinition)item).MyIndex;
@@ -425,6 +427,8 @@ namespace Gibraltar.Monitor
         /// <param name="item">The EventMetricValueDefinition item to remove.</param>
         public bool Remove(IEventMetricValueDefinition item)
         {
+            if (item == null) return false;
+
             bool itemRemoved = false;
 
             lock (m_Definition.Lock)

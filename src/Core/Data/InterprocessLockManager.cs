@@ -134,9 +134,8 @@ namespace Gibraltar.Data
             lock (g_Lock)
             {
                 string lockKey = disposingProxy.FullName;
-                InterprocessLockProxy actualProxy;
                 // Only remove the proxy if the one we're disposing is the one in our collection for that key.
-                if (g_Proxies.TryGetValue(lockKey, out actualProxy) && ReferenceEquals(actualProxy, disposingProxy))
+                if (g_Proxies.TryGetValue(lockKey, out var actualProxy) && ReferenceEquals(actualProxy, disposingProxy))
                 {
                     g_Proxies.Remove(lockKey);
                 }

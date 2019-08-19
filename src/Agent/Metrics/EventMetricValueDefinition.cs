@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Reflection;
-
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Agent.Metrics
@@ -33,7 +33,7 @@ namespace Gibraltar.Agent.Metrics
         public SummaryFunction SummaryFunction
         {
             get { return (SummaryFunction)m_WrappedValueDefinition.DefaultTrend; }
-            internal set { m_WrappedValueDefinition.DefaultTrend = (Loupe.Extensibility.Data.EventMetricValueTrend)value; }
+            internal set { m_WrappedValueDefinition.DefaultTrend = value; }
         }
 
         /// <summary>

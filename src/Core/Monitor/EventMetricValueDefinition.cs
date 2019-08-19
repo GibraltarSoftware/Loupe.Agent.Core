@@ -5,7 +5,7 @@ using System.Reflection;
 using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
-
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Monitor
@@ -40,7 +40,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The default way that individual samples will be aggregated to create a graphable trend.
         /// </summary>
-        public EventMetricValueTrend DefaultTrend
+        public SummaryFunction DefaultTrend
         {
             get { return m_Packet.DefaultTrend; }
             set { m_Packet.DefaultTrend = value; }

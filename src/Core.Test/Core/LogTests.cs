@@ -5,6 +5,7 @@ using System.Threading;
 using Gibraltar;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 using NUnit.Framework;
 
 
@@ -260,7 +261,7 @@ namespace Loupe.Core.Test.Core
         /// </summary>
         private class RandomPrincipalResolver : IPrincipalResolver
         {
-            /// <<inheritdoc/>
+            /// <inheritdoc/>
             public bool TryResolveCurrentPrincipal(out IPrincipal principal)
             {
                 principal = new GenericPrincipal(new GenericIdentity(DateTime.UtcNow.ToLongTimeString()), null);

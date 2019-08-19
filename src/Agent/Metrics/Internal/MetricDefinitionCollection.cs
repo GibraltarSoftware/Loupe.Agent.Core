@@ -83,8 +83,7 @@ namespace Gibraltar.Agent.Metrics.Internal
 
             lock (Lock)
             {
-                IMetricDefinition externalDefinition;
-                if (m_Externalized.TryGetValue(metricDefinition, out externalDefinition) == false)
+                if (m_Externalized.TryGetValue(metricDefinition, out var externalDefinition) == false)
                 {
                     Monitor.EventMetricDefinition eventDefinition = metricDefinition as Monitor.EventMetricDefinition;
                     Monitor.CustomSampledMetricDefinition customDefinition = metricDefinition as Monitor.CustomSampledMetricDefinition;
@@ -237,10 +236,8 @@ namespace Gibraltar.Agent.Metrics.Internal
         {
             lock (Lock)
             {
-                Loupe.Extensibility.Data.IMetricDefinition definition;
-
                 //gateway to our inner dictionary try get value
-                bool foundValue = m_WrappedCollection.TryGetValue(id, out definition);
+                bool foundValue = m_WrappedCollection.TryGetValue(id, out var definition);
                 value = foundValue ? Externalize(definition) : null;
                 return foundValue;
             }
@@ -263,10 +260,8 @@ namespace Gibraltar.Agent.Metrics.Internal
 
             lock (Lock)
             {
-                Loupe.Extensibility.Data.IMetricDefinition definition;
-
                 //gateway to our inner dictionary try get value
-                bool foundValue = m_WrappedCollection.TryGetValue(name.Trim(), out definition);
+                bool foundValue = m_WrappedCollection.TryGetValue(name.Trim(), out var definition);
                 value = foundValue ? Externalize(definition) : null;
                 return foundValue;
             }
@@ -285,10 +280,8 @@ namespace Gibraltar.Agent.Metrics.Internal
         {
             lock (Lock)
             {
-                Loupe.Extensibility.Data.IMetricDefinition definition;
-
                 //gateway to our inner dictionary try get value
-                bool foundValue = m_WrappedCollection.TryGetValue(metricsSystem, categoryName, counterName, out definition);
+                bool foundValue = m_WrappedCollection.TryGetValue(metricsSystem, categoryName, counterName, out var definition);
                 value = foundValue ? Externalize(definition) : null;
                 return foundValue;
             }
@@ -325,7 +318,7 @@ namespace Gibraltar.Agent.Metrics.Internal
         /// <returns></returns>
         public int IndexOf(IMetricDefinition item)
         {
-            return m_WrappedCollection.IndexOf(item.WrappedDefinition);
+            return m_WrappedCollection.IndexOf(item?.WrappedDefinition);
         }
 
         ///<summary>Inserting objects by index is not supported because the collection is sorted.</summary>
@@ -424,7 +417,7 @@ namespace Gibraltar.Agent.Metrics.Internal
         /// <summary>
         /// Add an existing IMetricDefinition item to this collection.
         /// </summary>
-        /// <remarks>If the supplied MetricDefinitin item is already in the collection, an exception will be thrown.</remarks>
+        /// <remarks>If the supplied MetricDefinition item is already in the collection, an exception will be thrown.</remarks>
         /// <param name="item">The new IMetricDefinition item to add.</param>
         /// <exception cref="ArgumentNullException">The provided item was null</exception>
         public void Add(IMetricDefinition item)
@@ -469,6 +462,8 @@ namespace Gibraltar.Agent.Metrics.Internal
         /// <returns>true if the item is found in the collection; otherwise false.</returns>
         public bool Contains(IMetricDefinition item)
         {
+            if (item == null) return false;
+
             //here we are relying on the fact that the comment object implements IComparable sufficiently to guarantee uniqueness
             return m_WrappedCollection.Contains(item.WrappedDefinition);
         }

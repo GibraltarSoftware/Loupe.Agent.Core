@@ -110,6 +110,8 @@ namespace Gibraltar.Monitor
         /// <returns></returns>
         public int IndexOf(IMetricSample item)
         {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
             lock (m_Lock)
             {
                 return m_List.IndexOfKey(item.Sequence);
@@ -234,6 +236,8 @@ namespace Gibraltar.Monitor
         /// <returns>true if the item is found in the collection; otherwise false.</returns>
         public bool Contains(IMetricSample item)
         {
+            if (item == null) return false;
+
             lock (m_Lock)
             {
                 //here we are relying on the fact that the MetricSample object implements IComparable sufficiently to guarantee uniqueness

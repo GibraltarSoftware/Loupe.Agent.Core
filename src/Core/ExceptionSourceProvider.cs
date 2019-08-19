@@ -1,7 +1,7 @@
 ﻿
 using System;
 using Gibraltar.Monitor;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar

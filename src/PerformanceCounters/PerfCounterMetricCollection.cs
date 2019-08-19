@@ -79,10 +79,8 @@ namespace Loupe.Agent.PerformanceCounters
         {
             get
             {
-                IMetric metric;
-
                 //see if we already have this performance counter object.
-                if (TryGetValue(counter, out metric) == false)
+                if (TryGetValue(counter, out var metric) == false)
                 {
                     //nope, not already in our collection.  We need to add it.
                     metric = Add(counter);
@@ -114,10 +112,9 @@ namespace Loupe.Agent.PerformanceCounters
         {
             //We are playing a few games to get native typing here.  Because it's an OUt value, we
             //have to swap types around ourselves so we can cast.
-            IMetric innerValue;
 
             //gateway to our inner dictionary try get value
-            bool result = base.TryGetValue(key, out innerValue);
+            bool result = base.TryGetValue(key, out var innerValue);
 
             value = (PerfCounterMetric)innerValue;
 
@@ -134,10 +131,9 @@ namespace Loupe.Agent.PerformanceCounters
         {
             //We are playing a few games to get native typing here.  Because it's an OUt value, we
             //have to swap types around ourselves so we can cast.
-            IMetric innerValue;
 
             //gateway to our inner dictionary try get value
-            bool result = base.TryGetValue(key, out innerValue);
+            bool result = base.TryGetValue(key, out var innerValue);
 
             value = (PerfCounterMetric)innerValue;
 

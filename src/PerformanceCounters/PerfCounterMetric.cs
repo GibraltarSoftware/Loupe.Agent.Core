@@ -158,9 +158,8 @@ namespace Loupe.Agent.PerformanceCounters
         {
             //we need to find the definition, adding it if necessary
             string definitionKey = PerfCounterMetricDefinition.GetKey(newPerformanceCounter);
-            IMetricDefinition definition;
 
-            if (Log.Metrics.TryGetValue(definitionKey, out definition))
+            if (Log.Metrics.TryGetValue(definitionKey, out var definition))
             {
                 //if the metric definition exists, but is of the wrong type we have a problem.
                 if ((definition is PerfCounterMetricDefinition) == false)

@@ -1,5 +1,6 @@
 ﻿using System;
 using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 
 namespace Gibraltar.Agent.Metrics.Internal
 {

@@ -156,8 +156,7 @@ namespace Gibraltar.Monitor
             // We need to lock the collection while we check for an existing definition and maybe add this one to it.
             lock (definitionCollection.Lock)
             {
-                IMetricDefinition rawDefinition;
-                if (definitionCollection.TryGetValue(MetricTypeName, CategoryName, CounterName, out rawDefinition) == false)
+                if (definitionCollection.TryGetValue(MetricTypeName, CategoryName, CounterName, out var rawDefinition) == false)
                 {
                     // There isn't already one by that Key.  Great!  Register ourselves.
                     SetReadOnly(); // Mark this definition as completed.
@@ -184,8 +183,7 @@ namespace Gibraltar.Monitor
                 IEventMetricValueDefinitionCollection officialValues = officialDefinition.Values;
                 foreach (EventMetricValueDefinition ourValue in Values)
                 {
-                    IEventMetricValueDefinition officialValue;
-                    if (officialValues.TryGetValue(ourValue.Name, out officialValue) == false)
+                    if (officialValues.TryGetValue(ourValue.Name, out var officialValue) == false)
                     {
                         // It doesn't have one of our value columns!
                         throw new ArgumentException(

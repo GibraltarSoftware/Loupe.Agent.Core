@@ -4,7 +4,7 @@ using System.IO;
 namespace Gibraltar.Messaging.Net
 {
     /// <summary>
-    /// Command for retrieving the list of sesion headers
+    /// Command for retrieving the list of session headers
     /// </summary>
     public class GetSessionHeadersCommandMessage : NetworkMessage
     {

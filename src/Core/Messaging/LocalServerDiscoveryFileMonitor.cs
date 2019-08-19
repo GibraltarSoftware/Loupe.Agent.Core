@@ -157,7 +157,7 @@ namespace Gibraltar.Messaging
                 if (!Log.SilentMode)
                 {
                     Log.Write(LogMessageSeverity.Warning, NetworkMessenger.LogCategory, "local server discovery file monitor queue event threw an exception, queue processing will pause",
-                        "While we were dequeueing items or raising events an exception was thrown.  Queue processing will be interupted until the next request comes in " +
+                        "While we were dequeueing items or raising events an exception was thrown.  Queue processing will be interrupted until the next request comes in " +
                         "and the request that caused the exception will be dropped.\r\n{0} exception thrown:\r\n{1}", ex.GetType(), ex.Message);
                 }
                 m_ActiveThread = false; //if we had an exception we need to be sure we can fire up again
@@ -211,8 +211,7 @@ namespace Gibraltar.Messaging
             LocalServerDiscoveryFileEventArgs eventArgs = null;
             lock (m_Lock)
             {
-                LocalServerDiscoveryFile victim;
-                if (m_DiscoveryFiles.TryGetValue(fullPath, out victim))
+                if (m_DiscoveryFiles.TryGetValue(fullPath, out var victim))
                 {
                     //indeed it existed so we want to raise the event.
                     m_DiscoveryFiles.Remove(fullPath);
@@ -272,7 +271,7 @@ namespace Gibraltar.Messaging
     }
 
     /// <summary>
-    /// Standard event handler delegate for the LocalSErverDiscoveryFile Event arguments
+    /// Standard event handler delegate for the LocalServerDiscoveryFile Event arguments
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

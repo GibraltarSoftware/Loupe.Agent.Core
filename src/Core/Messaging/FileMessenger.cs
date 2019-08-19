@@ -8,6 +8,7 @@ using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Messaging
 {

@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
-
-
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Monitor
@@ -77,9 +76,8 @@ namespace Gibraltar.Monitor
 
             //we need to find the definition, adding it if necessary
             string definitionKey = MetricDefinition.GetKey(metricTypeName, categoryName, counterName);
-            IMetricDefinition definition;
 
-            if (definitions.TryGetValue(definitionKey, out definition))
+            if (definitions.TryGetValue(definitionKey, out var definition))
             {
                 //if the metric definition exists, but is of the wrong type we have a problem.
                 if ((definition is EventMetricDefinition) == false)
@@ -296,7 +294,7 @@ namespace Gibraltar.Monitor
             }
             //There are two overall ways we trend things:  Either we count the # of non-null values for non-trendables, or
             //we actually make a numeric trend            
-            else if ((trendValue.IsTrendable == false) || (trendValue.DefaultTrend == EventMetricValueTrend.Count))
+            else if ((trendValue.IsTrendable == false) || (trendValue.DefaultTrend == SummaryFunction.Count))
             {
                 //count the number of things.
                 int itemCount = 0;
@@ -325,8 +323,8 @@ namespace Gibraltar.Monitor
                 int valueIndex = Definition.Values.IndexOf(trendValue);     //the zero-based index in the value collection of the value we want
 
                 //if it's a running value we need to start with the previous sample's state
-                if ((trendValue.DefaultTrend == EventMetricValueTrend.RunningAverage) 
-                    || (trendValue.DefaultTrend == EventMetricValueTrend.RunningSum))
+                if ((trendValue.DefaultTrend == SummaryFunction.RunningAverage) 
+                    || (trendValue.DefaultTrend == SummaryFunction.RunningSum))
                 {
                     //we need the previous running data.
                     sumValue = previousValue;
@@ -341,8 +339,8 @@ namespace Gibraltar.Monitor
 
                 //figure out the calculated value.  For performance and safety, don't do a divide we don't have to
                 if ((items > 1)
-                    && ((trendValue.DefaultTrend == EventMetricValueTrend.Average)
-                    || (trendValue.DefaultTrend == EventMetricValueTrend.RunningAverage)))
+                    && ((trendValue.DefaultTrend == SummaryFunction.Average)
+                    || (trendValue.DefaultTrend == SummaryFunction.RunningAverage)))
                 {
                     calculatedValue = sumValue / items;
                 }

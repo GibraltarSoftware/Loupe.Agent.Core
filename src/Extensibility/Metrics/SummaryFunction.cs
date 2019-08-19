@@ -1,9 +1,9 @@
-﻿namespace Loupe.Extensibility.Data
+﻿namespace Loupe.Metrics
 {
     /// <summary>
     /// Indicates the default way to interpret multiple values for display purposes
     /// </summary>
-    public enum EventMetricValueTrend
+    public enum SummaryFunction
     {
         /// <summary>
         /// Average all of the values within each sample range to determine the displayed value.

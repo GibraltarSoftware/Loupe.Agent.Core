@@ -462,6 +462,8 @@ namespace Gibraltar.Agent.Metrics
         /// <returns>True if the objects represent the same data.</returns>
         public bool Equals(EventMetric other)
         {
+            if (other == null) return false;
+
             //We're really just a type cast, refer to our base object
             return WrappedMetric.Equals(other.WrappedMetric);
         }

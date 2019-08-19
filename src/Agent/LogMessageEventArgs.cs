@@ -1,8 +1,6 @@
-﻿
-using System;
-using Gibraltar.Agent.Data;
+﻿using System;
 using Gibraltar.Agent.Internal;
-
+using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Agent
 {
@@ -17,8 +15,7 @@ namespace Gibraltar.Agent
         internal LogMessageEventArgs(Messaging.NotificationEventArgs eventArgs)
         {
             m_Event = eventArgs;
-            LogMessageInfo[] messages = ConvertMessages(eventArgs.Messages);
-            m_MessageCollection = new LogMessageInfoCollection(messages);
+            m_MessageCollection = new LogMessageInfoCollection(eventArgs.Messages);
         }
 
         #region Public Properties and Methods
@@ -31,7 +28,7 @@ namespace Gibraltar.Agent
         /// <summary>
         /// The strongest log message severity included in this notification event.
         /// </summary>
-        public LogMessageSeverity TopSeverity { get { return (LogMessageSeverity)m_Event.TopSeverity; } }
+        public LogMessageSeverity TopSeverity { get { return m_Event.TopSeverity; } }
 
         /// <summary>
         /// The total number of log messages included in this notification event.
@@ -57,26 +54,6 @@ namespace Gibraltar.Agent
         /// The number of log messages which have an attached Exception included in this notification event.
         /// </summary>
         public int ExceptionCount { get { return m_Event.ExceptionCount; } }
-
-        #endregion
-
-        #region Private Properties and Methods
-
-        private static LogMessageInfo[] ConvertMessages(Loupe.Extensibility.Data.ILogMessage[] internalMessages)
-        {
-            if (internalMessages == null)
-                return new LogMessageInfo[0];
-
-            int count = internalMessages.Length;
-            LogMessageInfo[] messages = new LogMessageInfo[count];
-
-            for (int i=0; i < count; i++)
-            {
-                messages[i] = new LogMessageInfo(internalMessages[i]);
-            }
-
-            return messages;
-        }
 
         #endregion
     }

@@ -93,7 +93,7 @@ namespace Loupe.Agent.AspNetCore
             where TMetric : RequestMetric
         {
             if (string.IsNullOrWhiteSpace(uniqueId))
-                throw new ArgumentNullException("uniqueId");
+                throw new ArgumentNullException(nameof(uniqueId));
 
             string key = HttpContextMetricPrefix + uniqueId;
 

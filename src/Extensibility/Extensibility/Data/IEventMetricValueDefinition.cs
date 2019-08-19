@@ -1,4 +1,5 @@
 ﻿using System;
+using Loupe.Metrics;
 
 namespace Loupe.Extensibility.Data
 {
@@ -10,7 +11,7 @@ namespace Loupe.Extensibility.Data
         /// <summary>
         /// The default way that individual samples will be aggregated to create a graphable trend.
         /// </summary>
-        EventMetricValueTrend DefaultTrend { get; }
+        SummaryFunction DefaultTrend { get; }
 
         /// <summary>
         /// The metric definition this value is associated with.

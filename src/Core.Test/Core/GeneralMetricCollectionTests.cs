@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Gibraltar.Monitor;
 using Loupe.Extensibility.Data;
+using Loupe.Metrics;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core
@@ -39,24 +40,24 @@ namespace Loupe.Core.Test.Core
                 // we now have a minimal definition, but we probably want to add a few attributes to make it useful
                 // NOTE:  This is designed to exactly match UserDataObject for convenience in analzing results.
                 EventMetricValueDefinitionCollection valueDefinitions = (EventMetricValueDefinitionCollection)newEventMetricDefinition.Values;
-                valueDefinitions.Add("short_average", typeof(short), "Short Average", "Data of type Short").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("short_sum", typeof(short), "Short Sum", "Data of type Short").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("ushort_average", typeof(ushort), "UShort Average", "Data of type UShort").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("ushort_sum", typeof(ushort), "UShort Sum", "Data of type UShort").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("int_average", typeof(int), "Int Average", "Data of type Int").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("int_sum", typeof(int), "Int Sum", "Data of type Int").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("uint_average", typeof(uint), "UInt Average", "Data of type UInt").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("uint_sum", typeof(uint), "UInt Sum", "Data of type UInt").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("long_average", typeof(long), "Long Average", "Data of type Long").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("long_sum", typeof(long), "Long Sum", "Data of type Long").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("ulong_average", typeof(ulong), "ULong Average", "Data of type ULong").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("ulong_sum", typeof(ulong), "ULong Sum", "Data of type ULong").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("decimal_average", typeof(decimal), "Decimal Average", "Data of type Decimal").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("decimal_sum", typeof(decimal), "Decimal Sum", "Data of type Decimal").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("double_average", typeof(double), "Double Average", "Data of type Double").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("double_sum", typeof(double), "Double Sum", "Data of type Double").DefaultTrend = EventMetricValueTrend.Sum;
-                valueDefinitions.Add("float_average", typeof(float), "Float Average", "Data of type Float").DefaultTrend = EventMetricValueTrend.Average;
-                valueDefinitions.Add("float_sum", typeof(float), "Float Sum", "Data of type Float").DefaultTrend = EventMetricValueTrend.Sum;
+                valueDefinitions.Add("short_average", typeof(short), "Short Average", "Data of type Short").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("short_sum", typeof(short), "Short Sum", "Data of type Short").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("ushort_average", typeof(ushort), "UShort Average", "Data of type UShort").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("ushort_sum", typeof(ushort), "UShort Sum", "Data of type UShort").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("int_average", typeof(int), "Int Average", "Data of type Int").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("int_sum", typeof(int), "Int Sum", "Data of type Int").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("uint_average", typeof(uint), "UInt Average", "Data of type UInt").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("uint_sum", typeof(uint), "UInt Sum", "Data of type UInt").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("long_average", typeof(long), "Long Average", "Data of type Long").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("long_sum", typeof(long), "Long Sum", "Data of type Long").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("ulong_average", typeof(ulong), "ULong Average", "Data of type ULong").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("ulong_sum", typeof(ulong), "ULong Sum", "Data of type ULong").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("decimal_average", typeof(decimal), "Decimal Average", "Data of type Decimal").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("decimal_sum", typeof(decimal), "Decimal Sum", "Data of type Decimal").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("double_average", typeof(double), "Double Average", "Data of type Double").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("double_sum", typeof(double), "Double Sum", "Data of type Double").DefaultTrend = SummaryFunction.Sum;
+                valueDefinitions.Add("float_average", typeof(float), "Float Average", "Data of type Float").DefaultTrend = SummaryFunction.Average;
+                valueDefinitions.Add("float_sum", typeof(float), "Float Sum", "Data of type Float").DefaultTrend = SummaryFunction.Sum;
                 valueDefinitions.Add("string", typeof(string), "String", "Data of type String");
                 valueDefinitions.Add("system.enum", typeof(System.Enum), "System.Enum", "Data of type System.Enum");
 

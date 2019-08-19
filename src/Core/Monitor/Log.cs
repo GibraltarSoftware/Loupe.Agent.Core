@@ -16,6 +16,7 @@ using Gibraltar.Monitor.Serialization;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Monitor
 {
@@ -1439,9 +1440,9 @@ namespace Gibraltar.Monitor
                         }
                     }
                 }
-                    // ReSharper disable EmptyGeneralCatchClause
+                // ReSharper disable EmptyGeneralCatchClause
                 catch
-                    // ReSharper restore EmptyGeneralCatchClause
+                // ReSharper restore EmptyGeneralCatchClause
                 {
                     // That should never throw an exception, but it would not be good if it killed NotifyDispatchMain() and
                     // skipped setting the next notify time.  So we'll swallow any exceptions here.

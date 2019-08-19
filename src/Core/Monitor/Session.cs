@@ -7,6 +7,7 @@ using Gibraltar.Data;
 using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Monitor
 {
@@ -318,8 +319,7 @@ namespace Gibraltar.Monitor
                             {
                                 // The new serialized version of LMP adds a ThreadIndex field.  Older versions will set this
                                 // field from the ThreadId field, so we can rely on ThreadIndex in any case.
-                                ThreadInfo threadInfo;
-                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out threadInfo) == false)
+                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out var threadInfo) == false)
                                 {
                                     // Uh-oh.  This should never happen.
                                     threadInfo = null; // We couldn't find the ThreadInfo for this log message!
@@ -340,8 +340,7 @@ namespace Gibraltar.Monitor
                             if (m_MetricDefinitions.ContainsMetricKey(metricPacket.ID) == false)
                             {
                                 //We need to find the definition object for this metric so we can create the metric object
-                                IMetricDefinition definition;
-                                if (m_MetricDefinitions.TryGetValue(metricPacket.DefinitionId, out definition) == false)
+                                if (m_MetricDefinitions.TryGetValue(metricPacket.DefinitionId, out var definition) == false)
                                 {
                                     //Trace out that we are going to have to drop this metric value because we don't have 
                                     //the metric it applies to
@@ -365,8 +364,7 @@ namespace Gibraltar.Monitor
                             //these are the individual metric samples that are associated with a metric
 
                             //we need to find the metric for this packet before we can add it
-                            IMetric metric;
-                            if (m_MetricDefinitions.TryGetMetricValue(metricSamplePacket.MetricId, out metric) == false)
+                            if (m_MetricDefinitions.TryGetMetricValue(metricSamplePacket.MetricId, out var metric) == false)
                             {
                                 //Trace out that we are going to have to drop this metric value because we don't have 
                                 //the metric it applies to
@@ -846,8 +844,7 @@ namespace Gibraltar.Monitor
 
             foreach (var fragmentId in fragmentIds)
             {
-                SessionFragment fragment;
-                if (Fragments.TryGetValue(fragmentId, out fragment))
+                if (Fragments.TryGetValue(fragmentId, out var fragment))
                 {
                     m_UnloadedPacketStreams.Add(fragment.Reader);
                 }

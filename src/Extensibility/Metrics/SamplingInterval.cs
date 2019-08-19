@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Agent.Metrics
+﻿namespace Loupe.Metrics
 {
     /// <summary>
     /// A suggested interval between value samples.

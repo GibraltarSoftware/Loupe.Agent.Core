@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Logging;
+using Loupe.Metrics;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.Metrics

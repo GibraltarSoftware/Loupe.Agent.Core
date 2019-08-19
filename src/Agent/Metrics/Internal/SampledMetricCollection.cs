@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using Gibraltar.Monitor;
 
 
 namespace Gibraltar.Agent.Metrics.Internal
@@ -89,10 +89,9 @@ namespace Gibraltar.Agent.Metrics.Internal
             {
                 //We are playing a few games to get native typing here.  Because it's an OUt value, we
                 //have to swap types around ourselves so we can cast.
-                Monitor.CustomSampledMetric innerValue;
 
                 //gateway to our inner dictionary try get value
-                bool result = m_WrappedCollection.TryGetValue(key, out innerValue);
+                bool result = m_WrappedCollection.TryGetValue(key, out var innerValue);
 
                 value = result ? Externalize(innerValue) : null;
 
@@ -112,10 +111,9 @@ namespace Gibraltar.Agent.Metrics.Internal
             {
                 //We are playing a few games to get native typing here.  Because it's an OUt value, we
                 //have to swap types around ourselves so we can cast.
-                Monitor.CustomSampledMetric innerValue;
 
                 //gateway to our internal dictionary try get value
-                bool result = m_WrappedCollection.TryGetValue(key, out innerValue);
+                bool result = m_WrappedCollection.TryGetValue(key, out var innerValue);
 
                 value = result ? Externalize(innerValue) : null;
 
@@ -198,8 +196,7 @@ namespace Gibraltar.Agent.Metrics.Internal
 
             lock (m_Lock)
             {
-                SampledMetric externalDefinition;
-                if (m_Externalized.TryGetValue(eventMetric, out externalDefinition) == false)
+                if (m_Externalized.TryGetValue(eventMetric, out var externalDefinition) == false)
                 {
                     externalDefinition = new SampledMetric(m_MetricDefinition, eventMetric);
                     m_Externalized[eventMetric] = externalDefinition;

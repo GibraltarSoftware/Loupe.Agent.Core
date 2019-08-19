@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 
 namespace Gibraltar.Monitor.Net

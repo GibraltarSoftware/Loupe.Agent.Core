@@ -226,8 +226,7 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                ApplicationUser item;
-                if (m_ApplicationUserByGuid.TryGetValue(id, out item))
+                if (m_ApplicationUserByGuid.TryGetValue(id, out var item))
                 {
                     m_SortedApplicationUser.Remove(item);
                     m_ApplicationUserByGuid.Remove(id);

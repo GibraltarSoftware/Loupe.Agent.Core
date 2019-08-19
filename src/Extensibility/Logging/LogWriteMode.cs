@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor
+﻿namespace Loupe.Logging
 {
     /// <summary>
     /// Selects the performance trade-off for writing a given message to the log.

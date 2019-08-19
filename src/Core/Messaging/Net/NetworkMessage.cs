@@ -118,11 +118,8 @@ namespace Gibraltar.Messaging.Net
             NetworkMessage newPacket;
 
             //read out the header, this gives us what we need to know what type of packet to make.
-            Version version;
-            NetworkMessageTypeCode typeCode;
-            int packetLength;
 
-            ReadPacket(stream, out typeCode, out version, out packetLength);
+            ReadPacket(stream, out var typeCode, out var version, out var packetLength);
 
             switch (typeCode)
             {
@@ -220,14 +217,12 @@ namespace Gibraltar.Messaging.Net
         /// </summary>
         private static void ReadPacket(Stream stream, out NetworkMessageTypeCode typeCode, out Version version, out int length)
         {
-            int rawTypeCode;
-            BinarySerializer.DeserializeValue(stream, out rawTypeCode);
+            BinarySerializer.DeserializeValue(stream, out int rawTypeCode);
             typeCode = (NetworkMessageTypeCode)rawTypeCode;
 
             //we serialize version as major/minor
-            int majorVer, minorVer;
-            BinarySerializer.DeserializeValue(stream, out majorVer);
-            BinarySerializer.DeserializeValue(stream, out minorVer);
+            BinarySerializer.DeserializeValue(stream, out int majorVer);
+            BinarySerializer.DeserializeValue(stream, out int minorVer);
             version = new Version(majorVer, minorVer);
 
             BinarySerializer.DeserializeValue(stream, out length);            

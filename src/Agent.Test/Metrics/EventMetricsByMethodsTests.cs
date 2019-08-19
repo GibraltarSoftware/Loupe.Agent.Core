@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Threading;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Logging;
+using Loupe.Metrics;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.Metrics
@@ -34,7 +36,7 @@ namespace Loupe.Agent.Test.Metrics
                 EventMetricDefinition newEventMetric = new EventMetricDefinition("EventMetricTests", "Gibraltar.Monitor.Test", "Manual");
 
                 // Now we want to add a few value columns to make it useful.
-                // NOTE:  This is designed to exactly match UserEventObject for convenience in analzing results.
+                // NOTE:  This is designed to exactly match UserEventObject for convenience in analyzing results.
                 // The dummy data values we're using are unitless, so we'll just use null for the required unitCaption parameter.
                 newEventMetric.AddValue("short_average", typeof(short), SummaryFunction.Average, null, "Short Average", "Data of type Short");
                 newEventMetric.AddValue("short_sum", typeof(short), SummaryFunction.Sum, null, "Short Sum", "Data of type Short");

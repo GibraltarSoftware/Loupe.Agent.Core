@@ -162,16 +162,16 @@ namespace Gibraltar.Monitor.Serialization
         {
             UpdateSessionHeader();
 
-            if (m_PacketStream is MemoryStream)
+            if (m_PacketStream is MemoryStream stream)
             {
-                int count = (int) m_PacketStream.Position;
+                int count = (int) stream.Position;
                 if (count > 0)
                 {
-                    byte[] array = ((MemoryStream) m_PacketStream).ToArray();
+                    byte[] array = stream.ToArray();
                     m_OutputStream.Write(array, 0, count);
 
                     m_OutputStream.Flush();
-                    m_PacketStream.Position = 0;
+                    stream.Position = 0;
                 }
             }
             else

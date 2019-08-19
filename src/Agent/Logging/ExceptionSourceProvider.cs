@@ -1,6 +1,6 @@
 ﻿
 using System;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar.Agent.Logging

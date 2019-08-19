@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Loupe.Extensibility.Data;
-
+using Loupe.Logging;
 
 
 namespace Gibraltar.Monitor

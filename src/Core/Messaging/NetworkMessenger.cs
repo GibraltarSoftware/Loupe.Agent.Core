@@ -7,6 +7,7 @@ using Gibraltar.Monitor;
 using Gibraltar.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Gibraltar.Messaging
 {
@@ -713,12 +714,10 @@ namespace Gibraltar.Messaging
 
         private void DiscoveryFileMonitorOnFileChanged(object sender, LocalServerDiscoveryFileEventArgs e)
         {
-            LiveSessionPublisher target;
-
             //this event *should* mean that we have a new proxy to connect to...
             lock (m_LocalProxyConnections)
             {
-                if (!m_LocalProxyConnections.TryGetValue(e.File.FileNamePath, out target))
+                if (!m_LocalProxyConnections.TryGetValue(e.File.FileNamePath, out var target))
                 {
                     if (e.File.IsAlive)
                     {

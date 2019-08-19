@@ -6,6 +6,7 @@ using System.Security.Principal;
 using Gibraltar.Messaging;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 #pragma warning disable 1591
 
@@ -589,8 +590,7 @@ namespace Gibraltar.Monitor.Serialization
                     packet.GetField("Caption", out m_Caption);
 
                     // Hmmm, it's tricky to handle the enum with an out parameter; use a temporary int and cast it.
-                    int severity;
-                    packet.GetField("Severity", out severity);
+                    packet.GetField("Severity", out int severity);
                     m_Severity = (LogMessageSeverity)severity;
 
                     packet.GetField("LogSystem", out m_LogSystem);
@@ -622,23 +622,17 @@ namespace Gibraltar.Monitor.Serialization
                     }
 
                     //we now know enough to get our thread info packet (if we don't, we can't re-serialize ourselves)
-                    ThreadInfo threadInfo;
-                    if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out threadInfo))
+                    if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out var threadInfo))
                     {
                         ThreadInfoPacket = threadInfo.Packet;
                     }
 
                     // Now the Exception info...
 
-                    string[] typeNames;
-                    string[] messages;
-                    string[] sources;
-                    string[] stackTraces;
-
-                    packet.GetField("TypeNames", out typeNames);
-                    packet.GetField("Messages", out messages);
-                    packet.GetField("Sources", out sources);
-                    packet.GetField("StackTraces", out stackTraces);
+                    packet.GetField("TypeNames", out string[] typeNames);
+                    packet.GetField("Messages", out string[] messages);
+                    packet.GetField("Sources", out string[] sources);
+                    packet.GetField("StackTraces", out string[] stackTraces);
 
                     //these are supposed to be parallel arrays - assume they're all the same size.
                     int arrayLength = typeNames.GetLength(0);
@@ -665,12 +659,10 @@ namespace Gibraltar.Monitor.Serialization
 
                     if (definition.Version >= 3)
                     {
-                        Guid applicationUserId;
-                        packet.GetField("ApplicationUserId", out applicationUserId);
+                        packet.GetField("ApplicationUserId", out Guid applicationUserId);
 
                         //we now know enough to get our user packet now if it was specified..
-                        ApplicationUser applicationUser;
-                        if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser))
+                        if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out var applicationUser))
                         {
                             UserPacket = applicationUser.Packet;
                         }
@@ -711,16 +703,14 @@ namespace Gibraltar.Monitor.Serialization
                 m_ThreadIndex = m_ThreadId; // Zero isn't legal, so it must not have had it.  Fall back to ThreadId.
 
             //we now know enough to get our thread info packet (if we don't, we can't re-serialize ourselves)
-            ThreadInfo threadInfo;
-            if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out threadInfo))
+            if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out var threadInfo))
             {
                 ThreadInfoPacket = threadInfo.Packet;
             }
 
             if (applicationUserId != Guid.Empty)
             {
-                ApplicationUser applicationUser;
-                m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser);
+                m_SessionPacketCache.Users.TryGetValue(applicationUserId, out var applicationUser);
                 UserPacket = applicationUser.Packet;
             }
 

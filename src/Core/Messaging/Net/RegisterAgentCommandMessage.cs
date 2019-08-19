@@ -7,7 +7,7 @@ using Gibraltar.Data;
 namespace Gibraltar.Messaging.Net
 {
     /// <summary>
-    /// Sernt by an agent to register itself with the remote server or desktop
+    /// Sent by an agent to register itself with the remote server or desktop
     /// </summary>
     public class RegisterAgentCommandMessage : NetworkMessage
     {

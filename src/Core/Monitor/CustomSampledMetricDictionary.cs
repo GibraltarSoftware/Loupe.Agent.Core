@@ -52,10 +52,9 @@ namespace Gibraltar.Monitor
         {
             //We are playing a few games to get native typing here.  Because it's an OUt value, we
             //have to swap types around ourselves so we can cast.
-            IMetric innerValue;
 
             //gateway to our inner dictionary try get value
-            bool result = base.TryGetValue(key, out innerValue);
+            bool result = base.TryGetValue(key, out var innerValue);
 
             value = (CustomSampledMetric)innerValue;
 
@@ -72,10 +71,9 @@ namespace Gibraltar.Monitor
         {
             //We are playing a few games to get native typing here.  Because it's an OUt value, we
             //have to swap types around ourselves so we can cast.
-            IMetric innerValue;
 
             //gateway to our inner dictionary try get value
-            bool result = base.TryGetValue(key, out innerValue);
+            bool result = base.TryGetValue(key, out var innerValue);
 
             value = (CustomSampledMetric)innerValue;
 

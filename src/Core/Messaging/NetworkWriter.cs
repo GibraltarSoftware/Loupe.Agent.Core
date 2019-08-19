@@ -132,9 +132,9 @@ namespace Gibraltar.Messaging
             {
 #if DEBUG
                 //BUG: This is a check to see why we're getting one byte session summaries.
-                if (packet is SessionSummaryPacket)
+                if (packet is SessionSummaryPacket summaryPacket)
                 {
-                    if ((string.IsNullOrEmpty(((SessionSummaryPacket)packet).ProductName)) && (Debugger.IsAttached))
+                    if ((string.IsNullOrEmpty(summaryPacket.ProductName)) && (Debugger.IsAttached))
                         Debugger.Break(); // Stop in debugger, ignore in production.
                 }
 #endif
@@ -160,7 +160,7 @@ namespace Gibraltar.Messaging
             //because we're used inside of the writing side of a messenger we have to be sure our thread doesn't block.
             Publisher.ThreadMustNotBlock();
 
-            bool connnected = false;
+            bool connected = false;
 
             //tell the other end who we are to start the conversation
             SendMessage(new LiveViewStartCommandMessage(m_RepositoryId, Log.SessionSummary.Id, m_ChannelId));
@@ -185,12 +185,12 @@ namespace Gibraltar.Messaging
                         //initialization is tetchy - we have to get the header, the cache, and be added to the list in one blow
                         //to be sure we get all of the packets we should.
                         m_Messenger.ActivateWriter(this, m_SequenceOffset); 
-                        connnected = true;
+                        connected = true;
                     }
                 }
-            } while ((nextPacket != null) && (connnected == false));
+            } while ((nextPacket != null) && (connected == false));
 
-            return connnected;
+            return connected;
         }
 
         /// <summary>
@@ -210,11 +210,11 @@ namespace Gibraltar.Messaging
                         //time to end...
                         RemoteClose();
                     }
-                    else if (nextPacket is SendSessionCommandMessage)
+                    else if (nextPacket is SendSessionCommandMessage packet)
                     {
                         //send to server baby!
 #pragma warning disable 4014
-                        m_Messenger.SendToServer((SendSessionCommandMessage)nextPacket);
+                        m_Messenger.SendToServer(packet);
 #pragma warning restore 4014
                     }
                 }

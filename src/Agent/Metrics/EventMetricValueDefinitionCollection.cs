@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Loupe.Extensibility.Data;
 using Gibraltar.Monitor;
-
+using Loupe.Metrics;
 
 
 namespace Gibraltar.Agent.Metrics
@@ -129,9 +129,8 @@ namespace Gibraltar.Agent.Metrics
         {
             lock (m_Definition.Lock)
             {
-                IEventMetricValueDefinition internalValue;
                 //gateway to our inner dictionary try get value
-                bool foundValue = m_WrappedCollection.TryGetValue(name, out internalValue);
+                bool foundValue = m_WrappedCollection.TryGetValue(name, out var internalValue);
                 value = foundValue ? Externalize(internalValue) : null;
 
                 return foundValue;
@@ -169,6 +168,8 @@ namespace Gibraltar.Agent.Metrics
         /// <returns>The zero based index of the object within the dictionary or -1 if not found.</returns>
         public int IndexOf(EventMetricValueDefinition item)
         {
+            if (item == null) return -1;
+
             lock (m_Definition.Lock)
             {
                 return m_WrappedCollection.IndexOf(item.WrappedValueDefinition);
@@ -308,7 +309,7 @@ namespace Gibraltar.Agent.Metrics
         public bool Contains(EventMetricValueDefinition item)
         {
             //here we are relying on the fact that the comment object implements IComparable sufficiently to guarantee uniqueness
-            return m_WrappedCollection.Contains(item.WrappedValueDefinition);
+            return m_WrappedCollection.Contains(item?.WrappedValueDefinition);
         }
 
         /// <summary>
@@ -393,7 +394,7 @@ namespace Gibraltar.Agent.Metrics
                     throw new InvalidOperationException("The collection is read-only");
                 }
 
-                itemRemoved = m_WrappedCollection.Remove(item.WrappedValueDefinition);
+                itemRemoved = m_WrappedCollection.Remove(item?.WrappedValueDefinition);
             }
 
             /*
@@ -453,8 +454,7 @@ namespace Gibraltar.Agent.Metrics
 
             lock (m_Definition.Lock)
             {
-                EventMetricValueDefinition externalDefinition;
-                if (m_Externalized.TryGetValue(valueDefinition, out externalDefinition) == false)
+                if (m_Externalized.TryGetValue(valueDefinition, out var externalDefinition) == false)
                 {
                     externalDefinition = new EventMetricValueDefinition(m_Definition, (Monitor.EventMetricValueDefinition)valueDefinition);
                     m_Externalized[valueDefinition] = externalDefinition;

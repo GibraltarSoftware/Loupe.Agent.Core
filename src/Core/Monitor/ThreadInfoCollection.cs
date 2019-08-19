@@ -223,8 +223,7 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                ThreadInfo item;
-                if (m_ThreadInfoByGuid.TryGetValue(id, out item))
+                if (m_ThreadInfoByGuid.TryGetValue(id, out var item))
                 {
                     m_SortedThreadInfo.Remove(item);
                     m_ThreadInfoByGuid.Remove(id);
@@ -244,8 +243,7 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                ThreadInfo item;
-                if (m_ThreadInfoByIndex.TryGetValue(threadIndex, out item))
+                if (m_ThreadInfoByIndex.TryGetValue(threadIndex, out var item))
                 {
                     m_SortedThreadInfo.Remove(item);
                     m_ThreadInfoByGuid.Remove(item.Id);
@@ -461,13 +459,11 @@ namespace Gibraltar.Monitor
                 // Now loop over the collection in order of ThreadIndex (usually complete, but could have holes).
                 for (int index=1; index <= m_MaxThreadIndex; index++)
                 {
-                    ThreadInfo currentInstance;
-                    if (m_ThreadInfoByIndex.TryGetValue(index, out currentInstance) == false)
+                    if (m_ThreadInfoByIndex.TryGetValue(index, out var currentInstance) == false)
                         continue; // Isn't one of that index, continue with next one.
 
                     string threadName = currentInstance.Caption;
-                    ThreadInfo previousInstance;
-                    if (currentInstanceByName.TryGetValue(threadName, out previousInstance))
+                    if (currentInstanceByName.TryGetValue(threadName, out var previousInstance))
                     {
                         int instanceNumber = previousInstance.ThreadInstance;
                         if (instanceNumber <= 0)

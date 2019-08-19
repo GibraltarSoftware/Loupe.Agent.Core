@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Agent.Metrics
+﻿namespace Loupe.Metrics
 {
     /// <summary>
     /// Determines what the raw data for a given sampled metric is, and how it has to be processed to produce final data point values for display.
@@ -20,38 +20,36 @@
     ///     enumeration provided by the runtime, but has been simplified for easier use.</para>
     /// </remarks>
     /// <seealso cref="!:Metrics_SampledMetricDesign.html" cat="Developer's Reference">Metrics - Designing Sampled Metrics</seealso>
-    /// <seealso cref="SampledMetricDefinition" cat="Related Classes">SampledMetricDefinition Class</seealso>
-    /// <seealso cref="SampledMetric" cat="Related Classes">SampledMetric Class</seealso>
     public enum SamplingType
     {
         /// <summary>
         /// Each sample is the raw value for display as this data point.
         /// </summary>
-        RawCount = Monitor.MetricSampleType.RawCount,
+        RawCount = 0,
 
         /// <summary>
         /// Each sample has the raw numerator and denominator of a fraction for display as the value for this data point. 
         /// </summary>
-        RawFraction = Monitor.MetricSampleType.RawFraction,
+        RawFraction = 1,
 
         /// <summary>
         /// Each sample is the incremental change in the value for display as this data point.
         /// </summary>
-        IncrementalCount = Monitor.MetricSampleType.IncrementalCount,
+        IncrementalCount = 2,
 
         /// <summary>
         /// Each sample has the separate incremental changes to the numerator and denominator of the fraction for display as this data point.
         /// </summary>
-        IncrementalFraction = Monitor.MetricSampleType.IncrementalFraction,
+        IncrementalFraction = 3,
 
         /// <summary>
         /// Each sample is the cumulative total of display value data points.
         /// </summary>
-        TotalCount = Monitor.MetricSampleType.TotalCount,
+        TotalCount = 4,
 
         /// <summary>
         /// Each sample has the separate cumulative totals of the numerators and denominators of fraction value data points.
         /// </summary>
-        TotalFraction = Monitor.MetricSampleType.TotalFraction,
+        TotalFraction = 5
     }
 }

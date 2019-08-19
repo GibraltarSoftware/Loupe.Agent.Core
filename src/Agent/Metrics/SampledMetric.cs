@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using Loupe.Metrics;
 
 namespace Gibraltar.Agent.Metrics
 {
@@ -542,6 +543,8 @@ namespace Gibraltar.Agent.Metrics
         /// <returns>True if the objects represent the same data.</returns>
         public bool Equals(SampledMetric other)
         {
+            if (other == null) return false;
+
             //We're really just a type cast, refer to our base object
             return WrappedMetric.Equals(other.WrappedMetric);
         }
@@ -597,7 +600,7 @@ namespace Gibraltar.Agent.Metrics
 
         /// <summary>
         /// The category of this metric for display purposes. Displayed as a dot (.)
-        /// delimited hierarchal display.
+        /// delimited hierarchical display.
         /// </summary>
         /// <remarks>
         /// You can create arbitrarily deep categorization by using periods (.) to separate
