@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Loupe;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
 using Loupe.Core.Monitor;
 using NUnit.Framework;
 

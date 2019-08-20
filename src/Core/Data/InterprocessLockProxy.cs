@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Loupe.Core.IO;
+using Loupe.Core.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Loupe.Core.Data

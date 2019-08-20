@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using Loupe.Core.Monitor;
 using Loupe.Configuration;
+using Loupe.Core.IO.Serialization;
 using Loupe.Extensibility.Data;
 
 

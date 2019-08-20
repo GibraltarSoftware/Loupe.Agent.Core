@@ -191,7 +191,7 @@ namespace Loupe.Agent.Test.Packaging
 
         private int m_PredicateMatches;
 
-        private bool OnPackagerNamedMethodPredicate(SessionSummary session)
+        private bool OnPackagerNamedMethodPredicate(ISessionSummary session)
         {
             Assert.IsNotNull(session);
 

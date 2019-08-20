@@ -4,7 +4,10 @@ using System.Globalization;
 using System.Reflection;
 using Loupe.Agent.Metrics.Internal;
 using Loupe.Core;
+using Loupe.Core.Metrics;
 using Loupe.Metrics;
+using MetricDefinitionCollection = Loupe.Agent.Metrics.Internal.MetricDefinitionCollection;
+using SampledMetricCollection = Loupe.Agent.Metrics.Internal.SampledMetricCollection;
 
 namespace Loupe.Agent.Metrics
 {
@@ -17,7 +20,7 @@ namespace Loupe.Agent.Metrics
     /// you create your own custom set of classes derived from SampledMetric (or derive from this class)</remarks>
     public sealed class SampledMetricDefinition : IMetricDefinition, IComparable<SampledMetricDefinition>, IEquatable<SampledMetricDefinition>
     {
-        private readonly Core.Monitor.CustomSampledMetricDefinition m_WrappedDefinition;
+        private readonly CustomSampledMetricDefinition m_WrappedDefinition;
         private readonly SampledMetricCollection m_Metrics;
 
         private static readonly Type[] s_SupportedDataTypes = new[]
@@ -58,7 +61,7 @@ namespace Loupe.Agent.Metrics
         /// <param name="metricCaption">A displayable caption for this sampled metric counter.</param>
         /// <param name="description">A description of what is tracked by this metric, suitable for end-user display.</param>
         internal SampledMetricDefinition(string metricsSystem, string categoryName, string counterName, SamplingType samplingType, string unitCaption, string metricCaption, string description)
-            : this(new Core.Monitor.CustomSampledMetricDefinition(metricsSystem, categoryName, counterName, samplingType, unitCaption, description))
+            : this(new CustomSampledMetricDefinition(metricsSystem, categoryName, counterName, samplingType, unitCaption, description))
         {
             m_WrappedDefinition.Caption = metricCaption; // ToDo: Add metricCaption parameter to Monitor.CSMD constructor.
         }
@@ -68,7 +71,7 @@ namespace Loupe.Agent.Metrics
         /// </summary>
         /// <remarks>The metric definition will automatically be added to the provided collection.</remarks>
         /// <param name="metricDefinition">The internal custom sampled metric definition to wrap.</param>
-        internal SampledMetricDefinition(Core.Monitor.CustomSampledMetricDefinition metricDefinition)
+        internal SampledMetricDefinition(CustomSampledMetricDefinition metricDefinition)
         {
             m_WrappedDefinition = metricDefinition;
             m_Metrics = new SampledMetricCollection(this);
@@ -1190,12 +1193,12 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal custom sampled metric definition we're wrapping. 
         /// </summary>
-        internal Core.Monitor.CustomSampledMetricDefinition WrappedDefinition { get { return m_WrappedDefinition; } }
+        internal CustomSampledMetricDefinition WrappedDefinition { get { return m_WrappedDefinition; } }
 
         /// <summary>
         /// The internal metric definition this IMetricDefinition is wrapping.
         /// </summary>
-        Core.Monitor.MetricDefinition IMetricDefinition.WrappedDefinition { get { return m_WrappedDefinition; } }
+        MetricDefinition IMetricDefinition.WrappedDefinition { get { return m_WrappedDefinition; } }
 
         /// <summary>
         /// Set the binding for the primary sampling data value (numerator);

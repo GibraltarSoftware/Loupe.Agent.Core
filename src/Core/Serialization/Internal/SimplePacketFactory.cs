@@ -42,7 +42,7 @@ namespace Loupe.Core.Serialization.Internal
             {
                 // Even though the current type implements IPacket, it may not have a GetPacketDefinition at this level
                 var typeInfo = type.GetTypeInfo();
-                var method = typeInfo.GetDeclaredMethod("Loupe.Serialization.IPacket.ReadFields");
+                var method = typeInfo.GetDeclaredMethod("Loupe.Core.Serialization.IPacket.ReadFields");
 //               var method = typeInfo.GetMethod("ReadFields", new Type[] {typeof(PacketDefinition), typeof(IFieldReader)}); //original better version that checked arguments
                 if (method != null) m_ReadMethods.Add(method);
                 type = typeInfo.BaseType;

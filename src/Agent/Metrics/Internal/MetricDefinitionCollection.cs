@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Loupe.Core;
+using Loupe.Core.Metrics;
 
 namespace Loupe.Agent.Metrics.Internal
 {
@@ -13,14 +15,14 @@ namespace Loupe.Agent.Metrics.Internal
     /// </remarks>
     internal sealed class MetricDefinitionCollection : IList<IMetricDefinition>
     {
-        private Core.Monitor.MetricDefinitionCollection m_WrappedCollection;
+        private Core.Metrics.MetricDefinitionCollection m_WrappedCollection;
         private readonly Dictionary<Loupe.Extensibility.Data.IMetricDefinition, IMetricDefinition> m_Externalized = new Dictionary<Loupe.Extensibility.Data.IMetricDefinition, IMetricDefinition>();
 
         /// <summary>
         /// Create a new collection of API metric definitions wrapping a given internal collection.
         /// </summary>
         /// <param name="definitionCollection">An internal metric definition collection to wrap.</param>
-        internal MetricDefinitionCollection(Core.Monitor.MetricDefinitionCollection definitionCollection)
+        internal MetricDefinitionCollection(Core.Metrics.MetricDefinitionCollection definitionCollection)
         {
             m_WrappedCollection = definitionCollection;
         }
@@ -38,7 +40,7 @@ namespace Loupe.Agent.Metrics.Internal
         /// <summary>
         /// Raised every time the collection's contents are changed to allow subscribers to automatically track changes.
         /// </summary>
-        internal event EventHandler<Core.Monitor.CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>> CollectionChanged;
+        internal event EventHandler<CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>> CollectionChanged;
 
         #region Private Properties and Methods
 
@@ -47,10 +49,10 @@ namespace Loupe.Agent.Metrics.Internal
         /// </summary>
         /// <remarks>If overridden, it is important to call this base implementation to actually fire the event.</remarks>
         /// <param name="e"></param>
-        private void OnCollectionChanged(Core.Monitor.CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition> e)
+        private void OnCollectionChanged(CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition> e)
         {
             //save the delegate field in a temporary field for thread safety
-            EventHandler<Core.Monitor.CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>> tempEvent = CollectionChanged;
+            EventHandler<CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>> tempEvent = CollectionChanged;
 
             if (tempEvent != null)
             {
@@ -62,13 +64,13 @@ namespace Loupe.Agent.Metrics.Internal
 
         #region Internal Properties and Methods
 
-        internal Core.Monitor.MetricDefinitionCollection WrappedCollection { get { return m_WrappedCollection; } }
+        internal Core.Metrics.MetricDefinitionCollection WrappedCollection { get { return m_WrappedCollection; } }
 
         /// <summary>
         /// Ensures that the provided object is used as the wrapped object.
         /// </summary>
         /// <param name="summary"></param>
-        internal void SyncWrappedObject(Core.Monitor.MetricDefinitionCollection summary)
+        internal void SyncWrappedObject(Core.Metrics.MetricDefinitionCollection summary)
         {
             if (ReferenceEquals(summary, m_WrappedCollection) == false)
             {
@@ -85,8 +87,8 @@ namespace Loupe.Agent.Metrics.Internal
             {
                 if (m_Externalized.TryGetValue(metricDefinition, out var externalDefinition) == false)
                 {
-                    var eventDefinition = metricDefinition as Core.Monitor.EventMetricDefinition;
-                    var customDefinition = metricDefinition as Core.Monitor.CustomSampledMetricDefinition;
+                    var eventDefinition = metricDefinition as Core.Metrics.EventMetricDefinition;
+                    var customDefinition = metricDefinition as CustomSampledMetricDefinition;
 
                     if (eventDefinition != null)
                     {
@@ -112,7 +114,7 @@ namespace Loupe.Agent.Metrics.Internal
         {
             lock (Lock)
             {
-                Core.Monitor.MetricDefinition internaldefinition = metricDefinition.WrappedDefinition;
+                MetricDefinition internaldefinition = metricDefinition.WrappedDefinition;
 
                 m_Externalized[internaldefinition] = metricDefinition;
             }
@@ -433,7 +435,7 @@ namespace Loupe.Agent.Metrics.Internal
             lock (Lock)
             {
                 // Set up our mapping of internal to API definition objects for the one we're about to add...
-                Core.Monitor.MetricDefinition internalDefinition = item.WrappedDefinition;
+                MetricDefinition internalDefinition = item.WrappedDefinition;
                 m_Externalized[internalDefinition] = item;
 
                 m_WrappedCollection.Add(internalDefinition); // ...Then add it to the internal collection.
@@ -441,7 +443,7 @@ namespace Loupe.Agent.Metrics.Internal
 
             //and fire our event, outside the lock
             // Note: This is not done by subscribing to the event from the internal collection, which happens inside the lock!
-            OnCollectionChanged(new Core.Monitor.CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>(this, item, Core.Monitor.CollectionAction.Added));
+            OnCollectionChanged(new CollectionChangedEventArgs<MetricDefinitionCollection, IMetricDefinition>(this, item, CollectionAction.Added));
         }
 
         /// <summary>

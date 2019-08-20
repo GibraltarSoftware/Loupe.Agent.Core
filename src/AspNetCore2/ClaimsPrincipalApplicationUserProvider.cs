@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Security.Principal;
-using Loupe.Core.Monitor;
+using Loupe.Extensibility;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -11,7 +12,7 @@ namespace Loupe.Agent.AspNetCore
     public class ClaimsPrincipalApplicationUserProvider : IApplicationUserProvider
     {
         /// <inheritdoc />
-        public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+        public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
         {
             if (principal is ClaimsPrincipal claimsPrincipal)
             {

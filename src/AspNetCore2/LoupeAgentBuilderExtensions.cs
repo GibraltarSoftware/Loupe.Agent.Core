@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Security.Principal;
-using Loupe.Core.Monitor;
 using Loupe.Agent.AspNetCore.Metrics;
 using Loupe.Agent.Core.Services;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -27,7 +27,7 @@ namespace Loupe.Agent.AspNetCore
         /// <param name="applicationUserFunc">The function to use for application user mapping from an IPrincipal</param>
         /// <returns>The <see cref="ILoupeAgentBuilder"/> instance.</returns>
         public static ILoupeAgentBuilder AddAspNetCoreDiagnostics(this ILoupeAgentBuilder builder,
-            Func<IPrincipal, Lazy<ApplicationUser>, bool> applicationUserFunc)
+            Func<IPrincipal, Lazy<IApplicationUser>, bool> applicationUserFunc)
         {
             return AddAspNetCoreDiagnostics(builder, null, applicationUserFunc);
         }
@@ -41,7 +41,7 @@ namespace Loupe.Agent.AspNetCore
         /// <returns>The <see cref="ILoupeAgentBuilder"/> instance.</returns>
         public static ILoupeAgentBuilder AddAspNetCoreDiagnostics(this ILoupeAgentBuilder builder,
             Func<IPrincipal> principalFunc,
-            Func<IPrincipal, Lazy<ApplicationUser>, bool> applicationUserFunc = null)
+            Func<IPrincipal, Lazy<IApplicationUser>, bool> applicationUserFunc = null)
         {
             builder = builder.AddListener<ActionDiagnosticListener>();
 

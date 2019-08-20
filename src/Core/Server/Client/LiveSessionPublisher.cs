@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
+using Loupe.Core.IO.Messaging;
 using Loupe.Core.Messaging;
-using Loupe.Core.Messaging.Net;
 using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 

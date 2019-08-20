@@ -50,12 +50,5 @@ namespace Loupe.Extensibility.Data
         /// </summary>
         /// <remarks>If specified, all sessions will have this promotion level regardless of where they were run.</remarks>
         IPromotionLevel PromotionLevel { get; }
-
-        /// <summary>
-        /// Designates the role of this version - from Internal (the lowest) to Release (the highest)
-        /// </summary>
-        /// <remarks>The set of release types is configurable on each server with new versions automatically designated to
-        /// the lowest release type (Internal by default)</remarks>
-        IReleaseType ReleaseType { get; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using Loupe.Configuration;
+using Loupe.Core.Logging;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 

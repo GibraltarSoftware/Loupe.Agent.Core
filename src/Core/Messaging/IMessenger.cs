@@ -1,7 +1,6 @@
 ﻿using System;
 using Loupe.Configuration;
-
-
+using Loupe.Core.IO.Serialization;
 
 
 namespace Loupe.Core.Messaging

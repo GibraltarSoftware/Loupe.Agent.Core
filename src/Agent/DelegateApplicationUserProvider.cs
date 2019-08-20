@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
-using Loupe.Core.Monitor;
+using Loupe.Extensibility;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent
 {
@@ -11,13 +12,13 @@ namespace Loupe.Agent
     /// takes a simple function and uses it to resolve the application user.</remarks>
     public class DelegateApplicationUserProvider : IApplicationUserProvider
     {
-        private readonly Func<IPrincipal, Lazy<ApplicationUser>, bool> _func;
+        private readonly Func<IPrincipal, Lazy<IApplicationUser>, bool> _func;
 
         /// <summary>
         /// Create a new application user provider for the specified function
         /// </summary>
         /// <param name="func">THe function to delegate user providing to</param>
-        public DelegateApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func)
+        public DelegateApplicationUserProvider(Func<IPrincipal, Lazy<IApplicationUser>, bool> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
@@ -25,7 +26,7 @@ namespace Loupe.Agent
         }
 
         /// <inheritdoc />
-        public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+        public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
         {
             try
             {

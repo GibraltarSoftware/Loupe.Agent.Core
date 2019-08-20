@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
+using Loupe.Core.Metrics;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using Loupe.Metrics;

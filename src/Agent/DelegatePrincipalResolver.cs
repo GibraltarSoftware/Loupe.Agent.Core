@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Principal;
+using Loupe.Core;
 using Loupe.Core.Monitor;
+using Loupe.Extensibility;
 
 namespace Loupe.Agent
 {

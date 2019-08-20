@@ -2,9 +2,10 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using Loupe.Core.Data;
-using Loupe.Core.Messaging.Net;
+using Loupe.Core.IO;
+using Loupe.Core.IO.Messaging;
+using Loupe.Core.IO.Serialization;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Core.Server.Client;
 using Loupe.Extensibility.Data;
 

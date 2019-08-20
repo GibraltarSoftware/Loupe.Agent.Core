@@ -1,4 +1,5 @@
 ﻿using System;
+using Loupe.Core.Metrics;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
@@ -120,6 +121,6 @@ namespace Loupe.Agent.Metrics.Internal
         /// <summary>
         /// The internal definition it wraps.
         /// </summary>
-        Core.Monitor.MetricDefinition WrappedDefinition { get; }
+        MetricDefinition WrappedDefinition { get; }
     }
 }

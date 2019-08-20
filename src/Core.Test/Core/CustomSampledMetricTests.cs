@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Threading;
+using Loupe.Core.Metrics;
 using Loupe.Core.Monitor;
 using Loupe.Metrics;
 using NUnit.Framework;

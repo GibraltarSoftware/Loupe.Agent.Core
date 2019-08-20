@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using Loupe.Core.Data;
 using Loupe.Configuration;
+using Loupe.Core.IO;
 using Loupe.Extensibility.Data;
 
 namespace Loupe.Packager

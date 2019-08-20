@@ -1,4 +1,5 @@
 ﻿using System;
+using Loupe.Core.Metrics;
 using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;

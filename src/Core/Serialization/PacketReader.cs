@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
 using Loupe.Core.Serialization.Internal;
 
 #pragma warning disable 1591

@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Loupe.Core.Data;
+using Loupe.Core.IO.Serialization;
+using Loupe.Core.Logging;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 

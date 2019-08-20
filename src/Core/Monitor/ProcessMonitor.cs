@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using Loupe.Core.Messaging;
+using Loupe.Core.Metrics;
 using Loupe.Metrics;
 
 namespace Loupe.Core.Monitor

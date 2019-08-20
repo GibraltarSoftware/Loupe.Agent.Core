@@ -620,8 +620,8 @@ namespace Loupe.Core.Serialization
 
         internal static MethodInfo GetIPacketMethod(Type type, string methodName, BindingFlags flags, Type[] methodArgTypes)
         {
-            var requestedMethod = type.GetTypeInfo().DeclaredMethods.FirstOrDefault(m => m.Name.Equals("Loupe.Serialization.IPacket." + methodName, StringComparison.Ordinal));
-            //            requestedMethod = type.GetMethod("Loupe.Serialization.IPacket." + methodName, flags, null, methodArgTypes, null); //original
+            var requestedMethod = type.GetTypeInfo().DeclaredMethods.FirstOrDefault(m => m.Name.Equals("Loupe.Core.Serialization.IPacket." + methodName, StringComparison.Ordinal));
+            //            requestedMethod = type.GetMethod("Loupe.Core.Serialization.IPacket." + methodName, flags, null, methodArgTypes, null); //original
 
             return requestedMethod;
         } 

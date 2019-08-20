@@ -3,10 +3,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Loupe.Core.Data;
-using Loupe.Core.Data.Internal;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Configuration;
+using Loupe.Core.IO;
+using Loupe.Core.IO.Internal;
+using Loupe.Core.IO.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 

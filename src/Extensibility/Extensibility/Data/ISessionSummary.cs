@@ -360,10 +360,5 @@ namespace Loupe.Extensibility.Data
         /// A copy of the collection of application specific properties. (Set via configuration at logging startup.  Do not modify here.)
         /// </summary>
         IDictionary<string, string> Properties { get; }
-
-        /// <summary>
-        /// Optional. Represents the computer that sent the session.
-        /// </summary>
-        IComputer Computer { get; }
     }
 }

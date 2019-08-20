@@ -3,8 +3,10 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using Loupe.Core;
+using Loupe.Core.Data;
+using Loupe.Core.IO.Serialization;
+using Loupe.Core.Metrics;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Core.Serialization;
 
 namespace Loupe.Agent.PerformanceCounters.Serialization

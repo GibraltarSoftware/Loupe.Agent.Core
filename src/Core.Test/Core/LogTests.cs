@@ -3,7 +3,11 @@ using System.Diagnostics;
 using System.Security.Principal;
 using System.Threading;
 using Loupe;
+using Loupe.Core.Data;
+using Loupe.Core.IO.Serialization;
+using Loupe.Core.Logging;
 using Loupe.Core.Monitor;
+using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;
@@ -123,7 +127,7 @@ namespace Loupe.Core.Test.Core
         {
             const int count = 10000;
             MessageSourceProvider source = new MessageSourceProvider(0, true);
-            var batch = new Loupe.Core.Messaging.IMessengerPacket[count];
+            var batch = new IMessengerPacket[count];
             for (int i = 0; i < count; i++)
             {
                 batch[i] = Log.MakeLogPacket(LogMessageSeverity.Verbose, "GibraltarTest", "Test.Core.LogMessage.Performance.Flush",
@@ -186,7 +190,7 @@ namespace Loupe.Core.Test.Core
 
         private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 var identity = principal.Identity;
                 var newUser = applicationUser.Value;
@@ -241,7 +245,7 @@ namespace Loupe.Core.Test.Core
         {
             private volatile int _ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref _ResolutionRequests);
 

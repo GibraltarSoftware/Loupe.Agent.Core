@@ -4,9 +4,10 @@ using System.IO;
 using System.Threading;
 using Loupe;
 using Loupe.Core.Data;
-using Loupe.Core.Data.Internal;
 using Loupe.Core.Monitor;
 using Loupe.Configuration;
+using Loupe.Core.IO;
+using Loupe.Core.IO.Internal;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
 

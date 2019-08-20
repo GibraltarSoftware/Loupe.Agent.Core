@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
+using Loupe.Core;
 using Loupe.Core.Monitor;
+using Loupe.Extensibility;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.Core.Services
 {
@@ -55,7 +58,7 @@ namespace Loupe.Agent.Core.Services
         /// Specify the Application User Provider function for the current application.
         /// </summary>
         /// <returns>The builder instance.</returns>
-        ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func);
+        ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<IApplicationUser>, bool> func);
 
     }
 }

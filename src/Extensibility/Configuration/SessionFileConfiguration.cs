@@ -163,6 +163,6 @@ namespace Loupe.Configuration
         }
 
         /// <inheritdoc />
-        string IMessengerConfiguration.MessengerTypeName => "Loupe.Messaging.FileMessenger";
+        string IMessengerConfiguration.MessengerTypeName => "Loupe.Core.Messaging.FileMessenger";
     }
 }

@@ -12,14 +12,14 @@ namespace Loupe.Agent.Metrics
     public sealed class EventMetricValueDefinition : IEquatable<EventMetricValueDefinition>
     {
         private readonly EventMetricDefinition m_Definition;
-        private readonly Core.Monitor.EventMetricValueDefinition m_WrappedValueDefinition;
+        private readonly Core.Metrics.EventMetricValueDefinition m_WrappedValueDefinition;
 
         /// <summary>
         /// Create a new API value definition from a provided API event metric definition and internal value definition.
         /// </summary>
         /// <param name="definition">The API event metric definition that owns this value definition</param>
         /// <param name="valueDefinition">The internal value definition to wrap.</param>
-        internal EventMetricValueDefinition(EventMetricDefinition definition, Core.Monitor.EventMetricValueDefinition valueDefinition)
+        internal EventMetricValueDefinition(EventMetricDefinition definition, Core.Metrics.EventMetricValueDefinition valueDefinition)
         {
             m_Definition = definition;
             m_WrappedValueDefinition = valueDefinition;
@@ -144,7 +144,7 @@ namespace Loupe.Agent.Metrics
         /// Conversion to the inner packet object
         /// </summary>
         /// <returns></returns>
-        internal Core.Monitor.EventMetricValueDefinition WrappedValueDefinition { get { return m_WrappedValueDefinition; } }
+        internal Core.Metrics.EventMetricValueDefinition WrappedValueDefinition { get { return m_WrappedValueDefinition; } }
 
         #endregion
     }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Loupe.Core.Data;
-
+using Loupe.Core.IO;
 
 
 #pragma warning disable 1591

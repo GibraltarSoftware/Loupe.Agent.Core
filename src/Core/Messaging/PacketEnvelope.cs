@@ -1,4 +1,6 @@
-﻿namespace Loupe.Core.Messaging
+﻿using Loupe.Core.IO.Serialization;
+
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Wraps a Loupe Packet for publishing

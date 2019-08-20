@@ -12,7 +12,7 @@ namespace Loupe.Agent.Metrics
     public sealed class EventMetricSample : IComparable<EventMetricSample>, IEquatable<EventMetricSample>
     {
         private readonly EventMetric m_Metric;
-        private readonly Core.Monitor.EventMetricSample m_WrappedSample;
+        private readonly Core.Metrics.EventMetricSample m_WrappedSample;
 
         /// <summary>
         /// Create a new API event metric sample object for the provided metric and internal event metric sample.
@@ -20,7 +20,7 @@ namespace Loupe.Agent.Metrics
         /// <remarks>The metric sample is NOT? automatically added to the samples collection of the provided metric object.</remarks>
         /// <param name="metric">The metric object this sample applies to.</param>
         /// <param name="metricSample">The internal metric sample.</param>
-        internal EventMetricSample(EventMetric metric, Core.Monitor.EventMetricSample metricSample)
+        internal EventMetricSample(EventMetric metric, Core.Metrics.EventMetricSample metricSample)
         {
             //and now that we've been created, make sure our metric definition set is locked.
             //metric.Definition.IsReadOnly = true; // ToDo: Double-check that this is set within internal sample.
@@ -241,7 +241,7 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal event metric sample we're wrapping.
         /// </summary>
-        internal Core.Monitor.EventMetricSample WrappedSample { get { return m_WrappedSample; } }
+        internal Core.Metrics.EventMetricSample WrappedSample { get { return m_WrappedSample; } }
 
         #endregion
     }

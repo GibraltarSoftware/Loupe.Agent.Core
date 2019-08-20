@@ -70,7 +70,7 @@ namespace Loupe.Agent
         /// <param name="reason">If there is not sufficient configuration information this value will describe what was missing.</param>
         public bool CanSendSession(ref string reason)
         {
-            return Core.Monitor.Log.CanSendSessions(ref reason);
+            return Core.Log.CanSendSessions(ref reason);
         }
 
         /// <summary>

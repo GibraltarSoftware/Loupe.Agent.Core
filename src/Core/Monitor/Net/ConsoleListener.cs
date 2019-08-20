@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Loupe.Core.Logging;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 

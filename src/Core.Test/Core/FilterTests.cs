@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Loupe.Core.IO.Serialization;
 using Loupe.Core.Messaging;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;

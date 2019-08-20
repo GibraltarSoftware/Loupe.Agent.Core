@@ -11,8 +11,8 @@ namespace Loupe.Agent.Metrics
     /// </summary>
     internal class EventMetricCollection
     {
-        private readonly Core.Monitor.EventMetricCollection m_WrappedCollection;
-        private readonly Dictionary<Core.Monitor.EventMetric, EventMetric> m_Externalized = new Dictionary<Core.Monitor.EventMetric, EventMetric>();
+        private readonly Core.Metrics.EventMetricCollection m_WrappedCollection;
+        private readonly Dictionary<Core.Metrics.EventMetric, EventMetric> m_Externalized = new Dictionary<Core.Metrics.EventMetric, EventMetric>();
         private readonly EventMetricDefinition m_MetricDefinition;
         private readonly object m_Lock = new object();
 
@@ -263,12 +263,12 @@ namespace Loupe.Agent.Metrics
         /// </summary>
         internal object Lock { get { return m_Lock; } }
 
-        internal Core.Monitor.EventMetricCollection WrappedCollection
+        internal Core.Metrics.EventMetricCollection WrappedCollection
         {
             get { return m_WrappedCollection; }
         }
 
-        internal EventMetric Externalize(Core.Monitor.EventMetric eventMetric)
+        internal EventMetric Externalize(Core.Metrics.EventMetric eventMetric)
         {
             if (eventMetric == null)
                 return null;
@@ -289,7 +289,7 @@ namespace Loupe.Agent.Metrics
         {
             lock (m_Lock)
             {
-                Core.Monitor.EventMetric internalMetric = metric.WrappedMetric;
+                Core.Metrics.EventMetric internalMetric = metric.WrappedMetric;
 
                 m_Externalized[internalMetric] = metric;
             }
@@ -301,10 +301,10 @@ namespace Loupe.Agent.Metrics
 
         private class Enumerator : IEnumerator<EventMetric>
         {
-            private readonly IEnumerator<Core.Monitor.EventMetric> m_Enumerator;
+            private readonly IEnumerator<Core.Metrics.EventMetric> m_Enumerator;
             private readonly EventMetricCollection m_Collection;
 
-            public Enumerator(EventMetricCollection collection, IEnumerator<Core.Monitor.EventMetric> enumerator)
+            public Enumerator(EventMetricCollection collection, IEnumerator<Core.Metrics.EventMetric> enumerator)
             {
                 m_Collection = collection;
                 m_Enumerator = enumerator;

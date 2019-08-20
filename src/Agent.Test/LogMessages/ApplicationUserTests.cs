@@ -2,7 +2,10 @@
 using System.Security.Principal;
 using System.Threading;
 using Loupe.Agent;
+using Loupe.Core;
+using Loupe.Core.Data;
 using Loupe.Core.Monitor;
+using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;
@@ -36,7 +39,7 @@ namespace Loupe.Agent.Test.LogMessages
 
         private class ResolveUserForCurrentPrincipal : IApplicationUserProvider
         {
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 //this is really a quite poor set of data for a user - you wouldn't want to touch the environment
                 //and naturally these details wouldn't be hard-coded.
@@ -93,7 +96,7 @@ namespace Loupe.Agent.Test.LogMessages
         {
             private volatile int m_ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 
@@ -208,7 +211,7 @@ namespace Loupe.Agent.Test.LogMessages
         {
             private volatile int m_ResolutionRequests;
 
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 Interlocked.Increment(ref m_ResolutionRequests);
 

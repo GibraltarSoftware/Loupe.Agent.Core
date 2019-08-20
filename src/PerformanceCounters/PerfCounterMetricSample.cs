@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Loupe.Core.Monitor;
 using Loupe.Agent.PerformanceCounters.Serialization;
+using Loupe.Core.Metrics;
 
 namespace Loupe.Agent.PerformanceCounters
 {

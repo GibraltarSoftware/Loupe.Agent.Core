@@ -1,6 +1,8 @@
 using System;
 using Loupe.Agent.Internal;
 using Loupe.Configuration;
+using Loupe.Core;
+using Loupe.Core.Data;
 using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent
@@ -78,7 +80,7 @@ namespace Loupe.Agent
     /// </example>
     public sealed class Packager : IDisposable
     {
-        private readonly Loupe.Core.Data.Packager m_Packager;
+        private readonly Core.IO.Packager m_Packager;
 
         private bool m_Disposed;
         
@@ -108,9 +110,9 @@ namespace Loupe.Agent
         public Packager()
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Core.Monitor.Log.IsLoggingActive();
+            Core.Log.IsLoggingActive();
 
-            m_Packager = new Loupe.Core.Data.Packager();
+            m_Packager = new Core.IO.Packager();
             Initialize();
         }
 
@@ -122,10 +124,10 @@ namespace Loupe.Agent
         public Packager(string productName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Core.Monitor.Log.IsLoggingActive();
+            Core.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Core.Data.Packager(productName);
+            m_Packager = new Core.IO.Packager(productName);
             Initialize();
         }
 
@@ -138,10 +140,10 @@ namespace Loupe.Agent
         public Packager(string productName, string applicationName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Core.Monitor.Log.IsLoggingActive();
+            Core.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Core.Data.Packager(productName, applicationName);
+            m_Packager = new Core.IO.Packager(productName, applicationName);
             Initialize();
         }
 
@@ -158,10 +160,10 @@ namespace Loupe.Agent
         public Packager(string productName, string applicationName = null, string directory = null)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Core.Monitor.Log.IsLoggingActive();
+            Core.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Core.Data.Packager(productName, applicationName, directory);
+            m_Packager = new Core.IO.Packager(productName, applicationName, directory);
             Initialize();
         }
 
@@ -250,10 +252,9 @@ namespace Loupe.Agent
         /// <exception cref="LoupeException">Thrown when generation or transmission fails, includes details on failure</exception>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
-        public void SendToFile(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath)
+        public void SendToFile(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToFile(predicateAdapter.Predicate, markAsRead, fullFileNamePath, false);
+            m_Packager.SendToFile(sessionMatchPredicate, markAsRead, fullFileNamePath, false);
         }
 
         /// <summary>
@@ -283,10 +284,9 @@ namespace Loupe.Agent
         /// <param name="fullFileNamePath">The file name and path to write the final package to.</param>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
-        public void SendToFileAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath)
+        public void SendToFileAsync(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToFile(predicateAdapter.Predicate, markAsRead, fullFileNamePath, true);
+            m_Packager.SendToFile(sessionMatchPredicate, markAsRead, fullFileNamePath, true);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -312,10 +312,9 @@ namespace Loupe.Agent
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
+        public void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, false, serverConfiguration);
+            m_Packager.SendToServer(sessionMatchPredicate, markAsRead, false, false, serverConfiguration);
         }
 
         /// <summary>Send sessions to a Loupe Server using the current agent configuration</summary>
@@ -343,10 +342,9 @@ namespace Loupe.Agent
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
-        public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
+        public void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, false, serverConfiguration);
+            m_Packager.SendToServer(sessionMatchPredicate, markAsRead, purgeSentSessions, false, serverConfiguration);
         }
 
         /// <summary>
@@ -370,10 +368,9 @@ namespace Loupe.Agent
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
+        public void SendToServerAsync(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, false, true, serverConfiguration);
+            m_Packager.SendToServer(sessionMatchPredicate, markAsRead, false, true, serverConfiguration);
         }
 
         /// <summary>
@@ -399,10 +396,9 @@ namespace Loupe.Agent
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.  Because sessions are 
         /// sent one by one, they will be individually marked as read once sent.</remarks>
-        public void SendToServerAsync(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
+        public void SendToServerAsync(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
-            var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            m_Packager.SendToServer(predicateAdapter.Predicate, markAsRead, purgeSentSessions, true, serverConfiguration);
+            m_Packager.SendToServer(sessionMatchPredicate, markAsRead, purgeSentSessions, true, serverConfiguration);
         }
 
         #endregion
@@ -477,7 +473,7 @@ namespace Loupe.Agent
 
         #region Event Handlers
 
-        private void m_Packager_EndSend(object sender, Loupe.Core.Data.PackageSendEventArgs args)
+        private void m_Packager_EndSend(object sender, Core.IO.PackageSendEventArgs args)
         {
             //translate the args....
             PackageSendEventArgs wrapperArgs = new PackageSendEventArgs(args);

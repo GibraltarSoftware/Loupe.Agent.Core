@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
 
 namespace Loupe.Core.Messaging
 {

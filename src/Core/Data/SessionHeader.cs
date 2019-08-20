@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Loupe.Core.IO;
 using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
@@ -1432,11 +1433,6 @@ namespace Loupe.Core.Data
         /// A collection of properties used to provided extended information about the session
         /// </summary>
         public IDictionary<string, string> Properties { get { return m_Properties; } }
-
-        /// <summary>
-        /// Optional. Represents the computer that sent the session
-        /// </summary>
-        public IComputer Computer { get { return null; } }
 
         /// <summary>
         /// The date and time the session was added to the repository

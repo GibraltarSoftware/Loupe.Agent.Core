@@ -2,7 +2,10 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using Loupe.Agent;
+using Loupe.Core;
 using Loupe.Core.Monitor;
+using Loupe.Extensibility;
+using Loupe.Extensibility.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -63,7 +66,7 @@ namespace Loupe.Agent.Core.Services
         }
 
         /// <inheritdoc />
-        public ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func)
+        public ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<IApplicationUser>, bool> func)
         {
             _services.TryAddEnumerable(ServiceDescriptor.Singleton<IApplicationUserProvider, DelegateApplicationUserProvider>(provider => new DelegateApplicationUserProvider(func)));
             return this;

@@ -9,7 +9,7 @@ namespace Loupe.Agent
     /// </summary>
     public sealed class PackageSendEventArgs : EventArgs
     {
-        internal PackageSendEventArgs(Loupe.Core.Data.PackageSendEventArgs args)
+        internal PackageSendEventArgs(Core.IO.PackageSendEventArgs args)
         {
             FileSize = args.FileSize;
             Result = (AsyncTaskResult)args.Result;

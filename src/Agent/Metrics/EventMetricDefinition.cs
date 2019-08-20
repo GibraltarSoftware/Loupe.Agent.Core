@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Loupe.Agent.Metrics.Internal;
+using Loupe.Core.Logging;
+using Loupe.Core.Metrics;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 using Microsoft.Extensions.Logging;
 using IMetricDefinition = Loupe.Agent.Metrics.Internal.IMetricDefinition;
-
+using MetricDefinitionCollection = Loupe.Agent.Metrics.Internal.MetricDefinitionCollection;
 
 
 namespace Loupe.Agent.Metrics
@@ -53,7 +54,7 @@ namespace Loupe.Agent.Metrics
     public sealed class EventMetricDefinition : IMetricDefinition, IComparable<EventMetricDefinition>, IEquatable<EventMetricDefinition>
     {
         private readonly ILogger m_Logger;
-        private readonly Core.Monitor.EventMetricDefinition m_WrappedDefinition;
+        private readonly Core.Metrics.EventMetricDefinition m_WrappedDefinition;
         private readonly EventMetricCollection m_Metrics;
         private readonly EventMetricValueDefinitionCollection m_MetricValues;
 
@@ -92,7 +93,7 @@ namespace Loupe.Agent.Metrics
         /// See the <see cref="EventMetric">EventMetric Class Overview</see> for an example.
         /// </example>
         public EventMetricDefinition(string metricsSystem, string categoryName, string counterName)
-            : this(new Core.Monitor.EventMetricDefinition(metricsSystem, categoryName, counterName))
+            : this(new Core.Metrics.EventMetricDefinition(metricsSystem, categoryName, counterName))
         {
         }
 
@@ -100,7 +101,7 @@ namespace Loupe.Agent.Metrics
         /// Create a new API event metric definition from the provided internal event metric definition.
         /// </summary>
         /// <param name="metricDefinition">The internal metric definition to wrap.</param>
-        internal EventMetricDefinition(Core.Monitor.EventMetricDefinition metricDefinition)
+        internal EventMetricDefinition(Core.Metrics.EventMetricDefinition metricDefinition)
         {
             m_WrappedDefinition = metricDefinition;
             m_Metrics = new EventMetricCollection(this);
@@ -114,7 +115,7 @@ namespace Loupe.Agent.Metrics
             s_Definitions.Internalize(this);
             */
 
-            m_Logger = Core.ApplicationLogging.CreateLogger<EventMetricDefinition>();
+            m_Logger = ApplicationLogging.CreateLogger<EventMetricDefinition>();
         }
 
         #region Public Properties and Methods
@@ -753,7 +754,7 @@ namespace Loupe.Agent.Metrics
                     // There was one other than us, make sure it's compatible with us.
                     // It's read-only, so we don't need the definition lock for this check.
                     IEventMetricValueDefinitionCollection officialValues = officialDefinition.WrappedDefinition.Values;
-                    foreach (Core.Monitor.EventMetricValueDefinition ourValue in WrappedDefinition.Values)
+                    foreach (Core.Metrics.EventMetricValueDefinition ourValue in WrappedDefinition.Values)
                     {
                         if (officialValues.TryGetValue(ourValue.Name, out var officialValue) == false)
                         {
@@ -763,7 +764,7 @@ namespace Loupe.Agent.Metrics
                                     "There is already an event metric definition for the same metrics system ({0}), category name ({1}), and counter name ({2}), but it is not compatible; it does not define value column \"{3}\".",
                                     MetricsSystem, CategoryName, CounterName, ourValue.Name));
                         }
-                        else if (ourValue.SerializedType != ((Core.Monitor.EventMetricValueDefinition)officialValue).SerializedType)
+                        else if (ourValue.SerializedType != ((Core.Metrics.EventMetricValueDefinition)officialValue).SerializedType)
                         {
                             throw new ArgumentException(
                                 string.Format(CultureInfo.InvariantCulture,
@@ -860,7 +861,7 @@ namespace Loupe.Agent.Metrics
         public static bool IsNumericValueType(Type type)
         {
             // Just ask our internal class.
-            return Core.Monitor.EventMetricDefinition.IsTrendableValueType(type);
+            return Core.Metrics.EventMetricDefinition.IsTrendableValueType(type);
         }
 
         /// <summary>
@@ -873,7 +874,7 @@ namespace Loupe.Agent.Metrics
         public static bool IsSupportedValueType(Type type)
         {
             // Just ask our internal class.
-            return Core.Monitor.EventMetricDefinition.IsSupportedValueType(type);
+            return Core.Metrics.EventMetricDefinition.IsSupportedValueType(type);
         }
 
         /// <summary>
@@ -885,7 +886,7 @@ namespace Loupe.Agent.Metrics
             {
                 lock (Lock)
                 {
-                    return m_MetricValues.Externalize((Core.Monitor.EventMetricValueDefinition)m_WrappedDefinition.DefaultValue);
+                    return m_MetricValues.Externalize((Core.Metrics.EventMetricValueDefinition)m_WrappedDefinition.DefaultValue);
                 }
             }
             //We do set in a round-the-world fashion to guarantee that the provided default value's name is in our collection.
@@ -1231,7 +1232,7 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal event metric definition we're wrapping. 
         /// </summary>
-        internal Core.Monitor.EventMetricDefinition WrappedDefinition
+        internal Core.Metrics.EventMetricDefinition WrappedDefinition
         {
             get { return m_WrappedDefinition; }
         }
@@ -1239,7 +1240,7 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal metric definition this IMetricDefinition is wrapping.
         /// </summary>
-        Core.Monitor.MetricDefinition IMetricDefinition.WrappedDefinition
+        MetricDefinition IMetricDefinition.WrappedDefinition
         {
             get { return m_WrappedDefinition; }
         }

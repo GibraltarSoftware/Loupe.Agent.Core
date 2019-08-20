@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
 using Loupe.Core.Serialization.Internal;
 
 namespace Loupe.Core.Serialization

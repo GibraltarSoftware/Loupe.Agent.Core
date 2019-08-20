@@ -63,6 +63,6 @@
         }
 
         /// <inheritdoc />
-        string IMessengerConfiguration.MessengerTypeName => "Loupe.Messaging.NetworkMessenger";
+        string IMessengerConfiguration.MessengerTypeName => "Loupe.Core.Messaging.NetworkMessenger";
     }
 }

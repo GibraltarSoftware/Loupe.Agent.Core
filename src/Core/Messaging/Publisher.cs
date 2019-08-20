@@ -5,9 +5,11 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using Loupe.Core.Monitor;
-using Loupe.Core.Monitor.Serialization;
 using Loupe.Core.Serialization;
 using Loupe.Configuration;
+using Loupe.Core.Data;
+using Loupe.Core.IO.Serialization;
+using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 
 namespace Loupe.Core.Messaging
@@ -482,7 +484,7 @@ namespace Loupe.Core.Messaging
 
                     //we use lazy initialization to avoid the expense of stamping, etc. if they
                     //aren't going to use it.  Even better would be to lazy this object too.
-                    var lazyApplicationUser = new Lazy<ApplicationUser>(delegate
+                    var lazyApplicationUser = new Lazy<IApplicationUser>(delegate
                     {
                         var userPacket = new ApplicationUserPacket {FullyQualifiedUserName = userName};
                         StampPacket(userPacket, DateTimeOffset.Now);
@@ -493,7 +495,7 @@ namespace Loupe.Core.Messaging
                         && lazyApplicationUser.IsValueCreated)
                     {
                         //cache this so we don't keep going after it.
-                        applicationUser = m_ApplicationUsers.TrySetValue(lazyApplicationUser.Value);
+                        applicationUser = m_ApplicationUsers.TrySetValue(lazyApplicationUser.Value as ApplicationUser);
                     }
                 }
                 catch (Exception ex)

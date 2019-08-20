@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Loupe.Core.Data;
+using Loupe.Core.IO;
 using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
