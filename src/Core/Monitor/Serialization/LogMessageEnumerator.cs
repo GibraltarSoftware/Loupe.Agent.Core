@@ -61,7 +61,7 @@ namespace Loupe.Monitor.Serialization
                         m_HasCorruptData = true;
                         m_PacketsLostCount = PacketsLostCount + 1;
 
-                        var serializationException = ex as GibraltarSerializationException;
+                        var serializationException = ex as LoupeSerializationException;
                         if ((serializationException != null) //and really this should always be the case...
                             && (serializationException.StreamFailed))
                         {

@@ -192,7 +192,7 @@ namespace Loupe.Monitor.Serialization
                     packet.GetField("rawValue", out m_RawValue);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
         #endregion

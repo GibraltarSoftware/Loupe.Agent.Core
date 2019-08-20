@@ -182,7 +182,7 @@ namespace Loupe.Core.Test.Data
                 UseGibraltarService = true,
                 CustomerName = "BogusNonexistantCustomer"
             };
-            Assert.Throws<GibraltarException>(() =>
+            Assert.Throws<LoupeException>(() =>
             {
                 using (Packager newPackager = new Packager())
                 {

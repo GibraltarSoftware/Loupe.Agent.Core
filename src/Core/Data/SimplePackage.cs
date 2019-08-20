@@ -90,7 +90,7 @@ namespace Loupe.Data
             using (GLFReader glfReader = new GLFReader(sessionStream)) // This will dispose the stream when it is disposed.
             {
                 if (!glfReader.IsSessionStream)
-                    throw new GibraltarException("The data stream provided is not a valid session data stream.");
+                    throw new LoupeException("The data stream provided is not a valid session data stream.");
 
                 if (!Log.SilentMode)
                     Log.Write(LogMessageSeverity.Verbose, LogCategory, "Stream is session file, attempting to load", null);

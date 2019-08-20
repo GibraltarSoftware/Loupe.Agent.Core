@@ -206,7 +206,7 @@ namespace Loupe.Monitor.Serialization
                     m_MetricSampleType = (SamplingType)rawSampleType;
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
         #endregion

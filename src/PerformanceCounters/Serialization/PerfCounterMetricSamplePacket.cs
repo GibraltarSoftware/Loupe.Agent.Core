@@ -194,7 +194,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
                     m_Sample = new CounterSample((long)base.RawValue, baseValue, counterFrequency, systemFrequency, timeStamp, timeStamp100nSec, counterType, counterTimeStamp);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 

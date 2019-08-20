@@ -6,7 +6,7 @@ namespace Loupe.Server.Client
     /// <summary>
     /// The base class for all exceptions thrown by the Web Channel
     /// </summary>
-    public class WebChannelException : GibraltarException
+    public class WebChannelException : LoupeException
     {
         /// <summary>
         /// Create a new web channel exception

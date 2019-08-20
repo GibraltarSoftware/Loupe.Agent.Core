@@ -114,7 +114,7 @@ namespace Loupe.Server.Client.Data
 
                     if (hubConfigurationNode == null)
                     {
-                        throw new GibraltarException("There is no server configuration data in the provided raw data");
+                        throw new LoupeException("There is no server configuration data in the provided raw data");
                     }
 
                     //read up our attributes

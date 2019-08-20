@@ -228,7 +228,7 @@ namespace Loupe.Data
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, bool asyncSend,
             ServerConfiguration serverConfiguration = null)
@@ -251,7 +251,7 @@ namespace Loupe.Data
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, bool asyncSend,
             ServerConfiguration serverConfiguration = null)
@@ -274,7 +274,7 @@ namespace Loupe.Data
         /// <param name="progressMonitors">Optional. The asynchronous progress monitoring stack.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid</exception>
         public async Task<PackageSendEventArgs> SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions,
             ServerConfiguration serverConfiguration = null, ProgressMonitorStack progressMonitors = null)
@@ -509,7 +509,7 @@ namespace Loupe.Data
                     }
 
                     //not our favorite thing to do because this isn't a public exception type.
-                    throw new GibraltarException(execTask.TaskResults.Message, execTask.TaskResults.Exception);
+                    throw new LoupeException(execTask.TaskResults.Message, execTask.TaskResults.Exception);
                 }
             }
         }

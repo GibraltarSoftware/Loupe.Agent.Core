@@ -57,7 +57,7 @@ namespace Loupe.Serialization
                     definition.m_WriteMethod = GetIPacketMethod(type, "WriteFields", flags, new Type[] { typeof(PacketDefinition), typeof(SerializedPacket) });
                     if (definition.m_WriteMethod == null)
                     {
-                        throw new GibraltarSerializationException("The current packet implements part but not all of the IPacket interface.  No Write Method could be found.  Did you implement IPacket explicitly?");
+                        throw new LoupeSerializationException("The current packet implements part but not all of the IPacket interface.  No Write Method could be found.  Did you implement IPacket explicitly?");
                     }
 
                     if (definition.CanHaveRequiredPackets)
@@ -65,7 +65,7 @@ namespace Loupe.Serialization
                         definition.m_GetRequiredPacketsMethod = GetIPacketMethod(type, "GetRequiredPackets", flags, Type.EmptyTypes);
                         if (definition.m_GetRequiredPacketsMethod == null)
                         {
-                            throw new GibraltarSerializationException("The current packet implements part but not all of the IPacket interface.  No GetRequiredPackets Method could be found.  Did you implement IPacket explicitly?");
+                            throw new LoupeSerializationException("The current packet implements part but not all of the IPacket interface.  No GetRequiredPackets Method could be found.  Did you implement IPacket explicitly?");
                         }
                     }
                 }
@@ -130,7 +130,7 @@ namespace Loupe.Serialization
             int nestingDepth = reader.ReadInt32();
             if (nestingDepth < 1)
             {
-                throw new GibraltarException(string.Format(CultureInfo.InvariantCulture, "While reading the definition of the next packet, the number of types in the definition was read as {0} which is less than 1.", nestingDepth));
+                throw new LoupeException(string.Format(CultureInfo.InvariantCulture, "While reading the definition of the next packet, the number of types in the definition was read as {0} which is less than 1.", nestingDepth));
             }
 
 
@@ -604,13 +604,13 @@ namespace Loupe.Serialization
                 if (basePacketException != null) // This happened earlier, so it takes precedence over field exceptions.
                 {
                     message = string.Format("Error reading base {0} of a {1}", m_BasePacket.QualifiedTypeName, QualifiedTypeName);
-                    throw new GibraltarSerializationException(message, basePacketException);
+                    throw new LoupeSerializationException(message, basePacketException);
                 }
                 if (firstException != null) // Otherwise we can report our first exception from reading fields.
                 {
                     message = string.Format("Error reading ({0}) field \"{1}\" in a {2}",
                                             firstFailedFieldType, firstFailedFieldName, QualifiedTypeName);
-                    throw new GibraltarSerializationException(message, firstException);
+                    throw new LoupeSerializationException(message, firstException);
                 }
 
                 SerializedPacket serializedPacket = new SerializedPacket(this, values);

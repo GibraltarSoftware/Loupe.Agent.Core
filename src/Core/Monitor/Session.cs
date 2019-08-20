@@ -279,7 +279,7 @@ namespace Loupe.Monitor
                     m_HasCorruptData = true;
                     m_PacketsLostCount++;
 
-                    //we used to just drop the current packet and continue for GibraltarSerializationException,
+                    //we used to just drop the current packet and continue for LoupeSerializationException,
                     //but in the field it doesn't seem there's ever a case where once we go bad we can recover.
                     if (!Log.SilentMode)
                         Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, LogCategory,

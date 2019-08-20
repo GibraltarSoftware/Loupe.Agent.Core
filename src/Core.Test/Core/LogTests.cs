@@ -29,7 +29,7 @@ namespace Loupe.Core.Test.Core
             Log.Write(LogMessageSeverity.Information, "Unit Tests", null, "This is a call to Log.Write with no arguments");
             Log.Write(LogMessageSeverity.Information, "Unit Tests", null, "This is a call to Log.Write with two arguments #1:{0}, #2:{1}", 1, 2);
 
-            Exception exception = new GibraltarException("This is a dummy exception to test API calls.");
+            Exception exception = new LoupeException("This is a dummy exception to test API calls.");
 
             Log.Trace(exception, "This is a call to Log.Trace with an exception and no arguments");
             Log.Trace(exception, "This is a call to Log.Trace with an exception and two arguments #1:{0}, #2:{1}", 1, 2);

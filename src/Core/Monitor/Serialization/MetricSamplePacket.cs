@@ -277,7 +277,7 @@ namespace Loupe.Monitor.Serialization
                     packet.GetField("metricPacketId", out m_MetricId);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 

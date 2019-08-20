@@ -77,7 +77,7 @@ namespace Loupe.Serialization
                     // we don't have quite enough bytes to read the length of the next packet.
                     var remainingBytes = m_CurrentBuffer.BytesAvailable();
                     if (remainingBytes <= 0 || remainingBytes >= 5)
-                        throw new GibraltarSerializationException("Unexpected number of BytesAvailable: " + remainingBytes +
+                        throw new LoupeSerializationException("Unexpected number of BytesAvailable: " + remainingBytes +
                                                                   ". The value should be in the range [1..4] because it is a partial length.", true);
 
                     // Copy these last few bytes from the current buffer into the other buffer
@@ -88,7 +88,7 @@ namespace Loupe.Serialization
                     m_OtherBuffer.Position = remainingBytes;
                     var bytesRead = FetchBuffer(m_OtherBuffer);
                     if (bytesRead <= 0)
-                        throw new GibraltarSerializationException("Unable to read the rest of a packet length that spans buffers", true);
+                        throw new LoupeSerializationException("Unable to read the rest of a packet length that spans buffers", true);
 
                     // Reset the position and swap buffers so m_CurrentBuffer will contain the complete packet
                     m_OtherBuffer.Position = 0;
@@ -119,7 +119,7 @@ namespace Loupe.Serialization
 
                     if (bytesRead < neededFromNextBuffer)
                     {
-                        throw new GibraltarSerializationException(string.Format(
+                        throw new LoupeSerializationException(string.Format(
                             "Incomplete session file detected after reading {0} packets.  Expected {1} bytes but hit EOF after {2} bytes.",
                             m_PacketCount, requiredLength, neededFromCurrentBuffer + bytesRead), true);
                     }

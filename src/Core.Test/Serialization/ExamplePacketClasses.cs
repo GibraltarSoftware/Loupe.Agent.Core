@@ -283,7 +283,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     packet.GetField("caption", out m_Caption);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -413,7 +413,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     packet.GetField("caption", out m_Caption);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -573,7 +573,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     packet.GetField("text", out text);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -727,7 +727,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     packet.GetField("text", out text);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -835,7 +835,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     packet.GetField("text", out text);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -967,7 +967,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     ((IPacket)m_SubPacket).ReadFields(definition.SubPackets[0], packet);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -1111,7 +1111,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     ((IPacket)m_SubPacket).ReadFields(definition.SubPackets[0], packet);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
@@ -1263,7 +1263,7 @@ namespace Loupe.Core.Serialization.UnitTests
                     ((IPacket)m_InnerPacket).ReadFields(definition.SubPackets[1], packet); // recursively reads its own SubPacket
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 

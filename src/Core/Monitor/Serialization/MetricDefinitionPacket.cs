@@ -393,7 +393,7 @@ namespace Loupe.Monitor.Serialization
                     m_ReadOnly = true;  //if we got read out of a file, we're read only.
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
 
             //we are NOT live - we came from a serialization reader

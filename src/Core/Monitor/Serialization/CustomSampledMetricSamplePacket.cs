@@ -176,7 +176,7 @@ namespace Loupe.Monitor.Serialization
                     packet.GetField("baseValue", out m_BaseValue);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 

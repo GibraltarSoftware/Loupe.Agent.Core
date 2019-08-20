@@ -160,7 +160,7 @@ namespace Loupe.Monitor.Serialization
 
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
 
             //Now we need to go off and find our value definition so we can be serialized out gain

@@ -350,7 +350,7 @@ namespace Loupe.Messaging.Net
 
                 if (commandSent == false)
                 {
-                    throw new GibraltarNetworkException("Unable to send message, usually because the network connection was lost.", sendException);
+                    throw new LoupeNetworkException("Unable to send message, usually because the network connection was lost.", sendException);
                 }
             }
         }
@@ -428,7 +428,7 @@ namespace Loupe.Messaging.Net
 
                 if (packetSent == false)
                 {
-                    throw new GibraltarNetworkException("Unable to send packet, usually because the network connection was lost.", sendException);
+                    throw new LoupeNetworkException("Unable to send packet, usually because the network connection was lost.", sendException);
                 }
             }
         }
@@ -548,7 +548,7 @@ namespace Loupe.Messaging.Net
                         m_HasCorruptData = true;
                         m_PacketsLostCount++;
 
-                        GibraltarSerializationException serializationException = ex as GibraltarSerializationException;
+                        LoupeSerializationException serializationException = ex as LoupeSerializationException;
                         if ((serializationException != null) //and really this should always be the case...
                             && (serializationException.StreamFailed))
                         {
@@ -680,7 +680,7 @@ namespace Loupe.Messaging.Net
                             }
                         }
                     }
-                    catch (GibraltarNetworkException ex)
+                    catch (LoupeNetworkException ex)
                     {
                         //in this case we've already handled the critical state issues, we just need to exit the loop and roll around again.
                         if (!Log.SilentMode)
@@ -849,7 +849,7 @@ namespace Loupe.Messaging.Net
             }
 
             //we always throw the exception to force the call stack to unwind.
-            throw new GibraltarNetworkException("The network socket has failed", ex);
+            throw new LoupeNetworkException("The network socket has failed", ex);
         }
 
         /// <summary>
@@ -1066,7 +1066,7 @@ namespace Loupe.Messaging.Net
 
             if (newClient == null)
             {
-                throw new GibraltarNetworkException("There is no connection available", innerException);
+                throw new LoupeNetworkException("There is no connection available", innerException);
             }
 
             return newClient;

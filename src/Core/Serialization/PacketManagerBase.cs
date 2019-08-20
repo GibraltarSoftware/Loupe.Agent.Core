@@ -143,7 +143,7 @@ namespace Loupe.Serialization
                 //if the packet size is less than one, that's obviously wrong
                 if (packetLength < 1)
                 {
-                    throw new GibraltarSerializationException("The size of the next packet is smaller than 1 byte or negative, which can't be correct.  The packet stream is corrupted.", true);
+                    throw new LoupeSerializationException("The size of the next packet is smaller than 1 byte or negative, which can't be correct.  The packet stream is corrupted.", true);
                 }
 
                 // The next possibility is that we read the length, but some of the packet data
@@ -176,14 +176,14 @@ namespace Loupe.Serialization
             public void ReadBytes(byte[] destination, int offset, int count)
             {
                 if (count <= 0)
-                    throw new GibraltarSerializationException("ReadBytes called with non-positive count: " + count, true);
+                    throw new LoupeSerializationException("ReadBytes called with non-positive count: " + count, true);
 
                 if (offset + count > destination.Length)
-                    throw new GibraltarSerializationException("ReadBytes called with count that would overflow buffer. Count="
+                    throw new LoupeSerializationException("ReadBytes called with count that would overflow buffer. Count="
                         + count + ", Buffer.Length=" + destination.Length + ", Buffer.Offset=" + offset, true);
 
                 if (count > BytesAvailable())
-                    throw new GibraltarSerializationException("ReadBytes called to read " + count + " bytes when only " + BytesAvailable() + " bytes are available.", true);
+                    throw new LoupeSerializationException("ReadBytes called to read " + count + " bytes when only " + BytesAvailable() + " bytes are available.", true);
 
                 System.Buffer.BlockCopy(DataBytes, Position, destination, offset, count);
                 Position += count;
@@ -208,7 +208,7 @@ namespace Loupe.Serialization
                     // But since we use 7-bit encoding, the encoded length
                     // may be up to 5 bytes long
                     if (index > Position + 5)
-                        throw new GibraltarSerializationException("Invalid length detected in ReadPacketLength. Length should not be more that 5 bytes.", true);
+                        throw new LoupeSerializationException("Invalid length detected in ReadPacketLength. Length should not be more that 5 bytes.", true);
 
                     byte nextByte = DataBytes[index];
 
@@ -225,7 +225,7 @@ namespace Loupe.Serialization
                             Position = index + 1;
 
                             if (result < 0 || result > int.MaxValue)
-                                throw new GibraltarSerializationException("Illegal packet length: " + result, true);
+                                throw new LoupeSerializationException("Illegal packet length: " + result, true);
 
                             return (int) result;
                         }
@@ -236,7 +236,7 @@ namespace Loupe.Serialization
                         Position = index + 1;
 
                         if (result < 0 || result > int.MaxValue)
-                            throw new GibraltarSerializationException("Illegal packet length read: " + result, true); 
+                            throw new LoupeSerializationException("Illegal packet length read: " + result, true); 
 
                         return (int) result;
                     }

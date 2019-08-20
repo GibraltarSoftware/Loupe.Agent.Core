@@ -230,7 +230,7 @@ namespace Loupe.Agent
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="fullFileNamePath">The file name and path to write the final package to.</param>
-        /// <exception cref="GibraltarException">Thrown when generation or transmission fails, includes details on failure</exception>
+        /// <exception cref="LoupeException">Thrown when generation or transmission fails, includes details on failure</exception>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFile(SessionCriteria sessions, bool markAsRead, string fullFileNamePath)
@@ -247,7 +247,7 @@ namespace Loupe.Agent
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="fullFileNamePath">The file name and path to write the final package to.</param>
-        /// <exception cref="GibraltarException">Thrown when generation or transmission fails, includes details on failure</exception>
+        /// <exception cref="LoupeException">Thrown when generation or transmission fails, includes details on failure</exception>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFile(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath)
@@ -296,7 +296,7 @@ namespace Loupe.Agent
         /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(SessionCriteria sessions, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
@@ -310,7 +310,7 @@ namespace Loupe.Agent
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, ServerConfiguration serverConfiguration = null)
         {
@@ -326,7 +326,7 @@ namespace Loupe.Agent
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {
@@ -341,7 +341,7 @@ namespace Loupe.Agent
         /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
         /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
         /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
-        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="LoupeException">The server couldn't be contacted or there was a communication error.</exception>
         /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
         public void SendToServer(Predicate<SessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, ServerConfiguration serverConfiguration = null)
         {

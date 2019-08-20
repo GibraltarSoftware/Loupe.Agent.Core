@@ -3,9 +3,9 @@
 
 namespace Loupe.Server.Client
 {
-    public class GibraltarRateLimitException : GibraltarException
+    public class LoupeRateLimitException : LoupeException
     {
-        public GibraltarRateLimitException(string message, TimeSpan? delay)
+        public LoupeRateLimitException(string message, TimeSpan? delay)
             :base(message)
         {
             Timestamp = DateTimeOffset.Now;

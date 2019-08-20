@@ -149,7 +149,7 @@ namespace Loupe.Serialization
             //if the packet size is less than one, that's obviously wrong
             if (packetSize < 1)
             {
-                throw new GibraltarSerializationException("The size of the next packet is smaller than 1 byte or negative, which can't be correct.  The packet stream is corrupted.", true);
+                throw new LoupeSerializationException("The size of the next packet is smaller than 1 byte or negative, which can't be correct.  The packet stream is corrupted.", true);
             }
 
             // TODO: There's got to be a more efficient way to get this done
@@ -165,7 +165,7 @@ namespace Loupe.Serialization
                 if (string.IsNullOrEmpty(definition.TypeName))
                 {
                     //we're hosed...  we won't be able to parse this packet.
-                    throw new GibraltarSerializationException("The type name of the definition is null, which can't be correct.  The packet stream is corrupted.", true);
+                    throw new LoupeSerializationException("The type name of the definition is null, which can't be correct.  The packet stream is corrupted.", true);
                 }
 
                 m_cachedTypes.Add(definition);
@@ -208,7 +208,7 @@ namespace Loupe.Serialization
                 if (string.IsNullOrEmpty(definition.TypeName))
                 {
                     //we're hosed...  we won't be able to parse this packet.
-                    throw new GibraltarSerializationException("The type name of the definition is null, which can't be correct.  The packet stream is corrupted.", true);
+                    throw new LoupeSerializationException("The type name of the definition is null, which can't be correct.  The packet stream is corrupted.", true);
                 }
 
                 m_cachedTypes.Add(definition);
@@ -254,7 +254,7 @@ namespace Loupe.Serialization
                 if (original[curIndex] != check[curIndex])
                 {
                     Debugger.Break();
-                    throw new GibraltarSerializationException(string.Format("Guard bytes don't match: Expected {0:x} and got {1:x}", check[curIndex], original[curIndex]));
+                    throw new LoupeSerializationException(string.Format("Guard bytes don't match: Expected {0:x} and got {1:x}", check[curIndex], original[curIndex]));
                 }
             }
         }

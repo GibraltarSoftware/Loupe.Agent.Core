@@ -314,7 +314,7 @@ namespace Loupe.Monitor.Serialization
                     packet.GetField("definitionId", out m_DefinitionId);
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
 
             //find our definition from the definitions on the session

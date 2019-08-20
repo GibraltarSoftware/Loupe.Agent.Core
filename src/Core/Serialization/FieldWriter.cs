@@ -272,7 +272,7 @@ namespace Loupe.Serialization
             }
             else if (stringIndex > newStringIndex)
             {
-                throw new GibraltarException(
+                throw new LoupeException(
                     "Something went wrong with string serialization, we got a bogus index from our string table: " + stringIndex);
             }
         }

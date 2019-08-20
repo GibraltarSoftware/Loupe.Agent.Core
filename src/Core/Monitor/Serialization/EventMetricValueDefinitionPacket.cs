@@ -258,7 +258,7 @@ namespace Loupe.Monitor.Serialization
 
                     break;
                 default:
-                    throw new GibraltarPacketVersionException(definition.Version);
+                    throw new LoupePacketVersionException(definition.Version);
             }
         }
 
