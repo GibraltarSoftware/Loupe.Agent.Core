@@ -5,14 +5,14 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Loupe.Data.Internal;
-using Loupe.Monitor;
-using Loupe.Server.Client;
+using Loupe.Core.Data.Internal;
+using Loupe.Core.Monitor;
+using Loupe.Core.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Packages up sessions collected on the local computer and sends them via server or file transport.

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using Loupe.Monitor;
-using Loupe.Serialization;
+using Loupe.Core.Monitor;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Reads a GLF file

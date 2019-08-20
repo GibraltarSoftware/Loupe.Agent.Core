@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// A collection of file references that can be persisted.

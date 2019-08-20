@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 
 
 namespace Loupe.Agent.Metrics.Internal
@@ -12,9 +12,9 @@ namespace Loupe.Agent.Metrics.Internal
     /// </summary>
     internal sealed class SampledMetricCollection
     {
-        private readonly Monitor.CustomSampledMetricDictionary m_WrappedCollection;
-        private readonly Dictionary<Monitor.CustomSampledMetric, SampledMetric> m_Externalized =
-            new Dictionary<Monitor.CustomSampledMetric, SampledMetric>();
+        private readonly Core.Monitor.CustomSampledMetricDictionary m_WrappedCollection;
+        private readonly Dictionary<Core.Monitor.CustomSampledMetric, SampledMetric> m_Externalized =
+            new Dictionary<Core.Monitor.CustomSampledMetric, SampledMetric>();
 
         private readonly SampledMetricDefinition m_MetricDefinition;
         private readonly object m_Lock = new object();
@@ -184,12 +184,12 @@ namespace Loupe.Agent.Metrics.Internal
         /// </summary>
         internal object Lock { get { return m_Lock; } }
 
-        internal Monitor.CustomSampledMetricDictionary WrappedCollection
+        internal Core.Monitor.CustomSampledMetricDictionary WrappedCollection
         {
             get { return m_WrappedCollection; }
         }
 
-        internal SampledMetric Externalize(Monitor.CustomSampledMetric eventMetric)
+        internal SampledMetric Externalize(Core.Monitor.CustomSampledMetric eventMetric)
         {
             if (eventMetric == null)
                 return null;
@@ -210,7 +210,7 @@ namespace Loupe.Agent.Metrics.Internal
         {
             lock (m_Lock)
             {
-                Monitor.CustomSampledMetric internalMetric = metric.WrappedMetric;
+                Core.Monitor.CustomSampledMetric internalMetric = metric.WrappedMetric;
 
                 m_Externalized[internalMetric] = metric;
             }
@@ -222,10 +222,10 @@ namespace Loupe.Agent.Metrics.Internal
 
         private class Enumerator : IEnumerator<SampledMetric>
         {
-            private readonly IEnumerator<Monitor.CustomSampledMetric> m_Enumerator;
+            private readonly IEnumerator<Core.Monitor.CustomSampledMetric> m_Enumerator;
             private readonly SampledMetricCollection m_Collection;
 
-            public Enumerator(SampledMetricCollection collection, IEnumerator<Monitor.CustomSampledMetric> enumerator)
+            public Enumerator(SampledMetricCollection collection, IEnumerator<Core.Monitor.CustomSampledMetric> enumerator)
             {
                 m_Collection = collection;
                 m_Enumerator = enumerator;

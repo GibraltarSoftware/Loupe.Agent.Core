@@ -1,5 +1,5 @@
 ﻿#pragma warning disable 1591
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// This is the set of data types that can be read/written using

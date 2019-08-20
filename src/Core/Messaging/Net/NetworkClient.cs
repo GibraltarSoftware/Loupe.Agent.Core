@@ -7,13 +7,13 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-using Loupe.Monitor;
-using Loupe.Serialization;
-using Loupe.Server.Client;
+using Loupe.Core.Monitor;
+using Loupe.Core.Serialization;
+using Loupe.Core.Server.Client;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// The base class for different network clients that talk to a server.

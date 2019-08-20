@@ -1,9 +1,9 @@
 ﻿using System;
-using Loupe.Messaging;
-using Loupe.Serialization;
+using Loupe.Core.Messaging;
+using Loupe.Core.Serialization;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public abstract class GibraltarPacket : IMessengerPacket, IEquatable<GibraltarPacket>
     {

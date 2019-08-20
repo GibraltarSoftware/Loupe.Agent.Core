@@ -9,7 +9,7 @@ using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor.Net
+namespace Loupe.Core.Monitor.Net
 {
     /// <summary>
     /// Monitors the Common Language Runtime for noteworthy events.

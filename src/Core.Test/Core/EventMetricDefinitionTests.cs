@@ -1,5 +1,5 @@
 ﻿using System;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 using NUnit.Framework;

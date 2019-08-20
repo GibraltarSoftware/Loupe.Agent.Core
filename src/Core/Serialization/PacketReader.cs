@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Loupe.Data;
-using Loupe.Serialization.Internal;
+using Loupe.Core.Data;
+using Loupe.Core.Serialization.Internal;
 
 #pragma warning disable 1591
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Reads a packet data stream, recreating the packets it contains

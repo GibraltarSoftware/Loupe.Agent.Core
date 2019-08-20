@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
-using Loupe.Serialization;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// The central publisher for messaging

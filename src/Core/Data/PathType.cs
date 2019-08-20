@@ -1,4 +1,4 @@
-﻿namespace Loupe.Data
+﻿namespace Loupe.Core.Data
 {
     /// <summary>
     /// The different path types that Loupe uses

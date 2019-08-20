@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of metric definitions, keyed by their unique ID and name

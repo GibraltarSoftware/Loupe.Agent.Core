@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using Loupe.Server.Client.Data;
+using Loupe.Core.Server.Client.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Uploads the state of a client repository, adding it if necessary.

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Loupe.Data;
+using Loupe.Core.Data;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public class LogMessageEnumerable: IEnumerable<LogMessage>
     {

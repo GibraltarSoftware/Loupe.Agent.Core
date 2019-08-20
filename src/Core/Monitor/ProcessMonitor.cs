@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Loupe.Messaging;
+using Loupe.Core.Messaging;
 using Loupe.Metrics;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Monitors the details of a process.

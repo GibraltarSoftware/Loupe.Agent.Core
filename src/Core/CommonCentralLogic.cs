@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// A static class to hold central logic for common file and OS operations needed by various projects.

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// A very simple implementation of the Package type for use within the agent

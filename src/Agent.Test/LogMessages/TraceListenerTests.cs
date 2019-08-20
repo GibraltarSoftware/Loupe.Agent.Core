@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Loupe.Agent;
-using Loupe.Monitor.Net;
+using Loupe.Core.Monitor.Net;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.LogMessages

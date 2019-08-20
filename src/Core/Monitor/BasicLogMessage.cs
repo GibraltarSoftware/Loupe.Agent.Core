@@ -5,7 +5,7 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// An intermediary class to log a basic log message for the Loupe API. 

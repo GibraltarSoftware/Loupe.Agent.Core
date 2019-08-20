@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Execute an asynchronous execution task without any user interface.

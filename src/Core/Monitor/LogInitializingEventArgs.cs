@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Configuration;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Event arguments for the Log.Initializing event of the Loupe Agent Logging class.

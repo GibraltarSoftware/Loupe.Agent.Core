@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// This is a base class for any new serialization Exception types we define and for generic exceptions

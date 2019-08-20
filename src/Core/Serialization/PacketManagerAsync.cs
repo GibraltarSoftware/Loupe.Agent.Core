@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Efficiently manage the deserialization of log packets with asynchronous reading of buffers

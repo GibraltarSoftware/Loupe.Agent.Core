@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Base class for log message template classes. 

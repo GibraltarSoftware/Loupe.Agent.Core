@@ -1,4 +1,4 @@
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Implemented to support writing packets

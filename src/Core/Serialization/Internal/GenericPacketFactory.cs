@@ -1,4 +1,4 @@
-﻿namespace Loupe.Serialization.Internal
+﻿namespace Loupe.Core.Serialization.Internal
 {
     /// <summary>
     /// Helper class used by PacketFactory to wrapper the creation of GenericPacket

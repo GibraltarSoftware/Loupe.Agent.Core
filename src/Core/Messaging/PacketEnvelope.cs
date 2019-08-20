@@ -1,4 +1,4 @@
-﻿namespace Loupe.Messaging
+﻿namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Wraps a Loupe Packet for publishing

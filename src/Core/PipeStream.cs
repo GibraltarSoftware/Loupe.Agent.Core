@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// A derivative of a MemoryStream primarily for reading which provides additional methods to append data and

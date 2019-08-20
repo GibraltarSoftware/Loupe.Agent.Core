@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Loupe.Data;
-using Loupe.Monitor;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Monitors the discovery directory of the local file system for discovery file changes.

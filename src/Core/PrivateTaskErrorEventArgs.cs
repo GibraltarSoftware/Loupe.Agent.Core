@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Event arguments for the TaskException event 

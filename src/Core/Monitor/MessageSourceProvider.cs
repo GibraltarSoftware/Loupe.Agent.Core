@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Loupe.Logging;
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A basic class to determine the source of a log message and act as an IMessageSourceProvider. 

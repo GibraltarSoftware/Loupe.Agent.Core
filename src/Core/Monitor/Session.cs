@@ -3,13 +3,13 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using Loupe.Data;
-using Loupe.Monitor.Serialization;
-using Loupe.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Contains the log information for a single execution cycle

@@ -9,10 +9,10 @@ namespace Loupe.Agent
     /// </summary>
     public class LogMessageAlertEventArgs : EventArgs
     {
-        private readonly Messaging.NotificationEventArgs m_Event;
+        private readonly Core.Messaging.NotificationEventArgs m_Event;
         private readonly LogMessageInfoCollection m_MessageCollection;
 
-        internal LogMessageAlertEventArgs(Messaging.NotificationEventArgs eventArgs)
+        internal LogMessageAlertEventArgs(Core.Messaging.NotificationEventArgs eventArgs)
         {
             m_Event = eventArgs;
             m_MessageCollection = new LogMessageInfoCollection(eventArgs.Messages);
@@ -70,7 +70,7 @@ namespace Loupe.Agent
         /// <param name="reason">If there is not sufficient configuration information this value will describe what was missing.</param>
         public bool CanSendSession(ref string reason)
         {
-            return Monitor.Log.CanSendSessions(ref reason);
+            return Core.Monitor.Log.CanSendSessions(ref reason);
         }
 
         /// <summary>

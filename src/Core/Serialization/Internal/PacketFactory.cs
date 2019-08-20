@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Loupe.Serialization.Internal
+namespace Loupe.Core.Serialization.Internal
 {
     /// <summary>
     /// This helper class is used by PacketReader to manage the list of IPacketFactory

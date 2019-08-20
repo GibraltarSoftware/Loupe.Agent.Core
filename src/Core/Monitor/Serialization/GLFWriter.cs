@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Loupe.Data;
-using Loupe.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using System.Diagnostics;
 using Ionic.Zlib;
 
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public class GLFWriter : IDisposable
     {

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// A baseline implementation of a messenger that provides common messenger functionality.

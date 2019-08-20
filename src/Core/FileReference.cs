@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Tracks files to detect changes.

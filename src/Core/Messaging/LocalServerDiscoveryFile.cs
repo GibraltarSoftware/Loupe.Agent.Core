@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
-using Loupe.Data;
+using Loupe.Core.Data;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// IP Configuration information for a live stream proxy running on the local computer

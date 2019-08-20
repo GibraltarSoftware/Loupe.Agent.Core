@@ -19,7 +19,7 @@ using System.Text;
 
 #endregion
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// This is an implementation of MD5 that can be used in a FIPS environment.  Not for real encryption.

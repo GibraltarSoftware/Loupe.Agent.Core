@@ -2,7 +2,7 @@
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Information about monitor changes

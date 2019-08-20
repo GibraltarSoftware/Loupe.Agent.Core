@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// This exception indicates that an unexpected packet version was encountered.

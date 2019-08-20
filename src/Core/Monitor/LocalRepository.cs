@@ -4,15 +4,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Loupe.Data;
-using Loupe.Data.Internal;
-using Loupe.Messaging;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Data.Internal;
+using Loupe.Core.Messaging;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The local collection repository, a minimalistic repository

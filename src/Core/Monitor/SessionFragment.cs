@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor.Serialization;
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single stream of the session's information as it was originally recorded.

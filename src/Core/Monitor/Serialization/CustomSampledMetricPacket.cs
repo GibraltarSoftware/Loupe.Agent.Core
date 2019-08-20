@@ -1,7 +1,7 @@
 ﻿using System;
 
 #pragma warning disable 1591
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// The serializeable representation of a custom sampled metric

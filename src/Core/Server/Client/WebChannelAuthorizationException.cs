@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Thrown by the web channel when it is unable to authenticate to the remote server.

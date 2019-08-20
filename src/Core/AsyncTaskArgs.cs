@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Arguments used to execute tasks asynchronously using progress monitors.

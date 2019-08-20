@@ -10,7 +10,7 @@ using System.Reflection;
 
 
 #pragma warning disable 1591
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Holds the metadata needed to correctly interpret the stream of fields associated with a serialized packet

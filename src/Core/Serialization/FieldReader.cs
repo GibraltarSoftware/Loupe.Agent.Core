@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Loupe.Data;
-using Loupe.Serialization.Internal;
+using Loupe.Core.Data;
+using Loupe.Core.Serialization.Internal;
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Provides low-level decompression of the basic data types we pass over the wire.

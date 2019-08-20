@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Loupe.Server.Client.Data;
+using Loupe.Core.Server.Client.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Informs the server that the session is complete (assuming it is a protocol 1.2 or higher server)

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Agent.PerformanceCounters;
 using Loupe.Configuration;
 using NUnit.Framework;
@@ -44,7 +44,7 @@ namespace Loupe.PerformanceCounters.Tests
 
             m_Configuration.SessionFile.EnableFilePruning = false;
 
-            Loupe.Monitor.Monitor.Subscribe(new PerformanceMonitor(new PerformanceConfiguration()));
+            Loupe.Core.Monitor.Monitor.Subscribe(new PerformanceMonitor(new PerformanceConfiguration()));
 
             //force us to initialize logging
             Log.StartSession(m_Configuration);

@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Used at the start of a data stream to contain the session summary

@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of metrics, keyed by their unique ID and name

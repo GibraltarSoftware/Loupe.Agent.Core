@@ -3,7 +3,7 @@
 
 
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Information about the Package Send Events.

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// An ordered list of the individual fragments that were captured for the session.

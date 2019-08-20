@@ -1,6 +1,6 @@
-﻿using Loupe.Monitor.Serialization;
+﻿using Loupe.Core.Monitor.Serialization;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The base class for defining sampled metrics

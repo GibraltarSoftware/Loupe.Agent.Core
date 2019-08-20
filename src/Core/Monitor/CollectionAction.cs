@@ -1,4 +1,4 @@
-﻿namespace Loupe.Monitor
+﻿namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The different possible actions that were performed on a collection

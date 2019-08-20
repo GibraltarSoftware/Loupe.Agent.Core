@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// EventArgs for LogMessage notify events.

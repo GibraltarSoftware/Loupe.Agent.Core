@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Determines the correct physical paths to use for various Loupe scenarios

@@ -2,12 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Record an event metric for a single execution of a data operation

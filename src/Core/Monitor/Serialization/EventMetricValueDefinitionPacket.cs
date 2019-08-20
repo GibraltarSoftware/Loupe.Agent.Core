@@ -1,9 +1,9 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// A serializable event value definition.  Provides metadata for one value associated with an event

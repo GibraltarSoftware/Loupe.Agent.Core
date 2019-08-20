@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// An exception thrown to indicate a connection failure on the web channel.

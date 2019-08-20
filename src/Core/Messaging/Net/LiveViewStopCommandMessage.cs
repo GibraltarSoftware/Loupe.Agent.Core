@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Indicates the live view session for the specified session Id be terminated

@@ -3,7 +3,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A group of log messages, typically 

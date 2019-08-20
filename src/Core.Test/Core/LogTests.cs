@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Security.Principal;
 using System.Threading;
 using Loupe;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;
@@ -123,7 +123,7 @@ namespace Loupe.Core.Test.Core
         {
             const int count = 10000;
             MessageSourceProvider source = new MessageSourceProvider(0, true);
-            Loupe.Messaging.IMessengerPacket[] batch = new Loupe.Messaging.IMessengerPacket[count];
+            var batch = new Loupe.Core.Messaging.IMessengerPacket[count];
             for (int i = 0; i < count; i++)
             {
                 batch[i] = Log.MakeLogPacket(LogMessageSeverity.Verbose, "GibraltarTest", "Test.Core.LogMessage.Performance.Flush",

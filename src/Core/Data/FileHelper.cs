@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// A class to provide common wrappers and direct access to low-level file calls.

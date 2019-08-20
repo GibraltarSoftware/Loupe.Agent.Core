@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Loupe.Messaging.Net;
-using Loupe.Monitor;
-using Loupe.Server.Client;
+using Loupe.Core.Messaging.Net;
+using Loupe.Core.Monitor;
+using Loupe.Core.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     internal class NetworkMessenger : MessengerBase
     {

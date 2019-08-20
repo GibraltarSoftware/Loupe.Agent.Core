@@ -1,7 +1,7 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// One raw data sample of a custom sampled metric

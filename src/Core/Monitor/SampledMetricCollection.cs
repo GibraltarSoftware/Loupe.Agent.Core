@@ -1,4 +1,4 @@
-﻿namespace Loupe.Monitor
+﻿namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of sampled metrics, keyed by their unique ID and name

@@ -15,17 +15,18 @@ namespace Loupe.Agent
     ///     architecture).</para>
     /// 	<para>This information can be referenced at any time by your application.</para>
     /// </remarks>
+    [Obsolete("This type is a duplicate and should be removed now that we don't have to isolate Agent and Core.")]
     public sealed class SessionSummary
     {
         private readonly ISessionSummary m_WrappedISessionSummary;
-        private Monitor.SessionSummary m_WrappedSummary;
+        private Core.Monitor.SessionSummary m_WrappedSummary;
         private readonly Dictionary<string, string> m_Properties;
 
         /// <summary>
         /// Create a new session summary as the live collection session for the current process
         /// </summary>
         /// <remarks>This constructor figures out all of the summary information when invoked, which can take a moment.</remarks>
-        internal SessionSummary(Monitor.SessionSummary summary)
+        internal SessionSummary(Core.Monitor.SessionSummary summary)
         {
             m_WrappedSummary = summary;
             m_Properties = new Dictionary<string, string>(summary.Properties);
@@ -328,7 +329,7 @@ namespace Loupe.Agent
         /// Ensures that the provided object is used as the wrapped object.
         /// </summary>
         /// <param name="summary"></param>
-        internal void SyncWrappedObject(Monitor.SessionSummary summary)
+        internal void SyncWrappedObject(Core.Monitor.SessionSummary summary)
         {
             if (ReferenceEquals(summary, m_WrappedSummary) == false)
             {

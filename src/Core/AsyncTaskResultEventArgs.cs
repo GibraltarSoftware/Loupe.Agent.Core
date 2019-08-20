@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// The results from processing an asynchronous task.

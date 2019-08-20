@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Loupe;
-using Loupe.Data;
-using Loupe.Monitor;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Data

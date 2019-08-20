@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Data.Internal
+namespace Loupe.Core.Data.Internal
 {
 
     /// <summary>

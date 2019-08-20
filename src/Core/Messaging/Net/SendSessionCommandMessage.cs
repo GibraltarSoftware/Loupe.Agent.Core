@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 using Loupe.Extensibility.Data;
 
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// A command to have the agent send sessions to the server immediately

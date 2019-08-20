@@ -27,7 +27,7 @@ namespace Loupe.Agent.Logging
         public ExceptionSourceProvider(Exception exception)
         {
             // We never skipped Loupe frames here, so go ahead with trustSkipFrames = true to disable that check.
-            CommonCentralLogic.FindMessageSource(0, true, exception, out m_ClassName, out m_MethodName,
+            Core.CommonCentralLogic.FindMessageSource(0, true, exception, out m_ClassName, out m_MethodName,
                                               out m_FileName, out m_LineNumber);
 
             OnMessageSourceCalculate(ref m_ClassName, ref m_MethodName, ref m_FileName, ref m_LineNumber);

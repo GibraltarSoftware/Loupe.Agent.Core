@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using NUnit.Framework;
 
 

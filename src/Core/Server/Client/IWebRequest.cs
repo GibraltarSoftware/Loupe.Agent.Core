@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// The format of a web request provided to the GibraltarWebClient

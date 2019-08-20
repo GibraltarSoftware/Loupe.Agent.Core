@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// String parsing utility methods.

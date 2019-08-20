@@ -92,7 +92,7 @@ namespace Loupe.Agent.Test.LogMessages.Internal
         /// </summary>
         public void WaitForMessages()
         {
-            Loupe.Monitor.Log.Flush();
+            Loupe.Core.Monitor.Log.Flush();
 
             //since the notifier we use is asynchronous we can't actually bank on the flush
             //delay getting things to us.  Really need to redesign that.

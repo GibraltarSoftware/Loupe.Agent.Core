@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Represents an exclusive lock on a repository within a process and between processes.

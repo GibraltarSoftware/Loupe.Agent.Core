@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Resolves the user principle for the current thread

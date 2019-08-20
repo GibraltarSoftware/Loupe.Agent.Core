@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 
 namespace Loupe.Agent.Core.Services
 {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
 #pragma warning disable 1591
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Indicates that the identified session has been closed.

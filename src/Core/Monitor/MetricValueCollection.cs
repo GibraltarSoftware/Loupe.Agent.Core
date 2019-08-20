@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A set of display-ready values for a metric. 

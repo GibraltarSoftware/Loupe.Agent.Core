@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Requests a new live view stream

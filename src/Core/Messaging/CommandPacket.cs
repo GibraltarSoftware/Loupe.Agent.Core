@@ -1,10 +1,10 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// A command to be processed by the messaging system.

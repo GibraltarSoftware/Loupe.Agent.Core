@@ -3,7 +3,7 @@ using System.IO;
 
 
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Informs the receiver to start a new packet serializer for the subsequent data.

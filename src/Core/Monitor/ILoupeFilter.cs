@@ -1,7 +1,7 @@
 ﻿using System;
-using Loupe.Messaging;
+using Loupe.Core.Messaging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Inline filter for packets evaluated for each packet

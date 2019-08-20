@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using Loupe.Core;
 using Loupe.Metrics;
 
 namespace Loupe.Agent.Metrics
@@ -99,7 +100,7 @@ namespace Loupe.Agent.Metrics
     /// </example>
     public sealed class SampledMetric : IComparable<SampledMetric>, IEquatable<SampledMetric>
     {
-        private readonly Monitor.CustomSampledMetric m_WrappedMetric;
+        private readonly Core.Monitor.CustomSampledMetric m_WrappedMetric;
         private readonly SampledMetricDefinition m_MetricDefinition;
 
         /*
@@ -123,7 +124,7 @@ namespace Loupe.Agent.Metrics
         /// <param name="definition">The metric definition for the metric instance</param>
         /// <param name="instanceName">The unique name of this instance within the metric's collection.</param>
         internal SampledMetric(SampledMetricDefinition definition, string instanceName)
-            : this(definition, new Monitor.CustomSampledMetric(definition.WrappedDefinition, instanceName))
+            : this(definition, new Core.Monitor.CustomSampledMetric(definition.WrappedDefinition, instanceName))
         {
             definition.Metrics.Internalize(this); // ToDo: Is this needed?
         }
@@ -134,7 +135,7 @@ namespace Loupe.Agent.Metrics
         /// <remarks>The new metric will automatically be added to the metric definition's metrics collection.</remarks>
         /// <param name="definition">The API custom sampled metric definition for the metric instance.</param>
         /// <param name="metric">The internal custom sampled metric to wrap.</param>
-        internal SampledMetric(SampledMetricDefinition definition, Monitor.CustomSampledMetric metric)
+        internal SampledMetric(SampledMetricDefinition definition, Core.Monitor.CustomSampledMetric metric)
         {
             m_MetricDefinition = definition;
             m_WrappedMetric = metric;
@@ -719,7 +720,7 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal custom sampled metric we're wrapping. 
         /// </summary>
-        internal Monitor.CustomSampledMetric WrappedMetric { get { return m_WrappedMetric; } }
+        internal Core.Monitor.CustomSampledMetric WrappedMetric { get { return m_WrappedMetric; } }
 
         #endregion
     }

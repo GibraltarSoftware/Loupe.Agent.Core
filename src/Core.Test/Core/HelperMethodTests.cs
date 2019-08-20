@@ -1,4 +1,4 @@
-﻿using Loupe.Monitor.Serialization;
+﻿using Loupe.Core.Monitor.Serialization;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core

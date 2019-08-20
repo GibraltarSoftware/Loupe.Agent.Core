@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Loupe.Serialization.Internal
+namespace Loupe.Core.Serialization.Internal
 {
     /// <summary>
     /// SimplePacketFactory is the IPacketFactory used when an IPacket

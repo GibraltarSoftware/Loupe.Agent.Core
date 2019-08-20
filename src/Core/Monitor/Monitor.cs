@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Loupe.Messaging;
-using Loupe.Monitor.Net;
+using Loupe.Core.Messaging;
+using Loupe.Core.Monitor.Net;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The central monitor that manages the configuration of the individual monitors

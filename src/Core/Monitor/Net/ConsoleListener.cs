@@ -6,7 +6,7 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Loupe.Monitor.Net
+namespace Loupe.Core.Monitor.Net
 {
     /// <summary>
     /// Listens for standard and error console output and redirects to the session file.

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of event values for the parent metric definition.

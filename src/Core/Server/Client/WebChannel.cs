@@ -8,12 +8,12 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Loupe.Monitor;
-using Loupe.Server.Client.Internal;
+using Loupe.Core.Monitor;
+using Loupe.Core.Server.Client.Internal;
 using Loupe.Extensibility.Data;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Provides in-order communication with a remote web server.

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using Loupe.Agent;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

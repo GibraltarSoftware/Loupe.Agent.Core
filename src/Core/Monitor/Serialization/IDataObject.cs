@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Implemented by any extensible data object to connect to its unique Id which it shares with its extension object.

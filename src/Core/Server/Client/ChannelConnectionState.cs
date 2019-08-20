@@ -1,4 +1,4 @@
-﻿namespace Loupe.Server.Client
+﻿namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// The status of the subscription connection

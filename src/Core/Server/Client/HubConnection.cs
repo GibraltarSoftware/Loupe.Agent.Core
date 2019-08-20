@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Loupe.Server.Client.Data;
-using Loupe.Server.Client.Internal;
+using Loupe.Core.Server.Client.Data;
+using Loupe.Core.Server.Client.Internal;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// A web channel specifically designed to work with the Loupe Server.

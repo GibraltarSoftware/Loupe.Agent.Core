@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using Loupe.Data;
-using Loupe.Messaging;
-using Loupe.Messaging.Net;
-using Loupe.Monitor;
+using Loupe.Core.Data;
+using Loupe.Core.Messaging;
+using Loupe.Core.Messaging.Net;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Communicates between an Agent and a Loupe Server

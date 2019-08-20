@@ -78,7 +78,7 @@ namespace Loupe.Agent
     /// </example>
     public sealed class Packager : IDisposable
     {
-        private readonly Loupe.Data.Packager m_Packager;
+        private readonly Loupe.Core.Data.Packager m_Packager;
 
         private bool m_Disposed;
         
@@ -108,9 +108,9 @@ namespace Loupe.Agent
         public Packager()
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive();
+            Core.Monitor.Log.IsLoggingActive();
 
-            m_Packager = new Loupe.Data.Packager();
+            m_Packager = new Loupe.Core.Data.Packager();
             Initialize();
         }
 
@@ -122,10 +122,10 @@ namespace Loupe.Agent
         public Packager(string productName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive();
+            Core.Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Data.Packager(productName);
+            m_Packager = new Loupe.Core.Data.Packager(productName);
             Initialize();
         }
 
@@ -138,10 +138,10 @@ namespace Loupe.Agent
         public Packager(string productName, string applicationName)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive();
+            Core.Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Data.Packager(productName, applicationName);
+            m_Packager = new Loupe.Core.Data.Packager(productName, applicationName);
             Initialize();
         }
 
@@ -158,10 +158,10 @@ namespace Loupe.Agent
         public Packager(string productName, string applicationName = null, string directory = null)
         {
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
-            Monitor.Log.IsLoggingActive();
+            Core.Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Loupe.Data.Packager(productName, applicationName, directory);
+            m_Packager = new Loupe.Core.Data.Packager(productName, applicationName, directory);
             Initialize();
         }
 
@@ -477,7 +477,7 @@ namespace Loupe.Agent
 
         #region Event Handlers
 
-        private void m_Packager_EndSend(object sender, Loupe.Data.PackageSendEventArgs args)
+        private void m_Packager_EndSend(object sender, Loupe.Core.Data.PackageSendEventArgs args)
         {
             //translate the args....
             PackageSendEventArgs wrapperArgs = new PackageSendEventArgs(args);

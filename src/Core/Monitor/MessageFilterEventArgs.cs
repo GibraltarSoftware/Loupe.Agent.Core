@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// EventArgs for Message Filter events.

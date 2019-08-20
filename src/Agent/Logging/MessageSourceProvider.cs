@@ -75,7 +75,7 @@ namespace Loupe.Agent.Logging
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public MessageSourceProvider(int skipFrames)
         {
-            CommonCentralLogic.FindMessageSource(skipFrames + 1, true, null,
+            Core.CommonCentralLogic.FindMessageSource(skipFrames + 1, true, null,
                                               out m_ClassName, out m_MethodName, out m_FileName, out m_LineNumber);
 
             OnMessageSourceCalculate(ref m_ClassName, ref m_MethodName, ref m_FileName, ref m_LineNumber);

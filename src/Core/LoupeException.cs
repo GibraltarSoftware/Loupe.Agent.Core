@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Represents errors that occur within Loupe during application execution.

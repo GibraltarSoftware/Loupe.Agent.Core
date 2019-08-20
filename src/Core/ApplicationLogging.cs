@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Loupe application logging factory

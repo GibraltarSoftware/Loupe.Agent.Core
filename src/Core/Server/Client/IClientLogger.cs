@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// HTTP Client logging interface

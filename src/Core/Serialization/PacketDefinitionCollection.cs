@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Helper class used by PacketRead and PacketWriter to maintain a

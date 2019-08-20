@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Principal;
-using Loupe.Messaging;
-using Loupe.Serialization;
+using Loupe.Core.Messaging;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public class LogMessagePacket : GibraltarPacket, IUserPacket, IPacket, ILogMessage, IComparable<LogMessagePacket>, IEquatable<LogMessagePacket>
     {
@@ -40,7 +40,7 @@ namespace Loupe.Monitor.Serialization
         public LogMessagePacket()
         {
             Id = Guid.NewGuid();
-            m_SuppressNotification = Loupe.Messaging.Publisher.QueryThreadMustNotNotify();
+            m_SuppressNotification = Loupe.Core.Messaging.Publisher.QueryThreadMustNotNotify();
         }
 
         internal LogMessagePacket(ISessionPacketCache sessionPacketCache)

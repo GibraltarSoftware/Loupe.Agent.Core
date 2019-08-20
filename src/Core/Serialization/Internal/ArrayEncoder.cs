@@ -4,7 +4,7 @@ using System.Reflection;
 
 
 
-namespace Loupe.Serialization.Internal
+namespace Loupe.Core.Serialization.Internal
 {
     /// <summary>
     /// This helper class implements an enhanced run length encoding strategy

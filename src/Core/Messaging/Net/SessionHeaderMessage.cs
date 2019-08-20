@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Contains the session summary information for a remote session

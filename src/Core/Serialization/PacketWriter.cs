@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
 
 
 #pragma warning disable 1591
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     public class PacketWriter : IPacketWriter, IDisposable
     {

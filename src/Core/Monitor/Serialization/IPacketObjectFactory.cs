@@ -1,4 +1,4 @@
-﻿namespace Loupe.Monitor.Serialization
+﻿namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Implement to support derived object creation from serialized packets

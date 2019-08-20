@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Marks the ending status of a session.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using Loupe;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
 namespace Loupe.Core.Serialization.UnitTests
 {

@@ -7,7 +7,7 @@ using System.Text;
 using System.Xml;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Server.Client.Data
+namespace Loupe.Core.Server.Client.Data
 {
     /// <summary>
     /// Convert between data representations of common repository objects

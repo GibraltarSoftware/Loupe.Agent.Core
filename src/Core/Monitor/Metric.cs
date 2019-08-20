@@ -2,12 +2,12 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single metric that has been captured.  A metric is a single measured value over time.  

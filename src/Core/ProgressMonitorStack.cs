@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// The default progress monitor stack implementation.

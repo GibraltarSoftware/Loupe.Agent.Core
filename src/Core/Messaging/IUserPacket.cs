@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Security.Principal;
 using System.Text;
-using Loupe.Monitor.Serialization;
-using Loupe.Serialization;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Serialization;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Identifies a packet that can be associated with a specific user

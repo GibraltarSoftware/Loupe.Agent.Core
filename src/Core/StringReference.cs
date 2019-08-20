@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Provides a way to ensure a string is a reference to a single copy instead of creating multiple copies.

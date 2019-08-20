@@ -2,7 +2,7 @@
 
 
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>Implemented on invariant packets that can be cached</summary>
     /// <remarks>

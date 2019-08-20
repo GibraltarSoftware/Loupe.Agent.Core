@@ -6,13 +6,13 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Loupe.Data;
-using Loupe.Data.Internal;
-using Loupe.Monitor;
+using Loupe.Core.Data;
+using Loupe.Core.Data.Internal;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// A web channel request to upload a session file or full session stream

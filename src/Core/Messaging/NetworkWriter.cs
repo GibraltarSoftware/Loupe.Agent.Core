@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Sockets;
-using Loupe.Data;
-using Loupe.Messaging.Net;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
-using Loupe.Server.Client;
+using Loupe.Core.Data;
+using Loupe.Core.Messaging.Net;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Server.Client;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Used by the agent to write session data to a network socket

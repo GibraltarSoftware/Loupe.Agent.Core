@@ -9,10 +9,10 @@ namespace Loupe.Agent
     /// </summary>
     public class LogMessageEventArgs : EventArgs
     {
-        private readonly Messaging.NotificationEventArgs m_Event;
+        private readonly Core.Messaging.NotificationEventArgs m_Event;
         private readonly LogMessageInfoCollection m_MessageCollection;
 
-        internal LogMessageEventArgs(Messaging.NotificationEventArgs eventArgs)
+        internal LogMessageEventArgs(Core.Messaging.NotificationEventArgs eventArgs)
         {
             m_Event = eventArgs;
             m_MessageCollection = new LogMessageInfoCollection(eventArgs.Messages);

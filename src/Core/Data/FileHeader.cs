@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Generates and parses the binary header used at the start of a Loupe Log File

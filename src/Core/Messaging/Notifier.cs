@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Loupe.Data;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Generates notifications from scanning log messages

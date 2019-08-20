@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Agent.PerformanceCounters.Serialization;
 using Loupe.Extensibility.Data;
-using Log = Loupe.Monitor.Log;
+using Log = Loupe.Core.Monitor.Log;
 
 namespace Loupe.Agent.PerformanceCounters
 {
@@ -160,7 +160,7 @@ namespace Loupe.Agent.PerformanceCounters
             //we need to find the definition, adding it if necessary
             string definitionKey = PerfCounterMetricDefinition.GetKey(newPerformanceCounter);
 
-            if (Loupe.Monitor.Log.Metrics.TryGetValue(definitionKey, out var definition))
+            if (Loupe.Core.Monitor.Log.Metrics.TryGetValue(definitionKey, out var definition))
             {
                 //if the metric definition exists, but is of the wrong type we have a problem.
                 if ((definition is PerfCounterMetricDefinition) == false)
@@ -171,7 +171,7 @@ namespace Loupe.Agent.PerformanceCounters
             else
             {
                 //we didn't find one, make a new one
-                definition = new PerfCounterMetricDefinition(Loupe.Monitor.Log.Metrics, newPerformanceCounter);
+                definition = new PerfCounterMetricDefinition(Loupe.Core.Monitor.Log.Metrics, newPerformanceCounter);
             }
 
             //now we have our definition, proceed to create a new metric if it doesn't exist

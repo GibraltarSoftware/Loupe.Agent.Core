@@ -1,5 +1,5 @@
 ﻿using System.Security.Principal;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore

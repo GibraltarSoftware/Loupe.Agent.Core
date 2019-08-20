@@ -1,6 +1,6 @@
 ﻿using System;
 using Loupe.Agent;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
@@ -52,12 +52,12 @@ namespace Loupe.Agent.Core.Services
 
             foreach (var monitor in _serviceProvider.GetServices<ILoupeMonitor>())
             {
-                Loupe.Monitor.Monitor.Subscribe(monitor);
+                Loupe.Core.Monitor.Monitor.Subscribe(monitor);
             }
 
             foreach (var filter in _serviceProvider.GetServices<ILoupeFilter>())
             {
-                Loupe.Monitor.Log.RegisterFilter(filter);
+                Loupe.Core.Monitor.Log.RegisterFilter(filter);
             }
 
             var principalResolver = _serviceProvider.GetService<IPrincipalResolver>();

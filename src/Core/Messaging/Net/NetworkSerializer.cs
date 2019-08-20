@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Used to serialize network packets across a TCP socket

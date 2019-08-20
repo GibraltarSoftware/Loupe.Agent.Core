@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A simple default principal resolver

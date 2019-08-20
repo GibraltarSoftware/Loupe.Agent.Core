@@ -3,7 +3,7 @@
 
 
 #pragma warning disable 1591
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     public class SerializedPacket
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A (sorted) collection of ThreadInfo objects.

@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 using IEnumerator=System.Collections.IEnumerator;
 
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of loaded sessions

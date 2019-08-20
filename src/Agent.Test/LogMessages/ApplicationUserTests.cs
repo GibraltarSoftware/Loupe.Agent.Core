@@ -2,7 +2,7 @@
 using System.Security.Principal;
 using System.Threading;
 using Loupe.Agent;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;

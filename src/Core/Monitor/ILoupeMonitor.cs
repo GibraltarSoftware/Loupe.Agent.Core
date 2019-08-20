@@ -1,7 +1,7 @@
 ﻿using System;
-using Loupe.Messaging;
+using Loupe.Core.Messaging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Extends Loupe to monitor external data sources in the background

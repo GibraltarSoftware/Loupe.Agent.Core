@@ -1,7 +1,7 @@
 ﻿using Loupe.Agent;
 using System;
 using System.Diagnostics;
-using Loupe.Data;
+using Loupe.Core.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Loupe.Serialization
+namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Standard interface for objects that can read individual fields

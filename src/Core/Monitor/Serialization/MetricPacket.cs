@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Defines a metric that has been captured.  Specific metrics extend this class.

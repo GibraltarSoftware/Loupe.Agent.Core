@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Loupe.Data.Internal
+namespace Loupe.Core.Data.Internal
 {
     internal abstract class TransportPackageBase : IDisposable
     {

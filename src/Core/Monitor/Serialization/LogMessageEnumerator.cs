@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Loupe.Data;
-using Loupe.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public class LogMessageEnumerator : IEnumerator<LogMessage>
     {

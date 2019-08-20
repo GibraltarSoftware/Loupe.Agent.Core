@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Loupe.Agent.Internal;
-using Loupe.Monitor;
-using Loupe.Server.Client;
+using Loupe.Core.Monitor;
+using Loupe.Core.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
@@ -163,18 +163,18 @@ namespace Loupe.Agent
     public static class Log
     {
         /// <summary>The file extension (without period) for a Loupe Package File.</summary>
-        public const string PackageExtension = Monitor.Log.PackageExtension;
+        public const string PackageExtension = Core.Monitor.Log.PackageExtension;
 
-        private const string ThisLogSystem = Monitor.Log.ThisLogSystem;
-        private const string Category = Monitor.Log.Category;
-        private const string ExceptionCategory = Monitor.Log.ExceptionCategory;
+        private const string ThisLogSystem = Core.Monitor.Log.ThisLogSystem;
+        private const string Category = Core.Monitor.Log.Category;
+        private const string ExceptionCategory = Core.Monitor.Log.ExceptionCategory;
         private const LogWriteMode Queued = LogWriteMode.Queued;
 
         private static readonly object s_SyncLock = new object();
 
         // Create a wrapped session summary so it's available to users of the agent.
         private static SessionSummary s_SessionSummary;
-        private static readonly MetricDefinitionCollection s_MetricDefinitions = new MetricDefinitionCollection(Monitor.Log.Metrics);
+        private static readonly MetricDefinitionCollection s_MetricDefinitions = new MetricDefinitionCollection(Core.Monitor.Log.Metrics);
 
         private static event MessageEventHandler s_MessageEvent;
         private static event MessageAlertEventHandler s_MessageAlertEvent;
@@ -242,7 +242,7 @@ namespace Loupe.Agent
                 {
                     if (s_MessageAlertEvent == null)
                     {
-                        Monitor.Log.MessageAlertNotifier.NotificationEvent += MessageAlertNotifierOnNotificationEvent;
+                        Core.Monitor.Log.MessageAlertNotifier.NotificationEvent += MessageAlertNotifierOnNotificationEvent;
                     }
 
                     s_MessageAlertEvent += value;
@@ -262,7 +262,7 @@ namespace Loupe.Agent
 
                     if (s_MessageAlertEvent == null)
                     {
-                        Monitor.Log.MessageAlertNotifier.NotificationEvent -= MessageAlertNotifierOnNotificationEvent;
+                        Core.Monitor.Log.MessageAlertNotifier.NotificationEvent -= MessageAlertNotifierOnNotificationEvent;
                     }
                 }
             }
@@ -285,7 +285,7 @@ namespace Loupe.Agent
                 {
                     if (s_MessageEvent == null)
                     {
-                        Monitor.Log.MessageNotifier.NotificationEvent += MessageNotifierOnNotificationEvent;
+                        Core.Monitor.Log.MessageNotifier.NotificationEvent += MessageNotifierOnNotificationEvent;
                     }
 
                     s_MessageEvent += value;
@@ -305,7 +305,7 @@ namespace Loupe.Agent
 
                     if (s_MessageEvent == null)
                     {
-                        Monitor.Log.MessageNotifier.NotificationEvent -= MessageNotifierOnNotificationEvent;
+                        Core.Monitor.Log.MessageNotifier.NotificationEvent -= MessageNotifierOnNotificationEvent;
                     }
                 }
             }
@@ -314,11 +314,11 @@ namespace Loupe.Agent
         static Log()
         {
             //we have to bind to the internal log event and create the object.
-            Monitor.Log.Initializing += LogOnInitializing;
+            Core.Monitor.Log.Initializing += LogOnInitializing;
             CachedCredentialsManager.CredentialsRequired += CachedCredentialsManagerOnCredentialsRequired;
 
             //make sure that we put logging in silent mode - we're the agent!
-            Monitor.Log.SilentMode = true;
+            Core.Monitor.Log.SilentMode = true;
         }
 
         #region Public Properties and Methods
@@ -341,8 +341,8 @@ namespace Loupe.Agent
         /// </summary>
         public static IApplicationUserProvider ApplicationUserProvider
         {
-            get => Monitor.Log.ApplicationUserProvider;
-            set => Monitor.Log.ApplicationUserProvider = value;
+            get => Core.Monitor.Log.ApplicationUserProvider;
+            set => Core.Monitor.Log.ApplicationUserProvider = value;
         }
 
         /// <summary>
@@ -350,8 +350,8 @@ namespace Loupe.Agent
         /// </summary>
         public static IPrincipalResolver PrincipalResolver
         {
-            get => Monitor.Log.PrincipalResolver;
-            set => Monitor.Log.PrincipalResolver = value;
+            get => Core.Monitor.Log.PrincipalResolver;
+            set => Core.Monitor.Log.PrincipalResolver = value;
         }
 
         /// <summary>
@@ -367,15 +367,15 @@ namespace Loupe.Agent
         /// </remarks>
         public static bool SendSessionsOnExit
         {
-            get { return Monitor.Log.SendSessionsOnExit; }
+            get { return Core.Monitor.Log.SendSessionsOnExit; }
             [MethodImplAttribute(MethodImplOptions.NoInlining)] 
             set
             {
                 //don't do jack if we aren't initialized.
-                if (Monitor.Log.IsLoggingActive() == false)
+                if (Core.Monitor.Log.IsLoggingActive() == false)
                     return;
 
-                Monitor.Log.SetSendSessionsOnExit(value); // Jump to the method (not property) for correct source attribution.
+                Core.Monitor.Log.SetSendSessionsOnExit(value); // Jump to the method (not property) for correct source attribution.
             }
         }
 
@@ -384,7 +384,7 @@ namespace Loupe.Agent
         /// </summary>
         public static Version AgentVersion
         {
-            get { return Monitor.Log.AgentVersion; }
+            get { return Core.Monitor.Log.AgentVersion; }
         }
 
         //
@@ -413,10 +413,10 @@ namespace Loupe.Agent
         public static void Verbose(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -450,10 +450,10 @@ namespace Loupe.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -487,10 +487,10 @@ namespace Loupe.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -530,10 +530,10 @@ namespace Loupe.Agent
                                    string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Verbose,
                 writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -557,10 +557,10 @@ namespace Loupe.Agent
                                          params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -588,10 +588,10 @@ namespace Loupe.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -615,10 +615,10 @@ namespace Loupe.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -648,10 +648,10 @@ namespace Loupe.Agent
                                          string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Verbose,
                 writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -683,10 +683,10 @@ namespace Loupe.Agent
         public static void Information(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -720,10 +720,10 @@ namespace Loupe.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -757,10 +757,10 @@ namespace Loupe.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -800,10 +800,10 @@ namespace Loupe.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Information,
                 writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -827,10 +827,10 @@ namespace Loupe.Agent
                                              params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -858,10 +858,10 @@ namespace Loupe.Agent
                                              string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -885,10 +885,10 @@ namespace Loupe.Agent
                                              string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -918,10 +918,10 @@ namespace Loupe.Agent
                                              string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Information,
                 writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -953,10 +953,10 @@ namespace Loupe.Agent
         public static void Warning(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -990,10 +990,10 @@ namespace Loupe.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1027,10 +1027,10 @@ namespace Loupe.Agent
                                    params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1070,10 +1070,10 @@ namespace Loupe.Agent
                                    string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Warning,
                 writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1097,10 +1097,10 @@ namespace Loupe.Agent
                                          params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1128,10 +1128,10 @@ namespace Loupe.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1155,10 +1155,10 @@ namespace Loupe.Agent
                                          string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1188,10 +1188,10 @@ namespace Loupe.Agent
                                          string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Warning,
                 writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1223,10 +1223,10 @@ namespace Loupe.Agent
         public static void Error(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1260,10 +1260,10 @@ namespace Loupe.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1298,10 +1298,10 @@ namespace Loupe.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1335,10 +1335,10 @@ namespace Loupe.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1378,10 +1378,10 @@ namespace Loupe.Agent
                                  string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1422,10 +1422,10 @@ namespace Loupe.Agent
                                  string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1449,10 +1449,10 @@ namespace Loupe.Agent
                                        params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1480,10 +1480,10 @@ namespace Loupe.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1512,10 +1512,10 @@ namespace Loupe.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1539,10 +1539,10 @@ namespace Loupe.Agent
                                        string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1572,10 +1572,10 @@ namespace Loupe.Agent
                                        string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1606,10 +1606,10 @@ namespace Loupe.Agent
                                        string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Error,
                 writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1641,10 +1641,10 @@ namespace Loupe.Agent
         public static void Critical(string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1678,10 +1678,10 @@ namespace Loupe.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1716,10 +1716,10 @@ namespace Loupe.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1753,10 +1753,10 @@ namespace Loupe.Agent
                                     params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1796,10 +1796,10 @@ namespace Loupe.Agent
                                     string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, exception, false, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1840,10 +1840,10 @@ namespace Loupe.Agent
                                     string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.BasicLogMessage logMessage = new Monitor.BasicLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.BasicLogMessage logMessage = new Core.Monitor.BasicLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, exception, attributeToException, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1867,10 +1867,10 @@ namespace Loupe.Agent
                                           params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1898,10 +1898,10 @@ namespace Loupe.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1930,10 +1930,10 @@ namespace Loupe.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1957,10 +1957,10 @@ namespace Loupe.Agent
                                           string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -1990,10 +1990,10 @@ namespace Loupe.Agent
                                           string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, exception, false, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -2024,10 +2024,10 @@ namespace Loupe.Agent
                                           string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage(LogMessageSeverity.Critical,
                 writeMode, ThisLogSystem, category, 1, exception, attributeToException, detailsXml, caption, description, args);
 
             logMessage.PublishToLog();
@@ -2076,13 +2076,13 @@ namespace Loupe.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
             if (skipFrames < 0)
                 skipFrames = 0; // Make sure they don't pass us a negative, it would attribute it here to us.
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((LogMessageSeverity)severity,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage((LogMessageSeverity)severity,
                 writeMode, logSystem, category, skipFrames + 1, exception, false, detailsXml, caption,
                 description, args);
 
@@ -2135,13 +2135,13 @@ namespace Loupe.Agent
                                  params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
             if (skipFrames < 0)
                 skipFrames = 0; // Make sure they don't pass us a negative, it would attribute it here to us.
 
-            Monitor.DetailLogMessage logMessage = new Monitor.DetailLogMessage((LogMessageSeverity)severity,
+            Core.Monitor.DetailLogMessage logMessage = new Core.Monitor.DetailLogMessage((LogMessageSeverity)severity,
                 writeMode, logSystem, category, skipFrames + 1, exception, attributeToException, detailsXml, caption,
                 description, args);
 
@@ -2179,10 +2179,10 @@ namespace Loupe.Agent
                                  string category, string caption, string description, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.Log.WriteMessage(severity, writeMode, logSystem, category, sourceProvider, principal, exception,
+            Core.Monitor.Log.WriteMessage(severity, writeMode, logSystem, category, sourceProvider, principal, exception,
                 detailsXml, caption, description, args);
         }
 
@@ -2234,7 +2234,7 @@ namespace Loupe.Agent
         public static void RecordException(Exception exception, string category, bool canContinue = true)
         {
             if (exception != null)
-                Monitor.Log.RecordException(1, exception, null, category, canContinue);
+                Core.Monitor.Log.RecordException(1, exception, null, category, canContinue);
         }
 
         /// <summary>
@@ -2250,10 +2250,10 @@ namespace Loupe.Agent
         public static void TraceVerbose(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2277,10 +2277,10 @@ namespace Loupe.Agent
         public static void TraceVerbose(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Verbose,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2299,10 +2299,10 @@ namespace Loupe.Agent
         public static void TraceInformation(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Information,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2326,10 +2326,10 @@ namespace Loupe.Agent
         public static void TraceInformation(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Information,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Information,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2348,10 +2348,10 @@ namespace Loupe.Agent
         public static void TraceWarning(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2375,10 +2375,10 @@ namespace Loupe.Agent
         public static void TraceWarning(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Warning,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2397,10 +2397,10 @@ namespace Loupe.Agent
         public static void TraceError(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Error,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2424,10 +2424,10 @@ namespace Loupe.Agent
         public static void TraceError(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Error,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Error,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2446,10 +2446,10 @@ namespace Loupe.Agent
         public static void TraceCritical(string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
                 ThisLogSystem, Category, 1, format, args);
 
             logMessage.PublishToLog();
@@ -2473,10 +2473,10 @@ namespace Loupe.Agent
         public static void TraceCritical(Exception exception, string format, params object[] args)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return;
 
-            Monitor.SimpleLogMessage logMessage = new Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
+            Core.Monitor.SimpleLogMessage logMessage = new Core.Monitor.SimpleLogMessage(LogMessageSeverity.Critical,
                 Queued, ThisLogSystem, Category, 1, exception, format, args);
 
             logMessage.PublishToLog();
@@ -2491,7 +2491,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void EndFile()
         {
-            Monitor.Log.EndFile(1, string.Empty); // No reason declared, attribute it to our immediate caller.
+            Core.Monitor.Log.EndFile(1, string.Empty); // No reason declared, attribute it to our immediate caller.
         }
 
         /// <summary>
@@ -2505,7 +2505,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void EndFile(string reason)
         {
-            Monitor.Log.EndFile(1, reason); // Pass on reason, attribute it to our immediate caller.
+            Core.Monitor.Log.EndFile(1, reason); // Pass on reason, attribute it to our immediate caller.
         }
 
         /// <summary>
@@ -2524,7 +2524,7 @@ namespace Loupe.Agent
             if (skipFrames < 0)
                 skipFrames = 0;
 
-            Monitor.Log.EndFile(skipFrames + 1, reason); // Pass on reason, attribute it farther back as specified.
+            Core.Monitor.Log.EndFile(skipFrames + 1, reason); // Pass on reason, attribute it farther back as specified.
         }
 
         /// <summary>
@@ -2554,7 +2554,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void EndSession(SessionStatus endingStatus, IMessageSourceProvider sourceProvider, string reason)
         {
-            Monitor.Log.EndSession(endingStatus, sourceProvider, reason);
+            Core.Monitor.Log.EndSession(endingStatus, sourceProvider, reason);
         }
 
         /// <summary>
@@ -2583,7 +2583,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void EndSession(SessionStatus endingStatus, int skipFrames, string reason)
         {
-            Monitor.Log.EndSession((Loupe.Extensibility.Data.SessionStatus)endingStatus, skipFrames + 1, reason);
+            Core.Monitor.Log.EndSession((Loupe.Extensibility.Data.SessionStatus)endingStatus, skipFrames + 1, reason);
         }
 
         /// <summary>
@@ -2612,7 +2612,7 @@ namespace Loupe.Agent
         public static void EndSession(SessionStatus endingStatus, string reason)
         {
             // A specified exit status attributed to our immediate caller with a specified reason.
-            Monitor.Log.EndSession((Loupe.Extensibility.Data.SessionStatus)endingStatus, 1, reason);
+            Core.Monitor.Log.EndSession((Loupe.Extensibility.Data.SessionStatus)endingStatus, 1, reason);
         }
 
         /// <summary>
@@ -2639,7 +2639,7 @@ namespace Loupe.Agent
         public static void EndSession(string reason)
         {
             // A specified exit status attributed to our immediate caller with a specified reason.
-            Monitor.Log.EndSession(Loupe.Extensibility.Data.SessionStatus.Normal, 1, reason);
+            Core.Monitor.Log.EndSession(Loupe.Extensibility.Data.SessionStatus.Normal, 1, reason);
         }
 
         /// <summary>
@@ -2665,7 +2665,7 @@ namespace Loupe.Agent
         public static void EndSession()
         {
             // A normal exit attributed to our immediate caller with no explicit reason.
-            Monitor.Log.EndSession(Loupe.Extensibility.Data.SessionStatus.Normal, 1, null);
+            Core.Monitor.Log.EndSession(Loupe.Extensibility.Data.SessionStatus.Normal, 1, null);
         }
 
         /// <summary>
@@ -2677,7 +2677,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void StartSession()
         {
-            Monitor.Log.StartSession(null, 1, null);
+            Core.Monitor.Log.StartSession(null, 1, null);
         }
 
         /// <summary>
@@ -2690,7 +2690,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void StartSession(string reason)
         {
-            Monitor.Log.StartSession(null, 1, reason);
+            Core.Monitor.Log.StartSession(null, 1, reason);
         }
 
         /// <summary>
@@ -2704,7 +2704,7 @@ namespace Loupe.Agent
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public static void StartSession(int skipFrames, string reason)
         {
-            Monitor.Log.StartSession(null, skipFrames + 1, reason);
+            Core.Monitor.Log.StartSession(null, skipFrames + 1, reason);
         }
 
         /// <summary>
@@ -2718,7 +2718,7 @@ namespace Loupe.Agent
         /// started.  All calls to the agent are safe whether it has been activated or not.</remarks>
         public static void StartSession(IMessageSourceProvider sourceProvider, string reason)
         {
-            Monitor.Log.StartSession(null, sourceProvider, reason);
+            Core.Monitor.Log.StartSession(null, sourceProvider, reason);
         }
 
         /// <summary>
@@ -2734,7 +2734,7 @@ namespace Loupe.Agent
             if (ReferenceEquals(configuration, null))
                 throw new ArgumentNullException(nameof(configuration));
 
-            Monitor.Log.StartSession(configuration, 1, null);
+            Core.Monitor.Log.StartSession(configuration, 1, null);
         }
 
         /// <summary>
@@ -2751,7 +2751,7 @@ namespace Loupe.Agent
             if (ReferenceEquals(configuration, null))
                 throw new ArgumentNullException(nameof(configuration));
 
-            Monitor.Log.StartSession(configuration, 1, reason);
+            Core.Monitor.Log.StartSession(configuration, 1, reason);
         }
 
         /// <summary>
@@ -2769,7 +2769,7 @@ namespace Loupe.Agent
             if (ReferenceEquals(configuration, null))
                 throw new ArgumentNullException(nameof(configuration));
 
-            Monitor.Log.StartSession(configuration, skipFrames + 1, reason);
+            Core.Monitor.Log.StartSession(configuration, skipFrames + 1, reason);
         }
 
         /// <summary>
@@ -2787,7 +2787,7 @@ namespace Loupe.Agent
             if (ReferenceEquals(configuration, null))
                 throw new ArgumentNullException(nameof(configuration));
 
-            Monitor.Log.StartSession(configuration, sourceProvider, reason);
+            Core.Monitor.Log.StartSession(configuration, sourceProvider, reason);
         }
 
         /// <summary>
@@ -2809,10 +2809,10 @@ namespace Loupe.Agent
         public static async Task<bool> SendSessions(SessionCriteria criteria)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions(criteria, null, false).ConfigureAwait(false);
+            return await Core.Monitor.Log.SendSessions(criteria, null, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2834,11 +2834,11 @@ namespace Loupe.Agent
         public static async Task<bool> SendSessions(Predicate<SessionSummary> sessionMatchPredicate)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            return await Monitor.Log.SendSessions(null, predicateAdapter.Predicate, false).ConfigureAwait(false);
+            return await Core.Monitor.Log.SendSessions(null, predicateAdapter.Predicate, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2860,10 +2860,10 @@ namespace Loupe.Agent
         public static async Task<bool> SendSessionsAsync(SessionCriteria criteria)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return false;
 
-            return await Monitor.Log.SendSessions(criteria, null, true).ConfigureAwait(false);
+            return await Core.Monitor.Log.SendSessions(criteria, null, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2885,11 +2885,11 @@ namespace Loupe.Agent
         public static async Task<bool> SendSessionsAsync(Predicate<SessionSummary> sessionMatchPredicate)
         {
             //don't do jack if we aren't initialized.
-            if (Monitor.Log.IsLoggingActive() == false)
+            if (Core.Monitor.Log.IsLoggingActive() == false)
                 return false;
 
             var predicateAdapter = new SessionSummaryPredicate(sessionMatchPredicate);
-            return await Monitor.Log.SendSessions(null, predicateAdapter.Predicate, true).ConfigureAwait(false);
+            return await Core.Monitor.Log.SendSessions(null, predicateAdapter.Predicate, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -2938,7 +2938,7 @@ namespace Loupe.Agent
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void LogOnInitializing(object sender, Monitor.LogInitializingEventArgs e)
+        static void LogOnInitializing(object sender, Core.Monitor.LogInitializingEventArgs e)
         {
             //see if we CAN initialize.
             InitializingEventHandler tempEvent = Initializing;
@@ -2955,7 +2955,7 @@ namespace Loupe.Agent
                 {
                     GC.KeepAlive(ex);
 #if DEBUG
-                    Monitor.Log.DebugBreak();
+                    Core.Monitor.Log.DebugBreak();
 #endif
                 }
 
@@ -2981,18 +2981,18 @@ namespace Loupe.Agent
                 //lets see if we get the same object both ways.
                 if (s_SessionSummary == null)
                 {
-                    s_SessionSummary = new SessionSummary(Monitor.Log.SessionSummary);                    
+                    s_SessionSummary = new SessionSummary(Core.Monitor.Log.SessionSummary);                    
                 }
                 else
                 {
-                    s_SessionSummary.SyncWrappedObject(Monitor.Log.SessionSummary);
+                    s_SessionSummary.SyncWrappedObject(Core.Monitor.Log.SessionSummary);
                 }
 
                 System.Threading.Monitor.PulseAll(s_SyncLock);
             }
         }
 
-        private static void MessageAlertNotifierOnNotificationEvent(object sender, Messaging.NotificationEventArgs e)
+        private static void MessageAlertNotifierOnNotificationEvent(object sender, Core.Messaging.NotificationEventArgs e)
         {
             var eventHandler = s_MessageAlertEvent;
 
@@ -3003,7 +3003,7 @@ namespace Loupe.Agent
             }
         }
 
-        private static void MessageNotifierOnNotificationEvent(object sender, Messaging.NotificationEventArgs e)
+        private static void MessageNotifierOnNotificationEvent(object sender, Core.Messaging.NotificationEventArgs e)
         {
             var eventHandler = s_MessageEvent;
 

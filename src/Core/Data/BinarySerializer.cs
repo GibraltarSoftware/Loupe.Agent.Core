@@ -6,7 +6,7 @@ using System.Text;
 
 
 
-namespace Loupe.Data
+namespace Loupe.Core.Data
 {
     /// <summary>
     /// Provides basic binary serialization for platform independent simple serialization

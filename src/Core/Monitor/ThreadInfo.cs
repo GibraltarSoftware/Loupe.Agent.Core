@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 
 #pragma warning disable 1591
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     [DebuggerDisplay("(Thread #{ThreadIndex} : {Description})")]
     public class ThreadInfo : IDisplayable, IComparable<ThreadInfo>, IEquatable<ThreadInfo>

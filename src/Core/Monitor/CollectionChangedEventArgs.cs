@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The event arguments for a collection change event, indicating what change was made to which collection.

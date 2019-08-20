@@ -1,4 +1,4 @@
-﻿namespace Loupe.Messaging
+﻿namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Different types of commands.

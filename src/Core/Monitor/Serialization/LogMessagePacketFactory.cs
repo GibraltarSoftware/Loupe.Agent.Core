@@ -1,8 +1,8 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public class LogMessagePacketFactory : IPacketFactory
     {

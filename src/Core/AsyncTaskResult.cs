@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// The result of processing an asynchronous task

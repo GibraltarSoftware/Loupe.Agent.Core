@@ -1,6 +1,6 @@
-﻿using Loupe.Server.Client.Data;
+﻿using Loupe.Core.Server.Client.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// The current status of a server that is accessible over the network

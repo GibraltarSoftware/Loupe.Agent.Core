@@ -5,7 +5,7 @@ using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor.Net
+namespace Loupe.Core.Monitor.Net
 {
     /// <summary>
     /// Implements a TraceListener to forward Trace and Debug messages from

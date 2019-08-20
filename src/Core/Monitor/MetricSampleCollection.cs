@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of metric samples for a metric.

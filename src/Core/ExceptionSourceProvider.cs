@@ -1,10 +1,10 @@
 ﻿
 using System;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Logging;
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Serves as an IMessageSourceProvider to attribute a message to the code location which threw an Exception.

@@ -1,4 +1,4 @@
-﻿namespace Loupe.Serialization
+﻿namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// This is the key interface objects implement to be serializable by Loupe.

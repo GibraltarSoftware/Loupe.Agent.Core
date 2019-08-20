@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Information used in the CredentialsRequired event.

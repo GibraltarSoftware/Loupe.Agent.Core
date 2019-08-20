@@ -2,15 +2,15 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using Loupe.Data;
-using Loupe.Data.Internal;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Data.Internal;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     internal class FileMessenger : MessengerBase
     {

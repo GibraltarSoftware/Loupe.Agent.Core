@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Loupe.Extensibility.Data;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Metrics;
 
 
@@ -15,7 +15,7 @@ namespace Loupe.Agent.Metrics
     /// <remarks>This object is automatically created by the Event Metric Definition and is accessible through the Values property.</remarks>
     internal sealed class EventMetricValueDefinitionCollection : IList<EventMetricValueDefinition>
     {
-        private readonly Monitor.EventMetricValueDefinitionCollection m_WrappedCollection;
+        private readonly Core.Monitor.EventMetricValueDefinitionCollection m_WrappedCollection;
         private readonly Dictionary<IEventMetricValueDefinition, EventMetricValueDefinition> m_Externalized =
             new Dictionary<IEventMetricValueDefinition, EventMetricValueDefinition>();
 
@@ -30,7 +30,7 @@ namespace Loupe.Agent.Metrics
         internal EventMetricValueDefinitionCollection(EventMetricDefinition definition)
         {
             m_Definition = definition;
-            m_WrappedCollection = (Monitor.EventMetricValueDefinitionCollection)definition.WrappedDefinition.Values;
+            m_WrappedCollection = (Core.Monitor.EventMetricValueDefinitionCollection)definition.WrappedDefinition.Values;
             m_WrappedCollection.CollectionChanged += WrappedCollection_CollectionChanged;
         }
 
@@ -445,7 +445,7 @@ namespace Loupe.Agent.Metrics
 
         #region Internal Properties and Methods
 
-        internal Monitor.EventMetricValueDefinitionCollection WrappedCollection { get { return m_WrappedCollection; } }
+        internal Core.Monitor.EventMetricValueDefinitionCollection WrappedCollection { get { return m_WrappedCollection; } }
 
         internal EventMetricValueDefinition Externalize(IEventMetricValueDefinition valueDefinition)
         {
@@ -456,7 +456,7 @@ namespace Loupe.Agent.Metrics
             {
                 if (m_Externalized.TryGetValue(valueDefinition, out var externalDefinition) == false)
                 {
-                    externalDefinition = new EventMetricValueDefinition(m_Definition, (Monitor.EventMetricValueDefinition)valueDefinition);
+                    externalDefinition = new EventMetricValueDefinition(m_Definition, (Core.Monitor.EventMetricValueDefinition)valueDefinition);
                     m_Externalized[valueDefinition] = externalDefinition;
                 }
 

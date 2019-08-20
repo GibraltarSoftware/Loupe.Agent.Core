@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Command for retrieving the list of session headers

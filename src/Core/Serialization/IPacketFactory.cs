@@ -1,4 +1,4 @@
-﻿namespace Loupe.Serialization
+﻿namespace Loupe.Core.Serialization
 {
     /// <summary>
     /// Defines the interface necessary for a packet factory to be

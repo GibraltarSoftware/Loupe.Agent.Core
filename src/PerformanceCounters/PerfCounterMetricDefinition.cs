@@ -1,7 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.Diagnostics;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Agent.PerformanceCounters.Serialization;
 
 namespace Loupe.Agent.PerformanceCounters

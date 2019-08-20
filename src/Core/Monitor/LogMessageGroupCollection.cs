@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 #pragma warning disable 1591
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A collection of logMessageGroups, ordered by date/time and accessible by unique ID or numerical index.

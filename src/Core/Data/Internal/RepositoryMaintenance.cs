@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
-using Loupe.Messaging;
-using Loupe.Monitor;
+using Loupe.Core.Messaging;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Data.Internal
+namespace Loupe.Core.Data.Internal
 {
     /// <summary>
     /// Performs repository level maintenance such as purging for size.  Should be used with collection repositories only.

@@ -9,16 +9,16 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Loupe.Data;
-using Loupe.Data.Internal;
-using Loupe.Messaging;
-using Loupe.Monitor.Serialization;
-using Loupe.Server.Client;
+using Loupe.Core.Data;
+using Loupe.Core.Data.Internal;
+using Loupe.Core.Messaging;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Handles interfacing with a single log file for the purpose of writing log messages.

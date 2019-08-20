@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 
 
-namespace Loupe
+namespace Loupe.Core
 {
     /// <summary>
     /// Observes the progress of one process for the purpose of progress reporting in user interfaces.

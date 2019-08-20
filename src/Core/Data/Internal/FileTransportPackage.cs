@@ -4,7 +4,7 @@ using System.IO;
 
 
 
-namespace Loupe.Data.Internal
+namespace Loupe.Core.Data.Internal
 {
     /// <summary>
     /// A transport package that is just being written out to a file.

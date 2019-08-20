@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single raw sample of a metric.  

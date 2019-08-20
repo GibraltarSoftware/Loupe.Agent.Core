@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Loupe.Data;
+using Loupe.Core.Data;
 
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     /// <summary>
     /// Used to determine the latency and relative clock drift of a connection

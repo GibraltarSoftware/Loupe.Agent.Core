@@ -2,7 +2,7 @@
 using System.Net;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     public class WebChannelMethodNotAllowedException : WebChannelException
     {

@@ -120,6 +120,6 @@ namespace Loupe.Agent.Metrics.Internal
         /// <summary>
         /// The internal definition it wraps.
         /// </summary>
-        Monitor.MetricDefinition WrappedDefinition { get; }
+        Core.Monitor.MetricDefinition WrappedDefinition { get; }
     }
 }

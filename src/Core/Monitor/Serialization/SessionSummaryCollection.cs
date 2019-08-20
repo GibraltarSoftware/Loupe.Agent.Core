@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// The session summary collection implementation for the local collection repository

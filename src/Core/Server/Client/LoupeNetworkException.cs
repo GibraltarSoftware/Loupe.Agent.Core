@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Exceptions related to network operations

@@ -1,4 +1,4 @@
-﻿namespace Loupe.Monitor.Serialization
+﻿namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Provides lookup services for packet factories to find other session-related packets

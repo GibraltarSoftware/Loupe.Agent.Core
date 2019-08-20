@@ -1,11 +1,11 @@
-﻿    using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;
-    using Loupe.Logging;
-    using Loupe.Metrics;
-    using NUnit.Framework;
+using Loupe.Logging;
+using Loupe.Metrics;
+using NUnit.Framework;
 
 namespace Loupe.Core.Test.Core
 {

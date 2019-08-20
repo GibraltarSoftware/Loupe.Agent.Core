@@ -1,4 +1,4 @@
-﻿namespace Loupe.Serialization
+﻿namespace Loupe.Core.Serialization
 {
     /// <remarks>
     /// Most packets have a static structure of fields that is the same for all

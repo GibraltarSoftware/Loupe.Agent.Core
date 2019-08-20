@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Principal;
-using Loupe.Messaging;
-using Loupe.Serialization;
+using Loupe.Core.Messaging;
+using Loupe.Core.Serialization;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Base object for all metric sample packets

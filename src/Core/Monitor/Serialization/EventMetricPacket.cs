@@ -1,7 +1,7 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// The serializeable representation of a custom sampled metric

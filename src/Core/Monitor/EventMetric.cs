@@ -1,12 +1,12 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single event metric instance object, representing one instance of an event metric definition.

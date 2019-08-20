@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Event arguments for tracking the state of a web request

@@ -9,12 +9,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using Loupe.Data;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Data;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// Summary information about the entire session.

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Loupe.Server.Client.Data;
+using Loupe.Core.Server.Client.Data;
 
-namespace Loupe.Server.Client
+namespace Loupe.Core.Server.Client
 {
     /// <summary>
     /// Get the current hub configuration information for the hub

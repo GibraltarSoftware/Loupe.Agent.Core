@@ -1,9 +1,9 @@
 ﻿
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// This interface is required to be a publishable cached packet

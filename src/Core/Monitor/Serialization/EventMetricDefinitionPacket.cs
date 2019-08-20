@@ -1,8 +1,8 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// A serializable event metric definition.  Provides metadata for metrics based on events.

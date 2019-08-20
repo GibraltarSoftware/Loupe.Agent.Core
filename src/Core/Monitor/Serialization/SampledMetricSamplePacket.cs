@@ -1,7 +1,7 @@
 ﻿using System;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// The base class for a single sampled metric data sample.

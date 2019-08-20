@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Serialization

@@ -1,12 +1,12 @@
 ﻿
 using System;
 using System.Reflection;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// The definition of an event metric, necessary before any specific metric can be created.

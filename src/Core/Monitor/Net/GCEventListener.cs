@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using Loupe.Metrics;
 
-namespace Loupe.Monitor.Net
+namespace Loupe.Core.Monitor.Net
 {
     /// <summary>
     /// Records Garbage Collector metrics

@@ -1,7 +1,7 @@
 ﻿using System;
 
 #pragma warning disable 1591
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// A serializable sampled metric definition.  Provides metadata for metrics based on sampled values.

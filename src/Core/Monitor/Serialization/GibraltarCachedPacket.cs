@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using Loupe.Messaging;
-using Loupe.Serialization;
+using Loupe.Core.Messaging;
+using Loupe.Core.Serialization;
 #pragma warning disable 1591
 
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     public abstract class GibraltarCachedPacket : ICachedMessengerPacket, IEquatable<GibraltarCachedPacket>
     {

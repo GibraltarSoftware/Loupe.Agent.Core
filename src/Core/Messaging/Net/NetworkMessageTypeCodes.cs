@@ -1,5 +1,5 @@
 ﻿#pragma warning disable 1591
-namespace Loupe.Messaging.Net
+namespace Loupe.Core.Messaging.Net
 {
     public enum NetworkMessageTypeCode
     {

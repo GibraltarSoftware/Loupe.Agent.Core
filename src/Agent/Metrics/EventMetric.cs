@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using Loupe.Core;
 
 
 namespace Loupe.Agent.Metrics
@@ -133,7 +134,7 @@ namespace Loupe.Agent.Metrics
     /// <seealso cref="!:Metrics_SampledEventMetrics.html" cat="Developer's Reference">Metrics - Sampled and Event Metrics</seealso>
     public sealed class EventMetric : IComparable<EventMetric>, IEquatable<EventMetric>
     {
-        private readonly Monitor.EventMetric m_WrappedMetric;
+        private readonly Core.Monitor.EventMetric m_WrappedMetric;
         private readonly EventMetricDefinition m_MetricDefinition;
 
         /// <summary>
@@ -143,7 +144,7 @@ namespace Loupe.Agent.Metrics
         /// <param name="definition">The metric definition for the metric instance</param>
         /// <param name="instanceName">The unique name of this instance within the metric's collection.</param>
         internal EventMetric(EventMetricDefinition definition, string instanceName)
-            : this(definition, new Monitor.EventMetric(definition.WrappedDefinition, instanceName))
+            : this(definition, new Core.Monitor.EventMetric(definition.WrappedDefinition, instanceName))
         {
             // Let our other constructor handle the rest.
         }
@@ -154,7 +155,7 @@ namespace Loupe.Agent.Metrics
         /// <remarks>The new metric will automatically be added to the metric definition's metrics collection.</remarks>
         /// <param name="definition">The API event metric definition that defines this metric</param>
         /// <param name="metric">The internal event metric</param>
-        internal EventMetric(EventMetricDefinition definition, Monitor.EventMetric metric)
+        internal EventMetric(EventMetricDefinition definition, Core.Monitor.EventMetric metric)
         {
             m_MetricDefinition = definition;
             m_WrappedMetric = metric;
@@ -556,7 +557,7 @@ namespace Loupe.Agent.Metrics
         /// <summary>
         /// The internal Metric object we're wrapping.
         /// </summary>
-        internal Monitor.EventMetric WrappedMetric { get { return m_WrappedMetric; } }
+        internal Core.Monitor.EventMetric WrappedMetric { get { return m_WrappedMetric; } }
 
         #endregion
     }

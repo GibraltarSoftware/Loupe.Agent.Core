@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Loupe.Monitor;
+using Loupe.Core.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
@@ -52,7 +52,7 @@ namespace Loupe.Core.Test
 
             //now we want to wait for our performance monitor to initialize before we proceed.
             DateTime perfMonitorInitStart = DateTime.Now;
-            while ((Loupe.Monitor.Monitor.Initialized == false) 
+            while ((Loupe.Core.Monitor.Monitor.Initialized == false) 
                 && ((DateTime.Now - perfMonitorInitStart).TotalMilliseconds < 5000))
             {
                 //just wait for it...
@@ -60,7 +60,7 @@ namespace Loupe.Core.Test
             }
 
             //if we exited the while loop and it isn't done yet, it didn't get done fast enough.
-            if (Loupe.Monitor.Monitor.Initialized == false)
+            if (Loupe.Core.Monitor.Monitor.Initialized == false)
             {
                 Log.Write(LogMessageSeverity.Warning, "Unit Tests", "Performance Monitor Initialization Failed", "Performance Monitor failed to complete its initialization after we waited {0} milliseconds.", 
                           (DateTime.Now - perfMonitorInitStart).TotalMilliseconds);

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Loupe.Server.Client.Data;
+using Loupe.Core.Server.Client.Data;
 using Loupe.Configuration;
 
-namespace Loupe.Server.Client.Internal
+namespace Loupe.Core.Server.Client.Internal
 {
     internal static class ServerExtensions
     {

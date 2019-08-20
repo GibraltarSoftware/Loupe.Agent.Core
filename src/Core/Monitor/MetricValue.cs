@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Loupe.Extensibility.Data;
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single display-ready metric value.  

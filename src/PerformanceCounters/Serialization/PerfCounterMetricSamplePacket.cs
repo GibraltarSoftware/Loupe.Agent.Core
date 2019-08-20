@@ -2,10 +2,10 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using Loupe;
-using Loupe.Monitor;
-using Loupe.Monitor.Serialization;
-using Loupe.Serialization;
+using Loupe.Core;
+using Loupe.Core.Monitor;
+using Loupe.Core.Monitor.Serialization;
+using Loupe.Core.Serialization;
 
 namespace Loupe.Agent.PerformanceCounters.Serialization
 {

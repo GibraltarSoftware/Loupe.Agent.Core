@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Loupe.Messaging;
-using Loupe.Monitor;
+using Loupe.Core.Messaging;
+using Loupe.Core.Monitor;
 using Loupe.Configuration;
+using Loupe.Core;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using Microsoft.Extensions.Options;
@@ -120,12 +121,12 @@ namespace Loupe.Agent.PerformanceCounters
 
             if (m_Initialized == false)
             {
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, "Loupe.Agent", "Skipping counter poll because object is not yet initialized.",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, "Loupe.Agent", "Skipping counter poll because object is not yet initialized.",
                           "This shouldn't happen unless the Performance Monitor is being misused.");
             }
             else if (m_BusyPolling)
             {
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Information, "Loupe.Agent", "Skipping counter poll because we are still polling.",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Information, "Loupe.Agent", "Skipping counter poll because we are still polling.",
                           "If this situation persists, slow down the requested poll rate because it is too fast for the system.");
             }
             else
@@ -162,7 +163,7 @@ namespace Loupe.Agent.PerformanceCounters
                     }
                     catch (Exception exception)
                     {
-                        if (!Loupe.Monitor.Log.SilentMode) Loupe.Monitor.Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, exception, "Loupe.Agent",
+                        if (!Loupe.Core.Monitor.Log.SilentMode) Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, exception, "Loupe.Agent",
                                   "Failed to poll performance counters due to an exception.",
                                   "Exception type: {0}\r\nException message: {1}\r\n",
                                   exception.GetType().FullName, exception.Message);
@@ -273,7 +274,7 @@ namespace Loupe.Agent.PerformanceCounters
             catch (Exception exception)
             {
                 GC.KeepAlive(exception); //some warning prevention...
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
                           "Unable to record performance information for disk counters",
                           "Specific exception: {0}\r\nException message: {1}",
                           exception.GetType().FullName, exception.Message);
@@ -308,7 +309,7 @@ namespace Loupe.Agent.PerformanceCounters
             catch (Exception exception)
             {
                 GC.KeepAlive(exception); //some warning prevention...
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
                           "Unable to record performance information for network counters", 
                           "Specific exception: {0}\r\nException message: {1}",
                           exception.GetType().FullName, exception.Message);
@@ -345,7 +346,7 @@ namespace Loupe.Agent.PerformanceCounters
                 catch (Exception exception)
                 {
                     GC.KeepAlive(exception); //some warning prevention...
-                    Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
+                    Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
                         "Unable to record performance information for .NET memory counters",
                         "Specific exception: {0}\r\nException message: {1}",
                         exception.GetType().FullName, exception.Message);
@@ -370,7 +371,7 @@ namespace Loupe.Agent.PerformanceCounters
             catch (Exception exception)
             {
                 GC.KeepAlive(exception); //some warning prevention...
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
                           "Unable to record performance information for system counters",
                           "Specific exception: {0}\r\nException message: {1}",
                           exception.GetType().FullName, exception.Message);
@@ -403,7 +404,7 @@ namespace Loupe.Agent.PerformanceCounters
             catch (Exception exception)
             {
                 GC.KeepAlive(exception);
-                Loupe.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
+                Loupe.Core.Monitor.Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Loupe.Agent",
                           "Unable to record performance information for process performance counters",
                           "Specific exception: {0}\r\nException message: {1}",
                           exception.GetType().FullName, exception.Message);

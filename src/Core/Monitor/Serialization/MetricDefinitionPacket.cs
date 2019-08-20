@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using Loupe.Serialization;
+using Loupe.Core.Serialization;
 using Loupe.Extensibility.Data;
 
 #pragma warning disable 1591
-namespace Loupe.Monitor.Serialization
+namespace Loupe.Core.Monitor.Serialization
 {
     /// <summary>
     /// Defines a metric that has been captured.  Specific metrics extend this class.

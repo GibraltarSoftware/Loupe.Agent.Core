@@ -4,7 +4,7 @@ using Loupe.Configuration;
 
 
 
-namespace Loupe.Messaging
+namespace Loupe.Core.Messaging
 {
     /// <summary>
     /// Implement this interface to be a packet sink for the messaging system. 

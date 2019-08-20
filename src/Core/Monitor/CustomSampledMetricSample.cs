@@ -1,11 +1,11 @@
 ﻿
 using System;
 using System.Globalization;
-using Loupe.Monitor.Serialization;
+using Loupe.Core.Monitor.Serialization;
 using Loupe.Metrics;
 
 
-namespace Loupe.Monitor
+namespace Loupe.Core.Monitor
 {
     /// <summary>
     /// A single sample of a custom sampled metric.  Sampled metrics generally require calculation to produce data, see ComputeValue.
