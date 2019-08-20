@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Gibraltar.Server.Client.Data;
+using Loupe.Server.Client.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Informs the server that the session is complete (assuming it is a protocol 1.2 or higher server)

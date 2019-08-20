@@ -3,23 +3,23 @@ using System.Diagnostics;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
-    /// Represents errors that occur within Gibraltar during application execution.
+    /// Represents errors that occur within Loupe during application execution.
     /// </summary>
     /// <remarks>This is a base class for any new Exception types we define and for generic exceptions we
-    /// generate.  Custom Exception types defined by Gibraltar should try to derive from GibraltarException
+    /// generate.  Custom Exception types defined by Loupe should try to derive from LoupeException
     /// so that they could be caught as this base type.  This may not currently be consistent, however.
     /// For more information, see the root class, Exception.</remarks>
     public class GibraltarException : Exception
     {
         // This is a dummy wrapper around generic exceptions (for now)
 
-        // This also has the problem that although Common\Agent is accessible to all of Gibraltar code,
-        // we hide it from view in Gibraltar.dll, thus preventing customer code from being able to reference it!
+        // This also has the problem that although Common\Agent is accessible to all of Loupe code,
+        // we hide it from view in Loupe.Agent.dll, thus preventing customer code from being able to reference it!
         // This will have to be reconsidered at some point.  However, we likely want to replace most or all
-        // exceptions with our ErrorNotifier system, because we don't want Gibraltar.dll to break vital customer
+        // exceptions with our ErrorNotifier system, because we don't want Loupe.Agent.dll to break vital customer
         // applications just because they made some mistake in accessing our code.  So they likely won't see
         // any of these exceptions, anyway.
 
@@ -53,7 +53,7 @@ namespace Gibraltar
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the GibraltarException class.
+        /// Initializes a new instance of the LoupeException class.
         /// </summary>
         /// <remarks>This constructor initializes the Message property of the new instance to a system-supplied
         /// message that describes the error and takes into account the current system culture.

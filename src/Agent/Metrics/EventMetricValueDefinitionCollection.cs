@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Loupe.Extensibility.Data;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// A collection of event values for the parent event metric definition.

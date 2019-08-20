@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// This is a base class for any new serialization Exception types we define and for generic exceptions
@@ -9,7 +9,7 @@ namespace Gibraltar.Serialization
     /// <remarks>Any generation of an ApplicationException in Serialization should probably use this class instead.</remarks>
     public class GibraltarSerializationException : GibraltarException
     {
-        // This is a dummy wrapper around Gibraltar exceptions (for now)
+        // This is a dummy wrapper around Loupe exceptions (for now)
 
         /// <summary>
         /// Initializes a new instance of the GibraltarSerializationException class.

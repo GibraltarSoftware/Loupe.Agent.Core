@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;

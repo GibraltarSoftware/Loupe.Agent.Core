@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Event arguments for tracking the state of a web request

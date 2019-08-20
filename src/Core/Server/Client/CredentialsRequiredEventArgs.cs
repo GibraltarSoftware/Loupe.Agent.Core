@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Information used in the CredentialsRequired event.

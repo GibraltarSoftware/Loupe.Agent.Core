@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// The default progress monitor stack implementation.

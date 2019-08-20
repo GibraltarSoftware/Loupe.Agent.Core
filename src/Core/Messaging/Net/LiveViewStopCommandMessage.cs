@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
 
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Indicates the live view session for the specified session Id be terminated

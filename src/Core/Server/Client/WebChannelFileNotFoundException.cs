@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Thrown by the web channel when the server reports that the file was not found..

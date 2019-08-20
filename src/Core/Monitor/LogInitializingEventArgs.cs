@@ -1,10 +1,10 @@
 ﻿using System;
 using Loupe.Configuration;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
-    /// Event arguments for the Log.Initializing event of the Gibraltar Agent Logging class.
+    /// Event arguments for the Log.Initializing event of the Loupe Agent Logging class.
     /// </summary>
     public class LogInitializingEventArgs : EventArgs
     {

@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor
+﻿namespace Loupe.Monitor
 {
     /// <summary>
     /// A collection of sampled metrics, keyed by their unique ID and name

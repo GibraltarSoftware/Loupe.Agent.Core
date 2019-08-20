@@ -1,8 +1,8 @@
 ﻿using System;
-using Gibraltar.Agent.Internal;
+using Loupe.Agent.Internal;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// EventArgs for Notification events.

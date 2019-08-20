@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Gibraltar.Data;
-using Gibraltar.Serialization;
+using Loupe.Data;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class LogMessageEnumerator : IEnumerator<LogMessage>
     {

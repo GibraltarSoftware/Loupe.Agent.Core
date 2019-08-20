@@ -5,17 +5,17 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
-    /// An intermediary class to log a basic log message for the Gibraltar API. 
+    /// An intermediary class to log a basic log message for the Loupe API. 
     /// </summary>
-    /// <remarks>This class knows how to formulate a log message for the basic Gibraltar API, including a caption and
+    /// <remarks>This class knows how to formulate a log message for the basic Loupe API, including a caption and
     /// formatted description.  Importantly, it knows how to acquire information about the source of a log message
     /// from the current call stack, and acts as its own IMessageSourceProvider when handing it off to the central Log.
     /// Thus, this object must be created while still within the same call stack as the origination of the log message.
     /// It can also scan the format args for the first Exception object, or an Exception object to attach (or null) may be
-    /// specified directly.  Used by our external Gibraltar log API.</remarks>
+    /// specified directly.  Used by our external Loupe log API.</remarks>
     public class BasicLogMessage : LogMessageBase
     {
         /// <summary>
@@ -26,7 +26,7 @@ namespace Gibraltar.Monitor
         /// one found as the Exception object for this log message (if any).</remarks>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
@@ -51,7 +51,7 @@ namespace Gibraltar.Monitor
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="writeMode">Whether to queue-and-return or wait-for-commit.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
@@ -75,7 +75,7 @@ namespace Gibraltar.Monitor
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="writeMode">Whether to queue-and-return or wait-for-commit.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be

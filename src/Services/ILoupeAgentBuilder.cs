@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 
 namespace Loupe.Agent.Core.Services
 {

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Gibraltar.Data;
-using Gibraltar.Serialization;
+using Loupe.Data;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using System.Diagnostics;
 using Ionic.Zlib;
 
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class GLFWriter : IDisposable
     {

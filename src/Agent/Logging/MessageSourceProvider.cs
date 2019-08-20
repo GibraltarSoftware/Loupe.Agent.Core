@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Agent.Logging
+namespace Loupe.Agent.Logging
 {
     /// <summary>
     /// A basic class to determine the source of a log message and act as an IMessageSourceProvider. 

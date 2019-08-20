@@ -1,13 +1,13 @@
 ﻿using System.IO;
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Efficiently manage the deserialization of log packets from a sequence of buffers.
     /// </summary>
     /// <remarks>
-    /// Gibraltar session files are large and complex.  Reading them fast is important to user satisfaction
-    /// -- particularly the time to open a session in Gibraltar Analyst. Sessions are read from a stream in
+    /// Loupe session files are large and complex.  Reading them fast is important to user satisfaction
+    /// -- particularly the time to open a session in Loupe Desktop. Sessions are read from a stream in
     /// a series of buffers.  Each buffer contains some number of packets. This base class provides common
     /// infrastructure to support higher-level concrete classes to support synchronous and asynchronous 
     /// reading of buffers.

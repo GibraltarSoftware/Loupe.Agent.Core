@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Common routines for manipulating files and directories that extend the .NET framework

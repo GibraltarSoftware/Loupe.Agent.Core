@@ -3,16 +3,16 @@ using System.Runtime.CompilerServices;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Base class for log message template classes. 
     /// </summary>
     /// <remarks>This class knows how to translate from a simple logging API like Trace into our more all-encompassing
-    /// Gibraltar Log collector.  Importantly, it knows how to acquire information about the source of a log message
+    /// Loupe Log collector.  Importantly, it knows how to acquire information about the source of a log message
     /// from the current call stack, and acts as its own IMessageSourceProvider when handing it off to the central Log.
     /// Thus, this object must be created while still within the same call stack as the origination of the log message.
-    /// Used internally by our Trace Listener and external Gibraltar log API.</remarks>
+    /// Used internally by our Trace Listener and external Loupe log API.</remarks>
     public abstract class LogMessageBase
     {
         private readonly LogMessageSeverity m_Severity;
@@ -33,7 +33,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         protected LogMessageBase(LogMessageSeverity severity, string logSystem, string categoryName)
@@ -48,12 +48,12 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
         /// identified as the source of the log message.</param>
-        /// <param name="localOrigin">True if logging a message originating in Gibraltar code.
+        /// <param name="localOrigin">True if logging a message originating in Loupe code.
         /// False if logging a message from the client application.</param>
         /// <param name="attributeToException">True if the call stack from where the exception was thrown should be used for log message attribution</param>
         /// <param name="exception">When attributeToException is used, this exception object is used to determine the calling location</param>
@@ -86,7 +86,7 @@ namespace Gibraltar.Monitor
         public LogMessageSeverity Severity { get { return m_Severity; } }
 
         /// <summary>
-        /// The name of the logging system the message was issued through, such as "Trace" or "Gibraltar".
+        /// The name of the logging system the message was issued through, such as "Trace" or "Loupe".
         /// </summary>
         public string LogSystem { get { return m_LogSystem; } }
 
@@ -187,7 +187,7 @@ namespace Gibraltar.Monitor
         }
             
         /// <summary>
-        /// Publish this SimpleLogMessage to the Gibraltar central log.
+        /// Publish this SimpleLogMessage to the Loupe central log.
         /// </summary>
         public void PublishToLog()
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Event arguments for the TaskException event 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The event arguments for a collection change event, indicating what change was made to which collection.

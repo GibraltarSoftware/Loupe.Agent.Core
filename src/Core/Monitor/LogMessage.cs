@@ -1,8 +1,8 @@
 ﻿using System;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A Loupe log message.
@@ -63,7 +63,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The system that logged the message
         /// </summary>
-        /// <remarks>Commonly Trace, Gibraltar, or Log4Net but can also be a user-specified system.</remarks>
+        /// <remarks>Commonly Trace, Loupe, or Log4Net but can also be a user-specified system.</remarks>
         public string LogSystem { get { return m_MessagePacket.LogSystem; } }
 
         /// <summary>

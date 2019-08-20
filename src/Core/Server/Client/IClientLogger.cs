@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// HTTP Client logging interface
@@ -14,7 +14,7 @@ namespace Gibraltar.Server.Client
         bool SilentMode { get; }
 
         /// <summary>
-        /// Write a trace message directly to the Gibraltar log.
+        /// Write a trace message directly to the Loupe log.
         /// </summary>
         /// <remarks>The log message will be attributed to the caller of this method.  Wrapper methods should
         /// instead call the WriteMessage() method in order to attribute the log message to their own outer
@@ -28,7 +28,7 @@ namespace Gibraltar.Server.Client
             params object[] args);
 
         /// <summary>
-        /// Write a log message directly to the Gibraltar log with an attached Exception and specifying
+        /// Write a log message directly to the Loupe log with an attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>The log message will be attributed to the caller of this method.  Wrapper methods should

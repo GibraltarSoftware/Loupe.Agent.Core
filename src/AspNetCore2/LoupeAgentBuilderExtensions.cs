@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Agent.AspNetCore.Metrics;
 using Loupe.Agent.Core.Services;
 

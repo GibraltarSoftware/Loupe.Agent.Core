@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A basic class to determine the source of a log message and act as an IMessageSourceProvider. 
@@ -73,12 +73,12 @@ namespace Gibraltar.Monitor
         /// usual direct PublishToLog() mechanism.</remarks>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
         /// identified as the source of the log message.</param>
-        /// <param name="localOrigin">True if logging a message originating in Gibraltar code.
+        /// <param name="localOrigin">True if logging a message originating in Loupe code.
         /// False if logging a message from the client application.</param>
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
         public MessageSourceProvider(int skipFrames, bool localOrigin)
         {
-            const bool trustSkipFrames = true; // Set true to trust skipFrames count and don't skip over Gibraltar libs.
+            const bool trustSkipFrames = true; // Set true to trust skipFrames count and don't skip over Loupe libs.
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
             CommonCentralLogic.FindMessageSource(skipFrames + 1, localOrigin || trustSkipFrames, null,

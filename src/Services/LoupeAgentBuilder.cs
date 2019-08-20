@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security.Principal;
-using Gibraltar.Agent;
-using Gibraltar.Monitor;
+using Loupe.Agent;
+using Loupe.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

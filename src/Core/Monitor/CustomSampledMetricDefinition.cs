@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The definition of a user-defined sampled metric

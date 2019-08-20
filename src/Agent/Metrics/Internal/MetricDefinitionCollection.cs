@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Gibraltar.Agent.Metrics.Internal
+namespace Loupe.Agent.Metrics.Internal
 {
     /// <summary>
     /// A collection of metric definitions, keyed by their unique Id and Key.

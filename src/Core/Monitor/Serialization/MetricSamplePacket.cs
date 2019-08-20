@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Principal;
-using Gibraltar.Messaging;
-using Gibraltar.Serialization;
+using Loupe.Messaging;
+using Loupe.Serialization;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Base object for all metric sample packets

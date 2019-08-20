@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using Gibraltar.Data;
-using Gibraltar.Serialization;
+using Loupe.Data;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     [DebuggerDisplay("{Caption} ({ID})")]
     public class SessionSummaryPacket : GibraltarCachedPacket, IPacket, IEquatable<SessionSummaryPacket>

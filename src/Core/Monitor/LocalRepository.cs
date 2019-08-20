@@ -4,15 +4,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Gibraltar.Data;
-using Gibraltar.Data.Internal;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Data;
+using Loupe.Data.Internal;
+using Loupe.Messaging;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The local collection repository, a minimalistic repository
@@ -387,7 +387,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Indicates if the database should log operations to Gibraltar or not.
+        /// Indicates if the database should log operations to Loupe or not.
         /// </summary>
         public bool IsLoggingEnabled { get { return m_LoggingEnabled; } set { m_LoggingEnabled = value; } }
 

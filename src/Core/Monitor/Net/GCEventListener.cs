@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using Loupe.Metrics;
 
-namespace Gibraltar.Monitor.Net
+namespace Loupe.Monitor.Net
 {
     /// <summary>
     /// Records Garbage Collector metrics

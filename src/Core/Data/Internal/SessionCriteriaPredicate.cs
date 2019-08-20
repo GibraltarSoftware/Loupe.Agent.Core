@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Data.Internal
+namespace Loupe.Data.Internal
 {
 
     /// <summary>

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Marks the ending status of a session.

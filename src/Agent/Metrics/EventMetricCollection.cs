@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// The collection of event metrics for a given event metric definition.

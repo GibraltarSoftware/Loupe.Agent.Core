@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Gibraltar.Data;
-using Gibraltar.Monitor;
+using Loupe.Data;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// Monitors the discovery directory of the local file system for discovery file changes.

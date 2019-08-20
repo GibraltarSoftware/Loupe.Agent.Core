@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using System.Threading;
-using Gibraltar;
-using Gibraltar.Monitor;
+using Loupe;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;
@@ -123,7 +123,7 @@ namespace Loupe.Core.Test.Core
         {
             const int count = 10000;
             MessageSourceProvider source = new MessageSourceProvider(0, true);
-            Gibraltar.Messaging.IMessengerPacket[] batch = new Gibraltar.Messaging.IMessengerPacket[count];
+            Loupe.Messaging.IMessengerPacket[] batch = new Loupe.Messaging.IMessengerPacket[count];
             for (int i = 0; i < count; i++)
             {
                 batch[i] = Log.MakeLogPacket(LogMessageSeverity.Verbose, "GibraltarTest", "Test.Core.LogMessage.Performance.Flush",

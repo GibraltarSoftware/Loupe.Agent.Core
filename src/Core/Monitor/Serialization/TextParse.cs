@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// String parsing utility methods.

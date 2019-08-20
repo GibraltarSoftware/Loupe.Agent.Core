@@ -1,7 +1,7 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// This interface is required to be a publishable packet

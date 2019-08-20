@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Security.Principal;
 using System.Text;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Serialization;
+using Loupe.Monitor.Serialization;
+using Loupe.Serialization;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// Identifies a packet that can be associated with a specific user

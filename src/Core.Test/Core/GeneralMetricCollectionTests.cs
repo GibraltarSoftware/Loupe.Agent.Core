@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 using NUnit.Framework;

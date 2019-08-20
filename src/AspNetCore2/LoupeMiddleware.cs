@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Gibraltar.Agent;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent;
+using Loupe.Agent.Metrics;
 using Loupe.Agent.Core.Services;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;

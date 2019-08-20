@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// A class to hold a file lock for this process (app domain) and pass it fairly to other waiting threads before release.

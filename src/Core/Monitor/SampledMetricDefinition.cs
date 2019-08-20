@@ -1,6 +1,6 @@
-﻿using Gibraltar.Monitor.Serialization;
+﻿using Loupe.Monitor.Serialization;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The base class for defining sampled metrics

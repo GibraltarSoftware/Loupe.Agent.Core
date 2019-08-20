@@ -1,11 +1,11 @@
 ﻿
 using System;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// EventArgs for Notification events.

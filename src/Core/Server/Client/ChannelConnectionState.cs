@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Server.Client
+﻿namespace Loupe.Server.Client
 {
     /// <summary>
     /// The status of the subscription connection

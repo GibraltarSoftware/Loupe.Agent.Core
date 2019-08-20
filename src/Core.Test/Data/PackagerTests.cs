@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using Gibraltar;
-using Gibraltar.Data;
-using Gibraltar.Data.Internal;
-using Gibraltar.Monitor;
+using Loupe;
+using Loupe.Data;
+using Loupe.Data.Internal;
+using Loupe.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;

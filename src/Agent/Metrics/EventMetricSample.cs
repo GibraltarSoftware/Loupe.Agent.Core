@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// One sample of a Event metric

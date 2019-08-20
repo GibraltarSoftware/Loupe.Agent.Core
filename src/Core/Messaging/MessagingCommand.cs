@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Messaging
+﻿namespace Loupe.Messaging
 {
     /// <summary>
     /// Different types of commands.
@@ -31,7 +31,7 @@
         CloseMessenger = 4,
 
         /// <summary>
-        /// Cause the Gibraltar Live View form to be (generated if necessary and) shown.
+        /// Cause the Loupe Live View form to be (generated if necessary and) shown.
         /// </summary>
         ShowLiveView = 5,
 

@@ -1,12 +1,12 @@
 ﻿
 using System;
 using System.Reflection;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The definition of an event metric, necessary before any specific metric can be created.

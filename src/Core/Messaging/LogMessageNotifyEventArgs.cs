@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// EventArgs for LogMessage notify events.

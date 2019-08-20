@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Defines a metric that has been captured.  Specific metrics extend this class.

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Extended information for a single application user

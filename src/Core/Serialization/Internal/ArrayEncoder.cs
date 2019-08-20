@@ -4,7 +4,7 @@ using System.Reflection;
 
 
 
-namespace Gibraltar.Serialization.Internal
+namespace Loupe.Serialization.Internal
 {
     /// <summary>
     /// This helper class implements an enhanced run length encoding strategy

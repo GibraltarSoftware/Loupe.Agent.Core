@@ -17,7 +17,7 @@ namespace Loupe.Configuration
     ///             False and specify a <see cref="Server">Server</see>
     /// 		</item>
     /// 	</list>
-    /// 	<para><strong>Using the Gibraltar Loupe Service</strong></para>
+    /// 	<para><strong>Using the Loupe Cloud-Hosted Service</strong></para>
     /// 	<para>Just set the UseGibraltarService option to True and specify your Account name
     ///     which you can find at <a href="http://www.GibraltarSoftware.com">www.GibraltarSoftware.com</a>.</para>
     /// 	<para><strong>Using a Private Loupe Server</strong></para>
@@ -103,7 +103,7 @@ namespace Loupe.Configuration
     ///         //and configure Loupe Server Connection
     ///         ServerConfiguration server = e.Configuration.Server;
     ///         server.UseGibraltarService = true;
-    ///         server.CustomerName = "Gibraltar Software";
+    ///         server.CustomerName = "yOUR_SERVICE_NAME";
     ///         server.AutoSendSessions = true;
     ///         server.SendAllApplications = true;
     ///         server.PurgeSentSessions = true;
@@ -167,12 +167,12 @@ namespace Loupe.Configuration
         public string ApplicationKey { get; set; }
 
         /// <summary>
-        /// The unique customer name when using the Gibraltar Loupe Service
+        /// The unique customer name when using the Loupe Cloud-Hosted Service
         /// </summary>
         public string CustomerName { get; set; }
 
         /// <summary>
-        /// Indicates if the Gibraltar Loupe Service should be used instead of a private Loupe Server
+        /// Indicates if the Loupe Cloud-Hosted Service should be used instead of a private Loupe Server
         /// </summary>
         /// <remarks>If true then the customer name must be specified.</remarks>
         public bool UseGibraltarService { get; set; }

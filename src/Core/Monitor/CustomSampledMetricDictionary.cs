@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The collection of custom sampled metrics for a given sampled metric definition.

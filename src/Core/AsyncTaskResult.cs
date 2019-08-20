@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// The result of processing an asynchronous task

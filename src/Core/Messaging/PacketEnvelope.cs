@@ -1,7 +1,7 @@
-﻿namespace Gibraltar.Messaging
+﻿namespace Loupe.Messaging
 {
     /// <summary>
-    /// Wraps a Gibraltar Packet for publishing
+    /// Wraps a Loupe Packet for publishing
     /// </summary>
     /// <remarks>For thread safety, request a lock on this object directly.  This is necessary when accessing updateable properties.</remarks>
     internal class PacketEnvelope
@@ -98,7 +98,7 @@
             }
         }
         /// <summary>
-        /// The actual Gibraltar Packet
+        /// The actual Loupe Packet
         /// </summary>
         public IMessengerPacket Packet { get { return m_Packet; } }
 

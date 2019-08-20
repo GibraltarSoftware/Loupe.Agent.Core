@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Standard interface for objects that can write individual serialized fields

@@ -3,7 +3,7 @@
 
 
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Information about the Package Send Events.

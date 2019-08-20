@@ -4,8 +4,8 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
-using Gibraltar.Agent;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent;
+using Loupe.Agent.Metrics;
 using Loupe.Logging;
 using Loupe.Metrics;
 using NUnit.Framework;
@@ -69,7 +69,7 @@ namespace Loupe.Agent.Test.Metrics
                 newEventMetric.AddValue("string", typeof(string), SummaryFunction.Count, null, "String", "Data of type String");
                 newEventMetric.AddValue("system.enum", typeof(UserDataEnumeration), SummaryFunction.Count, null, "System.Enum", "Data of type System.Enum");
                 
-                // Finally, register it with Gibraltar, and specify the default value column we saved above.
+                // Finally, register it with Loupe, and specify the default value column we saved above.
                 EventMetricDefinition.Register(ref newEventMetric, defaultValue);
             }
 
@@ -120,7 +120,7 @@ namespace Loupe.Agent.Test.Metrics
             newSample.SetValue("string", string.Format(CultureInfo.CurrentCulture, "The current manual sample is {0}", 1));
             newSample.SetValue("system.enum", (UserDataEnumeration)1);
 
-            // And finally, tell the sample to write itself to the Gibraltar log.
+            // And finally, tell the sample to write itself to the Loupe log.
             newSample.Write();
         }
 

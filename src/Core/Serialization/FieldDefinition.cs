@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Serialization
+﻿namespace Loupe.Serialization
 {
     /// <summary>
     /// FieldDefinition is only used internally by PacketDefinition to hold the name and type of a field

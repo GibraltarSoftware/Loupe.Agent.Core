@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
 
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     public class PacketWriter : IPacketWriter, IDisposable
     {

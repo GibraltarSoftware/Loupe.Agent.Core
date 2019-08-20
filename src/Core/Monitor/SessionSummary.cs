@@ -9,12 +9,12 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using Gibraltar.Data;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Data;
+using Loupe.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Summary information about the entire session.
@@ -518,7 +518,7 @@ namespace Gibraltar.Monitor
         public Version ApplicationVersion => m_Packet.ApplicationVersion;
 
         /// <summary>
-        /// The version of the Gibraltar Agent used to monitor the session
+        /// The version of the Loupe Agent used to monitor the session
         /// </summary>
         public Version AgentVersion => m_Packet.AgentVersion;
 

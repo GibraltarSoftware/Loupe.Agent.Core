@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Gibraltar.Data.Internal;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor;
-using Gibraltar.Server.Client;
+using Loupe.Data.Internal;
+using Loupe.Messaging;
+using Loupe.Monitor;
+using Loupe.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Performs constant, background publishing of sessions from the repository.

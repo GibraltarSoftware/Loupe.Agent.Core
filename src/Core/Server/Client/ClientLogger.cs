@@ -1,9 +1,9 @@
 ﻿using System;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Client logger implementation for our core Loupe logging interface

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Messaging;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;

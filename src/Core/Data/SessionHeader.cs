@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Used at the start of a data stream to contain the session summary
@@ -642,7 +642,7 @@ namespace Gibraltar.Data
         }
 
         /// <summary>
-        /// The version of the Gibraltar Agent used to monitor the session
+        /// The version of the Loupe Agent used to monitor the session
         /// </summary>
         public Version AgentVersion
         {

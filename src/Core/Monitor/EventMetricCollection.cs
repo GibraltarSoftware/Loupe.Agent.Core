@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The collection of event metrics for a given event metric definition.

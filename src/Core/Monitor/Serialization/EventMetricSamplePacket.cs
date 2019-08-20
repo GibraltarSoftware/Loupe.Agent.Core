@@ -1,8 +1,8 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// One raw data sample of an event metric

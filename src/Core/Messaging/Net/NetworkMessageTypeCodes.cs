@@ -1,5 +1,5 @@
 ﻿#pragma warning disable 1591
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     public enum NetworkMessageTypeCode
     {

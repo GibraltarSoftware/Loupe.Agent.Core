@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using NUnit.Framework;
 
 #pragma warning disable 1591

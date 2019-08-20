@@ -1,4 +1,4 @@
-﻿using Gibraltar.Agent.Metrics;
+﻿using Loupe.Agent.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Loupe.Agent.EntityFrameworkCore

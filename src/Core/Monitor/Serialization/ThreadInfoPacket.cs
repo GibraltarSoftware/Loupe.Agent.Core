@@ -1,9 +1,9 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class ThreadInfoPacket : GibraltarCachedPacket, IPacket, IEquatable<ThreadInfoPacket>, IThreadInfo
     {

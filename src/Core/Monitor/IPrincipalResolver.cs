@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Resolves the user principle for the current thread

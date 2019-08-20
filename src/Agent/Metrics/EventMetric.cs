@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reflection;
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// A single event metric instance object, representing one instance of an event
@@ -17,7 +17,7 @@ namespace Gibraltar.Agent.Metrics
     ///     </para>
     /// 	<para>
     ///         To protect against duplicates with the same instance name, EventMetric does not
-    ///         have public constructors. Instead, use the static <see cref="Register(Gibraltar.Agent.Metrics.EventMetricDefinition, string)">EventMetric.Register</see>
+    ///         have public constructors. Instead, use the static <see cref="Register(Loupe.Agent.Metrics.EventMetricDefinition, string)">EventMetric.Register</see>
     ///         method with appropriate arguments to identify the specific event metric
     ///         definition under which to create an event metric instance with a designated
     ///         instance name.
@@ -55,7 +55,7 @@ namespace Gibraltar.Agent.Metrics
     ///     </para>
     /// 	<para><strong>Viewing Metrics</strong></para>
     /// 	<para>Metrics are visible in the <a href="Viewer_Session_Introduction.html">Session
-    ///     Viewer</a> of the <a href="Viewer_Introduction.html">Gibraltar Analyst</a>. Metrics
+    ///     Viewer</a> of <a href="Viewer_Introduction.html">Loupe Desktop</a>. Metrics
     ///     are not displayed in the Loupe Live Viewer.</para>
     /// </remarks>
     /// <seealso cref="EventMetricSample" cat="Related Classes">EventMetricSample Class</seealso>

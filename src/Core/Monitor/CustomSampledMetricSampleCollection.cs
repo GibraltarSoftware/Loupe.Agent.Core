@@ -1,7 +1,7 @@
 ﻿using System;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The collection of metric samples for a custom sampled metric.

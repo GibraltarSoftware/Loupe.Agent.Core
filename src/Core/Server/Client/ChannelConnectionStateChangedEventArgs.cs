@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// The event arguments for the connection state changed event

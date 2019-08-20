@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar;
+using Loupe;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test

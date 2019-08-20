@@ -1,10 +1,10 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// A command to be processed by the messaging system.

@@ -10,7 +10,7 @@ using System.Reflection;
 
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Holds the metadata needed to correctly interpret the stream of fields associated with a serialized packet
@@ -620,8 +620,8 @@ namespace Gibraltar.Serialization
 
         internal static MethodInfo GetIPacketMethod(Type type, string methodName, BindingFlags flags, Type[] methodArgTypes)
         {
-            var requestedMethod = type.GetTypeInfo().DeclaredMethods.FirstOrDefault(m => m.Name.Equals("Gibraltar.Serialization.IPacket." + methodName, StringComparison.Ordinal));
-//            requestedMethod = type.GetMethod("Gibraltar.Serialization.IPacket." + methodName, flags, null, methodArgTypes, null); //original
+            var requestedMethod = type.GetTypeInfo().DeclaredMethods.FirstOrDefault(m => m.Name.Equals("Loupe.Serialization.IPacket." + methodName, StringComparison.Ordinal));
+            //            requestedMethod = type.GetMethod("Loupe.Serialization.IPacket." + methodName, flags, null, methodArgTypes, null); //original
 
             return requestedMethod;
         } 

@@ -1,7 +1,7 @@
-﻿using Gibraltar.Agent;
+﻿using Loupe.Agent;
 using System;
 using System.Diagnostics;
-using Gibraltar.Data;
+using Loupe.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
@@ -184,7 +184,7 @@ namespace Loupe.Packager
                                     else
                                     {
                                         using (var packager =
-                                            new Gibraltar.Agent.Packager(productName, applicationName, folder))
+                                            new Loupe.Agent.Packager(productName, applicationName, folder))
                                         {
                                             Console.WriteLine("Sending new sessions to {0}", configuration);
                                             packager.SendToServer(SessionCriteria.NewSessions, true,
@@ -207,7 +207,7 @@ namespace Loupe.Packager
                                     else
                                     {
                                         using (var packager =
-                                            new Gibraltar.Agent.Packager(productName, applicationName, folder))
+                                            new Loupe.Agent.Packager(productName, applicationName, folder))
                                         {
                                             packager.SendToFile(SessionCriteria.NewSessions, true,
                                                 fullFileNamePath);

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Loupe application logging factory

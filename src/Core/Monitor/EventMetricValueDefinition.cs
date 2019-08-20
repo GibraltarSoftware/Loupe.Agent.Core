@@ -2,13 +2,13 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Serialization;
+using Loupe.Monitor.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Defines one value that can be associated with an event metric.

@@ -16,7 +16,7 @@
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <AssemblyName>Loupe.Agent.NETCore</AssemblyName>
-    <RootNamespace>Gibraltar.Agent</RootNamespace>
+    <RootNamespace>Loupe.Agent</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

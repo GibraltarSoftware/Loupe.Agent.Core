@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using Gibraltar.Agent;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent;
+using Loupe.Agent.Metrics;
 using Loupe.Logging;
 using Loupe.Metrics;
 using NUnit.Framework;

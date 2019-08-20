@@ -2,7 +2,7 @@
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// An interface to get the Name of NameValuePair&lt;TValue&gt; of any value type.

@@ -1,4 +1,4 @@
-﻿using Gibraltar.Agent.Metrics;
+﻿using Loupe.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore.Metrics
@@ -12,7 +12,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         private const string MetricName = "Page Hit";
         private const string MetricCaption = "Page Hit";
         private const string MetricDescription = "Performance tracking data about every web page hit";
-        private const string MetricSystem = "Gibraltar";
+        private const string MetricSystem = "Loupe";
 
         private readonly EventMetric _metric;
 

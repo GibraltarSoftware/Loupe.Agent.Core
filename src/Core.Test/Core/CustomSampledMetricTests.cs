@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Threading;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Metrics;
 using NUnit.Framework;
 

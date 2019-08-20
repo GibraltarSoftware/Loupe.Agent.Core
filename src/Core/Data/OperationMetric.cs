@@ -2,12 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Record an event metric for a single execution of a data operation
@@ -24,7 +24,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// The metric type name
         /// </summary>
-        public const string MetricTypeName = "Gibraltar Software";
+        public const string MetricTypeName = "Loupe";
 
         /// <summary>
         /// The metric counter name
@@ -47,7 +47,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Create a new operation metric monitoring object to record a single operation.
         /// </summary>
-        /// <remarks>All event metrics are recorded under the same metric counter in Gibraltar.Data called Repository Operation.</remarks>
+        /// <remarks>All event metrics are recorded under the same metric counter in Loupe.Data called Repository Operation.</remarks>
         /// <param name="category">The category to use for the metric</param>
         /// <param name="operationName">The name of the operation for tracking purposes</param>
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
@@ -59,7 +59,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Create a new operation metric monitoring object to record a single operation.
         /// </summary>
-        /// <remarks>All event metrics are recorded under the same metric counter in Gibraltar.Data called Repository Operation.</remarks>
+        /// <remarks>All event metrics are recorded under the same metric counter in Loupe.Data called Repository Operation.</remarks>
         /// <param name="category">The category to use for the metric</param>
         /// <param name="operationName">The name of the operation for tracking purposes</param>
         /// <param name="startMessage">A trace message to add at the start of the operation.</param>
@@ -72,7 +72,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Create a new operation metric monitoring object to record a single operation.
         /// </summary>
-        /// <remarks>All event metrics are recorded under the same metric counter in Gibraltar.Data called Repository Operation.</remarks>
+        /// <remarks>All event metrics are recorded under the same metric counter in Loupe.Data called Repository Operation.</remarks>
         /// <param name="category">The category to use for the metric</param>
         /// <param name="operationName">The name of the operation for tracking purposes</param>
         /// <param name="startMessage">A trace message to add at the start of the operation.</param>
@@ -86,7 +86,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Create a new operation metric monitoring object to record a single operation.
         /// </summary>
-        /// <remarks>All event metrics are recorded under the same metric counter in Gibraltar.Data called Repository Operation.</remarks>
+        /// <remarks>All event metrics are recorded under the same metric counter in Loupe.Data called Repository Operation.</remarks>
         /// <param name="category">The category to use for the metric</param>
         /// <param name="operationName">The name of the operation for tracking purposes</param>
         /// <param name="startMessage">A trace message to add at the start of the operation. Any args provided will be inserted.</param>
@@ -193,7 +193,7 @@ namespace Gibraltar.Data
             m_Timer = Stopwatch.StartNew();
 
             //and record off our input
-            m_Category = string.IsNullOrEmpty(category) ? "Gibraltar.Data" : category;
+            m_Category = string.IsNullOrEmpty(category) ? "Loupe.Data" : category;
             m_OperationName = string.IsNullOrEmpty(operationName) ? "Operation" : operationName;
             m_Args = args;
 

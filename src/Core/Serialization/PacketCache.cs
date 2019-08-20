@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     public class PacketCache : IEnumerable<ICachedPacket>
     {

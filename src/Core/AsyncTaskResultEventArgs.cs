@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// The results from processing an asynchronous task.

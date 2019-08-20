@@ -2,7 +2,7 @@
 
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// Describes shared parameters for sampled metrics defined on the current object.

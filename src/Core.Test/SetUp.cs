@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
@@ -52,7 +52,7 @@ namespace Loupe.Core.Test
 
             //now we want to wait for our performance monitor to initialize before we proceed.
             DateTime perfMonitorInitStart = DateTime.Now;
-            while ((Gibraltar.Monitor.Monitor.Initialized == false) 
+            while ((Loupe.Monitor.Monitor.Initialized == false) 
                 && ((DateTime.Now - perfMonitorInitStart).TotalMilliseconds < 5000))
             {
                 //just wait for it...
@@ -60,7 +60,7 @@ namespace Loupe.Core.Test
             }
 
             //if we exited the while loop and it isn't done yet, it didn't get done fast enough.
-            if (Gibraltar.Monitor.Monitor.Initialized == false)
+            if (Loupe.Monitor.Monitor.Initialized == false)
             {
                 Log.Write(LogMessageSeverity.Warning, "Unit Tests", "Performance Monitor Initialization Failed", "Performance Monitor failed to complete its initialization after we waited {0} milliseconds.", 
                           (DateTime.Now - perfMonitorInitStart).TotalMilliseconds);
@@ -85,7 +85,7 @@ namespace Loupe.Core.Test
                 //set up our logging.
                 PublisherConfiguration publisher = e.Configuration.Publisher;
                 publisher.ProductName = "NUnit";
-                publisher.ApplicationName = "Gibraltar.Test";
+                publisher.ApplicationName = "Loupe.Test";
 
                 //and now try to get the file version.  This is risky.
                 var fileVersionAttributes = this.GetType().GetTypeInfo().Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute));
@@ -100,7 +100,7 @@ namespace Loupe.Core.Test
                     }
                 }
 
-                publisher.ApplicationDescription = "NUnit tests of the Gibraltar Core Library";
+                publisher.ApplicationDescription = "NUnit tests of the Loupe Core Library";
 
                 e.Configuration.SessionFile.EnableFilePruning = false;
             }
@@ -110,7 +110,7 @@ namespace Loupe.Core.Test
         public void RunAfterAllTests()
         {
             //Tell our central log session we're shutting down nicely
-            Log.EndSession(SessionStatus.Normal, 0, "Ending unit tests in Gibraltar.Test");
+            Log.EndSession(SessionStatus.Normal, 0, "Ending unit tests in Loupe.Test");
         }
     }
 }

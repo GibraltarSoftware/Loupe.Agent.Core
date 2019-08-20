@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The sorted list of all log messages

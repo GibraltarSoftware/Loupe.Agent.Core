@@ -3,7 +3,7 @@ using System.IO;
 
 
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Informs the receiver to start a new packet serializer for the subsequent data.

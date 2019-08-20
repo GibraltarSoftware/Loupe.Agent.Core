@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Arguments used to execute tasks asynchronously using progress monitors.

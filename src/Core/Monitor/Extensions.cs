@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Gibraltar
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Conversion extensions

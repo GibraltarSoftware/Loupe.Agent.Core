@@ -2,14 +2,14 @@
 
 
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// Information about the Package Send Events.
     /// </summary>
     public sealed class PackageSendEventArgs : EventArgs
     {
-        internal PackageSendEventArgs(Gibraltar.Data.PackageSendEventArgs args)
+        internal PackageSendEventArgs(Loupe.Data.PackageSendEventArgs args)
         {
             FileSize = args.FileSize;
             Result = (AsyncTaskResult)args.Result;

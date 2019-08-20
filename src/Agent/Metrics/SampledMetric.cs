@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using Loupe.Metrics;
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// A single instance of a metric that is recorded by sampling its value on a

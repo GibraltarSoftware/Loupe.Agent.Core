@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
 
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Contains the session summary information for a remote session

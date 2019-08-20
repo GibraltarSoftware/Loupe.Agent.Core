@@ -9,7 +9,7 @@ using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor.Net
+namespace Loupe.Monitor.Net
 {
     /// <summary>
     /// Monitors the Common Language Runtime for noteworthy events.
@@ -17,7 +17,7 @@ namespace Gibraltar.Monitor.Net
     /// <remarks>This listener is automatically activated by the PerformanceMonitor class.</remarks>
     public class CLRListener : IDisposable
     {
-        private const string ThisLogSystem = "Gibraltar";
+        private const string ThisLogSystem = "Loupe";
 
         private bool m_Disposed;
 
@@ -758,7 +758,7 @@ namespace Gibraltar.Monitor.Net
 
         private static void LogEvent(LogMessageSeverity severity, string category, string caption, string description, params object[] args)
         {
-            MessageSource source = new MessageSource("Gibraltar.Agent.Net.CLRListener", "LogEvent");
+            MessageSource source = new MessageSource("Loupe.Agent.Net.CLRListener", "LogEvent");
             Log.WriteMessage(severity, LogWriteMode.Queued, ThisLogSystem, category, source, null, null, null, caption, description, args);
         }
 

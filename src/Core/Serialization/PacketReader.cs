@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Gibraltar.Data;
-using Gibraltar.Serialization.Internal;
+using Loupe.Data;
+using Loupe.Serialization.Internal;
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Reads a packet data stream, recreating the packets it contains

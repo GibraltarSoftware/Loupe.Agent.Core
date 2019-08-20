@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// A collection of file references that can be persisted.
@@ -622,7 +622,7 @@ namespace Gibraltar
             lock (m_DirectoryMonitorThreadLock)
             {
                 m_DirectoryMonitorThread = new Thread(DirectoryMonitorMain);
-                m_DirectoryMonitorThread.Name = "Gibraltar Directory Monitor"; //name our thread so we can isolate it out of metrics and such
+                m_DirectoryMonitorThread.Name = "Loupe Directory Monitor"; //name our thread so we can isolate it out of metrics and such
                 m_DirectoryMonitorThread.IsBackground = true;
                 m_DirectoryMonitorThread.Start();
 
@@ -677,7 +677,7 @@ namespace Gibraltar
             }
             catch (Exception ex)
             {
-                //Write a message to the trace log.  Note that we pass the exception twice:  The first is for a shorter message and the second is so Gibraltar can log the
+                //Write a message to the trace log.  Note that we pass the exception twice:  The first is for a shorter message and the second is so Loupe can log the
                 //full rich exception information
                 m_Logger.LogInformation("Error Processing Async File System Monitor Request\r\nWhile processing a file system monitor request, an exception was thrown: {0}", ex.Message, ex);
             }

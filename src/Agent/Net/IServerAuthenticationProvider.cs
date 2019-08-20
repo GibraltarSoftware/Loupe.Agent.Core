@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Gibraltar.Agent.Net
+namespace Loupe.Agent.Net
 {
     /// <summary>
     /// Implemented to provide custom authentication for a web channel

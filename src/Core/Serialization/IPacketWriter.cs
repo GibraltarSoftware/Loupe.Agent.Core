@@ -1,4 +1,4 @@
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Implemented to support writing packets

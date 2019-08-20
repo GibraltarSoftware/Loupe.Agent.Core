@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// A baseline implementation of a messenger that provides common messenger functionality.

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
 
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Sent by an agent to register itself with the remote server or desktop

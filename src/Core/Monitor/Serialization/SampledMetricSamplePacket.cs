@@ -1,7 +1,7 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// The base class for a single sampled metric data sample.

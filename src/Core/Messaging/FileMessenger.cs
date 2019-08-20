@@ -2,15 +2,15 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using Gibraltar.Data;
-using Gibraltar.Data.Internal;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Data;
+using Loupe.Data.Internal;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     internal class FileMessenger : MessengerBase
     {

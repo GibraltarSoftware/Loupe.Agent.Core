@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Diagnostics;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Agent.PerformanceCounters.Serialization;
 
 namespace Loupe.Agent.PerformanceCounters

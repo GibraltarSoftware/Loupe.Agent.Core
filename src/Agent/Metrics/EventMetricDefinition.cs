@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Gibraltar.Agent.Metrics.Internal;
+using Loupe.Agent.Metrics.Internal;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 using Microsoft.Extensions.Logging;
-using IMetricDefinition = Gibraltar.Agent.Metrics.Internal.IMetricDefinition;
+using IMetricDefinition = Loupe.Agent.Metrics.Internal.IMetricDefinition;
 
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// The definition of an event metric, which must be registered before any specific event metric instance can be created or sampled.

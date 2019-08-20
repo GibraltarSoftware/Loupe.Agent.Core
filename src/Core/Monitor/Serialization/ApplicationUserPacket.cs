@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class ApplicationUserPacket : GibraltarCachedPacket, IPacket, IEquatable<ApplicationUserPacket>, IApplicationUser
     {

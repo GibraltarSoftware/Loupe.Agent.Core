@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
-    /// Generates and parses the binary header used at the start of a Gibraltar Log File
+    /// Generates and parses the binary header used at the start of a Loupe Log File
     /// </summary>
     public class FileHeader
     {

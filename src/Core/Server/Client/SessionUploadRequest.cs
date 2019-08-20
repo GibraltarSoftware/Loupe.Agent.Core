@@ -6,13 +6,13 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Gibraltar.Data;
-using Gibraltar.Data.Internal;
-using Gibraltar.Monitor;
+using Loupe.Data;
+using Loupe.Data.Internal;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// A web channel request to upload a session file or full session stream

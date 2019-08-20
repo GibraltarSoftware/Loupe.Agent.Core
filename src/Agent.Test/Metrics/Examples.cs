@@ -1,4 +1,4 @@
-﻿using Gibraltar.Agent.Metrics;
+﻿using Loupe.Agent.Metrics;
 using Loupe.Metrics;
 using NUnit.Framework;
 

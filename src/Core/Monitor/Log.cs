@@ -9,16 +9,16 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Gibraltar.Data;
-using Gibraltar.Data.Internal;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Server.Client;
+using Loupe.Data;
+using Loupe.Data.Internal;
+using Loupe.Messaging;
+using Loupe.Monitor.Serialization;
+using Loupe.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Handles interfacing with a single log file for the purpose of writing log messages.
@@ -26,12 +26,12 @@ namespace Gibraltar.Monitor
     public static class Log
     {
         /// <summary>
-        /// The file extension (without period) for a Gibraltar Log File.  Used internally to Gibraltar.
+        /// The file extension (without period) for a Loupe Log File.  Used internally to Loupe.
         /// </summary>
         public const string LogExtension = FileMessenger.LogExtension;
 
         /// <summary>
-        /// The file extension (without period) for a Gibraltar Package File.
+        /// The file extension (without period) for a Loupe Package File.
         /// </summary>
         public const string PackageExtension = FileMessenger.PackageExtension;
 
@@ -51,9 +51,9 @@ namespace Gibraltar.Monitor
         public const string FileFilterPackagesOnly = "Package File(*." + PackageExtension + ")|*." + PackageExtension + "|All Files (*.*)|*.*";
 
         /// <summary>
-        /// The log system name for Gibraltar
+        /// The log system name for Loupe
         /// </summary>
-        public const string ThisLogSystem = "Gibraltar";
+        public const string ThisLogSystem = "Loupe";
 
         /// <summary>
         /// The category for trace messages
@@ -421,7 +421,7 @@ namespace Gibraltar.Monitor
         {
             if (s_Initialized == false)
             {
-                message = "Gibraltar is not currently enabled";
+                message = "Loupe is not currently enabled";
                 return false;
             }
 
@@ -489,7 +489,7 @@ namespace Gibraltar.Monitor
         {
             if (s_Initialized == false)
             {
-                message = "Gibraltar is not currently enabled";
+                message = "Loupe is not currently enabled";
                 return false;
             }
 
@@ -521,7 +521,7 @@ namespace Gibraltar.Monitor
         {
             if (s_Initialized == false)
             {
-                message = "Gibraltar is not currently enabled";
+                message = "Loupe is not currently enabled";
                 return false;
             }
 
@@ -609,7 +609,7 @@ namespace Gibraltar.Monitor
         /// Indicates if the StartSession API method was ever explicitly called.
         /// </summary>
         /// <remarks>If StartSession was not explicitly called then an ApplicationExit event will implicitly call
-        /// EndSession for easy Gibraltar drop-in support.  If StartSession was explicitly called then we expect
+        /// EndSession for easy Loupe drop-in support.  If StartSession was explicitly called then we expect
         /// the client to make a corresponding explicit EndSession call, and the Agent's ApplicationExit handler
         /// will not call EndSession.</remarks>
         public static bool ExplicitStartSessionCalled
@@ -688,7 +688,7 @@ namespace Gibraltar.Monitor
 
 
         /// <summary>
-        /// The version information for the Gibraltar Agent.
+        /// The version information for the Loupe Agent.
         /// </summary>
         public static Version AgentVersion
         {
@@ -701,7 +701,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a trace message directly to the Gibraltar log.
+        /// Write a trace message directly to the Loupe log.
         /// </summary>
         /// <remarks>The log message will be attributed to the caller of this method.  Wrapper methods should
         /// instead call the WriteMessage() method in order to attribute the log message to their own outer
@@ -723,7 +723,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a log message directly to the Gibraltar log with an attached Exception and specifying
+        /// Write a log message directly to the Loupe log with an attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>The log message will be attributed to the caller of this method.  Wrapper methods should
@@ -753,7 +753,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a log message directly to the Gibraltar log with an attached Exception and specifying
+        /// Write a log message directly to the Loupe log with an attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>The log message will be attributed to the caller of this method.  Wrapper methods should
@@ -784,7 +784,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a log message directly to the Gibraltar log with an attached Exception and specifying
+        /// Write a log message directly to the Loupe log with an attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>The log message will be attributed to the caller of this method.  Wrapper methods should
@@ -815,7 +815,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a trace message directly to the Gibraltar log with an optional attached Exception and specifying
+        /// Write a trace message directly to the Loupe log with an optional attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>This overload of WriteMessage() is provided as an API hook for simple wrapping methods
@@ -824,7 +824,7 @@ namespace Gibraltar.Monitor
         /// of the caller of this method as the originator, and so on.  It will then extract information about
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
-        /// Gibraltar should use the other overload of WriteMessage(), passing a customized IMessageSourceProvider.</para>
+        /// Loupe should use the other overload of WriteMessage(), passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
         /// exiting the application upon return from this call).  See the LogWriteMode enum for more information.</para>
@@ -854,7 +854,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a trace message directly to the Gibraltar log with an optional attached Exception and specifying
+        /// Write a trace message directly to the Loupe log with an optional attached Exception and specifying
         /// Queued or WaitForCommit behavior.
         /// </summary>
         /// <remarks><para>This overload of WriteMessage() is provided as an API hook for simple wrapping methods
@@ -863,7 +863,7 @@ namespace Gibraltar.Monitor
         /// of the caller of this method as the originator, and so on.  It will then extract information about
         /// the originator automatically based on the indicated stack frame.  Bridge logic adapting from a logging
         /// system which already determines and provides information about the originator (such as log4net) into
-        /// Gibraltar should use the other overload of WriteMessage(), passing a customized IMessageSourceProvider.</para>
+        /// Loupe should use the other overload of WriteMessage(), passing a customized IMessageSourceProvider.</para>
         /// <para>This method also requires explicitly selecting the LogWriteMode between Queued (the normal default,
         /// for optimal performance) and WaitForCommit (to help ensure critical information makes it to disk, e.g. before
         /// exiting the application upon return from this call).  See the LogWriteMode enum for more information.</para>
@@ -894,7 +894,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a Verbose trace message directly to the Gibraltar log.
+        /// Write a Verbose trace message directly to the Loupe log.
         /// </summary>
         /// <remarks>Information about the current thread and calling method is automatically captured.
         /// The log message will be attributed to the immediate caller of this method.  Wrapper implementations
@@ -915,7 +915,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a Verbose trace message directly to the Gibraltar log.
+        /// Write a Verbose trace message directly to the Loupe log.
         /// </summary>
         /// <remarks><para>Information about the current thread and calling method is automatically captured.
         /// The log message will be attributed to the immediate caller of this method.  Wrapper implementations
@@ -942,7 +942,7 @@ namespace Gibraltar.Monitor
 
 
         /// <summary>
-        /// Record an unexpected Exception to the Gibraltar central log, formatted automatically.
+        /// Record an unexpected Exception to the Loupe log, formatted automatically.
         /// </summary>
         /// <remarks><para>This method provides an easy way to record an Exception as a separate message which will be
         /// attributed to the code location which threw the Exception rather than where this method was called from.
@@ -975,7 +975,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Record an unexpected Exception to the Gibraltar central log, formatted automatically.
+        /// Record an unexpected Exception to the Loupe log, formatted automatically.
         /// </summary>
         /// <remarks><para>This method provides an easy way to record an Exception as a separate message which will be
         /// attributed to the code location which threw the Exception rather than where this method was called from.
@@ -1003,7 +1003,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Record an unexpected Exception to the Gibraltar central log, formatted automatically.
+        /// Record an unexpected Exception to the Loupe log, formatted automatically.
         /// </summary>
         /// <remarks><para>This method provides an easy way to record an Exception as a separate message which will be
         /// attributed to the code location which threw the Exception rather than where this method was called from.
@@ -1080,16 +1080,16 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Write a complete log message to the Gibraltar central log.
+        /// Write a complete log message to the Loupe log.
         /// </summary>
         /// <remarks>Used as an API entry point for interfaces for other logging systems to hand off log messages
-        /// into Gibraltar.  This method ONLY supports being invoked on the same thread which originated the log
+        /// into Loupe.  This method ONLY supports being invoked on the same thread which originated the log
         /// message.</remarks>
         /// <param name="severity">The severity enum value of the log message.</param>
         /// <param name="writeMode">A LogWriteMode enum value indicating whether to simply queue the log message
         /// and return quickly, or to wait for the log message to be committed to disk before returning.</param>
         /// <param name="logSystem">The name of the originating log system, such as "Trace", "Log4Net",
-        /// or "Gibraltar".</param>
+        /// or "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="sourceProvider">An IMessageSourceProvider object which supplies the source information
@@ -1204,7 +1204,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Called at the end of the process execution cycle to indicate that the process shut down normally or explicitly crashed.
         /// </summary>
-        /// <remarks><para>This will put the Gibraltar log into an ending state in which it will flush everything still
+        /// <remarks><para>This will put the Loupe log into an ending state in which it will flush everything still
         /// in its queue and then switch to a background thread to process any further log messages.  All log messages
         /// submitted after this call will block the submitting thread until they are committed to disk, so that any
         /// foreground thread still logging final items will be sure to get them through before they exit.  This is
@@ -1308,7 +1308,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Called at the end of the process execution cycle to indicate that the process shut down normally or explicitly crashed.
         /// </summary>
-        /// <remarks><para>This will put the Gibraltar log into an ending state in which it will flush everything still
+        /// <remarks><para>This will put the Loupe log into an ending state in which it will flush everything still
         /// in its queue and then switch to a background thread to process any further log messages.  All log messages
         /// submitted after this call will block the submitting thread until they are committed to disk, so that any
         /// foreground thread still logging final items will be sure to get them through before they exit.  This is
@@ -1575,14 +1575,14 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Create a complete log message WITHOUT sending it to the Gibraltar central log.
+        /// Create a complete log message WITHOUT sending it to the Loupe log.
         /// </summary>
         /// <remarks>This method is used internally to construct a complete LogMessagePacket, which can then be
         /// bundled with other packets (in an array) to be submitted to the log as a batch.  This method ONLY
         /// supports being invoked on the same thread which is originating the log message.</remarks>
         /// <param name="severity">The severity enum value of the log message.</param>
         /// <param name="logSystem">The name of the originating log system, such as "Trace", "Log4Net",
-        /// or "Gibraltar".</param>
+        /// or "Loupe".</param>
         /// <param name="category">The application subsystem or logging category that the log message is associated with,
         /// which can be a dot-delimited hierarchy (e.g. the logger name in log4net).</param>
         /// <param name="sourceProvider">An IMessageSourceProvider object which supplies the source information
@@ -1699,16 +1699,7 @@ namespace Gibraltar.Monitor
 
             proposedPath = Path.GetDirectoryName(proposedPath);
 
-            //the packager we're looking for depends on the version of .NET
-            string packagerExeName;
-            if (SessionSummary.RuntimeVersion.Major >= 4)
-            {
-                packagerExeName = "Gibraltar.Packager.NET40.exe";
-            }
-            else
-            {
-                packagerExeName = "Gibraltar.Packager.exe";
-            }
+            string packagerExeName = "Loupe.Packager.exe";
 
             string packagerFileNamePath = Path.Combine(proposedPath, packagerExeName);
 
@@ -1780,7 +1771,7 @@ namespace Gibraltar.Monitor
                 else
                 {
 #if DEBUG
-                    Write(LogMessageSeverity.Information, "Gibraltar.Agent.Send Session", "Can not send via Server, attempting via email",
+                    Write(LogMessageSeverity.Information, "Loupe.Agent.Send Session", "Can not send via Server, attempting via email",
                           "When preparing to send session data upon exit as requested a check of server configuration and server "+
                           "connectivity failed:\r\n{0}", message);
 #endif
@@ -1805,8 +1796,8 @@ namespace Gibraltar.Monitor
                 Process.Start(packagerStartInfo); //and we don't care what happens so once we've launched it we are outta here.
 #if DEBUG
                 // Only log this for a Debug build?
-                Write(LogMessageSeverity.Information, "Gibraltar.Agent.Send Session", "Packager process started to send session after exit",
-                      "Gibraltar.Packager.exe was launched to submit this session data after this process ({0}) exits.", ourPid);
+                Write(LogMessageSeverity.Information, "Loupe.Agent.Send Session", "Packager process started to send session after exit",
+                      "Loupe.Packager.exe was launched to submit this session data after this process ({0}) exits.", ourPid);
 #endif
             }
             catch (Exception ex)
@@ -1814,7 +1805,7 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
 #if DEBUG
                 // Only log this for a Debug build?
-                Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, "Gibraltar.Agent.Send Session", "Error sending session on exit",
+                Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, "Loupe.Agent.Send Session", "Error sending session on exit",
                       "An error occurred while attempting to submit session data upon exit as requested, " +
                       "and the session could not be sent.  Check that configuration of email and server " +
                       "are each valid or disabled, and check the status of the Loupe server or subscription.");

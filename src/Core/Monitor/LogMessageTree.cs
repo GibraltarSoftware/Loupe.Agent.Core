@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// An acyclic tree graph of log message groups.

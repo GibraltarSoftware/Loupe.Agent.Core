@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Efficiently manage the deserialization of log packets.

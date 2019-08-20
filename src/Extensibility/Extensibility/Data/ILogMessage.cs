@@ -41,7 +41,7 @@ namespace Loupe.Extensibility.Data
         /// <summary>
         /// The log system which issued this log message.
         /// </summary>
-        /// <remarks>Internally, Loupe generally uses &quot;Gibraltar&quot; for its own messages as well as those
+        /// <remarks>Internally, Loupe generally uses &quot;Loupe&quot; for its own messages as well as those
         /// logged directly to the Log object, and &quot;Trace&quot; for messages captured via the .NET Trace subsystem.
         /// You can use your own value by using the Log.Write methods which are designed to enable forwarding messages
         /// from other log systems.</remarks>

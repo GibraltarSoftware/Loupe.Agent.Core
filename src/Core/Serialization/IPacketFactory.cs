@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Serialization
+﻿namespace Loupe.Serialization
 {
     /// <summary>
     /// Defines the interface necessary for a packet factory to be

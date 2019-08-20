@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A single display-ready metric value.  

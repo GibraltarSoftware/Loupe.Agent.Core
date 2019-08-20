@@ -2,10 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 
 
-namespace Gibraltar.Agent.Metrics.Internal
+namespace Loupe.Agent.Metrics.Internal
 {
     /// <summary>
     /// The collection of custom sampled metrics for a given sampled metric definition.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Used to serialize network packets across a TCP socket

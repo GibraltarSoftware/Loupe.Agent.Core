@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A collection of metric definitions, keyed by their unique ID and name

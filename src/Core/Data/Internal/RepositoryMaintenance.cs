@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor;
+using Loupe.Messaging;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Data.Internal
+namespace Loupe.Data.Internal
 {
     /// <summary>
     /// Performs repository level maintenance such as purging for size.  Should be used with collection repositories only.
@@ -139,7 +139,7 @@ namespace Gibraltar.Data.Internal
         public DateTimeOffset LastMaintenanceRunDateTime { get; private set; }
 
         /// <summary>
-        /// Indicates if the database should log operations to Gibraltar or not.
+        /// Indicates if the database should log operations to Loupe or not.
         /// </summary>
         public bool IsLoggingEnabled
         {

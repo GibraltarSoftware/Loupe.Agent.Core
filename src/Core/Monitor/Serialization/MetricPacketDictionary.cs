@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// A collection of performance counter metric packets, keyed by their unique ID.  This is the persistable form of a performance counter metric.

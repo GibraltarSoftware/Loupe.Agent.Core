@@ -1,7 +1,7 @@
 ﻿    using System;
 using System.Diagnostics;
 using System.Globalization;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
     using Loupe.Logging;
     using Loupe.Metrics;

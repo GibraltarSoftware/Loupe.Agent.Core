@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Gibraltar.Monitor;
-using Gibraltar.Server.Client;
-using Gibraltar.Server.Client.Data;
+using Loupe.Monitor;
+using Loupe.Server.Client;
+using Loupe.Server.Client.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Data.Internal
+namespace Loupe.Data.Internal
 {
     /// <summary>
     /// Publishes sessions from the specified repository to a remote destination repository.

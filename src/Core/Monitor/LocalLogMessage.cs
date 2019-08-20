@@ -5,15 +5,15 @@ using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
-    /// An intermediary class to log a Gibraltar log message from within Gibraltar libraries. 
+    /// An intermediary class to log a Loupe log message from within Loupe libraries. 
     /// </summary>
-    /// <remarks>This class knows how to formulate a Gibraltar log message including an optional XML details string and
+    /// <remarks>This class knows how to formulate a Loupe log message including an optional XML details string and
     /// optionally including an associated Exception object.  Importantly, it knows how to acquire information about the
     /// source of a log message from the current call stack without filtering out stack frames to attribute the message
-    /// within Gibraltar libraries, and acts as its own IMessageSourceProvider when handing it off to the central Log.
+    /// within Loupe libraries, and acts as its own IMessageSourceProvider when handing it off to the central Log.
     /// Thus, this object must be created while still within the same call stack as the origination of the log message.
     /// Used internally by our CLR listener (etc).</remarks>
     internal class LocalLogMessage : LogMessageBase
@@ -23,11 +23,11 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <remarks>This constructor creates a LocalLogMessage with the default LogWriteMode behavior (Queued)
         /// and a specified XML details string (which may be null).  This constructor also allows the log message
-        /// to be of local origin, so Gibraltar stack frames will not be automatically skipped over when determining
+        /// to be of local origin, so Loupe stack frames will not be automatically skipped over when determining
         /// the originator for internally-issued log messages.</remarks>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
@@ -49,12 +49,12 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <remarks>This constructor creates a LocalLogMessage with specified LogWriteMode behavior (queue-and-return
         /// or wait-for-commit) and XML details string (which may be null).  This constructor also allows the log message
-        /// to be of local origin, so Gibraltar stack frames will not be automatically skipped over when determining
+        /// to be of local origin, so Loupe stack frames will not be automatically skipped over when determining
         /// the originator for internally-issued log messages.</remarks>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="writeMode">Whether to queue-and-return or wait-for-commit.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
@@ -75,12 +75,12 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <remarks>This constructor creates a LocalLogMessage with specified LogWriteMode behavior (queue-and-return
         /// or wait-for-commit), a specified Exception object to attach, and XML details string (which may be null).
-        /// This constructor also allows the log message to be of local origin, so Gibraltar stack frames will not be
+        /// This constructor also allows the log message to be of local origin, so Loupe stack frames will not be
         /// automatically skipped over when determining the originator for internally-issued log messages.</remarks>
         /// <param name="severity">The severity of the log message.</param>
         /// <param name="writeMode">Whether to queue-and-return or wait-for-commit.</param>
         /// <param name="logSystem">The name of the logging system the message was issued through, such as "Trace" or
-        /// "Gibraltar".</param>
+        /// "Loupe".</param>
         /// <param name="categoryName">The logging category or application subsystem category that the log message
         /// is associated with, such as "Trace", "Console", "Exception", or the logger name in Log4Net.</param>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be

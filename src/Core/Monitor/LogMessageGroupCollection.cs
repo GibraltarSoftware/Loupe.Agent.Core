@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 #pragma warning disable 1591
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A collection of logMessageGroups, ordered by date/time and accessible by unique ID or numerical index.

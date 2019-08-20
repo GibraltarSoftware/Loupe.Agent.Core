@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Command for retrieving the list of session headers

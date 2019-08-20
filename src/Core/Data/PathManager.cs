@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
-    /// Determines the correct physical paths to use for various Gibraltar scenarios
+    /// Determines the correct physical paths to use for various Loupe scenarios
     /// </summary>
     public static class PathManager
     {

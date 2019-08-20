@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Helper class used by PacketRead and PacketWriter to maintain a

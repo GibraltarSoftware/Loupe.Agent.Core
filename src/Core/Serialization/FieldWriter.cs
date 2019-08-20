@@ -2,12 +2,12 @@
 using System;
 using System.IO;
 using System.Text;
-using Gibraltar.Data;
-using Gibraltar.Serialization.Internal;
+using Loupe.Data;
+using Loupe.Serialization.Internal;
 
 
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Provides low-level compression of the basic data types we pass over the wire.

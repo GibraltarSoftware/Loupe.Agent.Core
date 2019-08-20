@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 #pragma warning disable 1591
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// This is the class returned by PacketReader when an unknown packet type

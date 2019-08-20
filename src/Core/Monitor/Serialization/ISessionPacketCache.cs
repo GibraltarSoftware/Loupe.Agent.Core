@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor.Serialization
+﻿namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Provides lookup services for packet factories to find other session-related packets

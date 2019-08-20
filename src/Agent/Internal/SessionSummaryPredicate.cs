@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Agent.Internal
+namespace Loupe.Agent.Internal
 {
     /// <summary>
     /// Adapts a SessionSummary predicate to the internal ISessionSummary used in the core

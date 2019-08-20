@@ -3,7 +3,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A group of log messages, typically 

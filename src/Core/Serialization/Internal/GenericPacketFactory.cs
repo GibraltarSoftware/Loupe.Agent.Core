@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Serialization.Internal
+﻿namespace Loupe.Serialization.Internal
 {
     /// <summary>
     /// Helper class used by PacketFactory to wrapper the creation of GenericPacket

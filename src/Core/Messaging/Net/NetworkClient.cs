@@ -7,13 +7,13 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-using Gibraltar.Monitor;
-using Gibraltar.Serialization;
-using Gibraltar.Server.Client;
+using Loupe.Monitor;
+using Loupe.Serialization;
+using Loupe.Server.Client;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// The base class for different network clients that talk to a server.

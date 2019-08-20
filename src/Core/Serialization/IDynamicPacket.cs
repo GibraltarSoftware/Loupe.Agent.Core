@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Serialization
+﻿namespace Loupe.Serialization
 {
     /// <remarks>
     /// Most packets have a static structure of fields that is the same for all

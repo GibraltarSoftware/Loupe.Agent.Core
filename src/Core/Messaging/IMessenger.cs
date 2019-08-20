@@ -4,7 +4,7 @@ using Loupe.Configuration;
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// Implement this interface to be a packet sink for the messaging system. 

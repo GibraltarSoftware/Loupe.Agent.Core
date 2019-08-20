@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Agent.Test.LogMessages.Internal;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;

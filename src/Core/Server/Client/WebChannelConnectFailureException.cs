@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// An exception thrown to indicate a connection failure on the web channel.

@@ -2,7 +2,7 @@
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
-namespace Gibraltar.Agent.Metrics.Internal
+namespace Loupe.Agent.Metrics.Internal
 {
     /// <summary>
     /// The definition of a single metric that has been captured.  

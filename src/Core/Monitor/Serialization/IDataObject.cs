@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Implemented by any extensible data object to connect to its unique Id which it shares with its extension object.

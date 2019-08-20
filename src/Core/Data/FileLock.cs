@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// A wrapper for conveniently holding a file lock where the stream access is not necessarily needed.

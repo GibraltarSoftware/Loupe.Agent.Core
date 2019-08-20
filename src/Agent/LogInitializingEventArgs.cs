@@ -1,7 +1,7 @@
 ﻿using System;
 using Loupe.Configuration;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// Event arguments for the Log.Initialize event of the Loupe Agent Logging class.

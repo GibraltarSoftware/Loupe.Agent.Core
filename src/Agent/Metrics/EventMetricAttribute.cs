@@ -3,7 +3,7 @@ using System;
 
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// Define an event metric with value columns from the members of the current object.

@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>
     /// Helper class used by FieldReader and FieldWriter to maintain a cache of unique strings that have

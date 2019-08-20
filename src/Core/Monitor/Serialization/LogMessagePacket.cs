@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Principal;
-using Gibraltar.Messaging;
-using Gibraltar.Serialization;
+using Loupe.Messaging;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class LogMessagePacket : GibraltarPacket, IUserPacket, IPacket, ILogMessage, IComparable<LogMessagePacket>, IEquatable<LogMessagePacket>
     {
@@ -18,7 +18,7 @@ namespace Gibraltar.Monitor.Serialization
 
         private Guid m_ID;
         private LogMessageSeverity m_Severity;
-        private string m_LogSystem; // The major log system it comes from, eg. "Log4net", "Trace", "Gibraltar", "ELF"
+        private string m_LogSystem; // The major log system it comes from, eg. "Log4net", "Trace", "Loupe", "ELF"
         private string m_CategoryName; // The subsystem category, eg. the LoggerName from Log4Net
         private string m_UserName;
         private string m_Caption;
@@ -29,7 +29,7 @@ namespace Gibraltar.Monitor.Serialization
         private string m_ClassName;
         private string m_FileName;
         private int m_LineNumber;
-        private int m_ThreadIndex; // The UNIQUE index assigned by Gibraltar.Agent to identify the thread.
+        private int m_ThreadIndex; // The UNIQUE index assigned by Loupe.Agent to identify the thread.
         private int m_ThreadId; // The unique-at-any-one-time-but-not-for-the-whole-process-lifetime ManagedThreadId from .NET.
         private readonly bool m_SuppressNotification; // Read only, for now.
 
@@ -40,7 +40,7 @@ namespace Gibraltar.Monitor.Serialization
         public LogMessagePacket()
         {
             Id = Guid.NewGuid();
-            m_SuppressNotification = Gibraltar.Messaging.Publisher.QueryThreadMustNotNotify();
+            m_SuppressNotification = Loupe.Messaging.Publisher.QueryThreadMustNotNotify();
         }
 
         internal LogMessagePacket(ISessionPacketCache sessionPacketCache)

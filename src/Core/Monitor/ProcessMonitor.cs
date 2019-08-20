@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Gibraltar.Messaging;
+using Loupe.Messaging;
 using Loupe.Metrics;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Monitors the details of a process.

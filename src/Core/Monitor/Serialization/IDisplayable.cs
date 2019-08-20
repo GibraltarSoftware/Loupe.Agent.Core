@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor.Serialization
+﻿namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// A standard interface for ensuring an item can be displayed in user interfaces by providing an end user short caption and long description

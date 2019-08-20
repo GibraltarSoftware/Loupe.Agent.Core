@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Implemented to translate an <see cref="IPrincipal">IPrincipal</see> to a Loupe <see cref="ApplicationUser">ApplicationUser</see>.

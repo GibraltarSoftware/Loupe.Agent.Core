@@ -2,7 +2,7 @@
 using System.Net;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     public class WebChannelMethodNotAllowedException : WebChannelException
     {

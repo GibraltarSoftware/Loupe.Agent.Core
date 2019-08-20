@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Security.Principal;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 
 namespace Loupe.Agent.AspNetCore
 {

@@ -1,11 +1,11 @@
 ﻿
 using System;
 using System.Globalization;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A single sample of a custom sampled metric.  Sampled metrics generally require calculation to produce data, see ComputeValue.

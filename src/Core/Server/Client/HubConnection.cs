@@ -2,15 +2,15 @@
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Gibraltar.Server.Client.Data;
-using Gibraltar.Server.Client.Internal;
+using Loupe.Server.Client.Data;
+using Loupe.Server.Client.Internal;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
-    /// A web channel specifically designed to work with the Gibraltar Hub.
+    /// A web channel specifically designed to work with the Loupe Server.
     /// </summary>
     [DebuggerDisplay("{EndUserTestUrl} Status: {Status}")]
     public class HubConnection : IDisposable
@@ -26,12 +26,12 @@ namespace Gibraltar.Server.Client
         private const string ApplicationKeyEntryPath = "Agent/{0}/";
 
         /// <summary>
-        /// The version number for the new Gibraltar 3.0 features
+        /// The version number for the new Loupe 3.0 features
         /// </summary>
         public static readonly Version Hub30ProtocolVersion = new Version(1, 2);
 
         /// <summary>
-        /// The version number for the new Gibraltar 3.8 features
+        /// The version number for the new Loupe 3.8 features
         /// </summary>
         public static readonly Version Hub38ProtocolVersion = new Version(1, 4);
 

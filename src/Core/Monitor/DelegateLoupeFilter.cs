@@ -1,7 +1,7 @@
 ﻿using System;
-using Gibraltar.Messaging;
+using Loupe.Messaging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Creates a Loupe Filter out of the provided delegate function

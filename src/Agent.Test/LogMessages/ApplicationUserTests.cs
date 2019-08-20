@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Security.Principal;
 using System.Threading;
-using Gibraltar.Agent;
-using Gibraltar.Monitor;
+using Loupe.Agent;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;
-using Log = Gibraltar.Agent.Log;
+using Log = Loupe.Agent.Log;
 
 namespace Loupe.Agent.Test.LogMessages
 {

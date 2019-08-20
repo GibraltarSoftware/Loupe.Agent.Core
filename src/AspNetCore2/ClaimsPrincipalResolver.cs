@@ -1,5 +1,5 @@
 ﻿using System.Security.Principal;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore

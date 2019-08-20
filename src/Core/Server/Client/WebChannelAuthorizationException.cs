@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Thrown by the web channel when it is unable to authenticate to the remote server.

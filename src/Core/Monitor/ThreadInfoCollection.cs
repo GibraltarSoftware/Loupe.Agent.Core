@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A (sorted) collection of ThreadInfo objects.
@@ -65,7 +65,7 @@ namespace Gibraltar.Monitor
                     // This mostly could happen when analyzing a session with an intermediate internal version which reports
                     // multiple ThreadInfo packets for the same ThreadId but does not include a ThreadIndex property.
                     ThreadInfo existingItem = m_ThreadInfoByIndex[threadIndex];
-                    Log.Write(LogMessageSeverity.Warning, "Gibraltar.Session.ThreadInfo", "ThreadInfo index collision",
+                    Log.Write(LogMessageSeverity.Warning, "Loupe.Session.ThreadInfo", "ThreadInfo index collision",
                               "Two ThreadInfo objects with different Guid IDs have the same ThreadIndex in the same session.\r\n" +
                               "ThreadIndex = {0}\r\nOld Guid ID = {1}\r\nNew Guid ID = {2}\r\nOld thread: {3}\r\nNew thread: {4}\r\n",
                               threadIndex, existingItem.Id, item.Id, existingItem.Description, item.Description);

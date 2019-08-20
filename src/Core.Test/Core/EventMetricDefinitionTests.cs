@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 using NUnit.Framework;

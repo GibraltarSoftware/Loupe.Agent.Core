@@ -1,4 +1,4 @@
-﻿using Gibraltar.Agent;
+﻿using Loupe.Agent;
 using Loupe.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

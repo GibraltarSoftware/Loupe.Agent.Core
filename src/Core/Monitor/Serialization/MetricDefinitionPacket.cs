@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 
 #pragma warning disable 1591
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Defines a metric that has been captured.  Specific metrics extend this class.

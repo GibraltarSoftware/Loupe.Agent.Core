@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using Gibraltar.Agent.Metrics.Internal;
+using Loupe.Agent.Metrics.Internal;
 using Loupe.Metrics;
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
 
     /// <summary>

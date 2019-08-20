@@ -4,7 +4,7 @@ using System.Reflection;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// Defines one value that can be associated with an event metric, created via eventMetricDefinition.AddValue(...);

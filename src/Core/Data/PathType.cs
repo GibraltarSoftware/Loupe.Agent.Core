@@ -1,7 +1,7 @@
-﻿namespace Gibraltar.Data
+﻿namespace Loupe.Data
 {
     /// <summary>
-    /// The different path types that Gibraltar uses
+    /// The different path types that Loupe uses
     /// </summary>
     public enum PathType
     {

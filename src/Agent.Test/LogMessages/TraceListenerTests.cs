@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Gibraltar.Agent;
-using Gibraltar.Monitor.Net;
+using Loupe.Agent;
+using Loupe.Monitor.Net;
 using NUnit.Framework;
 
 namespace Loupe.Agent.Test.LogMessages

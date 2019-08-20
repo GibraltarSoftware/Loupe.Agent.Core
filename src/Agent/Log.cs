@@ -2,16 +2,16 @@
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Gibraltar.Agent.Internal;
-using Gibraltar.Monitor;
-using Gibraltar.Server.Client;
+using Loupe.Agent.Internal;
+using Loupe.Monitor;
+using Loupe.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
-using IServerAuthenticationProvider = Gibraltar.Agent.Net.IServerAuthenticationProvider;
-using MetricDefinitionCollection=Gibraltar.Agent.Metrics.Internal.MetricDefinitionCollection;
+using IServerAuthenticationProvider = Loupe.Agent.Net.IServerAuthenticationProvider;
+using MetricDefinitionCollection= Loupe.Agent.Metrics.Internal.MetricDefinitionCollection;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>This static class is the primary API for logging with the Loupe Agent.</summary>
     /// <remarks>
@@ -29,7 +29,7 @@ namespace Gibraltar.Agent
     /// 		<item><strong>Trace Methods:</strong> Designed to mirror the Trace class built
     ///         into .NET, these provide the simplest API and are a direct substitute for
     ///         existing calls that use the Trace method (simply change the class name from
-    ///         System.Diagnostics.Trace to Gibraltar.Agent.Log)</item>
+    ///         System.Diagnostics.Trace to Loupe.Agent.Log)</item>
     /// 		<item><strong>Severity Methods:</strong> A method for each Loupe severity
     ///         from Critical (the most severe) to Verbose (the least). These provide a full
     ///         featured API for logging directly to Loupe as part of your
@@ -2902,7 +2902,7 @@ namespace Gibraltar.Agent
         /// <p>Individual providers can perform authentication processes independently of the server
         /// request pipeline and can modify each server request to add additional headers or other data
         /// as required to authenticate the request.  A simple authentication provider for handling HTTP
-        /// Basic Authentication is implemented in the <see cref="Gibraltar.Agent.Net.BasicAuthenticationProvider">
+        /// Basic Authentication is implemented in the <see cref="Loupe.Agent.Net.BasicAuthenticationProvider">
         /// BasicAuthenticationProvider</see> class.</p></remarks>
         public static IServerAuthenticationProvider ServerAuthenticationProvider
         {

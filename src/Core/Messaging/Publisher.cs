@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Serialization;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
+using Loupe.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// The central publisher for messaging
@@ -371,7 +371,7 @@ namespace Gibraltar.Messaging
                 }
                 else
                 {
-                    // Not a command, so it must be a Gibraltar data packet of some type.  
+                    // Not a command, so it must be a Loupe data packet of some type.  
 
                     //stamp the packet, and all of its dependent packets (this sets the sequence number)
                     StampPacket(packet, packet.Timestamp);
@@ -379,7 +379,7 @@ namespace Gibraltar.Messaging
                     GibraltarPacket gibraltarPacket = packet as GibraltarPacket;
                     if (gibraltarPacket != null)
                     {
-                        //this is a gibraltar packet so lets go ahead and fix the data in place now that we're on the background thread.
+                        //this is a Loupe packet so lets go ahead and fix the data in place now that we're on the background thread.
                         gibraltarPacket.FixData();
                     }
 

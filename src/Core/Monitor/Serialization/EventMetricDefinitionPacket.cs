@@ -1,8 +1,8 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// A serializable event metric definition.  Provides metadata for metrics based on events.

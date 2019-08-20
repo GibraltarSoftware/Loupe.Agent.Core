@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Gibraltar.Messaging;
-using Gibraltar.Monitor.Net;
+using Loupe.Messaging;
+using Loupe.Monitor.Net;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// The central monitor that manages the configuration of the individual monitors
@@ -313,7 +313,7 @@ namespace Gibraltar.Monitor
             catch (Exception ex)
             {
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Loupe.Agent",
                         "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
                         "While attempting to do a routine initialization / re-initialization of the console listener, an exception was raised: {0}", ex.Message);
             }
@@ -341,7 +341,7 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
 
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Loupe.Agent",
                  "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
                     "While attempting to do a routine initialization / re-initialization of the CLR listener, an exception was thrown: {0}", ex.Message);
             }
@@ -366,7 +366,7 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
 
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Loupe.Agent",
                         "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
                         "While attempting to do a routine initialization / re-initialization of the CLR listener, an exception was thrown: {0}", ex.Message);
             }
@@ -390,7 +390,7 @@ namespace Gibraltar.Monitor
             catch (Exception ex)
             {
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent",
+                    Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Loupe.Agent",
                         "Unable to initialize Common Language Runtime Listener due to " + ex.GetBaseException().GetType().Name,
                         "While attempting to do a routine initialization / re-initialization of the console listener, an exception was raised: {0}", ex.Message);
             }
@@ -412,7 +412,7 @@ namespace Gibraltar.Monitor
                             throw;
 
                         if (!Log.SilentMode)
-                            Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Gibraltar.Agent", 
+                            Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, "Loupe.Agent", 
                                 "Unable to poll monitor due to " + ex.GetBaseException().GetType().Name, 
                                 "While attempting to do a routine poll of a monitor, an exception was thrown: {0}", ex.Message);
                     }

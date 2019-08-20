@@ -1,10 +1,10 @@
-﻿using Gibraltar.Monitor.Serialization;
+﻿using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// One sample of a sampled metric

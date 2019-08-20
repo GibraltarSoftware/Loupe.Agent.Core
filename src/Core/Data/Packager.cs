@@ -5,14 +5,14 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Gibraltar.Data.Internal;
-using Gibraltar.Monitor;
-using Gibraltar.Server.Client;
+using Loupe.Data.Internal;
+using Loupe.Monitor;
+using Loupe.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Packages up sessions collected on the local computer and sends them via server or file transport.
@@ -147,7 +147,7 @@ namespace Gibraltar.Data
         /// <param name="progressMonitors">The asynchronous progress monitoring stack.</param>
         /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
         /// <remarks>The EndSend event will be raised when the send operation completes.
-        /// Any provided extension will be removed and replaced with the standard Gibraltar package extension.</remarks>
+        /// Any provided extension will be removed and replaced with the standard Loupe package extension.</remarks>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public PackageSendEventArgs SendToFile(SessionCriteria sessions, bool markAsRead, string fullFileNamePath, ProgressMonitorStack progressMonitors)
@@ -174,7 +174,7 @@ namespace Gibraltar.Data
         /// <param name="fullFileNamePath">The file name and path to write the final package to</param>
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.
-        /// Any provided extension will be removed and replaced with the standard Gibraltar package extension.</remarks>
+        /// Any provided extension will be removed and replaced with the standard Loupe package extension.</remarks>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFile(SessionCriteria sessions, bool markAsRead, string fullFileNamePath, bool asyncSend)
@@ -200,7 +200,7 @@ namespace Gibraltar.Data
         /// <param name="fullFileNamePath">The file name and path to write the final package to</param>
         /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
         /// <remarks>The EndSend event will be raised when the send operation completes.
-        /// Any provided extension will be removed and replaced with the standard Gibraltar package extension.</remarks>
+        /// Any provided extension will be removed and replaced with the standard Loupe package extension.</remarks>
         /// <exception cref="ArgumentNullException">A required parameter was null.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The provided file information is not a fully qualified file name and path.</exception>
         public void SendToFile(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, string fullFileNamePath, bool asyncSend)

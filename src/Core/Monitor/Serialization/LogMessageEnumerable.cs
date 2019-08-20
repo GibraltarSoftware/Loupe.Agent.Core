@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Gibraltar.Data;
+using Loupe.Data;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class LogMessageEnumerable: IEnumerable<LogMessage>
     {

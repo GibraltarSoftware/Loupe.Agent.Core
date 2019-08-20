@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>Summary information about the current session.</summary>
     /// <remarks>

@@ -6,7 +6,7 @@ using System.Text;
 
 
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Provides basic binary serialization for platform independent simple serialization

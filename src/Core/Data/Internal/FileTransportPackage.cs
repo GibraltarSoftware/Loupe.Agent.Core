@@ -4,7 +4,7 @@ using System.IO;
 
 
 
-namespace Gibraltar.Data.Internal
+namespace Loupe.Data.Internal
 {
     /// <summary>
     /// A transport package that is just being written out to a file.

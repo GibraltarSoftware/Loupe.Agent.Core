@@ -3,13 +3,13 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-using Gibraltar.Data;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Serialization;
+using Loupe.Data;
+using Loupe.Monitor.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Contains the log information for a single execution cycle
@@ -449,7 +449,7 @@ namespace Gibraltar.Monitor
                         else
                         {
                             if (!Log.SilentMode)
-                                Log.Write(LogMessageSeverity.Error, LogCategory, "Packet stream contained unexpected object.", "This can be due to loading a newer file format into an older version of Gibraltar. Object: {0}", nextPacket);
+                                Log.Write(LogMessageSeverity.Error, LogCategory, "Packet stream contained unexpected object.", "This can be due to loading a newer file format into an older version of Loupe. Object: {0}", nextPacket);
                         }
 
                         //if this is a sequence #'d packet (and they really all should be) then we need to check if it's our new top sequence.

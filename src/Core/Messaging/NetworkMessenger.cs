@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Gibraltar.Messaging.Net;
-using Gibraltar.Monitor;
-using Gibraltar.Server.Client;
+using Loupe.Messaging.Net;
+using Loupe.Monitor;
+using Loupe.Server.Client;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     internal class NetworkMessenger : MessengerBase
     {

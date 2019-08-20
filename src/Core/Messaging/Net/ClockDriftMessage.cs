@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Used to determine the latency and relative clock drift of a connection

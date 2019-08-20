@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using Gibraltar.Server.Client.Data;
+using Loupe.Server.Client.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Uploads the state of a client repository, adding it if necessary.

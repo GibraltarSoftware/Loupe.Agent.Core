@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using Gibraltar;
-using Gibraltar.Data;
-using Gibraltar.Monitor;
+using Loupe;
+using Loupe.Data;
+using Loupe.Monitor;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Data

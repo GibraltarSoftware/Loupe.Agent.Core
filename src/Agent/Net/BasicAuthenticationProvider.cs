@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gibraltar.Agent.Net
+namespace Loupe.Agent.Net
 {
     /// <summary>
     /// Basic Authentication credentials for authenticating with the server

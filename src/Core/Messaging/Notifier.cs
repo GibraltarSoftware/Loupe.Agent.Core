@@ -2,22 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Gibraltar.Data;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Data;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// Generates notifications from scanning log messages
     /// </summary>
     public class Notifier
     {
-        private const string NotifierCategoryBase = "Gibraltar.Agent.Notifier";
-        private const string NotifierThreadBase = "Gibraltar Notifier";
+        private const string NotifierCategoryBase = "Loupe.Agent.Notifier";
+        private const string NotifierThreadBase = "Loupe Notifier";
         private const int BurstMillisecondLatency = 28;
         private readonly object m_MessageQueueLock = new object();
         private readonly object m_MessageDispatchThreadLock = new object();
@@ -321,7 +321,7 @@ namespace Gibraltar.Messaging
             {
                 if (m_EventErrorSourceProvider == null)
                 {
-                    m_EventErrorSourceProvider = new MessageSourceProvider("Gibraltar.Messaging.Notifier", "NotificationDispatchMain");
+                    m_EventErrorSourceProvider = new MessageSourceProvider("Loupe.Messaging.Notifier", "NotificationDispatchMain");
                 }
 
                 return m_EventErrorSourceProvider;

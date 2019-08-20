@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using Microsoft.Extensions.Logging;
@@ -55,7 +55,7 @@ namespace Loupe.Extensions.Logging
                         throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
                 }
 
-            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
+            Loupe.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
         }
 
         /// <inheritdoc />

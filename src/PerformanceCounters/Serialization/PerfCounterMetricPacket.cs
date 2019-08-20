@@ -2,9 +2,9 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Serialization;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
+using Loupe.Serialization;
 
 #pragma warning disable 1591
 namespace Loupe.Agent.PerformanceCounters.Serialization

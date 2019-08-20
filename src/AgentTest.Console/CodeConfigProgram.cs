@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Agent.Test.LogMessages;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;

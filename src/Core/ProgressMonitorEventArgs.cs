@@ -2,7 +2,7 @@
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Information about monitor changes

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Tracks files to detect changes.

@@ -6,7 +6,7 @@ using System.Linq;
 using Loupe.Extensibility.Data;
 
 
-namespace Gibraltar.Agent.Internal
+namespace Loupe.Agent.Internal
 {
     /// <summary>
     /// A read-only collection of info describing one or more log messages.

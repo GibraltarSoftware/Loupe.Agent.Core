@@ -5,7 +5,7 @@ using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Monitor.Net
+namespace Loupe.Monitor.Net
 {
     /// <summary>
     /// Implements a TraceListener to forward Trace and Debug messages from
@@ -28,11 +28,11 @@ namespace Gibraltar.Monitor.Net
     /// <configuration>
     /// <!-- You may already have a <system.diagnostics> section in your configuration file,
     ///    possibly also including the <trace> and <listeners> tags.  If this is the case,
-    ///    you only need to add the line that starts <add name="gibraltar" ... /> to the file -->
+    ///    you only need to add the line that starts <add name="Loupe" ... /> to the file -->
     ///  <system.diagnostics>
     ///    <trace>
     ///      <listeners>
-    ///        <add name="gibraltar" type="Gibraltar.Agent.LogListener, Gibraltar.Agent"/>
+    ///        <add name="Loupe" type="Loupe.Agent.LogListener, Loupe.Agent"/>
     ///      </listeners>
     ///    </trace>
     ///  </system.diagnostics>

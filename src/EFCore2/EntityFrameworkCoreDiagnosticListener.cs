@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Agent.Core.Services;
 using Loupe.Logging;
 using Microsoft.EntityFrameworkCore.Diagnostics;

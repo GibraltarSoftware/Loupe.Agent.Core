@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 using Loupe.Extensibility.Data;
 
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// A command to have the agent send sessions to the server immediately

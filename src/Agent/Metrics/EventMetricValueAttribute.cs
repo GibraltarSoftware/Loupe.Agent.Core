@@ -3,7 +3,7 @@ using System;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// Define a value column mapped from this field, property, or zero-argument method as part of the event metric definition.

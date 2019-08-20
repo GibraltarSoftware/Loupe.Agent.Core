@@ -1,10 +1,10 @@
 ﻿
 using System;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Logging;
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Serves as an IMessageSourceProvider to attribute a message to the code location which threw an Exception.
@@ -27,7 +27,7 @@ namespace Gibraltar
         /// <param name="exception">The Exception whose first stack frame is the declared originator.</param>
         public ExceptionSourceProvider(Exception exception)
         {
-            // We never skipped Gibraltar frames here, so go ahead with trustSkipFrames = true to disable that check.
+            // We never skipped Loupe frames here, so go ahead with trustSkipFrames = true to disable that check.
             CommonCentralLogic.FindMessageSource(0, true, exception, out m_ClassName, out m_MethodName,
                                               out m_FileName, out m_LineNumber);
         }

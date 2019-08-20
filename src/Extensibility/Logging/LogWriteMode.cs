@@ -5,7 +5,7 @@
     /// </summary>
     /// <remarks><para>This enum selects the preferred trade-off between run-time performance and diagnostic data
     /// persistence for an individual log message being issued.  By default (in API calls which do not take an argument
-    /// of this type) Gibraltar uses LogWriteMode.Queued under normal conditions but will automatically enforce
+    /// of this type) Loupe uses LogWriteMode.Queued under normal conditions but will automatically enforce
     /// a wait-for-commit mode under certain abnormal conditions or during normal application exit.  The
     /// LogWriteMode.WaitForCommit setting allows the issuer of a log message to specifically request that the
     /// call not return until the log message has been committed to disk, instead of the normal queue-and-return
@@ -13,7 +13,7 @@
     /// <para>Queued<br/>
     /// This setting indicates that the caller prefers to continue execution as soon as possible
     /// and only cares that the message be placed on the queue to be eventually written into the log file
-    /// on disk.  Messages written with this mode could be lost if the application crashes and Gibraltar
+    /// on disk.  Messages written with this mode could be lost if the application crashes and Loupe
     /// is not able to flush its queue to the log file on disk.  Under certain unusual conditions and
     /// during normal application exit, even calls with this explicit setting may be forced to behave as
     /// WaitForCommit to provide better logging integrity in those scenarios.
@@ -21,7 +21,7 @@
     /// <para>WaitForCommit<br/>
     /// This setting indicates that the caller needs to make sure this message makes it into the
     /// log file on disk because the application is exiting or may crash when it continues.  The call will
-    /// force a flush of the queue and block until Gibraltar has committed the message to the log file on
+    /// force a flush of the queue and block until Loupe has committed the message to the log file on
     /// disk.  Messages written with this mode will not be lost--IF the call completes and returns--but
     /// will incur a significant performance hit, so it should generally only be used for critical information
     /// which needs to survive a crash scenario to help diagnose the cause of the crash.

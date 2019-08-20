@@ -1,8 +1,8 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Gibraltar.Server.Client;
+using Loupe.Server.Client;
 
-namespace Gibraltar.Agent.Internal
+namespace Loupe.Agent.Internal
 {
     internal class WebAuthenticationProvider : IWebAuthenticationProvider
     {

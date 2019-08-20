@@ -1,7 +1,7 @@
 ﻿using System;
-using Gibraltar.Messaging;
+using Loupe.Messaging;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// Extends Loupe to monitor external data sources in the background

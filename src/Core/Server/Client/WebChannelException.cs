@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// The base class for all exceptions thrown by the Web Channel

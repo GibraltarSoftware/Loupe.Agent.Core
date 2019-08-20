@@ -2,7 +2,7 @@
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Agent.Metrics
+namespace Loupe.Agent.Metrics
 {
     /// <summary>
     /// Define a specific sampled metric counter mapped from this field, property, or zero-argument method.

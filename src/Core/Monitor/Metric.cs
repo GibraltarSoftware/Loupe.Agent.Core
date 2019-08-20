@@ -2,12 +2,12 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A single metric that has been captured.  A metric is a single measured value over time.  

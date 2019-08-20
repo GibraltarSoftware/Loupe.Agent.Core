@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 using NUnit.Framework;

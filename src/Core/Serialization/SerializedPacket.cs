@@ -3,7 +3,7 @@
 
 
 #pragma warning disable 1591
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     public class SerializedPacket
     {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
 
-namespace Gibraltar.Data.Internal
+namespace Loupe.Data.Internal
 {
     internal abstract class TransportPackageBase : IDisposable
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Security.Principal;
-using Gibraltar.Monitor;
+using Loupe.Monitor;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// Resolve the current IPrincipal using a delegate

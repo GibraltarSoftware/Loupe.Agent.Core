@@ -32,12 +32,12 @@ namespace Loupe.Configuration
     ///         Application.SetCompatibleTextRenderingDefault(false);
     ///         Thread.CurrentThread.Name = "User Interface Main";  //set the thread name before our first call that logs on this thread.
     ///  
-    ///         Log.StartSession("Starting Gibraltar Analyst");
+    ///         Log.StartSession("Starting Loupe Desktop");
     ///  
     ///         //here you actual start up your application
     ///  
     ///         //and if we got to this point, we done good and can mark the session as being not crashed :)
-    ///         Log.EndSession("Exiting Gibraltar Analyst");
+    ///         Log.EndSession("Exiting Loupe Desktop");
     ///     }
     ///  
     ///     static void Log_Initializing(object sender, LogInitializingEventArgs e)
@@ -76,7 +76,7 @@ namespace Loupe.Configuration
         /// Create a new agent configuration, copying properties from existing one.
         /// </summary>
         /// <param name="configuration">An existing agent configuration.</param>
-        /// <remarks>Inferring this from usage in <c>Gibraltar.Agent.Log</c>.</remarks>
+        /// <remarks>Inferring this from usage in <c>Loupe.Agent.Log</c>.</remarks>
         public AgentConfiguration(AgentConfiguration configuration)
         {
             Listener = configuration.Listener;

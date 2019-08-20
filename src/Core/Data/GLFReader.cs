@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using Gibraltar.Monitor;
-using Gibraltar.Serialization;
+using Loupe.Monitor;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// Reads a GLF file

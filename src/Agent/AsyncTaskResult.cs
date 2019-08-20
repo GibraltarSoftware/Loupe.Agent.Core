@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// The result of processing an asynchronous task

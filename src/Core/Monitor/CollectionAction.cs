@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor
+﻿namespace Loupe.Monitor
 {
     /// <summary>
     /// The different possible actions that were performed on a collection

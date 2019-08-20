@@ -1,12 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
 using Loupe.Agent.PerformanceCounters.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Logging;
+using Log = Loupe.Monitor.Log;
 
 namespace Loupe.Agent.PerformanceCounters
 {
@@ -260,7 +260,8 @@ namespace Loupe.Agent.PerformanceCounters
                         //mark the counter in error so we don't report subsequent problems.
                         curMetric.PollingState = PerfCounterPollingState.Error;
 
-                        if (!Log.SilentMode) Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, exception, "Gibraltar.Agent", "Performance counter error", "The performance counter {0} threw an exception ({1}) while being polled, and will be excluded from metrics until it can be successfully polled again.\r\nException message: {2}",
+                        if (!Loupe.Monitor.Log.SilentMode) Loupe.Monitor.Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, exception, 
+                            "Loupe.Agent", "Performance counter error", "The performance counter {0} threw an exception ({1}) while being polled, and will be excluded from metrics until it can be successfully polled again.\r\nException message: {2}",
                             curMetric.Name, exception.GetType().Name, exception.Message);
                     }
 #endif
@@ -269,7 +270,7 @@ namespace Loupe.Agent.PerformanceCounters
             }
 
             //now that we've sampled everything, write out those samples to the log
-            Log.Write(samples);
+            Loupe.Monitor.Log.Write(samples);
         }
 
         /// <summary>

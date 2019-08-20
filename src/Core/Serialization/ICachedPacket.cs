@@ -2,7 +2,7 @@
 
 
 
-namespace Gibraltar.Serialization
+namespace Loupe.Serialization
 {
     /// <summary>Implemented on invariant packets that can be cached</summary>
     /// <remarks>

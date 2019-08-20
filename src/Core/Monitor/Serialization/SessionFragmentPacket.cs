@@ -1,8 +1,8 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 #pragma warning disable 1591
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     public class SessionFragmentPacket : GibraltarCachedPacket, IPacket, IEquatable<SessionFragmentPacket>
     {

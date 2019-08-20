@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Sockets;
-using Gibraltar.Data;
-using Gibraltar.Messaging.Net;
-using Gibraltar.Monitor;
-using Gibraltar.Monitor.Serialization;
-using Gibraltar.Server.Client;
+using Loupe.Data;
+using Loupe.Messaging.Net;
+using Loupe.Monitor;
+using Loupe.Monitor.Serialization;
+using Loupe.Server.Client;
 using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Messaging
+namespace Loupe.Messaging
 {
     /// <summary>
     /// Used by the agent to write session data to a network socket
@@ -180,7 +180,7 @@ namespace Gibraltar.Messaging
                     else if (nextPacket is PacketStreamStartCommandMessage)
                     {
                         if (!Log.SilentMode)
-                            Log.Write(LogMessageSeverity.Information, LogCategory, "Packet Stream start command received from server", "Received the start command, now we will switch over to the gibraltar session stream data.\r\n{0}", this);
+                            Log.Write(LogMessageSeverity.Information, LogCategory, "Packet Stream start command received from server", "Received the start command, now we will switch over to the session stream data.\r\n{0}", this);
 
                         //initialization is tetchy - we have to get the header, the cache, and be added to the list in one blow
                         //to be sure we get all of the packets we should.

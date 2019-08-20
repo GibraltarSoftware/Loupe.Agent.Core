@@ -4,7 +4,7 @@ using Loupe.Extensibility.Data;
 
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A collection of metrics, keyed by their unique ID and name

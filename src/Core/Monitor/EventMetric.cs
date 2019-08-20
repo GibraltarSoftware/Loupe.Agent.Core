@@ -1,12 +1,12 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Gibraltar.Monitor.Serialization;
+using Loupe.Monitor.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A single event metric instance object, representing one instance of an event metric definition.

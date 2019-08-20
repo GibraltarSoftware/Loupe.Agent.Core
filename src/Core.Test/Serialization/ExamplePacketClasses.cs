@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using Gibraltar;
-using Gibraltar.Serialization;
+using Loupe;
+using Loupe.Serialization;
 
 namespace Loupe.Core.Serialization.UnitTests
 {

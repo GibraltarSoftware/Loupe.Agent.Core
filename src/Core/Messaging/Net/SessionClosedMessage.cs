@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using Gibraltar.Data;
+using Loupe.Data;
 
 
 
 #pragma warning disable 1591
 
-namespace Gibraltar.Messaging.Net
+namespace Loupe.Messaging.Net
 {
     /// <summary>
     /// Indicates that the identified session has been closed.

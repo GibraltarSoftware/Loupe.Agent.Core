@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent.Metrics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 #pragma warning disable 1591

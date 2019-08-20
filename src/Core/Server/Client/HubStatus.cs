@@ -1,6 +1,6 @@
-﻿using Gibraltar.Server.Client.Data;
+﻿using Loupe.Server.Client.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// The current status of a server that is accessible over the network

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Gibraltar.Server.Client.Data;
+using Loupe.Server.Client.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Get the current hub configuration information for the hub

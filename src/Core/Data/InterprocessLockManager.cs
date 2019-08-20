@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Gibraltar.Data
+namespace Loupe.Data
 {
     /// <summary>
     /// A multiprocess lock manager for repositories

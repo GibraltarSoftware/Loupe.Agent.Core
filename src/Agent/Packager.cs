@@ -1,9 +1,9 @@
 using System;
-using Gibraltar.Agent.Internal;
+using Loupe.Agent.Internal;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Agent
+namespace Loupe.Agent
 {
     /// <summary>
     /// Packages up session files collected on the local computer and sends them to a
@@ -78,7 +78,7 @@ namespace Gibraltar.Agent
     /// </example>
     public sealed class Packager : IDisposable
     {
-        private readonly Gibraltar.Data.Packager m_Packager;
+        private readonly Loupe.Data.Packager m_Packager;
 
         private bool m_Disposed;
         
@@ -110,7 +110,7 @@ namespace Gibraltar.Agent
             //We have to ping the log object to make sure everything has been initialized. (this might be the first thing ever done in this process with the agent)
             Monitor.Log.IsLoggingActive();
 
-            m_Packager = new Gibraltar.Data.Packager();
+            m_Packager = new Loupe.Data.Packager();
             Initialize();
         }
 
@@ -125,7 +125,7 @@ namespace Gibraltar.Agent
             Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Gibraltar.Data.Packager(productName);
+            m_Packager = new Loupe.Data.Packager(productName);
             Initialize();
         }
 
@@ -141,7 +141,7 @@ namespace Gibraltar.Agent
             Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Gibraltar.Data.Packager(productName, applicationName);
+            m_Packager = new Loupe.Data.Packager(productName, applicationName);
             Initialize();
         }
 
@@ -161,7 +161,7 @@ namespace Gibraltar.Agent
             Monitor.Log.IsLoggingActive();
 
             //we aren't using our other overloads because the Packager class has its own logic for how things should override.
-            m_Packager = new Gibraltar.Data.Packager(productName, applicationName, directory);
+            m_Packager = new Loupe.Data.Packager(productName, applicationName, directory);
             Initialize();
         }
 
@@ -477,7 +477,7 @@ namespace Gibraltar.Agent
 
         #region Event Handlers
 
-        private void m_Packager_EndSend(object sender, Gibraltar.Data.PackageSendEventArgs args)
+        private void m_Packager_EndSend(object sender, Loupe.Data.PackageSendEventArgs args)
         {
             //translate the args....
             PackageSendEventArgs wrapperArgs = new PackageSendEventArgs(args);

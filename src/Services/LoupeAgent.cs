@@ -1,11 +1,11 @@
 ﻿using System;
-using Gibraltar.Agent;
-using Gibraltar.Monitor;
+using Loupe.Agent;
+using Loupe.Monitor;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Log = Gibraltar.Agent.Log;
+using Log = Loupe.Agent.Log;
 using Microsoft.Extensions.Options;
 
 namespace Loupe.Agent.Core.Services
@@ -52,12 +52,12 @@ namespace Loupe.Agent.Core.Services
 
             foreach (var monitor in _serviceProvider.GetServices<ILoupeMonitor>())
             {
-                Monitor.Subscribe(monitor);
+                Loupe.Monitor.Monitor.Subscribe(monitor);
             }
 
             foreach (var filter in _serviceProvider.GetServices<ILoupeFilter>())
             {
-                Gibraltar.Monitor.Log.RegisterFilter(filter);
+                Loupe.Monitor.Log.RegisterFilter(filter);
             }
 
             var principalResolver = _serviceProvider.GetService<IPrincipalResolver>();

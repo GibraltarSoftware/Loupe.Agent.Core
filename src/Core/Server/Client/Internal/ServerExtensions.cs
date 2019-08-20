@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gibraltar.Server.Client.Data;
+using Loupe.Server.Client.Data;
 using Loupe.Configuration;
 
-namespace Gibraltar.Server.Client.Internal
+namespace Loupe.Server.Client.Internal
 {
     internal static class ServerExtensions
     {

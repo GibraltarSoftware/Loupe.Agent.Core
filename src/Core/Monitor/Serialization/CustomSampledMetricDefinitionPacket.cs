@@ -1,9 +1,9 @@
 ﻿using System;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using Loupe.Extensibility.Data;
 using Loupe.Metrics;
 
-namespace Gibraltar.Monitor.Serialization
+namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// The serializeable representation of a custom sampled metric

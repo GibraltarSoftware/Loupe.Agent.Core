@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AspNetCore2.Sandbox.Data;
-using Gibraltar.Agent;
+using Loupe.Agent;
 using Loupe.Agent.AspNetCore;
 using Loupe.Agent.Core.Services;
 using Loupe.Agent.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent.Metrics;
 using Loupe.Metrics;
 
 #pragma warning disable 3003

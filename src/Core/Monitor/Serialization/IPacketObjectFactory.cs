@@ -1,4 +1,4 @@
-﻿namespace Gibraltar.Monitor.Serialization
+﻿namespace Loupe.Monitor.Serialization
 {
     /// <summary>
     /// Implement to support derived object creation from serialized packets

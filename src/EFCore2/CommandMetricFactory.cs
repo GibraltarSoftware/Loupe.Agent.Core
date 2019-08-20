@@ -1,5 +1,5 @@
 ﻿using System;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent.Metrics;
 using Loupe.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 

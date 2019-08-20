@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Gibraltar.Server.Client.Data;
+using Loupe.Server.Client.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Uploads a session XML document to the endpoint of the web channel

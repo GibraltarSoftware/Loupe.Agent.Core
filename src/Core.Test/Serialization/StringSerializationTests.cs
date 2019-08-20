@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Gibraltar.Serialization;
+using Loupe.Serialization;
 using NUnit.Framework;
 
 namespace Loupe.Core.Test.Serialization

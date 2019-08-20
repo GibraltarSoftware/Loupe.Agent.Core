@@ -1,7 +1,7 @@
-﻿namespace Gibraltar.Serialization
+﻿namespace Loupe.Serialization
 {
     /// <summary>
-    /// This is the key interface objects implement to be serializable by Gibraltar.
+    /// This is the key interface objects implement to be serializable by Loupe.
     /// </summary>
     /// <remarks>
     /// To properly implement IPacket the class should also provide a default constructor.

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// A static class to hold central logic for common file and OS operations needed by various projects.
@@ -127,12 +127,12 @@ namespace Gibraltar
         /// </summary>
         /// <remarks>This is used internally to perform the actual stack frame walk.  Constructors for derived classes
         /// all call this method.  This constructor also allows the caller to specify a log message as being
-        /// of local origin, so Gibraltar stack frames will not be automatically skipped over when determining
+        /// of local origin, so Loupe stack frames will not be automatically skipped over when determining
         /// the originator for internally-issued log messages.</remarks>
         /// <param name="skipFrames">The number of stack frames to skip over to find the first candidate to be
         /// identified as the source of the log message.  (Should generally use 0 if exception parameter is not null.)</param>
-        /// <param name="trustSkipFrames">True if logging a message originating in Gibraltar code (or to just trust skipFrames).
-        /// False if logging a message from the client application and Gibraltar frames should be explicitly skipped over.</param>
+        /// <param name="trustSkipFrames">True if logging a message originating in Loupe code (or to just trust skipFrames).
+        /// False if logging a message from the client application and Loupe frames should be explicitly skipped over.</param>
         /// <param name="exception">An exception declared as the source of this log message (or null for normal call stack source).</param>
         /// <param name="className">The class name of the identified source (usually available).</param>
         /// <param name="methodName">The method name of the identified source (usually available).</param>

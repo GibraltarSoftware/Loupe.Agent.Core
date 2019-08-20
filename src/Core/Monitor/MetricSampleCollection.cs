@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Monitor
+namespace Loupe.Monitor
 {
     /// <summary>
     /// A collection of metric samples for a metric.

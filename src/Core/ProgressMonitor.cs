@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 
 
-namespace Gibraltar
+namespace Loupe
 {
     /// <summary>
     /// Observes the progress of one process for the purpose of progress reporting in user interfaces.

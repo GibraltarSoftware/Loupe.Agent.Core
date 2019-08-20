@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using Gibraltar.Data;
-using Gibraltar.Messaging;
-using Gibraltar.Messaging.Net;
-using Gibraltar.Monitor;
+using Loupe.Data;
+using Loupe.Messaging;
+using Loupe.Messaging.Net;
+using Loupe.Monitor;
 using Loupe.Extensibility.Data;
 
-namespace Gibraltar.Server.Client
+namespace Loupe.Server.Client
 {
     /// <summary>
     /// Communicates between an Agent and a Loupe Server
