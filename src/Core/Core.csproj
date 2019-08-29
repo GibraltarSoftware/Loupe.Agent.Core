@@ -4,8 +4,8 @@
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <AssemblyName>Loupe.Core.NETCore</AssemblyName>
     <RootNamespace>Gibraltar</RootNamespace>
-    <Version>4.8.0.0</Version>
-    <FileVersion>4.8.0.0</FileVersion>
+    <Version>4.8.0.1</Version>
+    <FileVersion>4.8.0.1</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
     <Description>Internal functionality for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
