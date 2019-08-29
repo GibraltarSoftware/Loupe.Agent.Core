@@ -24,7 +24,7 @@ namespace Gibraltar.Monitor
         /// <inheritdoc />
         public bool TryResolveCurrentPrincipal(out IPrincipal principal)
         {
-            principal = ClaimsPrincipal.Current;
+            principal = ClaimsPrincipal.Current; //returns Thread.CurrentPrincipal by default.
 
             if (principal == null && _IsWindows)
             {

@@ -65,20 +65,20 @@ namespace Loupe.Agent.Test.LogMessages
 
                 var principal = new GenericPrincipal(new GenericIdentity(Guid.NewGuid().ToString()), null); //we want a unique, but consistent, principal.
 
-                var justOnceResolver = new ResolveUserJustOnceProvider();
-                Log.ApplicationUserProvider = justOnceResolver;
+                var justOnceProvider = new ResolveUserJustOnceProvider();
+                Log.ApplicationUserProvider = justOnceProvider;
                 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, principal, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Assign Just Once",
                     "This message should be attributed to ApplicationUserAssignJustOnce",
                     "And we should get the resolution event following it.");
-                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We didn't get exactly one resolution after the first message");
+                Assert.AreEqual(1, justOnceProvider.ResolutionRequests, "We didn't get exactly one resolution after the first message");
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, principal, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Assign Just Once",
                     "This message should be attributed to ApplicationUserAssignJustOnce",
                     "And we should NOT get the resolution event following it.");
-                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
+                Assert.AreEqual(1, justOnceProvider.ResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
             }
             finally
             {
@@ -97,6 +97,7 @@ namespace Loupe.Agent.Test.LogMessages
                 Interlocked.Increment(ref m_ResolutionRequests);
 
                 var user = applicationUser.Value;
+                user.Caption = principal?.Identity?.Name;
 
                 return true;
             }
@@ -185,9 +186,9 @@ namespace Loupe.Agent.Test.LogMessages
                     "Flushing message queue prior to doing deadlock test",
                     null);
 
-                var userResolver = new LoggingUserResolver();
+                var userProvider = new LoggingUserResolver();
                 Log.PrincipalResolver = new RandomPrincipalResolver();
-                Log.ApplicationUserProvider = userResolver;
+                Log.ApplicationUserProvider = userProvider;
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Logging Doesn't Deadlock",
@@ -236,20 +237,20 @@ namespace Loupe.Agent.Test.LogMessages
                     "We should get no resolution as we shouldn't have the resolver bound yet.");
 
                 Log.PrincipalResolver = new DelegatePrincipalResolver(() => new GenericPrincipal(new GenericIdentity("Can_Use_Lambda_For_Principal_Resolver"), null));
-                var justOnceResolver = new ResolveUserJustOnceProvider();
-                Log.ApplicationUserProvider = justOnceResolver;
+                var justOnceProvider = new ResolveUserJustOnceProvider();
+                Log.ApplicationUserProvider = justOnceProvider;
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Principal Resolver",
                     "This message should be attributed to user Can_Use_Lambda_For_Principal_Resolver",
                     "And we should get the resolution event following it.");
-                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We didn't get exactly one resolution after the first message");
+                Assert.AreEqual(1, justOnceProvider.ResolutionRequests, "We didn't get exactly one resolution after the first message");
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Principal Resolver",
                     "This message should be attributed to user Can_Use_Lambda_For_Principal_Resolver",
                     "And we should NOT get the resolution event following it.");
-                Assert.AreEqual(1, justOnceResolver.ResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
+                Assert.AreEqual(1, justOnceProvider.ResolutionRequests, "We got an additional ResolveApplicationUser event after our initial attempt.");
             }
             finally
             {
@@ -263,19 +264,19 @@ namespace Loupe.Agent.Test.LogMessages
         {
             try
             {
-                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our event handler.
+                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our resolvers.
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Application User Provider",
-                    "Flushing message queue prior to doing resolve once test",
+                    "Flushing message queue prior to doing test",
                     "We should get no resolution as we shouldn't have the resolver bound yet.");
 
                 Log.PrincipalResolver = new RandomPrincipalResolver();
-                Log.ApplicationUserProvider = new DelegateApplicationUserProvider(((principal, lazy) =>
+                Log.ApplicationUserProvider = new DelegateApplicationUserProvider((principal, lazy) =>
                 {
                     var user = lazy.Value;
                     user.Caption = "Can_Use_Lambda_For_Application_User_Provider";
                     return true;
-                }));
+                });
 
                 Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
                     LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Lambda Application User Provider",
@@ -286,6 +287,54 @@ namespace Loupe.Agent.Test.LogMessages
             {
                 Log.PrincipalResolver = null;
                 Log.ApplicationUserProvider = null;
+            }
+        }
+
+        [Test]
+        public void Specified_IPrincipal_Overrides_Resolved_IPrincipal()
+        {
+            try
+            {
+                //the first message is done with wait for commit so we know we've written everything through the publisher before we connect up our resolvers.
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, null, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Override IPrincipal",
+                    "Flushing message queue prior to doing test",
+                    "We should get no resolution as we shouldn't have the resolver bound yet.");
+
+                //Test scenario: Have a principal resolver, but specify something *else* manually to the API.
+                var principal =
+                    new GenericPrincipal(
+                        new GenericIdentity("Specified_IPrincipal_Overrides_Resolved_IPrincipal-" + Guid.NewGuid()),
+                        null);
+
+                Log.PrincipalResolver = new RandomPrincipalResolver();
+                var userProvider = new CapturePrincipalUserProvider();
+                Log.ApplicationUserProvider = userProvider;
+
+                Log.Write(LogMessageSeverity.Information, "Loupe", null, principal, null,
+                    LogWriteMode.WaitForCommit, null, "LogTests.ApplicationUser.Override IPrincipal",
+                    "This message should be attributed to user caption Specified_IPrincipal_Overrides_Resolved_IPrincipal",
+                    "And we should get the resolution event following it.");
+
+                Assert.That(userProvider.LastPrincipal, Is.Not.Null);
+                Assert.That(userProvider.LastPrincipal, Is.SameAs(principal), "The user principal was not the object we expected");
+            }
+            finally
+            {
+                Log.PrincipalResolver = null;
+                Log.ApplicationUserProvider = null;
+            }
+        }
+
+        private class CapturePrincipalUserProvider : IApplicationUserProvider
+        {
+            public IPrincipal LastPrincipal { get; set; }
+
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            {
+                LastPrincipal = principal;
+                var user = applicationUser.Value;
+                return true;
             }
         }
     }
