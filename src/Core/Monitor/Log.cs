@@ -78,7 +78,7 @@ namespace Gibraltar.Monitor
         private static Packager s_ActivePackager; //PROTECTED BY LOCK
         private static LocalRepository s_Repository;
         private static IApplicationUserProvider s_ApplicationUserProvider; //PROTECTED BY LOCK
-        private static IPrincipalResolver s_PrincipalResolver; //PROTECTED BY LOCK
+        private static IPrincipalResolver s_PrincipalResolver = new DefaultPrincipalResolver(); //PROTECTED BY LOCK
 
         private static readonly MetricDefinitionCollection s_Metrics = new MetricDefinitionCollection();
 
@@ -1926,7 +1926,7 @@ namespace Gibraltar.Monitor
                                                s_SessionStartInfo.ApplicationVersion,
                                                DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture));
 
-            s_Publisher = new Publisher(sessionName, s_RunningConfiguration, s_SessionStartInfo);
+            s_Publisher = new Publisher(sessionName, s_RunningConfiguration, s_SessionStartInfo, s_PrincipalResolver, s_ApplicationUserProvider);
 
             //record our session start info right now so we're sure it's the first packet we have.
             Write(s_SessionStartInfo.Packet);

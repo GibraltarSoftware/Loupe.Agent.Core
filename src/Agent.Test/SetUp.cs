@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Gibraltar.Agent;
+using Gibraltar.Monitor;
 using Loupe.Configuration;
 using NUnit.Framework;
+using Log = Gibraltar.Agent.Log;
+using LogInitializingEventArgs = Gibraltar.Agent.LogInitializingEventArgs;
 
 namespace Loupe.Agent.Test
 {
@@ -69,6 +71,10 @@ namespace Loupe.Agent.Test
             //force us to initialize logging
             Log.StartSession(m_Configuration);
             Trace.TraceInformation("Starting testing at {0} on computer {1}", DateTimeOffset.UtcNow, Log.SessionSummary.HostName);
+
+            //we have to test this before we get into the application user tests and start manipulating the properties.
+            Assert.That(Gibraltar.Monitor.Log.PrincipalResolver, Is.InstanceOf(typeof(DefaultPrincipalResolver)));
+            Assert.That(Log.PrincipalResolver, Is.InstanceOf(typeof(DefaultPrincipalResolver)));
         }
 
         void Log_Initializing(object sender, LogInitializingEventArgs e)
