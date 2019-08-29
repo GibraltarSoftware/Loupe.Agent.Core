@@ -21,10 +21,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\Loupe.Agent.AspNetCore.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Loupe.Agent.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Loupe.Agent.AspNetCore.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Loupe.Agent.AspNetCore.xml</DocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>

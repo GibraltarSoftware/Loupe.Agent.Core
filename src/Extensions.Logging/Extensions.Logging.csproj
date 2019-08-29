@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Labs\Loupe\Loupe.Agent.Core\src\Extensions.Logging\Loupe.Extensions.Logging.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Loupe.Extensions.Logging.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -42,7 +42,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
-    <DocumentationFile>C:\Labs\Loupe\Loupe.Agent.Core\src\Extensions.Logging\Loupe.Extensions.Logging.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Loupe.Extensions.Logging.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.1'">

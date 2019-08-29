@@ -24,11 +24,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp1.1\Loupe.Core.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Loupe.Core.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Core.NETCore.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Loupe.Core.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
