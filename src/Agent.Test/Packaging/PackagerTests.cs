@@ -2,9 +2,11 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Gibraltar.Agent;
+using Gibraltar.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
+using Packager = Gibraltar.Agent.Packager;
 
 namespace Loupe.Agent.Test.Packaging
 {
@@ -207,8 +209,7 @@ namespace Loupe.Agent.Test.Packaging
         public void CreatePackageFromAlternateDirectory()
         {
             //find our normal log directory..
-            var loggingPath = Path.Combine(Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ProgramData" : "Home"),
-                "Gibraltar\\Local Logs\\Loupe");
+            var loggingPath = Path.Combine(PathManager.FindBestPath(PathType.Collection), "Loupe");
 
             var tempDir = Path.Combine(Path.GetTempPath(), "PackagerTests");
             if (Directory.Exists(tempDir))
