@@ -211,6 +211,13 @@ namespace Loupe.Agent.Test.Packaging
             //find our normal log directory..
             var loggingPath = Path.Combine(PathManager.FindBestPath(PathType.Collection), "Loupe");
 
+            if (Directory.Exists(loggingPath) == false)
+            {
+                Log.Warning("Agent Test.Packager", "Unable to run test because logging directory doesn't exist", 
+                    "This is super suspicious but may be a result of permissions resolving different paths.\r\nPath: {0}", loggingPath);
+                return; //we can't run this test.
+            }
+
             var tempDir = Path.Combine(Path.GetTempPath(), "PackagerTests");
             if (Directory.Exists(tempDir))
                 Directory.Delete(tempDir); //so we start from a known, blank position.
