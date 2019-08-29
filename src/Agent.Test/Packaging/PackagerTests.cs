@@ -2,9 +2,11 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Gibraltar.Agent;
+using Gibraltar.Data;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
 using NUnit.Framework;
+using Packager = Gibraltar.Agent.Packager;
 
 namespace Loupe.Agent.Test.Packaging
 {
@@ -207,8 +209,14 @@ namespace Loupe.Agent.Test.Packaging
         public void CreatePackageFromAlternateDirectory()
         {
             //find our normal log directory..
-            var loggingPath = Path.Combine(Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "ProgramData" : "Home"),
-                "Gibraltar\\Local Logs\\Loupe");
+            var loggingPath = Path.Combine(PathManager.FindBestPath(PathType.Collection), "Loupe");
+
+            if (Directory.Exists(loggingPath) == false)
+            {
+                Log.Warning("Agent Test.Packager", "Unable to run test because logging directory doesn't exist", 
+                    "This is super suspicious but may be a result of permissions resolving different paths.\r\nPath: {0}", loggingPath);
+                return; //we can't run this test.
+            }
 
             var tempDir = Path.Combine(Path.GetTempPath(), "PackagerTests");
             if (Directory.Exists(tempDir))

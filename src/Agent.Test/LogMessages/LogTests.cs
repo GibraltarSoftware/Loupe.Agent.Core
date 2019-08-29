@@ -16,6 +16,7 @@ namespace Loupe.Agent.Test.LogMessages
         /// <summary>
         /// Write a log message using each different trace log statement on the Log object
         /// </summary>
+        [Ignore("Loupe doesn't have Trace support for .NET Core/Standard yet")]
         [Test]
         public void WriteTrace()
         {
