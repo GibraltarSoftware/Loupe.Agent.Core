@@ -6,6 +6,9 @@
     <RootNamespace>Loupe.Core</RootNamespace>
     <Version>4.8.0.0</Version>
     <FileVersion>4.8.0.0</FileVersion>
+    <RootNamespace>Gibraltar</RootNamespace>
+    <Version>4.8.0.1</Version>
+    <FileVersion>4.8.0.1</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
     <Description>Internal functionality for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
@@ -24,11 +27,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp1.1\Loupe.Core.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Loupe.Core.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp1.1\Loupe.Core.NETCore.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Loupe.Core.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

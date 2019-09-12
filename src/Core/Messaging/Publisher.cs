@@ -68,7 +68,7 @@ namespace Loupe.Core.Messaging
         /// <remarks>The publisher is a very central class; generally there should be only one per process.
         /// More specifically, there should be a one to one relationship between publisher, packet cache, and 
         /// messengers to ensure integrity of the message output.</remarks>
-        public Publisher(string sessionName, AgentConfiguration configuration, SessionSummary sessionSummary)
+        internal Publisher(string sessionName, AgentConfiguration configuration, SessionSummary sessionSummary, IPrincipalResolver principalResolver, IApplicationUserProvider userProvider)
         {
             if (string.IsNullOrEmpty(sessionName))
             {
@@ -100,7 +100,8 @@ namespace Loupe.Core.Messaging
 
             m_MessageQueueMaxLength = Math.Max(configuration.Publisher.MaxQueueLength, 1); //make sure there's no way to get it below 1.
 
-            m_PrincipalResolver = new DefaultPrincipalResolver();
+            m_PrincipalResolver = principalResolver;
+            m_ApplicationUserProvider = userProvider;
 
             //create the thread we use for dispatching messages
             CreateMessageDispatchThread();
@@ -849,8 +850,8 @@ namespace Loupe.Core.Messaging
             IPrincipal principal = null;
             if (resolver != null)
             {
-                //and set that user to each packet that wants to track the current user
-                foreach (var packet in packetArray.AsEnumerable().OfType<IUserPacket>())
+                //and set that user to each packet that wants to track the current user (and doesn't have one manually set)
+                foreach (var packet in packetArray.AsEnumerable().OfType<IUserPacket>().Where(p => p.Principal == null))
                 {
                     //we only want to resolve the principal once per block, even if there are multiple messages.
                     if (principal == null)
