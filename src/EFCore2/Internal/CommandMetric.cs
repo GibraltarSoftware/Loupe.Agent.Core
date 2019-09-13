@@ -1,8 +1,9 @@
 ﻿
 using System;
 using System.Diagnostics;
-using Gibraltar.Agent;
-using Gibraltar.Agent.Metrics;
+using Loupe.Agent.Metrics;
+using Loupe.Logging;
+using Loupe.Metrics;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Loupe.Agent.EntityFrameworkCore.Internal

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gibraltar.Agent;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.EntityFrameworkCore
 {
+    /// <summary>
+    /// Configuration options for the EF Core agent
+    /// </summary>
     public class EntityFrameworkConfiguration
     {
         /// <summary>
@@ -12,6 +15,9 @@ namespace Loupe.Agent.EntityFrameworkCore
         /// </summary>
         internal const string LogCategory = "Data Access";
 
+        /// <summary>
+        /// Create a new default configuration
+        /// </summary>
         public EntityFrameworkConfiguration()
         {
             Enabled = true;

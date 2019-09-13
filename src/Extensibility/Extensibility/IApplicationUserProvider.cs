@@ -5,9 +5,9 @@ using Loupe.Extensibility.Data;
 namespace Loupe.Extensibility
 {
     /// <summary>
-    /// Implemented to translate an <see cref="IPrincipal">IPrincipal</see> to a Loupe <see cref="Loupe.Core.Data.ApplicationUser">ApplicationUser</see>.
+    /// Implemented to translate an <see cref="IPrincipal">IPrincipal</see> to a Loupe <see cref="IApplicationUser">ApplicationUser</see>.
     /// </summary>
-    /// <remarks><para>Loupe stores extended information about each application user in an <see cref="Loupe.Core.Data.ApplicationUser">ApplicationUser</see>
+    /// <remarks><para>Loupe stores extended information about each application user in an <see cref="IApplicationUser">ApplicationUser</see>
     /// object.  This application user is associated with a single IPrincipal based on the name of that principal (from the Identity).
     /// Each time a data packet is recorded that has an IPrincipal specified the name is checked.  If no ApplicationUser has been
     /// provided then the TryGetApplicationUser method is invoked.  Once a valid application user is provided it is cached for

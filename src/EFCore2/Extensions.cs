@@ -70,7 +70,7 @@ namespace Loupe.Agent.EntityFrameworkCore
                     changes.Count, added, modified, deleted);
             }
 
-            Gibraltar.Agent.Log.Verbose(category, caption, description.ToString());
+            Log.Verbose(category, caption, description.ToString());
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Loupe.Core.Data;
 using Loupe.Core.Monitor;
 using Loupe.Extensibility.Data;

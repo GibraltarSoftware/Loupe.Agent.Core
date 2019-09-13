@@ -20,8 +20,9 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Loupe.Logging;
 
-namespace Gibraltar.Agent.EntityFramework.Internal
+namespace Loupe.Agent.EntityFrameworkCore.Internal
 {
     /// <summary>
     /// A basic class to determine the source of a log message and act as an IMessageSourceProvider for Gibraltar. 

@@ -75,7 +75,7 @@ namespace Loupe.Agent.PerformanceCounters
                 return;
 #if DEBUG
             //don't log during initialize in a lock, we will probably deadlock.
-            Log.Write(LogMessageSeverity.Information, "Loupe.Agent", "Starting asynchronous performance monitoring initialization", null);
+            Log.Information("Loupe.Agent", "Starting asynchronous performance monitoring initialization", null);
 #endif
 
             //we want to make sure anything that might want to mess with our data will wait until we're done initializing
@@ -107,7 +107,7 @@ namespace Loupe.Agent.PerformanceCounters
 
 #if DEBUG
             //don't log during initialize in a lock, we will probably deadlock.
-            Log.Write(LogMessageSeverity.Information, "Loupe.Agent", "Completed asynchronous performance monitoring initialization", null);
+            Log.Information("Loupe.Agent", "Completed asynchronous performance monitoring initialization", null);
 #endif
         }
 

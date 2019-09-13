@@ -2947,7 +2947,7 @@ namespace Loupe.Agent
                 {
                     GC.KeepAlive(ex);
 #if DEBUG
-                    Core.Monitor.Log.DebugBreak();
+                    Core.Log.DebugBreak();
 #endif
                 }
 

@@ -336,18 +336,18 @@ namespace Loupe.Core.Serialization.UnitTests
             MemoryStream buffer = new MemoryStream();
             IFieldWriter writer = new FieldWriter(buffer);
             IFieldReader reader = new FieldReader(buffer);
-            var referenceTime = new DateTime(1973, 6, 25, 8, 30, 12, DateTimeKind.Local); //we convert to UTC during serialization, we want local time.
+            var referenceTime = new DateTime(2019, 12, 31, 8, 30, 12, DateTimeKind.Utc);
             buffer.Position = 0;
             writer.Write(referenceTime);
-            Assert.AreEqual(12, buffer.Position);
+            Assert.AreEqual(11, buffer.Position);
             writer.Write(referenceTime.AddTicks(1));
-            Assert.AreEqual(16, buffer.Position);
+            Assert.AreEqual(14, buffer.Position);
             writer.Write(referenceTime.AddMilliseconds(50));
-            Assert.AreEqual(22, buffer.Position);
+            Assert.AreEqual(19, buffer.Position);
             writer.Write(referenceTime.AddHours(1));
-            Assert.AreEqual(31, buffer.Position);
+            Assert.AreEqual(27, buffer.Position);
             writer.Write(referenceTime.AddDays(1));
-            Assert.AreEqual(40, buffer.Position);
+            Assert.AreEqual(35, buffer.Position);
             buffer.Position = 0;
             Assert.AreEqual(referenceTime, reader.ReadDateTime());
             Assert.AreEqual(referenceTime.AddTicks(1), reader.ReadDateTime());

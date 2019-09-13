@@ -334,7 +334,7 @@ namespace Loupe.Agent.Test.LogMessages
         {
             public IPrincipal LastPrincipal { get; set; }
 
-            public bool TryGetApplicationUser(IPrincipal principal, Lazy<ApplicationUser> applicationUser)
+            public bool TryGetApplicationUser(IPrincipal principal, Lazy<IApplicationUser> applicationUser)
             {
                 LastPrincipal = principal;
                 var user = applicationUser.Value;

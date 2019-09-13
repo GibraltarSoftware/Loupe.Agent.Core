@@ -3,6 +3,8 @@ using System.IO;
 using System.IO.Compression;
 using Loupe.Core.Data;
 using Loupe.Core.Serialization;
+using Loupe.Extensibility.Data;
+using Loupe.Logging;
 
 namespace Loupe.Core.IO
 {
