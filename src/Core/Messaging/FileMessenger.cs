@@ -101,7 +101,7 @@ namespace Gibraltar.Messaging
             m_MaxFileSizeBytes = fileConfiguration.MaxFileSize < 1 ? 1024 : fileConfiguration.MaxFileSize;
             m_MaxFileSizeBytes = m_MaxFileSizeBytes * 1048576; //the configured value is in MB, we use bytes for faster comparisons
 
-            m_MaxLogDurationSeconds = fileConfiguration.MaxFileDuration * 60;  //the configured value is in minutes, we use seconds for consistency
+            m_MaxLogDurationSeconds = Math.Max(fileConfiguration.MaxFileDuration, 1) * 60;  //the configured value is in minutes, we use seconds for consistency
 
             m_RepositoryMaintenanceEnabled = fileConfiguration.EnableFilePruning;
             m_MaxLocalDiskUsage = fileConfiguration.MaxLocalDiskUsage;
