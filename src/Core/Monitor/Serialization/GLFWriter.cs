@@ -89,9 +89,11 @@ namespace Gibraltar.Monitor.Serialization
             // This logic will store GZip compressed files for protocol version 2 and beyond
             if (majorVersion > 1)
             {
-                //we are explicitly *NOT* using the system GZipStream because it doesn't support flush.
-                m_PacketStream = new GZipStream(m_OutputStream, CompressionMode.Compress, CompressionLevel.Default, true){ FlushMode = FlushType.Sync};
-
+                //Be sure whatever GZipStream you use supports flushing..
+                m_PacketStream = new GZipStream(m_OutputStream, CompressionMode.Compress, CompressionLevel.Default, true)
+                {
+                    FlushMode = FlushType.Sync
+                };
             }
             else
             {
