@@ -30,7 +30,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceCounters", "PerformanceCounters\PerformanceCounters.csproj", "{42C92BF1-1731-4F66-979A-3E33B7CF931E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceCounters.Tests", "PerformanceCounters.Tests\PerformanceCounters.Tests.csproj", "{447E88F0-05D9-4B8B-9587-E5E541678A39}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packager", "Packager\Packager.csproj", "{0F7A73A1-5B48-434D-99A1-78410509D24D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore3.Sandbox", "AspNetCore3.Sandbox\AspNetCore3.Sandbox.csproj", "{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -222,6 +223,18 @@ Global
 		{0F7A73A1-5B48-434D-99A1-78410509D24D}.Release|x64.Build.0 = Release|Any CPU
 		{0F7A73A1-5B48-434D-99A1-78410509D24D}.Release|x86.ActiveCfg = Release|Any CPU
 		{0F7A73A1-5B48-434D-99A1-78410509D24D}.Release|x86.Build.0 = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|x64.Build.0 = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{EBD10D9B-E931-40A8-8F9B-1217BE0363DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

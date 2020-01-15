@@ -22,6 +22,31 @@ namespace Loupe.Agent.AspNetCore.Metrics
     {
         private readonly Stopwatch _timer;
 
+        internal RequestMetric(HttpContext httpContext, ActionDescriptor actionDescriptor)
+        {
+            
+            StartTimestamp = DateTimeOffset.Now;
+            _timer = Stopwatch.StartNew();
+
+            SessionId = httpContext.GetSessionId();
+            AgentSessionId = httpContext.GetAgentSessionId();
+
+            HttpMethod = httpContext.Request.Method;
+
+            if (actionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            {
+                ControllerName = controllerActionDescriptor.ControllerName;
+                ActionName = controllerActionDescriptor.ActionName;
+                MethodName = controllerActionDescriptor.MethodInfo?.Name;
+                ClassName = controllerActionDescriptor.ControllerTypeInfo?.Name;
+            }
+
+            UniqueId = actionDescriptor.Id;
+
+            SubCategory = "MVC";
+
+            Parameters = StringifyParameterNames(actionDescriptor.Parameters);
+        }
         internal RequestMetric(ActionExecutingContext actionExecutingContext)
         {
             StartTimestamp = DateTimeOffset.Now;

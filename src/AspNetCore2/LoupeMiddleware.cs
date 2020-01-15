@@ -70,8 +70,8 @@ namespace Loupe.Agent.AspNetCore
         private void WriteSample(HttpContext context, TimeSpan elapsed, Exception ex = null)
         {
             var sample = _requestMetric.CreateSample();
-            
-            var routeString = context.Features.Get<IRoutingFeature>().GetRouteString();
+
+            var routeString = context.GetRouteString();
             sample.SetValue("request", routeString);
             sample.SetValue("duration", elapsed);
             if (ex != null)

@@ -1,4 +1,5 @@
-﻿using Loupe.Agent.Core.Services;
+﻿#if(!NETCORE3)
+using Loupe.Agent.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DiagnosticAdapter;
@@ -135,3 +136,4 @@ namespace Loupe.Agent.AspNetCore.Metrics
         public string Name => "Microsoft.AspNetCore";
     }
 }
+#endif
