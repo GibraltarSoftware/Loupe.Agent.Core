@@ -50,6 +50,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
             }
         }
 
+        public void StartRequestExecution(string actionName)
+        {
+            _requestExecution = Stopwatch.GetTimestamp();
+            SetPageName($"{actionName}");
+        }
+        
         public void StopRequestExecution()
         {
             if (_requestExecution > 0)
@@ -89,5 +95,10 @@ namespace Loupe.Agent.AspNetCore.Metrics
         }
 
         public Exception Exception { get; set; }
+
+        public void SetException(Exception exception)
+        {
+            Exception = exception;
+        }
     }
 }

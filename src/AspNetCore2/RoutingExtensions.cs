@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if(!NETCORE3)
+using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -17,8 +18,9 @@ namespace Loupe.Agent.AspNetCore
         /// </summary>
         /// <param name="routing">The <see cref="IRoutingFeature"/> instance.</param>
         /// <returns>A readable string form of the route, if available; otherwise, <c>null</c>.</returns>
-        public static string GetRouteString(this IRoutingFeature routing)
+        public static string GetRouteString(this HttpContext httpContext)
         {
+            var routing = httpContext.Features.Get<IRoutingFeature>();
             if (routing == null) return null;
 
             var templateRoute = routing.RouteData.Routers.OfType<Route>().FirstOrDefault();
@@ -54,3 +56,4 @@ namespace Loupe.Agent.AspNetCore
         }
     }
 }
+#endif
