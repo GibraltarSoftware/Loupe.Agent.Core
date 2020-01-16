@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <PackageId>Loupe.Agent.Core.Extensibility</PackageId>
-    <Version>4.8.0.1</Version>
-    <FileVersion>4.8.0.1</FileVersion>
+    <Version>4.8.1.0</Version>
+    <FileVersion>4.8.1.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Description>Shared types for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
-    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <Company>Gibraltar Software, Inc.</Company>
     <AssemblyName>Loupe.Extensibility.NETCore</AssemblyName>
     <RootNamespace>Loupe</RootNamespace>

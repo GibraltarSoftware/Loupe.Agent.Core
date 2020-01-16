@@ -5,14 +5,14 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Loupe.Packager</AssemblyName>
     <RootNamespace>Loupe.Packager</RootNamespace>
-    <Version>4.8.0.1</Version>
-    <FileVersion>4.8.0.1</FileVersion>
+    <Version>4.8.1.0</Version>
+    <FileVersion>4.8.1.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
     <Description>Command line utility for sending Loupe data files to a Loupe server or packaging them into a Loupe package file for transport.</Description>
-    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>

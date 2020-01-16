@@ -4,13 +4,13 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>Loupe.Agent.Core.Services</AssemblyName>
     <RootNamespace>Loupe.Agent.Core.Services</RootNamespace>
-    <Version>4.8.0.1</Version>
-    <FileVersion>4.8.0.1</FileVersion>
+    <Version>4.8.1.0</Version>
+    <FileVersion>4.8.1.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Company>Gibraltar Software, Inc.</Company>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
-    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>

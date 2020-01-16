@@ -5,14 +5,14 @@
     <AssemblyName>Loupe.Extensions.Logging</AssemblyName>
     <RootNamespace>Loupe.Extensions.Logging</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.8.0.1</Version>
-    <FileVersion>4.8.0.1</FileVersion>
+    <Version>4.8.1.0</Version>
+    <FileVersion>4.8.1.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
     <Description>Implements Microsoft.Extensions.Logging.Abstractions for the Loupe Agent for .NET Core (Loupe.Agent.Core)</Description>
-    <Copyright>Copyright © 2008-2019 Gibraltar Software, Inc.</Copyright>
+    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
     <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
