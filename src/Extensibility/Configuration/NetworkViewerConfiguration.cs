@@ -1,4 +1,6 @@
-﻿namespace Loupe.Configuration
+﻿using System.Text;
+
+namespace Loupe.Configuration
 {
     /// <summary>
     /// Network Messenger Configuration
@@ -64,5 +66,18 @@
 
         /// <inheritdoc />
         string IMessengerConfiguration.MessengerTypeName => "Gibraltar.Messaging.NetworkMessenger";
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
+            stringBuilder.AppendFormat("\tAllow Local Clients: {0}\r\n", AllowLocalClients);
+            stringBuilder.AppendFormat("\tAllow Remote Clients: {0}\r\n", AllowRemoteClients);
+            stringBuilder.AppendFormat("\tMax Queue Length: {0}\r\n", MaxQueueLength);
+
+            return stringBuilder.ToString();
+        }
     }
 }

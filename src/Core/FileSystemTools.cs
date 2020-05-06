@@ -12,22 +12,14 @@ namespace Gibraltar
         private const int DefaultFileBufferSize = 32768;
 
         /// <summary>
-        /// Sanitize the provided directory name by substituting underscore for illegal values.
-        /// </summary>
-        /// <param name="directoryName">The name of the directory to sanitize.</param>
-        /// <returns>The sanitized directory name.</returns>
-        public static string SanitizeDirectoryName(string directoryName)
-        {
-            return SanitizeDirectoryName(directoryName, '_');
-        }
-
-        /// <summary>
         /// Sanitize the provided directory name by substituting a specified character for illegal values.
         /// </summary>
         /// <param name="directoryName">The name of the directory to sanitize.</param>
+        /// <param name="eliminateSpaces">When true, treat whitespace as an illegal value</param>
+        /// <param name="lowerCaseOnly">When true, ensure the final name is lower case.</param>
         /// <param name="replaceChar">The character to substitute for illegal values, must be legal.</param>
         /// <returns>The sanitized directory name.</returns>
-        public static string SanitizeDirectoryName(string directoryName, char replaceChar)
+        public static string SanitizeDirectoryName(string directoryName, bool eliminateSpaces = true, bool lowerCaseOnly = true, char replaceChar = '_')
         {
             if (string.IsNullOrEmpty(directoryName))
                 throw new ArgumentNullException(directoryName);
@@ -36,32 +28,30 @@ namespace Gibraltar
             foreach (char c in Path.GetInvalidPathChars())
                 name = name.Replace(c, replaceChar);
 
-            return name;
-        }
+            if (eliminateSpaces)
+                name = name.Replace(' ', replaceChar);
 
-        /// <summary>
-        /// Sanitize the provided file name (without path) by substituting an underscore for illegal values.
-        /// </summary>
-        /// <param name="fileName">The file name to sanitize</param>
-        /// <returns>The sanitized file name.</returns>
-        public static string SanitizeFileName(string fileName)
-        {
-            return SanitizeFileName(fileName, '_');
+            return lowerCaseOnly ? name.ToLowerInvariant() : name;
         }
 
         /// <summary>
         /// Sanitize the provided file name (without path) by substituting the specified character for illegal values.
         /// </summary>
         /// <param name="fileName">The file name to sanitize</param>
+        /// <param name="eliminateSpaces">When true, treat whitespace as an illegal value</param>
+        /// <param name="lowerCaseOnly">When true, ensure the final name is lower case.</param>
         /// <param name="replaceChar">The character to substitute for illegal values, must be legal.</param>
         /// <returns>The sanitized file name.</returns>
-        public static string SanitizeFileName(string fileName, char replaceChar)
+        public static string SanitizeFileName(string fileName, bool eliminateSpaces = true, bool lowerCaseOnly = true, char replaceChar = '_')
         {
             string name = fileName;
             foreach (char c in Path.GetInvalidFileNameChars())
                 name = name.Replace(c, replaceChar);
 
-            return name;
+            if (eliminateSpaces)
+                name = name.Replace(' ', replaceChar);
+
+            return lowerCaseOnly ? name.ToLowerInvariant() : name;
         }
 
         /// <summary>

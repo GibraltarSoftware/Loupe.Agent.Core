@@ -5,20 +5,24 @@
     <AssemblyName>Loupe.Agent.AspNetCore</AssemblyName>
     <RootNamespace>Loupe.Agent.AspNetCore</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.8.1.0</Version>
-    <FileVersion>4.8.1.0</FileVersion>
+    <Version>4.8.2.0</Version>
+    <FileVersion>4.8.2.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Company>Gibraltar Software, Inc.</Company>
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
+    <PackageIcon>loupe-192x192.png</PackageIcon>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>The Loupe Agent for ASP.NET Core - automatically record performance and diagnostic information for ASP.NET Core applications.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>..\..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\Loupe.Agent.AspNetCore.xml</DocumentationFile>
@@ -54,6 +58,15 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.0" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Agent\Agent.csproj" />

@@ -1,4 +1,6 @@
-﻿namespace Loupe.Configuration
+﻿using System.Text;
+
+namespace Loupe.Configuration
 {
     /// <summary>
     /// Configuration information for the trace listener.
@@ -30,5 +32,17 @@
         /// When true, metrics are recorded for Garbage Collector (GC) events.
         /// </summary>
         public bool EnableGCEvents { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tEnable Console: {0}\r\n", EnableConsole);
+            stringBuilder.AppendFormat("\tEnable Network Events: {0}\r\n", EnableNetworkEvents);
+            stringBuilder.AppendFormat("\tEnable GC Events: {0}\r\n", EnableGCEvents);
+
+            return stringBuilder.ToString();
+        }
     }
 }

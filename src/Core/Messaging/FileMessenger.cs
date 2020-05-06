@@ -17,7 +17,7 @@ namespace Gibraltar.Messaging
 
         public const string LogExtension = "glf";
         public const string PackageExtension = "glp";
-        public const string SessionLockFolderName = "RunningSessions";
+        public const string SessionLockFolderName = "runningsessions";
 
         private static readonly Random m_RandomGenerator = new Random(); //static is important so multiple instances created close together get different values
 
@@ -55,7 +55,7 @@ namespace Gibraltar.Messaging
         /// <returns></returns>
         public static string SessionFileNamePrefix(string productName, string applicationName)
         {
-            return FileSystemTools.SanitizeFileName(string.Format(CultureInfo.InvariantCulture, "{0} {1}", productName, applicationName));
+            return FileSystemTools.SanitizeFileName(string.Format(CultureInfo.InvariantCulture, "{0}_{1}", productName, applicationName), true);
         }
 
         #endregion
@@ -443,10 +443,10 @@ namespace Gibraltar.Messaging
 
         private string MakeFileName()
         {
-            string fileName = string.Format(CultureInfo.InvariantCulture, "{0} {1:yyyy-MM-dd-HH-mm-ss}-{2}.{3}", SessionFileNamePrefix(Publisher.SessionSummary.Product, Publisher.SessionSummary.Application), 
+            string fileName = string.Format(CultureInfo.InvariantCulture, "{0}_{1:yyyy-MM-dd-HH-mm-ss}-{2}.{3}", SessionFileNamePrefix(Publisher.SessionSummary.Product, Publisher.SessionSummary.Application), 
                 Publisher.SessionSummary.StartDateTime.UtcDateTime, m_CurrentSessionFile, LogExtension);
 
-            return FileSystemTools.SanitizeFileName(fileName);
+            return FileSystemTools.SanitizeFileName(fileName, true);
         }
 
 #endregion

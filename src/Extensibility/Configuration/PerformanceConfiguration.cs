@@ -1,4 +1,5 @@
-﻿using Loupe.Configuration;
+﻿using System.Text;
+using Loupe.Configuration;
 
 namespace Loupe.Agent.PerformanceCounters
 {
@@ -53,5 +54,20 @@ namespace Loupe.Agent.PerformanceCounters
         /// When true, system performance information will be automatically captured
         /// </summary>
         public bool EnableSystemMetrics { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
+            stringBuilder.AppendFormat("\tEnable Process Metrics: {0}\r\n", EnableProcessMetrics);
+            stringBuilder.AppendFormat("\tEnable Disk Metrics: {0}\r\n", EnableDiskMetrics);
+            stringBuilder.AppendFormat("\tEnable Memory Metrics: {0}\r\n", EnableMemoryMetrics);
+            stringBuilder.AppendFormat("\tEnable Network Metrics: {0}\r\n", EnableNetworkMetrics);
+            stringBuilder.AppendFormat("\tEnable System Metrics: {0}\r\n", EnableSystemMetrics);
+
+            return stringBuilder.ToString();
+        }
     }
 }

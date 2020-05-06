@@ -1367,7 +1367,13 @@ namespace Gibraltar.Monitor
                 if (string.IsNullOrEmpty(reason))
                     reason = "Session started";
 
-                WriteMessage(LogMessageSeverity.Information, LogWriteMode.Queued, ThisLogSystem, Category, sourceProvider, null, null, null, reason, null );
+                string description = null;
+                if (s_RunningConfiguration?.Publisher?.EnableDebugMode ?? false)
+                {
+                    description = s_RunningConfiguration.ToString();
+                }
+
+                WriteMessage(LogMessageSeverity.Information, LogWriteMode.Queued, ThisLogSystem, Category, sourceProvider, null, null, null, reason, description);
             }            
         }
 
@@ -1411,7 +1417,15 @@ namespace Gibraltar.Monitor
                 try
                 {
                     string message = null;
-                    if (IsHubSubmissionConfigured(ref message) && (await Packager.CanSendToServer().ConfigureAwait(false)).IsValid)
+                    HubConnectionStatus connectionStatus = null;
+
+                    var configured = IsHubSubmissionConfigured(ref message);
+                    if (configured)
+                    {
+                        connectionStatus = await Packager.CanSendToServer().ConfigureAwait(false);
+                    }
+                    
+                    if (configured && (connectionStatus?.IsValid ?? false))
                     {
                         //we DON'T release the active packager here, we do it in the event handler.
                         ServerConfiguration config = s_RunningConfiguration.Server;
@@ -1427,7 +1441,12 @@ namespace Gibraltar.Monitor
                     else
                     {
                         //we can't send.
-                        Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to configuration", "Either the current configuration doesn't support server or email submission or the server is not available.");
+                        var description = configured == false
+                            ? message
+                            : connectionStatus?.Message;
+
+                        Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to configuration", 
+                            description);
 
                         //no good, dispose and clear the packager.
                         lock(s_SyncObject)

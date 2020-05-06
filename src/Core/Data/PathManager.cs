@@ -11,19 +11,26 @@ namespace Gibraltar.Data
     public static class PathManager
     {
         /// <summary>
+        /// The root folder to use for all of our sub-folders
+        /// </summary>
+        public const string RootFolder = "gibraltar";
+
+        /// <summary>
         /// The subfolder of the selected path used for the repository
         /// </summary>
-        public const string RepositoryFolder = "Repository";
+        public const string RepositoryFolder = "repository";
 
         /// <summary>
         /// The subfolder of the selected path used for local session log collection
         /// </summary>
-        public const string CollectionFolder = "Local Logs";
+        public const string CollectionFolder = "logs";
+
+        public const string CollectionFolderOld = "Local Logs";
 
         /// <summary>
         /// The subfolder of the selected path used for discovery information
         /// </summary>
-        public const string DiscoveryFolder = "Discovery";
+        public const string DiscoveryFolder = "discovery";
 
         /// <summary>
         /// Determine the best path of the provided type for the current user
@@ -102,7 +109,7 @@ namespace Gibraltar.Data
         public static string ComputePath(string basePath, string folderName)
         {
             string bestPath = basePath;
-            bestPath = Path.Combine(bestPath, "Gibraltar");
+            bestPath = Path.Combine(bestPath, RootFolder);
             bestPath = Path.Combine(bestPath, folderName);
 
             return bestPath;
@@ -170,7 +177,8 @@ namespace Gibraltar.Data
             switch (pathType)
             {
                 case PathType.Collection:
-                    pathFolder = CollectionFolder;
+                    //for backwards compatibility we're presently trying to generate the same path the old agent does by default.
+                    pathFolder = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? CollectionFolderOld : CollectionFolder;
                     break;
                 case PathType.Repository:
                     pathFolder = RepositoryFolder;

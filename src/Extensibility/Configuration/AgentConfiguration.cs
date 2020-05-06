@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Loupe.Agent.PerformanceCounters;
 
 namespace Loupe.Configuration
@@ -129,7 +130,6 @@ namespace Loupe.Configuration
         /// </summary>
         public Dictionary<string, string> Properties { get; set; }
 
-
         /// <summary>
         /// Normalize configuration values
         /// </summary>
@@ -141,6 +141,30 @@ namespace Loupe.Configuration
             Publisher.Sanitize();
             SessionFile.Sanitize();
             Server.Sanitize();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("Publisher:\r\n{0}\r\n", Publisher);
+            stringBuilder.AppendFormat("Listener:\r\n{0}\r\n", Listener);
+            stringBuilder.AppendFormat("Performance:\r\n{0}\r\n", Performance);
+            stringBuilder.AppendFormat("Session File:\r\n{0}\r\n", SessionFile);
+            stringBuilder.AppendFormat("Server:\r\n{0}\r\n", Server);
+            stringBuilder.AppendFormat("Network Viewer:\r\n{0}\r\n", NetworkViewer);
+
+            if (Properties?.Count > 0)
+            {
+                stringBuilder.AppendLine("\r\nProperties:");
+                foreach (var property in Properties)
+                {
+                    stringBuilder.AppendFormat("{0}: {1}", property.Key, property.Value);
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

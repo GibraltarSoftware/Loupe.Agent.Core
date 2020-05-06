@@ -23,9 +23,8 @@ namespace Gibraltar
                 case Architecture.X64:
                     return ProcessorArchitecture.Amd64;
                 case Architecture.Arm:
-                    return ProcessorArchitecture.Arm;
                 case Architecture.Arm64:
-                    return ProcessorArchitecture.Arm; ;
+                    return ProcessorArchitecture.Arm;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(architecture), architecture, null);
             }
