@@ -23,8 +23,8 @@ namespace Gibraltar.Monitor
         /// </summary>
         protected const string LogCategory = "Loupe.Local Repository";
 
-        private const string RepositoryTempFolder = "Temp";
-        internal const string RepositoryArchiveFolder = "Archive";
+        private const string RepositoryTempFolder = "temp";
+        internal const string RepositoryArchiveFolder = "archive";
         internal const string RepositoryKeyFile = "repository.gak";
         internal const string ComputerKeyFile = "computer.gak";
 
@@ -117,7 +117,7 @@ namespace Gibraltar.Monitor
             using (GetMaintenanceLock())
             {
                 //if the repository doesn't have a readme file and our basic information, create that.
-                string readme = Path.Combine(m_RepositoryPath, "_ReadMe.txt");
+                string readme = Path.Combine(m_RepositoryPath, "_readme.txt");
                 if (File.Exists(readme) == false)
                 {
                     try
@@ -1225,9 +1225,9 @@ namespace Gibraltar.Monitor
             if (string.IsNullOrEmpty(applicationName))
                 file = string.Format("{0}.gasc", product);
             else
-                file = string.Format("{0} {1}.gasc", product, applicationName);
+                file = string.Format("{0}_{1}.gasc", product, applicationName);
 
-            return FileSystemTools.SanitizeFileName(file);
+            return FileSystemTools.SanitizeFileName(file, true);
         }
 
         /// <summary>

@@ -5,18 +5,22 @@
     <AssemblyName>Loupe.Agent.PerformanceCounters</AssemblyName>
     <RootNamespace>Loupe.Agent.PerformanceCounters</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.8.1.0</Version>
-    <FileVersion>4.8.1.0</FileVersion>
+    <Version>4.8.2.0</Version>
+    <FileVersion>4.8.2.0</FileVersion>
     <AssemblyVersion>4.8.0.0</AssemblyVersion>
     <Authors>Gibraltar Software, Inc.</Authors>
     <Product>Loupe</Product>
     <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
     <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIconUrl>https://onloupe.com/assets/icons/favicon.ico</PackageIconUrl>
+    <PackageIcon>loupe-192x192.png</PackageIcon>
     <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Description>The Loupe Agent for Windows Performance Counters - automatically record key performance counters to Loupe for analysis along with the rest of your session's data.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>..\..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,12 +38,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
   </ItemGroup>
 

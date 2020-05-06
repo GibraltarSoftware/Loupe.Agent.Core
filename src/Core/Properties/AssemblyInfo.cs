@@ -2,4 +2,4 @@
 
 
 //Here's the problem:  Since we get signed, we can only expose internals to other strong named assemblies.
-[assembly: InternalsVisibleTo("Loupe.Core.Test")]
+[assembly: InternalsVisibleTo("Loupe.Core.Test, PublicKey=00240000048000009400000006020000002400005253413100040000010001000ddbab872f79cb9d11bed118a17f254452c57e410ba22ecd1042e7706428d745054fce7b23dec93355c7deb17e9a74de3e04956817cf45084576f6603581e1b6a8e9d06d9645899ef54a59a5cb1d39894290368695e2663a0ecf6e0fb7846a3e78df5823de34bd8e7d31bbc2edb1ac015e5ec7c7dfb93ed9f7534c4344bc81d9")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Loupe.Configuration
 {
@@ -164,5 +165,25 @@ namespace Loupe.Configuration
 
         /// <inheritdoc />
         string IMessengerConfiguration.MessengerTypeName => "Gibraltar.Messaging.FileMessenger";
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
+            stringBuilder.AppendFormat("\tAuto Flush Interval: {0}\r\n", AutoFlushInterval);
+            stringBuilder.AppendFormat("\tIndex Update Interval: {0}\r\n", IndexUpdateInterval);
+            stringBuilder.AppendFormat("\tMax File Size: {0}\r\n", MaxFileSize);
+            stringBuilder.AppendFormat("\tMax File Duration: {0}\r\n", MaxFileDuration);
+            stringBuilder.AppendFormat("\tEnable File Pruning: {0}\r\n", EnableFilePruning);
+            stringBuilder.AppendFormat("\tMax Local Disk Usage: {0}\r\n", MaxLocalDiskUsage);
+            stringBuilder.AppendFormat("\tMax Local File Age: {0}\r\n", MaxLocalFileAge);
+            stringBuilder.AppendFormat("\tMinimum Free Disk: {0}\r\n", MinimumFreeDisk);
+            stringBuilder.AppendFormat("\tForce Synchronous: {0}\r\n", ForceSynchronous);
+            stringBuilder.AppendFormat("\tMax Queued Length: {0}\r\n", MaxQueueLength);
+
+            return stringBuilder.ToString();
+        }
     }
 }

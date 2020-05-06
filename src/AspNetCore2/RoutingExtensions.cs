@@ -16,7 +16,7 @@ namespace Loupe.Agent.AspNetCore
         /// <summary>
         /// Gets the route as a readable string.
         /// </summary>
-        /// <param name="routing">The <see cref="IRoutingFeature"/> instance.</param>
+        /// <param name="httpContext">The <see cref="HttpContext"/> instance.</param>
         /// <returns>A readable string form of the route, if available; otherwise, <c>null</c>.</returns>
         public static string GetRouteString(this HttpContext httpContext)
         {

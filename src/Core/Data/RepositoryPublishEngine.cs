@@ -56,7 +56,7 @@ namespace Gibraltar.Data
                 (m_Configuration.SendAllApplications ? string.Empty : "~" + m_ApplicationName);
 
             //we have to make sure the multiprocess lock doesn't have any unsafe characters.
-            m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName);
+            m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName, true);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Gibraltar.Data
                                      (string.IsNullOrEmpty(applicationName) ? string.Empty : "~" + applicationName);
 
             //we have to make sure the multiprocess lock doesn't have any unsafe characters.
-            m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName);
+            m_MultiprocessLockName = FileSystemTools.SanitizeFileName(m_MultiprocessLockName, true);
 
             BackgroundStartupDelay = 0;
         }

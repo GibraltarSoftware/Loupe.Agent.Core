@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Text;
 using Loupe.Extensibility.Data;
 
 namespace Loupe.Configuration
@@ -149,6 +150,26 @@ namespace Loupe.Configuration
             if (string.IsNullOrEmpty(ApplicationName))
                 ApplicationName = null;
 
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tProduct Name: {0}\r\n", ProductName);
+            stringBuilder.AppendFormat("\tApplication Name: {0}\r\n", ApplicationName);
+            stringBuilder.AppendFormat("\tApplication Description: {0}\r\n", ApplicationDescription);
+            stringBuilder.AppendFormat("\tApplication Type: {0}\r\n", ApplicationType);
+            stringBuilder.AppendFormat("\tApplication Version: {0}\r\n", ApplicationVersion);
+            stringBuilder.AppendFormat("\tEnvironment Name: {0}\r\n", EnvironmentName);
+            stringBuilder.AppendFormat("\tPromotion Level Name: {0}\r\n", PromotionLevelName);
+            stringBuilder.AppendFormat("\tForce Synchronous: {0}\r\n", ForceSynchronous);
+            stringBuilder.AppendFormat("\tMax Queue Length: {0}\r\n", MaxQueueLength);
+            stringBuilder.AppendFormat("\tEnable Anonymous Mode: {0}\r\n", EnableAnonymousMode);
+            stringBuilder.AppendFormat("\tEnable Debug Mode: {0}\r\n", EnableDebugMode);
+
+            return stringBuilder.ToString();
         }
     }
 }
