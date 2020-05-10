@@ -5,6 +5,9 @@ using Gibraltar.Agent;
 
 namespace Loupe.Agent.EntityFrameworkCore
 {
+    /// <summary>
+    /// Loupe Agent configuration options for Entity Framework
+    /// </summary>
     public class EntityFrameworkConfiguration
     {
         /// <summary>
@@ -12,6 +15,9 @@ namespace Loupe.Agent.EntityFrameworkCore
         /// </summary>
         internal const string LogCategory = "Data Access";
 
+        /// <summary>
+        /// Create a new default configuration
+        /// </summary>
         public EntityFrameworkConfiguration()
         {
             Enabled = true;

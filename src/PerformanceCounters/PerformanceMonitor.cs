@@ -42,15 +42,22 @@ namespace Loupe.Agent.PerformanceCounters
 
         #region Public Properties and Methods
 
+        /// <summary>
+        /// Create a performance monitor with the default configuration
+        /// </summary>
         public PerformanceMonitor()
             : this(new PerformanceConfiguration())
         {
 
         }
 
+        /// <summary>
+        /// Create a performance monitor with the specified configuration
+        /// </summary>
+        /// <param name="configuration">The configuration options for the performance monitor</param>
         public PerformanceMonitor(PerformanceConfiguration configuration)
         {
-            m_Configuration = configuration;
+            m_Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <summary>

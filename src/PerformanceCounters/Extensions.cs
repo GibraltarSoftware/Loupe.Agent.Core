@@ -5,6 +5,9 @@ using Loupe.Agent.Core.Services;
 
 namespace Loupe.Agent.PerformanceCounters
 {
+    /// <summary>
+    /// Extension methods for Performance Counters
+    /// </summary>
     public static class Extensions
     {
         /// <summary>
