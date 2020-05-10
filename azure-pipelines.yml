@@ -59,8 +59,11 @@ jobs:
       configuration: '$(buildConfiguration)'
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
-        **\*.Tests.dll
-        !**\*TestAdapter.dll
-        !**\obj\**
-      searchFolder: '$(System.DefaultWorkingDirectory)'
+        **/bin/Release/**/*.Tests.dll
+      searchFolder: '$(Build.SourcesDirectory)'
       vsTestVersion: '16.0'
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'JaCoCo'
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/**/coverage.xml
