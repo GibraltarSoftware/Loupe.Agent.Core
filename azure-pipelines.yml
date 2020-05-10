@@ -1,4 +1,4 @@
-name: $(major).$(minor).$(revision)$(patch)
+name: $(major).$(minor).$(revision)$(Rev:.r)
 trigger:
 - master
 
@@ -9,8 +9,8 @@ variables:
   major: 4
   minor: 8
   revision: 2
-  patch: $(Rev:.r)
-  fileVersion: '$(major).$(minor).$(revision)$(patch)'
+  patch:
+  fileVersion: '$(Build.BuildNumber)'
 
 jobs:
 - job: build
