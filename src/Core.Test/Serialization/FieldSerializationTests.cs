@@ -340,18 +340,18 @@ namespace Loupe.Core.Serialization.UnitTests
             var referenceTime = new DateTime(1973, 6, 25, 8, 30, 12, DateTimeKind.Utc); //UTC to ensure tests are portable
             buffer.Position = 0;
             writer.Write(referenceTime);
-            Assert.AreEqual(12, buffer.Position, 
+            Assert.AreEqual(11, buffer.Position, 
                 "Serialized value isn't the expected length.  Position is: {1}, expected {0}.\r\nSerialized Value: {2}", 
-                buffer.Position, 12, buffer.ToArray().ToDisplayString());
+                buffer.Position, 11, buffer.ToArray().ToDisplayString());
 
             writer.Write(referenceTime.AddTicks(1));
-            Assert.AreEqual(16, buffer.Position);
+            Assert.AreEqual(14, buffer.Position);
             writer.Write(referenceTime.AddMilliseconds(50));
-            Assert.AreEqual(22, buffer.Position);
+            Assert.AreEqual(19, buffer.Position);
             writer.Write(referenceTime.AddHours(1));
-            Assert.AreEqual(31, buffer.Position);
+            Assert.AreEqual(27, buffer.Position);
             writer.Write(referenceTime.AddDays(1));
-            Assert.AreEqual(40, buffer.Position);
+            Assert.AreEqual(35, buffer.Position);
             buffer.Position = 0;
             Assert.AreEqual(referenceTime, reader.ReadDateTime());
             Assert.AreEqual(referenceTime.AddTicks(1), reader.ReadDateTime());

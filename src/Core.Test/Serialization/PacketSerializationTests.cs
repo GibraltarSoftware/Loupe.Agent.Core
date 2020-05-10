@@ -59,23 +59,30 @@ namespace Loupe.Core.Serialization.UnitTests
             m_PacketReader.RegisterType(typeof(LogPacket));
             m_PacketReader.RegisterType(typeof(ThreadInfo));
 
+            //since timestamp length varies by time zone we have to measure it first (sigh..)
+            var timestampLength = DateTimeOffsetSerializedLength(); 
+
+            //The first message has to write out a bunch of stuff - definitions, threads, etc.
             LogPacket.Write("message 1", 101, m_PacketWriter);
-            Assert.AreEqual(145, m_MemoryStream.Position);
-            Assert.AreEqual(145, m_MemoryStream.Position,
+            Assert.AreEqual(133 + timestampLength, m_MemoryStream.Position,
                 "Serialized value isn't the expected length.  Position is: {1}, expected {0}.\r\nSerialized Value: {2}",
-                m_MemoryStream.Position, 145, m_MemoryStream.ToArray().ToDisplayString());
+                m_MemoryStream.Position, 133 + timestampLength, m_MemoryStream.ToArray().ToDisplayString());
 
             Thread.Sleep(50);
 
+            //having now written that these messages will be smaller because we don't have to write out threads and timestamps are smaller.
+            var baseline = m_MemoryStream.Position;
             LogPacket.Write("message 2", 101, m_PacketWriter);
-            Assert.AreEqual(165, m_MemoryStream.Position);
+            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
             Thread.Sleep(50);
 
+            baseline = m_MemoryStream.Position;
             LogPacket.Write("message 3", 101, m_PacketWriter);
-            Assert.AreEqual(185, m_MemoryStream.Position);
+            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
 
+            baseline = m_MemoryStream.Position;
             LogPacket.Write("message 1", 101, m_PacketWriter);
-            Assert.AreEqual(205, m_MemoryStream.Position);
+            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
 
             m_MemoryStream.Position = 0;
 
@@ -177,5 +184,15 @@ namespace Loupe.Core.Serialization.UnitTests
         }
 
         #endregion
+
+
+        private long DateTimeOffsetSerializedLength()
+        {
+            MemoryStream buffer = new MemoryStream();
+            IFieldWriter writer = new FieldWriter(buffer);
+            buffer.Position = 0;
+            writer.Write(DateTimeOffset.Now);
+            return buffer.Position;
+        }
     }
 }
