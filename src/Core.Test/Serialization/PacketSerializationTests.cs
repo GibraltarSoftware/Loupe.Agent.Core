@@ -60,7 +60,8 @@ namespace Loupe.Core.Serialization.UnitTests
             m_PacketReader.RegisterType(typeof(ThreadInfo));
 
             //since timestamp length varies by time zone we have to measure it first (sigh..)
-            var timestampLength = DateTimeOffsetSerializedLength(); 
+            var timestampLength = DateTimeOffsetSerializedLength();
+            bool haveTimeZone = timestampLength == 12;
 
             //The first message has to write out a bunch of stuff - definitions, threads, etc.
             LogPacket.Write("message 1", 101, m_PacketWriter);
@@ -73,16 +74,16 @@ namespace Loupe.Core.Serialization.UnitTests
             //having now written that these messages will be smaller because we don't have to write out threads and timestamps are smaller.
             var baseline = m_MemoryStream.Position;
             LogPacket.Write("message 2", 101, m_PacketWriter);
-            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
+            Assert.AreEqual(haveTimeZone ? 20 : 19, m_MemoryStream.Position - baseline);
             Thread.Sleep(50);
 
             baseline = m_MemoryStream.Position;
             LogPacket.Write("message 3", 101, m_PacketWriter);
-            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
+            Assert.AreEqual(haveTimeZone ? 20 : 19, m_MemoryStream.Position - baseline);
 
             baseline = m_MemoryStream.Position;
             LogPacket.Write("message 1", 101, m_PacketWriter);
-            Assert.AreEqual(20, m_MemoryStream.Position - baseline);
+            Assert.AreEqual(haveTimeZone ? 20 : 19, m_MemoryStream.Position - baseline);
 
             m_MemoryStream.Position = 0;
 
