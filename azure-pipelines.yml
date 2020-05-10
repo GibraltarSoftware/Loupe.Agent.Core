@@ -26,7 +26,7 @@ jobs:
     inputs:
       SourceFolder: '$(Agent.TempDirectory)'
       Contents: 'loupe.agent.snk'
-      TargetFolder: '$(Build.SourceDirectory)'
+      TargetFolder: '$(Build.SourcesDirectory)'
 
   - task: NuGetToolInstaller@1
 
@@ -43,7 +43,7 @@ jobs:
 
   - task: CopyFiles@2
     inputs:
-      sourceFolder: '$(Build.SourceDirectory)/src'
+      sourceFolder: '$(Build.SourcesDirectory)/src'
       contents: '**/*.nupkg'
       flattenFolders: true
       targetFolder: '$(Build.ArtifactStagingDirectory)/packages'
