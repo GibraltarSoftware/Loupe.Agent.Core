@@ -4,7 +4,7 @@ trigger:
 variables:
   agentSolution: 'src/Agent.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Publish'
+  buildConfiguration: 'Release'
   major: 4
   minor: 8
   revision: 2
