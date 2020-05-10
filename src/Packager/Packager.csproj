@@ -24,7 +24,7 @@
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

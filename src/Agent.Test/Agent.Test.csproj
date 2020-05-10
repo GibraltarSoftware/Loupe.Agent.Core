@@ -6,7 +6,7 @@
     <AssemblyName>Loupe.Agent.Test</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
