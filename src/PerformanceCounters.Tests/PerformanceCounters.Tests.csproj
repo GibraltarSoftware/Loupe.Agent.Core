@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>Loupe.PerformanceCounters.Tests</AssemblyName>
+    <AssemblyName>Loupe.PerformanceCounters.Test</AssemblyName>
 
-    <RootNamespace>Loupe.PerformanceCounters.Tests</RootNamespace>
+    <RootNamespace>Loupe.PerformanceCounters.Test</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -27,20 +27,21 @@ namespace Loupe.Agent.AspNetCore.Metrics
             _actionMetricFactory = new ActionMetricFactory();
         }
 
-        /// <summary>
-        /// Returns the name of the <see cref="T:System.Diagnostics.DiagnosticSource" /> this implementation targets.
-        /// </summary>
+        /// <inheritdoc />
         public string Name => "Microsoft.AspNetCore";
 
+        /// <inheritdoc />
         public void OnCompleted()
         {
         }
 
+        /// <inheritdoc />
         public void OnError(Exception error)
         {
             Log.Error(error, LogWriteMode.Queued, "AspNetCoreDiagnosticListener", error.Message, "LoupeDiagnosticListener");
         }
 
+        /// <inheritdoc />
         public void OnNext(KeyValuePair<string, object> value)
         {
             try

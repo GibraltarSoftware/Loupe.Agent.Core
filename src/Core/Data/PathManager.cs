@@ -25,6 +25,9 @@ namespace Gibraltar.Data
         /// </summary>
         public const string CollectionFolder = "logs";
 
+        /// <summary>
+        /// The subfolder of the selected path used for local session log collection on the .NET Framework original agent
+        /// </summary>
         public const string CollectionFolderOld = "Local Logs";
 
         /// <summary>

@@ -429,6 +429,7 @@ namespace Loupe.Agent.PerformanceCounters
 
         #region Base Object Overrides
 
+        /// <inheritdoc />
         protected override MetricSample OnMetricSampleRead(MetricSamplePacket packet)
         {
             //create a new perf counter metric sample object

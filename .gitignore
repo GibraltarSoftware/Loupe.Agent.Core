@@ -122,6 +122,7 @@ ClientBin/
 *.[Dd]bmdl
 *.pfx
 *.publishsettings
+*.snk
 
 # RIA/Silverlight projects
 Generated_Code/

@@ -551,6 +551,7 @@ namespace Gibraltar.Serialization
             //write it out as a date time offset so we get time offset information
             Write(new DateTimeOffset(value));
         }
+
         /// <summary>
         /// Stores a DateTime value to the stream
         /// </summary>
