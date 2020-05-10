@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Gibraltar.Serialization;
+using Loupe.Core.Test;
 using NUnit.Framework;
 
 #pragma warning disable 1591
@@ -339,7 +340,10 @@ namespace Loupe.Core.Serialization.UnitTests
             var referenceTime = new DateTime(1973, 6, 25, 8, 30, 12, DateTimeKind.Local); //we convert to UTC during serialization, we want local time.
             buffer.Position = 0;
             writer.Write(referenceTime);
-            Assert.AreEqual(12, buffer.Position);
+            Assert.AreEqual(12, buffer.Position, 
+                "Serialized value isn't the expected length.  Position is: {1}, expected {0}.\r\nSerialized Value: {2}", 
+                buffer.Position, 12, buffer.ToArray().ToDisplayString());
+
             writer.Write(referenceTime.AddTicks(1));
             Assert.AreEqual(16, buffer.Position);
             writer.Write(referenceTime.AddMilliseconds(50));
@@ -402,7 +406,7 @@ namespace Loupe.Core.Serialization.UnitTests
             {
                 bool[] current = list[i];
                 bool[] actual = reader.ReadBoolArray();
-                CompareArray(current, actual);
+                current.CompareArray(actual);
             }
             Assert.AreEqual(buffer.Length, buffer.Position);
         }
@@ -426,12 +430,12 @@ namespace Loupe.Core.Serialization.UnitTests
             writer.Write(array5);
             writer.Write(array6);
             buffer.Position = 0;
-            CompareArray(array1, reader.ReadInt32Array());
-            CompareArray(array2, reader.ReadInt32Array());
-            CompareArray(array3, reader.ReadInt32Array());
-            CompareArray(array4, reader.ReadInt32Array());
-            CompareArray(array5, reader.ReadInt32Array());
-            CompareArray(array6, reader.ReadInt32Array());
+            array1.CompareArray(reader.ReadInt32Array());
+            array2.CompareArray(reader.ReadInt32Array());
+            array3.CompareArray(reader.ReadInt32Array());
+            array4.CompareArray(reader.ReadInt32Array());
+            array5.CompareArray(reader.ReadInt32Array());
+            array6.CompareArray(reader.ReadInt32Array());
         }
 
         [Test]
@@ -453,12 +457,12 @@ namespace Loupe.Core.Serialization.UnitTests
             writer.Write(array5);
             writer.Write(array6);
             buffer.Position = 0;
-            CompareArray(array1, reader.ReadInt64Array());
-            CompareArray(array2, reader.ReadInt64Array());
-            CompareArray(array3, reader.ReadInt64Array());
-            CompareArray(array4, reader.ReadInt64Array());
-            CompareArray(array5, reader.ReadInt64Array());
-            CompareArray(array6, reader.ReadInt64Array());
+            array1.CompareArray(reader.ReadInt64Array());
+            array2.CompareArray(reader.ReadInt64Array());
+            array3.CompareArray(reader.ReadInt64Array());
+            array4.CompareArray(reader.ReadInt64Array());
+            array5.CompareArray(reader.ReadInt64Array());
+            array6.CompareArray(reader.ReadInt64Array());
         }
 
         [Test]
@@ -480,12 +484,12 @@ namespace Loupe.Core.Serialization.UnitTests
             writer.Write(array5);
             writer.Write(array6);
             buffer.Position = 0;
-            CompareArray(array1, reader.ReadUInt32Array());
-            CompareArray(array2, reader.ReadUInt32Array());
-            CompareArray(array3, reader.ReadUInt32Array());
-            CompareArray(array4, reader.ReadUInt32Array());
-            CompareArray(array5, reader.ReadUInt32Array());
-            CompareArray(array6, reader.ReadUInt32Array());
+            array1.CompareArray(reader.ReadUInt32Array());
+            array2.CompareArray(reader.ReadUInt32Array());
+            array3.CompareArray(reader.ReadUInt32Array());
+            array4.CompareArray(reader.ReadUInt32Array());
+            array5.CompareArray(reader.ReadUInt32Array());
+            array6.CompareArray(reader.ReadUInt32Array());
         }
 
         [Test]
@@ -507,12 +511,12 @@ namespace Loupe.Core.Serialization.UnitTests
             writer.Write(array5);
             writer.Write(array6);
             buffer.Position = 0;
-            CompareArray(array1, reader.ReadUInt64Array());
-            CompareArray(array2, reader.ReadUInt64Array());
-            CompareArray(array3, reader.ReadUInt64Array());
-            CompareArray(array4, reader.ReadUInt64Array());
-            CompareArray(array5, reader.ReadUInt64Array());
-            CompareArray(array6, reader.ReadUInt64Array());
+            array1.CompareArray(reader.ReadUInt64Array());
+            array2.CompareArray(reader.ReadUInt64Array());
+            array3.CompareArray(reader.ReadUInt64Array());
+            array4.CompareArray(reader.ReadUInt64Array());
+            array5.CompareArray(reader.ReadUInt64Array());
+            array6.CompareArray(reader.ReadUInt64Array());
         }
 
         [Test]
@@ -534,19 +538,13 @@ namespace Loupe.Core.Serialization.UnitTests
             writer.Write(array5);
             writer.Write(array6);
             buffer.Position = 0;
-            CompareArray(array1, reader.ReadDoubleArray());
-            CompareArray(array2, reader.ReadDoubleArray());
-            CompareArray(array3, reader.ReadDoubleArray());
-            CompareArray(array4, reader.ReadDoubleArray());
-            CompareArray(array5, reader.ReadDoubleArray());
-            CompareArray(array6, reader.ReadDoubleArray());
+            array1.CompareArray(reader.ReadDoubleArray());
+            array2.CompareArray(reader.ReadDoubleArray());
+            array3.CompareArray(reader.ReadDoubleArray());
+            array4.CompareArray(reader.ReadDoubleArray());
+            array5.CompareArray(reader.ReadDoubleArray());
+            array6.CompareArray(reader.ReadDoubleArray());
         }
 
-        private static void CompareArray<T>(T[] array, T[] returnValue)
-        {
-            Assert.AreEqual(array.Length, returnValue.Length);
-            for (int i = 0; i < array.Length; i++)
-                Assert.AreEqual(array[i], returnValue[i]);
-        }
     }
 }

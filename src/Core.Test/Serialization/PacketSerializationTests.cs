@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Gibraltar.Serialization;
+using Loupe.Core.Test;
 using NUnit.Framework;
 
 
@@ -60,6 +61,10 @@ namespace Loupe.Core.Serialization.UnitTests
 
             LogPacket.Write("message 1", 101, m_PacketWriter);
             Assert.AreEqual(145, m_MemoryStream.Position);
+            Assert.AreEqual(145, m_MemoryStream.Position,
+                "Serialized value isn't the expected length.  Position is: {1}, expected {0}.\r\nSerialized Value: {2}",
+                m_MemoryStream.Position, 145, m_MemoryStream.ToArray().ToDisplayString());
+
             Thread.Sleep(50);
 
             LogPacket.Write("message 2", 101, m_PacketWriter);
