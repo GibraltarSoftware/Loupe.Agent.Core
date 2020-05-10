@@ -1,0 +1,66 @@
+trigger:
+- master
+
+variables:
+  agentSolution: 'src/Agent.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Publish'
+  major: 4
+  minor: 8
+  revision: 2
+  patch: $[counter('patch', 1000)]
+  fileVersion: '$(major).$(minor).$(revision).$(patch)'
+
+jobs:
+- job: build
+  pool:
+    vmImage: 'windows-latest'
+
+  steps:
+  - task: DownloadSecureFile@1
+    name: loupeAgentSigningKey
+    inputs:
+      secureFile: 'loupe.agent.snk'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Agent.TempDirectory)'
+      Contents: 'loupe.agent.snk'
+      TargetFolder: 'Extension'
+
+  - task: NuGetToolInstaller@1
+
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '$(agentSolution)'
+
+  - task: VSBuild@1
+    inputs:
+      solution: '$(agentSolution)'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildArgs: '/p:CustomVersion=$(fileVersion) /p:CustomInformationalVersion=$(fileVersion)'
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: '$(Build.SourceDirectory)/src'
+      contents: '**/*.nupkg'
+      flattenFolders: true
+      targetFolder: '$(Build.ArtifactStagingDirectory)/packages'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)/packages'
+      artifactName: packages
+
+  - task: VSTest@2
+    inputs:
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\*.Tests.dll
+        !**\*TestAdapter.dll
+        !**\obj\**
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      vsTestVersion: '16.0'
