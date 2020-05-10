@@ -337,9 +337,7 @@ namespace Loupe.Core.Serialization.UnitTests
             MemoryStream buffer = new MemoryStream();
             IFieldWriter writer = new FieldWriter(buffer);
             IFieldReader reader = new FieldReader(buffer);
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            var referenceTime =
-                TimeZoneInfo.ConvertTime(new DateTime(1973, 6, 25, 8, 30, 12, DateTimeKind.Utc), timeZone); //we convert to UTC during serialization, we want local time.
+            var referenceTime = new DateTime(1973, 6, 25, 8, 30, 12, DateTimeKind.Utc); //UTC to ensure tests are portable
             buffer.Position = 0;
             writer.Write(referenceTime);
             Assert.AreEqual(12, buffer.Position, 
