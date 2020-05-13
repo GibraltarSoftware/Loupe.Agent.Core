@@ -175,7 +175,7 @@ namespace Gibraltar.Server.Client
                     {
                         using (var csp = SHA1.Create())
                         {
-                            string hash = BitConverter.ToString(csp.ComputeHash(sessionStream));
+                            var hash = BitConverter.ToString(csp.ComputeHash(sessionStream));
                             additionalHeaders.Add(new NameValuePair<string>(HubConnection.SHA1HashHeader, hash));
                         }
 
@@ -192,7 +192,7 @@ namespace Gibraltar.Server.Client
                 //if it's SMALL we just put the whole thing up as a single action.
                 if (sessionStream.Length < SinglePassCutoffBytes)
                 {
-                    byte[] sessionData = new byte[ sessionStream.Length ];
+                    var sessionData = new byte[ sessionStream.Length ];
                     sessionStream.Read(sessionData, 0, sessionData.Length);
                     await connection.UploadData(GenerateResourceUri(), HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
                 }
@@ -201,8 +201,8 @@ namespace Gibraltar.Server.Client
                     //we need to do a segmented post operation.  Note that we may be restarting a request after an error, so don't reset
                     //our bytes written.
                     sessionStream.Position = m_BytesWritten;
-                    int restartCount = 0;
-                    byte[] sessionData = new byte[DefaultSegmentSizeBytes];
+                    var restartCount = 0;
+                    var sessionData = new byte[DefaultSegmentSizeBytes];
                     while (m_BytesWritten < sessionStream.Length)
                     {
                         //Read the next segment which is either our segment size or the last fragment of the file, exactly sized.
@@ -213,11 +213,11 @@ namespace Gibraltar.Server.Client
                         }
                         sessionStream.Read(sessionData, 0, sessionData.Length);
 
-                        bool isComplete = (sessionStream.Position == sessionStream.Length);
-                        string requestUrl = string.Format("{0}?Start={1}&Complete={2}&FileSize={3}",
+                        var isComplete = (sessionStream.Position == sessionStream.Length);
+                        var requestUrl = string.Format("{0}?Start={1}&Complete={2}&FileSize={3}",
                                                           GenerateResourceUri(), m_BytesWritten, isComplete, sessionStream.Length);
 
-                        bool restartTransfer = false;
+                        var restartTransfer = false;
                         try
                         {
                             await connection.UploadData(requestUrl, HttpMethod.Post, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
@@ -228,7 +228,7 @@ namespace Gibraltar.Server.Client
                             if (ex.Status == WebExceptionStatus.ProtocolError)
                             {
                                 //get the inner web response to figure out exactly what the deal is.
-                                HttpWebResponse response = (HttpWebResponse)ex.Response;
+                                var response = (HttpWebResponse)ex.Response;
                                 if (response.StatusCode == HttpStatusCode.BadRequest)
                                 {
                                     if (!Log.SilentMode)
@@ -283,9 +283,9 @@ namespace Gibraltar.Server.Client
 
         private int LoadProgressTrackingFile()
         {
-            using (FileStream sessionXmlFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.Open, FileAccess.Read, FileShare.None))
+            using (var sessionXmlFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.Open, FileAccess.Read, FileShare.None))
             {
-                using (BinaryReader reader = new BinaryReader(sessionXmlFileStream, Encoding.UTF8))
+                using (var reader = new BinaryReader(sessionXmlFileStream, Encoding.UTF8))
                 {
                     return reader.ReadInt32();
                 }
@@ -294,14 +294,14 @@ namespace Gibraltar.Server.Client
 
         private void UpdateProgressTrackingFile()
         {
-            using (FileStream sessionTrackingFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+            using (var sessionTrackingFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
             {
-                using (BinaryWriter writer = new BinaryWriter(sessionTrackingFileStream, Encoding.UTF8))
+                using (var writer = new BinaryWriter(sessionTrackingFileStream, Encoding.UTF8))
                 {
                     writer.Write(m_BytesWritten);
                     writer.Flush();
+                    sessionTrackingFileStream.SetLength(sessionTrackingFileStream.Position);
                 }
-                sessionTrackingFileStream.SetLength(sessionTrackingFileStream.Position);
             }
         }
 
@@ -410,7 +410,7 @@ namespace Gibraltar.Server.Client
                 return;
 
             //we need to grab a lock on this session to prevent it from being transported to the same endpoint at the same time.
-            string sessionWorkingFileNamePath = GenerateTemporarySessionFileNamePath();
+            var sessionWorkingFileNamePath = GenerateTemporarySessionFileNamePath();
 
             //we aren't going to do Using - we keep the lock!
             if (m_SessionTransportLock == null) //if we are retrying to initialize after a failure we may already have it.
