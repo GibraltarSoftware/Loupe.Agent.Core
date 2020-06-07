@@ -6,16 +6,16 @@ using Gibraltar.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Loupe.Agent.Core.Services
+namespace Loupe.Agent.Core.Services.Internal
 {
     /// <summary>Default implementation of <see cref="ILoupeAgentBuilder"/>.</summary>
-    internal sealed class LoupeAgentBuilder : ILoupeAgentBuilder
+    internal sealed class LoupeAgentServicesCollectionBuilder : ILoupeAgentBuilder
     {
         private readonly IServiceCollection _services;
 
-        /// <summary>Initializes a new instance of the <see cref="LoupeAgentBuilder"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="LoupeAgentServicesCollectionBuilder"/> class.</summary>
         /// <param name="services">The services container.</param>
-        public LoupeAgentBuilder(IServiceCollection services)
+        public LoupeAgentServicesCollectionBuilder(IServiceCollection services)
         {
             _services = services;
         }
