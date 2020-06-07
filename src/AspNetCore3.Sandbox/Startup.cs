@@ -28,10 +28,13 @@ namespace AspNetCore3.Sandbox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.AddLoupe()
-                .AddAspNetCoreDiagnostics();
 
-            services.AddLogging(builder => { builder.AddLoupe(); });
+            //In this sample we're doing Loupe initialization all in the Program IHostBuilder area.
+            //services.AddLoupe()
+            //    .AddAspNetCoreDiagnostics();
+
+            //services.AddLoupeLogging();
+
             services.AddControllersWithViews();
         }
 

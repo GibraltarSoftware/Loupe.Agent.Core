@@ -8,6 +8,9 @@ using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+#if NETCORE3
+using Microsoft.Extensions.Hosting;
+#endif
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -21,6 +24,27 @@ namespace Loupe.Agent.AspNetCore
         private readonly RequestDelegate _next;
         private readonly EventMetric _requestMetric;
 
+#if NETCORE3
+        /// <summary>
+        /// Constructs and instance of <see cref="LoupeMiddleware"/>.
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="agent"></param>
+        /// <param name="applicationLifetime"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public LoupeMiddleware(RequestDelegate next, LoupeAgent agent, IHostApplicationLifetime applicationLifetime)
+        {
+            _next = next ?? throw new ArgumentNullException(nameof(next));
+            _agent = agent ?? throw new ArgumentNullException(nameof(agent));
+            if (applicationLifetime == null) throw new ArgumentNullException(nameof(applicationLifetime));
+
+            applicationLifetime.ApplicationStarted.Register(StartSession);
+            applicationLifetime.ApplicationStopped.Register(OnApplicationStopping);
+
+            var requestMetricDefinition = DefineRequestMetric(agent.ApplicationName);
+            _requestMetric = EventMetric.Register(requestMetricDefinition, null);
+        }
+#else
         /// <summary>
         /// Constructs and instance of <see cref="LoupeMiddleware"/>.
         /// </summary>
@@ -40,6 +64,7 @@ namespace Loupe.Agent.AspNetCore
             var requestMetricDefinition = DefineRequestMetric(agent.ApplicationName);
             _requestMetric = EventMetric.Register(requestMetricDefinition, null);
         }
+#endif
 
         /// <summary>
         /// The automagically-called method that processes the request.

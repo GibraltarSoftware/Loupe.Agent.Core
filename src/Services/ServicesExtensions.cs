@@ -1,4 +1,5 @@
 ﻿using System;
+using Loupe.Agent.Core.Services.Internal;
 using Loupe.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,7 @@ namespace Loupe.Agent.Core.Services
             AddOptions(services, configure);
             services.AddSingleton<IHostedService, LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
-            return new LoupeAgentBuilder(services);
+            return new LoupeAgentServicesCollectionBuilder(services);
         }
 
         /// <summary>
@@ -35,8 +36,46 @@ namespace Loupe.Agent.Core.Services
             AddOptions(services);
             services.AddSingleton<IHostedService, LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
-            return new LoupeAgentBuilder(services);
+            return new LoupeAgentServicesCollectionBuilder(services);
         }
+
+#if !NETSTANDARD2_0 && !NET461
+        /// <summary>
+        /// Adds the Loupe provider for <c>Microsoft.Extensions.Logging</c>.
+        /// </summary>
+        /// <param name="builder">The <see cref="IHostBuilder"/>.</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="IHostBuilder"/>.</returns>
+        public static IHostBuilder AddLoupe(this IHostBuilder builder, Action<AgentConfiguration> configure = null)
+        {
+            return builder.ConfigureServices((context, services) =>
+            {
+                AddOptions(services, configure);
+                services.AddSingleton<IHostedService, LoupeAgentService>();
+                services.AddSingleton<LoupeAgent>();
+            });
+        }
+
+        /// <summary>
+        /// Adds the Loupe provider for <c>Microsoft.Extensions.Logging</c>.
+        /// </summary>
+        /// <param name="builder">The <see cref="IHostBuilder"/>.</param>
+        /// <param name="agentBuilder">A Loupe Agent builder delegate</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="IHostBuilder"/>.</returns>
+        public static IHostBuilder AddLoupe(this IHostBuilder builder, Action<ILoupeAgentBuilder> agentBuilder, Action<AgentConfiguration> configure = null)
+        {
+            return builder.ConfigureServices((context, services) =>
+            {
+                AddOptions(services, configure);
+                services.AddSingleton<IHostedService, LoupeAgentService>();
+                services.AddSingleton<LoupeAgent>();
+
+                agentBuilder(new LoupeAgentServicesCollectionBuilder(services));
+            });
+        }
+
+#endif
 
         private static void AddOptions(IServiceCollection services, Action<AgentConfiguration> configure = null)
         {
