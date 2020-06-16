@@ -10,14 +10,16 @@ namespace Loupe.Extensions.Logging
     /// </summary>
     public class LoupeLogger : ILogger
     {
+        private readonly LoupeLoggerProvider _provider;
         private readonly string _category;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoupeLogger"/> class.
         /// </summary>
         /// <param name="category">The category.</param>
-        public LoupeLogger(string category)
+        public LoupeLogger(LoupeLoggerProvider provider, string category)
         {
+            _provider = provider;
             _category = category;
         }
 
@@ -27,33 +29,11 @@ namespace Loupe.Extensions.Logging
             if (!IsEnabled(logLevel))
                 return;
 
-            LogMessageSeverity severity;
-            switch (logLevel)
-                {
-                    case LogLevel.Trace:
-                    case LogLevel.Debug:
-                       severity = LogMessageSeverity.Verbose;
-                        break;
-                    case LogLevel.Information:
-                        severity = LogMessageSeverity.Information;
-                        break;
-                    case LogLevel.Warning:
-                        severity = LogMessageSeverity.Warning;
-                        break;
-                    case LogLevel.Error:
-                        severity = LogMessageSeverity.Error;
-                        break;
-                    case LogLevel.Critical:
-                        severity = LogMessageSeverity.Critical;
-                        break;
-                    case LogLevel.None:
-                        severity = LogMessageSeverity.None;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
-                }
+            var severity = LogLevelConversion.ToSeverity(logLevel);
 
-            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, null, _category, null, formatter(state, exception), state);
+            var description = formatter(state, exception);
+            var details = LoupeLogEnricher.GetJson(state, _provider);
+            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, details, _category, null, description, state);
         }
 
         /// <inheritdoc />
@@ -65,7 +45,7 @@ namespace Loupe.Extensions.Logging
         /// <inheritdoc />
         public IDisposable BeginScope<TState>(TState state)
         {
-            return new LoupeLoggerScope(state);
+            return _provider.BeginScope(state);
         }
     }
 }

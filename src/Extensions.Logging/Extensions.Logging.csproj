@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.1;netcoreapp2.0;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netstandard2.1;netcoreapp2.0;netstandard2.0;</TargetFrameworks>
     <AssemblyName>Loupe.Extensions.Logging</AssemblyName>
     <RootNamespace>Loupe.Extensions.Logging</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <Choose>
-    <When Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netcoreapp2.0'" >
+    <When Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netcoreapp2.0'">
       <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
@@ -61,10 +61,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.5" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
 </Project>
