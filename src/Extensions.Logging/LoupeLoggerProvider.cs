@@ -1,4 +1,7 @@
-﻿using Gibraltar.Agent;
+﻿using System;
+using System.ComponentModel;
+using System.Threading;
+using Gibraltar.Agent;
 using Loupe.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -26,6 +29,15 @@ namespace Loupe.Extensions.Logging
         }
 
         /// <summary>
+        /// For testing only.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public LoupeLoggerProvider()
+        {
+            
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -37,6 +49,26 @@ namespace Loupe.Extensions.Logging
         /// </summary>
         /// <param name="categoryName">The category name for messages produced by the logger.</param>
         /// <returns>A new <see cref="ILogger"/> instance.</returns>
-        public ILogger CreateLogger(string categoryName) => new LoupeLogger(categoryName);
+        public ILogger CreateLogger(string categoryName) => new LoupeLogger(this, categoryName);
+
+        // AsyncLocal field to hold CurrentScope
+        private readonly AsyncLocal<LoupeLoggerScope> _scope = new AsyncLocal<LoupeLoggerScope>();
+
+        internal LoupeLoggerScope CurrentScope
+        {
+            get => _scope.Value;
+            set => _scope.Value = value;
+        }
+
+        /// <summary>
+        /// Starts a new Scope.
+        /// </summary>
+        /// <param name="state">The state from <see cref="ILogger.BeginScope{TState}"/>.</param>
+        /// <typeparam name="T">The type of the <see cref="state"/> parameter.</typeparam>
+        /// <returns>A new logging scope.</returns>
+        internal IDisposable BeginScope<T>(T state)
+        {
+            return new LoupeLoggerScope(this, state);
+        }
     }
 }
