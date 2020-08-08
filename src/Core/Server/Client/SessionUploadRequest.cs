@@ -193,7 +193,7 @@ namespace Gibraltar.Server.Client
                 if (sessionStream.Length < SinglePassCutoffBytes)
                 {
                     var sessionData = new byte[ sessionStream.Length ];
-                    sessionStream.Read(sessionData, 0, sessionData.Length);
+                    await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
                     await connection.UploadData(GenerateResourceUri(), HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
                 }
                 else
@@ -211,7 +211,7 @@ namespace Gibraltar.Server.Client
                             //we're at the last block - resize our buffer down.
                             sessionData = new byte[(sessionStream.Length - sessionStream.Position)];
                         }
-                        sessionStream.Read(sessionData, 0, sessionData.Length);
+                        await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
 
                         var isComplete = (sessionStream.Position == sessionStream.Length);
                         var requestUrl = string.Format("{0}?Start={1}&Complete={2}&FileSize={3}",
@@ -224,7 +224,6 @@ namespace Gibraltar.Server.Client
                         }
                         catch (WebException ex)
                         {
-                            //is this an access denied error?
                             if (ex.Status == WebExceptionStatus.ProtocolError)
                             {
                                 //get the inner web response to figure out exactly what the deal is.
@@ -256,6 +255,7 @@ namespace Gibraltar.Server.Client
                             PerformCleanup(connection);
                             sessionStream.Position = 0;
                             m_BytesWritten = 0;
+                            UpdateProgressTrackingFile();
                         }
                         else
                         {

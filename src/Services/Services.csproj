@@ -23,14 +23,11 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+    <DocumentationFile>bin\Loupe.Agent.Core.Services.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <DocumentationFile>bin\Debug\Loupe.Agent.Core.Services.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DocumentationFile>bin\Release\Loupe.Agent.Core.Services.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />

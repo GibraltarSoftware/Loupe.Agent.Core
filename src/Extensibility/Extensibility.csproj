@@ -24,14 +24,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\Loupe.Extensibility.NETCore.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\Loupe.Extensibility.NETCore.xml</DocumentationFile>
+    <DocumentationFile>bin\Loupe.Extensibility.NETCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
