@@ -73,8 +73,6 @@ namespace Gibraltar
         }
 
 
-        #region Public Properties and Methods
-
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -414,10 +412,6 @@ namespace Gibraltar
             return m_FilesDictionary.TryGetValue(key, out value);
         }
 
-        #endregion
-
-        #region Internal Properties and Methods
-
         /// <summary>
         /// Called to clear all of the item found flags on existing file references prior to checking for updates.
         /// </summary>
@@ -451,10 +445,6 @@ namespace Gibraltar
                 Remove(reference);
             }
         }
-
-        #endregion
-
-        #region Protected Properties and Methods
 
         /// <summary>
         /// Called to raise the CollectionChanged event
@@ -617,10 +607,6 @@ namespace Gibraltar
             return foundChanges;
         }
 
-        #endregion
-
-        #region Private Properties and Methods
-
         private void CreateDirectoryMonitorThread()
         {
             lock (m_DirectoryMonitorThreadLock)
@@ -686,7 +672,5 @@ namespace Gibraltar
                 m_Logger.LogInformation("Error Processing Async File System Monitor Request\r\nWhile processing a file system monitor request, an exception was thrown: {0}", ex.Message, ex);
             }
         }
-
-        #endregion
     }
 }

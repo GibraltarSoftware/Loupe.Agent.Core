@@ -93,8 +93,6 @@ namespace Gibraltar.Data
             BackgroundStartupDelay = 0;
         }
 
-        #region Public Properties and Methods
-
         /// <summary>
         /// Indicates if the publisher has a valid configuration and is running.
         /// </summary>
@@ -142,10 +140,6 @@ namespace Gibraltar.Data
             }
         }
 
-        #endregion
-
-        #region Private Properties and Methods
-
         private void CreateMessageDispatchThread()
         {
             lock (m_SessionPublishThreadLock)
@@ -167,7 +161,7 @@ namespace Gibraltar.Data
             }
         }
 
-        private async void RepositoryPublishMain()
+        private void RepositoryPublishMain()
         {
             //before we get going, lets stall for a few seconds.  We aren't a critical operation, and I don't 
             //want to get in the way of the application starting up.
@@ -179,7 +173,7 @@ namespace Gibraltar.Data
                         "To avoid competing against other startup activities we're going to delay for {0} before we start.",
                         BackgroundStartupDelay);
 
-                await Task.Delay(BackgroundStartupDelay).ConfigureAwait(false);
+                Thread.Sleep(BackgroundStartupDelay);
             }
 
             InterprocessLock backgroundLock = null; //we can't do our normal using trick in this situation.
@@ -200,7 +194,7 @@ namespace Gibraltar.Data
                 if (backgroundLock != null)
                 {
                     //here is where we want to keep looping - it will return every time the subscription changes.
-                    await RepositoryPublishLoop().ConfigureAwait(false);
+                    RepositoryPublishLoop();
 
                     //release the lock; we'll get it on the next round.
                     backgroundLock.Dispose();
@@ -234,7 +228,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Called when we're the one true publisher for our data to have us poll for data to push and push as soon as available.
         /// </summary>
-        private async Task RepositoryPublishLoop()
+        private void RepositoryPublishLoop()
         {
             // Now we need to make sure we're initialized.
             lock (m_SessionPublishThreadLock)
@@ -251,7 +245,7 @@ namespace Gibraltar.Data
                 while (m_StopRequested == false)
                 {
                     //make sure the server is available.  if not there's no point in proceeding.
-                    var serverStatus = await m_Client.CanConnect().ConfigureAwait(false);
+                    var serverStatus = m_Client.CanConnect().Result;
                     if (serverStatus.IsValid)
                     {
                         //make sure SendSessionsOnExit is set (since we were active)
@@ -266,7 +260,7 @@ namespace Gibraltar.Data
                         m_FailedAttempts = 0;
 
                         //perform one process cycle.  This is isolated so that whenever it needs to end it can just return and we'll sleep.  
-                        await m_Client.PublishSessions(false, m_Configuration.PurgeSentSessions).ConfigureAwait(false);
+                        m_Client.PublishSessions(false, m_Configuration.PurgeSentSessions).Wait();
                     }
                     else
                     {
@@ -400,7 +394,5 @@ namespace Gibraltar.Data
                 System.Threading.Monitor.PulseAll(m_SessionPublishThreadLock);
             }
         }
-
-        #endregion
     }
 }
