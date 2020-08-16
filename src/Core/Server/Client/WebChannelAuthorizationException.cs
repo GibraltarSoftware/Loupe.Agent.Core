@@ -11,7 +11,7 @@ namespace Gibraltar.Server.Client
         /// <summary>
         /// Create a new authorization exception
         /// </summary>
-        public WebChannelAuthorizationException(string message, WebException innerException, Uri requestUri)
+        public WebChannelAuthorizationException(string message, Exception innerException, Uri requestUri)
             : base(message, innerException, requestUri)
         {
             

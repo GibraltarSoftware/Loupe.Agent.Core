@@ -189,12 +189,14 @@ namespace Gibraltar.Server.Client
                     }
                 }
 
+                var resourceUri = GenerateResourceUri();
+
                 //if it's SMALL we just put the whole thing up as a single action.
                 if (sessionStream.Length < SinglePassCutoffBytes)
                 {
                     var sessionData = new byte[ sessionStream.Length ];
                     await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
-                    await connection.UploadData(GenerateResourceUri(), HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
+                    await connection.UploadData(resourceUri, HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
                 }
                 else
                 {
@@ -211,57 +213,41 @@ namespace Gibraltar.Server.Client
                             //we're at the last block - resize our buffer down.
                             sessionData = new byte[(sessionStream.Length - sessionStream.Position)];
                         }
+
                         await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
 
                         var isComplete = (sessionStream.Position == sessionStream.Length);
-                        var requestUrl = string.Format("{0}?Start={1}&Complete={2}&FileSize={3}",
-                                                          GenerateResourceUri(), m_BytesWritten, isComplete, sessionStream.Length);
+                        var requestUrl =
+                            $"{resourceUri}?Start={m_BytesWritten}&Complete={isComplete}&FileSize={sessionStream.Length}";
 
-                        var restartTransfer = false;
                         try
                         {
                             await connection.UploadData(requestUrl, HttpMethod.Post, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
+
+                            //and now that we've written the bytes and not gotten an exception we can mark these bytes as done!
+                            m_BytesWritten = (int)sessionStream.Position;
+                            UpdateProgressTrackingFile();
                         }
-                        catch (WebException ex)
+                        catch (WebChannelBadRequestException ex)
                         {
-                            if (ex.Status == WebExceptionStatus.ProtocolError)
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Server exchange error, we will assume client and server are out of sync.",
+                                    "The server returned a Bad Request Error (400) which generally means there is either a session-specific transfer problem that may be resolved by restarting the transfer from zero or an internal server problem.\r\nException: {0}", ex);
+
+                            if (restartCount < 4)
                             {
-                                //get the inner web response to figure out exactly what the deal is.
-                                var response = (HttpWebResponse)ex.Response;
-                                if (response.StatusCode == HttpStatusCode.BadRequest)
-                                {
-                                    if (!Log.SilentMode)
-                                        Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Server exchange error, we will assume client and server are out of sync.", 
-                                            "The server returned a Bad Request Error (400) which generally means there is either a session-specific transfer problem that may be resolved by restarting the transfer from zero or an internal server problem.\r\nException: {0}", ex);
-
-                                    if (restartCount < 4)
-                                    {
-                                        restartTransfer = true;
-                                        restartCount++;
-                                    }
-                                }
+                                //if we experience this type of Server-level transport error, assume there's some out of sync condition and start again.
+                                restartCount++;
+                                PerformCleanup(connection);
+                                sessionStream.Position = 0;
+                                m_BytesWritten = 0;
+                                UpdateProgressTrackingFile();
                             }
-
-                            if (restartTransfer == false)
+                            else
                             {
                                 //we didn't find a reason to restart the transfer, we need to let the exception fly.
                                 throw;
                             }
-                        }
-
-                        if (restartTransfer)
-                        {
-                            //if we experience this type of Server-level transport error, assume there's some out of sync condition and start again.
-                            PerformCleanup(connection);
-                            sessionStream.Position = 0;
-                            m_BytesWritten = 0;
-                            UpdateProgressTrackingFile();
-                        }
-                        else
-                        {
-                            //and now that we've written the bytes and not gotten an exception we can mark these bytes as done!
-                            m_BytesWritten = (int)sessionStream.Position;
-                            UpdateProgressTrackingFile();
                         }
                     }
                 }
@@ -283,9 +269,9 @@ namespace Gibraltar.Server.Client
 
         private int LoadProgressTrackingFile()
         {
-            using (var sessionXmlFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.Open, FileAccess.Read, FileShare.None))
+            using (var sessionTrackingFileStream = new FileStream(m_TempSessionProgressFileNamePath, FileMode.Open, FileAccess.Read, FileShare.None))
             {
-                using (var reader = new BinaryReader(sessionXmlFileStream, Encoding.UTF8))
+                using (var reader = new BinaryReader(sessionTrackingFileStream, Encoding.UTF8))
                 {
                     return reader.ReadInt32();
                 }
@@ -354,8 +340,8 @@ namespace Gibraltar.Server.Client
 
         private string GenerateResourceUri()
         {
-            return FileId.HasValue ?  string.Format("/Hub/Hosts/{0}/Sessions/{1}/Files/{2}.zip", ClientId, SessionId, FileId) :
-                string.Format("/Hub/Hosts/{0}/Sessions/{1}/session.glf", ClientId, SessionId);
+            return FileId.HasValue ? $"/Hub/Hosts/{ClientId}/Sessions/{SessionId}/Files/{FileId}.zip"
+                : $"/Hub/Hosts/{ClientId}/Sessions/{SessionId}/session.glf";
         }
 
         /// <summary>
@@ -392,16 +378,16 @@ namespace Gibraltar.Server.Client
         private string GenerateTemporarySessionFileName()
         {
             //the path needs to be generated reliably, but uniquely.
-            return FileId.HasValue ?  string.Format("{0}_{1}_{2}", SessionId, ClientId, FileId) : string.Format("{0}_{1}", SessionId, ClientId);            
+            return FileId.HasValue ? $"{SessionId}_{ClientId}_{FileId}" : $"{SessionId}_{ClientId}";            
         }
 
         /// <summary>
         /// The full file name and path (without extension) for the transfer information for this session
         /// </summary>
         /// <returns></returns>
-        private string GenerateTemporarySessionFileNamePath()
+        internal string GenerateTemporarySessionFileNamePath()
         {
-            return Path.Combine(GenerateTemporarySessionPath(), GenerateTemporarySessionFileName());
+            return Path.Combine(GenerateTemporarySessionPath(), GenerateTemporarySessionFileName() + ".txt");
         }
 
         private void Initialize()
@@ -422,7 +408,7 @@ namespace Gibraltar.Server.Client
             if (m_SessionTransportLock != null)
             {
                 //Lets figure out if we're restarting a previous send or starting a new one.
-                m_TempSessionProgressFileNamePath = sessionWorkingFileNamePath + ".txt";
+                m_TempSessionProgressFileNamePath = sessionWorkingFileNamePath;
 
                 m_BytesWritten = 0;
                 if (File.Exists(m_TempSessionProgressFileNamePath))

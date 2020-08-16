@@ -6,7 +6,7 @@ namespace Gibraltar.Server.Client
 {
     public class WebChannelMethodNotAllowedException : WebChannelException
     {
-        public WebChannelMethodNotAllowedException(string message, WebException innerException, Uri requestUri)
+        public WebChannelMethodNotAllowedException(string message, Exception innerException, Uri requestUri)
             : base(message, innerException, requestUri)
         {
         }

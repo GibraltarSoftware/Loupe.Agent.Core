@@ -6,7 +6,7 @@ namespace Gibraltar.Server.Client
 {
     public class WebChannelExpectationFailedException : WebChannelException
     {
-        public WebChannelExpectationFailedException(string message, WebException innerException, Uri requestUri)
+        public WebChannelExpectationFailedException(string message, Exception innerException, Uri requestUri)
             : base(message, innerException, requestUri)
         {
         }

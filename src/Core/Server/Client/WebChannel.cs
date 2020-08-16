@@ -190,11 +190,11 @@ namespace Gibraltar.Server.Client
 
             switch (response.StatusCode)
             {
+                case HttpStatusCode.BadRequest:
+                    throw new WebChannelBadRequestException(response.ReasonPhrase, null, requestUri);
                 case HttpStatusCode.NotFound:
-                    //throw our dedicated file not found exception.
                     throw new WebChannelFileNotFoundException(response.ReasonPhrase, null, requestUri);
                 case HttpStatusCode.Unauthorized:
-                    //create a new exception that tells our caller it's an authorization problem.
                     throw new WebChannelAuthorizationException(response.ReasonPhrase, null, requestUri);
                 case HttpStatusCode.MethodNotAllowed:
                     throw new WebChannelMethodNotAllowedException(response.ReasonPhrase, null, requestUri);

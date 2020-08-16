@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Gibraltar.Server.Client.Data;
 using Gibraltar.Server.Client.Internal;
@@ -701,7 +702,8 @@ namespace Gibraltar.Server.Client
             {
                 channel = CreateChannel(configuration);
                 var configurationGetRequest = new HubConfigurationGetRequest();
-                await channel.ExecuteRequest(configurationGetRequest, 1).ConfigureAwait(false); //we'd like it to succeed, so we'll give it one retry 
+                await channel.ExecuteRequest(configurationGetRequest, 1)
+                    .ConfigureAwait(false); //we'd like it to succeed, so we'll give it one retry 
 
                 var configurationXml = configurationGetRequest.Configuration;
 
@@ -715,17 +717,21 @@ namespace Gibraltar.Server.Client
                 else
                 {
                     //set the right status message
-                    status = (HubStatus)configurationXml.status;
+                    status = (HubStatus) configurationXml.status;
 
                     switch (status)
                     {
                         case HubStatus.Available:
                             break;
                         case HubStatus.Expired:
-                            statusMessage = "The Server's license has expired.  " + (configuration.UseGibraltarService ? "You can reactivate your license in seconds at www.GibraltarSoftware.com." : "To renew your license, run the Administration tool on the Loupe Server.");
+                            statusMessage = "The Server's license has expired.  " + (configuration.UseGibraltarService
+                                    ? "You can reactivate your license in seconds at www.GibraltarSoftware.com."
+                                    : "To renew your license, run the Administration tool on the Loupe Server."
+                                );
                             break;
                         case HubStatus.Maintenance:
-                            statusMessage = "The Server is currently undergoing maintenance and can't process requests.";
+                            statusMessage =
+                                "The Server is currently undergoing maintenance and can't process requests.";
                             break;
                         default:
                             throw new ArgumentOutOfRangeException("status");
@@ -743,7 +749,7 @@ namespace Gibraltar.Server.Client
 
                     string publicKey = configurationXml.publicKey;
 
-                    if (String.IsNullOrEmpty(configurationXml.protocolVersion) == false)
+                    if (string.IsNullOrEmpty(configurationXml.protocolVersion) == false)
                     {
                         protocolVersion = new Version(configurationXml.protocolVersion);
                     }
@@ -751,13 +757,23 @@ namespace Gibraltar.Server.Client
                     LiveStreamServerXml liveStreamConfig = configurationXml.liveStream;
                     if (liveStreamConfig != null)
                     {
-                        agentLiveStream = new NetworkConnectionOptions { HostName = channel.HostName, Port = liveStreamConfig.agentPort, UseSsl = liveStreamConfig.useSsl };
-                        clientLiveStream = new NetworkConnectionOptions { HostName = channel.HostName, Port = liveStreamConfig.clientPort, UseSsl = liveStreamConfig.useSsl };
+                        agentLiveStream = new NetworkConnectionOptions
+                        {
+                            HostName = channel.HostName, Port = liveStreamConfig.agentPort,
+                            UseSsl = liveStreamConfig.useSsl
+                        };
+                        clientLiveStream = new NetworkConnectionOptions
+                        {
+                            HostName = channel.HostName, Port = liveStreamConfig.clientPort,
+                            UseSsl = liveStreamConfig.useSsl
+                        };
                     }
 
                     //We've connected for sure, time to set up our connection status to return to our caller with the full connection info
-                    connectionStatus = new HubConnectionStatus(configuration, channel, new HubRepository(expirationDt, serverRepositoryId, protocolVersion, publicKey, agentLiveStream, clientLiveStream),
-                                                   true, status, statusMessage);
+                    connectionStatus = new HubConnectionStatus(configuration, channel,
+                        new HubRepository(expirationDt, serverRepositoryId, protocolVersion, publicKey, agentLiveStream,
+                            clientLiveStream),
+                        true, status, statusMessage);
                 }
             }
             catch (WebChannelFileNotFoundException)
@@ -771,40 +787,23 @@ namespace Gibraltar.Server.Client
                 }
                 else
                 {
-                    statusMessage = "The server does not support this service or the specified directory is not valid";
+                    statusMessage = "No service could be found with the provided information";
                 }
 
                 connectionStatus = new HubConnectionStatus(configuration, false, status, statusMessage);
             }
-            catch (WebException ex)
+            catch (WebChannelBadRequestException)
             {
                 canConnect = false;
-                HttpWebResponse response = (HttpWebResponse)ex.Response;
-                statusMessage = response.StatusDescription; //by default we'll use the detailed description we got back from the web server.
-
                 //we want to be somewhat more intelligent in our responses to decode what these might MEAN.
                 if (configuration.UseGibraltarService)
                 {
-                    switch (response.StatusCode)
-                    {
-                        case HttpStatusCode.NotFound:
-                        case HttpStatusCode.BadRequest:
-                            status = HubStatus.Expired;
-                            statusMessage = "The specified customer name is not valid";
-                            break;
-                    }
+                    status = HubStatus.Expired;
+                    statusMessage = "The specified customer name is not valid";
                 }
                 else
                 {
-                    switch (response.StatusCode)
-                    {
-                        case HttpStatusCode.NotFound:
-                            statusMessage = "No service could be found with the provided information";
-                            break;
-                        case HttpStatusCode.BadRequest:
-                            statusMessage = "The server does not support this service or the specified directory is not valid";
-                            break;
-                    }
+                    statusMessage = "The server does not support this service or the specified directory is not valid";
                 }
 
                 connectionStatus = new HubConnectionStatus(configuration, false, status, statusMessage);

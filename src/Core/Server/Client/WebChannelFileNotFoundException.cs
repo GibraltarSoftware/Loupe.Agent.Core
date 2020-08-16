@@ -14,7 +14,7 @@ namespace Gibraltar.Server.Client
         /// <param name="message"></param>
         /// <param name="innerException"></param>
         /// <param name="requestUri"></param>
-        public WebChannelFileNotFoundException(string message, WebException innerException, Uri requestUri)
+        public WebChannelFileNotFoundException(string message, Exception innerException, Uri requestUri)
             : base(message, innerException, requestUri)
         {
         }
