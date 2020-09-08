@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
@@ -38,6 +39,9 @@ namespace Gibraltar.Messaging
         private Thread m_MessageDispatchThread; //LOCKED BY THREADLOCK
         private volatile bool m_MessageDispatchThreadFailed; //LOCKED BY THREADLOCK (and volatile to allow quick reading outside the lock)
         private int m_MessageQueueMaxLength = 2000; //LOCKED BY QUEUELOCK
+        private bool m_AutoSendOnError;
+        private bool m_PendingAutoSend;
+        private DateTimeOffset m_NextAutoSendAllowed = DateTimeOffset.MinValue;
         private bool m_ForceWriteThrough;
         private bool m_Initialized; //designed to enable us to do our initialization in the background. LOCKED BY THREADLOCK
         private bool m_ExitingMode; //forces writeThrough behavior when application is exiting LOCKED BY QUEUELOCK
@@ -58,7 +62,7 @@ namespace Gibraltar.Messaging
         // A thread-specific static flag so we can prevent recursion in the application user resolver
         [ThreadStatic] private static bool t_ThreadMustNotResolveApplicationUser;
 
-        internal static event LogMessageNotifyEventHandler LogMessageNotify;
+        internal event LogMessageNotifyEventHandler LogMessageNotify;
 
         /// <summary>
         /// Create a new publisher
@@ -87,6 +91,12 @@ namespace Gibraltar.Messaging
             m_SessionName = sessionName;
             m_SessionSummary = sessionSummary;
             m_Configuration = configuration;
+
+            var serverConfig = Log.Configuration.Server;
+            if (serverConfig.AutoSendOnError && serverConfig.AutoSendSessions && serverConfig.Enabled)
+            {
+                m_AutoSendOnError = true;
+            }
 
             //create our queue, cache, and messenger objects
             m_MessageQueue = new Queue<PacketEnvelope>(50); //a more or less arbitrary initial queue size.
@@ -608,9 +618,37 @@ namespace Gibraltar.Messaging
 
         private void QueueToNotifier(IMessengerPacket packet)
         {
-            LogMessageNotifyEventHandler notifyEvent = LogMessageNotify;
-            if (notifyEvent != null)
-                notifyEvent(this, new LogMessageNotifyEventArgs(packet));
+            if (packet is LogMessagePacket message)
+            {
+                if (m_AutoSendOnError)
+                {
+                    //Do we have an error that should be sent?
+                    if (m_PendingAutoSend || message.Severity <= LogMessageSeverity.Error)
+                    {
+                        //OK, but *can* we?  We don't want to go too often...
+                        if (m_NextAutoSendAllowed < DateTimeOffset.UtcNow)
+                        {
+                            try
+                            {
+                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true));
+                            }
+                            catch (Exception)
+                            {
+                                //we never want to log this because we're in the middle of the publisher pipeline..
+                            }
+                            m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultNotificationDelay);
+                        }
+                        else
+                        {
+                            //We are holding this send until the minimum delay expires.
+                            m_PendingAutoSend = true;
+                        }
+                    }
+                }
+
+                //now that we've dealt with auto-send, lets notify everyone else.
+                LogMessageNotify?.Invoke(this, new LogMessageNotifyEventArgs(message));
+            }
         }
 
         /// <summary>

@@ -16,7 +16,6 @@ namespace Loupe.Extensions.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="LoupeLogger"/> class.
         /// </summary>
-        /// <param name="category">The category.</param>
         public LoupeLogger(LoupeLoggerProvider provider, string category)
         {
             _provider = provider;
@@ -33,7 +32,7 @@ namespace Loupe.Extensions.Logging
 
             var description = formatter(state, exception);
             var details = LoupeLogEnricher.GetJson(state, _provider);
-            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, details, _category, null, description, state);
+            Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, details, _category, null, description);
         }
 
         /// <inheritdoc />

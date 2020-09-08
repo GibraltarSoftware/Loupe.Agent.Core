@@ -284,7 +284,7 @@ namespace Gibraltar.Monitor
             {
                 trendable = true;
             }
-                //Now check object types
+            //Now check object types
             else if ((type == typeof(DateTimeOffset)) || (type == typeof(TimeSpan)))
             {
                 trendable = true;

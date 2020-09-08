@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Gibraltar.Data;
 using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Extensibility.Data;
-
 
 
 namespace Gibraltar.Messaging
@@ -14,11 +14,14 @@ namespace Gibraltar.Messaging
     /// <summary>
     /// Generates notifications from scanning log messages
     /// </summary>
-    public class Notifier
+    public class Notifier : IDisposable
     {
+        internal static TimeSpan DefaultNotificationDelay = new TimeSpan(0, 5, 0);
         private const string NotifierCategoryBase = "Gibraltar.Agent.Notifier";
         private const string NotifierThreadBase = "Gibraltar Notifier";
         private const int BurstMillisecondLatency = 28;
+
+        private readonly Publisher m_Publisher;
         private readonly object m_MessageQueueLock = new object();
         private readonly object m_MessageDispatchThreadLock = new object();
         private readonly LogMessageSeverity m_MinimumSeverity;
@@ -37,16 +40,16 @@ namespace Gibraltar.Messaging
         private DateTimeOffset m_NextNotifyAfter; // Not locked.  Single-threaded modify inside the dispatch loop only.
         private MessageSourceProvider m_EventErrorSourceProvider; // Not locked.  Single-threaded use inside the dispatch loop only.
 
-        private event NotificationEventHandler m_NotificationEvent; // LOCKED BY QUEUELOCK (subscribed only through property)
-
         /// <summary>
         /// Create a Notifier looking for a given minimum LogMessageSeverity.
         /// </summary>
+        /// <param name="publisher"></param>
         /// <param name="minimumSeverity">The minimum LogMessageSeverity to look for.</param>
         /// <param name="notifierName">A name for this notifier (may be null for generic).</param>
         /// <param name="groupMessages">True to delay and group messages together for more efficient processing</param>
-        public Notifier(LogMessageSeverity minimumSeverity, string notifierName, bool groupMessages = true)
+        public Notifier(Publisher publisher, LogMessageSeverity minimumSeverity, string notifierName, bool groupMessages = true)
         {
+            m_Publisher = publisher;
             m_MessageQueue = new Queue<LogMessagePacket>(50); // a more or less arbitrary initial size.
             m_MinimumSeverity = minimumSeverity;
             m_GroupMessages = groupMessages;
@@ -63,53 +66,14 @@ namespace Gibraltar.Messaging
                 m_NotifierName = notifierName;
                 m_NotifierCategoryName = string.Format("{0}.{1}", NotifierCategoryBase, notifierName);
             }
+
+            m_Publisher.LogMessageNotify += Publisher_LogMessageNotify;
         }
 
         /// <summary>
         /// Notification event.
         /// </summary>
-        public event NotificationEventHandler NotificationEvent
-        {
-            add
-            {
-                if (value == null)
-                    return;
-
-                lock (m_MessageQueueLock)
-                {
-                    if (m_NotificationEvent == null)
-                    {
-                        // This is the first subscriber.  We need to initialize our own subscription to the publisher's event.
-                        Publisher.LogMessageNotify -= Publisher_LogMessageNotify; // Ensure no duplicates.
-                        Publisher.LogMessageNotify += Publisher_LogMessageNotify; // We need to subscribe.
-                    }
-
-                    m_NotificationEvent += value; // Subscribe them to the underlying event.
-                }
-            }
-            remove
-            {
-                if (value == null)
-                    return;
-
-                lock (m_MessageQueueLock)
-                {
-                    if (m_NotificationEvent == null)
-                        return; // Already empty, no subscriptions to remove.
-
-                    m_NotificationEvent -= value; // Unsubscribe them from the underlying event.
-
-                    if (m_NotificationEvent == null)
-                    {
-                        // That was the last subscriber.  We need to clean out our own subscription to the publisher's event.
-                        Publisher.LogMessageNotify -= Publisher_LogMessageNotify; // Unsubscribe for efficiency.
-
-                        m_MessageQueue.Clear(); // No more subscribers, dump the queue.
-                        System.Threading.Monitor.PulseAll(m_MessageQueueLock); // Kick out of the wait so it can reset the times.
-                    }
-                }
-            }
-        }
+        public event NotificationEventHandler NotificationEvent;
 
         /// <summary>
         /// Get the CategoryName for this Notifier instance, as determined from the provided notifier name.
@@ -118,21 +82,20 @@ namespace Gibraltar.Messaging
 
         private void Publisher_LogMessageNotify(object sender, LogMessageNotifyEventArgs e)
         {
-            QueuePacket(e.Packet);
+            QueuePacket(e.Message);
         }
 
-        private void QueuePacket(IMessengerPacket messengerPacket)
+        private void QueuePacket(LogMessagePacket message)
         {
-            LogMessagePacket packet = messengerPacket as LogMessagePacket;
-            if (packet == null || packet.SuppressNotification)
+            if (message == null || message.SuppressNotification)
                 return;
 
-            if (packet.Severity > m_MinimumSeverity) // Severity compares in reverse.  Critical = 1, Verbose = 16.
+            if (message.Severity > m_MinimumSeverity) // Severity compares in reverse.  Critical = 1, Verbose = 16.
                 return; // Bail if this packet doesn't meet the minimum severity we care about.
 
             lock (m_MessageQueueLock)
             {
-                if (m_NotificationEvent == null) // Check for unsubscribe race condition.
+                if (NotificationEvent == null) // Check for unsubscribe race condition.
                     return; // Don't add it to the queue if there are no subscribers.
 
                 int messageQueueLength = m_MessageQueue.Count;
@@ -141,7 +104,7 @@ namespace Gibraltar.Messaging
                     if (messageQueueLength <= 0) // First new one:  Wait for a burst to collect.
                         m_BurstCollectionWait = DateTimeOffset.MinValue; // Clear it so we'll reset the wait clock.
 
-                    m_MessageQueue.Enqueue(packet);
+                    m_MessageQueue.Enqueue(message);
 
                     // If there were already messages in our queue, it's waiting on a timeout, so don't bother pulsing it.
                     // But if there were no messages in the queue, we need to make sure it's not waiting forever!
@@ -211,7 +174,7 @@ namespace Gibraltar.Messaging
                         {
                             System.Threading.Monitor.Wait(m_MessageQueueLock); // Wait indefinitely until we get a message.
 
-                            if (m_NotificationEvent == null)
+                            if (NotificationEvent == null)
                             {
                                 m_MinimumWaitNextNotify = TimeSpan.Zero; // Reset default wait time.
                                 m_NextNotifyAfter = DateTimeOffset.UtcNow; // Reset any forced wait pending.
@@ -244,7 +207,7 @@ namespace Gibraltar.Messaging
                         }
 
                         // The wait has ended.  Get our subscriber(s) and messages, if any.
-                        notificationEvent = m_NotificationEvent;
+                        notificationEvent = NotificationEvent;
                         if (notificationEvent == null) // Have we lost all of our subscribers while waiting?
                         {
                             m_MinimumWaitNextNotify = TimeSpan.Zero; // Reset default wait time.
@@ -263,15 +226,7 @@ namespace Gibraltar.Messaging
                     {
                         // Fire the event from outside the lock.
                         NotificationEventArgs eventArgs = new NotificationEventArgs(messages, m_MinimumWaitNextNotify);
-
-                        // see if we should default to automatically sending data using the rules we typically recommend.
-                        var serverConfig = Log.Configuration.Server;
-                        if ((eventArgs.TopSeverity <= LogMessageSeverity.Error) 
-                            && (serverConfig.AutoSendOnError && serverConfig.AutoSendSessions && serverConfig.Enabled))
-                        {
-                            eventArgs.SendSession = true;
-                            eventArgs.MinimumNotificationDelay = new TimeSpan(0, 5, 0);
-                        }
+                        eventArgs.MinimumNotificationDelay = DefaultNotificationDelay;
 
                         try
                         {
@@ -288,9 +243,9 @@ namespace Gibraltar.Messaging
                                 m_MinimumWaitNextNotify = TimeSpan.Zero;
 
                             if (eventArgs.SendSession) // Did they signal us to send the current session now?
-#pragma warning disable 4014
-                                Log.SendSessions(SessionCriteria.ActiveSession, null, true); // Then let's send it before we start the wait time.
-#pragma warning restore 4014
+                            {
+                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true));
+                            }
 
                             m_LastNotifyCompleted = DateTimeOffset.UtcNow;
                             m_NextNotifyAfter = m_LastNotifyCompleted + m_MinimumWaitNextNotify;
@@ -326,6 +281,12 @@ namespace Gibraltar.Messaging
 
                 return m_EventErrorSourceProvider;
             }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            m_Publisher.LogMessageNotify -= Publisher_LogMessageNotify;
         }
     }
 

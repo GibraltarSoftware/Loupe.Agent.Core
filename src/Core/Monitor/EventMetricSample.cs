@@ -62,7 +62,8 @@ namespace Gibraltar.Monitor
 #else
                 //log and return, nothing we can do.
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition", "There is no value definition named {1} for metric definition {0}",
+                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition",
+                        "There is no value definition named {1} for metric definition {0}",
                         Metric.Definition.Name, name);
                 return;
 #endif
@@ -102,7 +103,8 @@ namespace Gibraltar.Monitor
 #else
                 //log and return, nothing we can do.
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition", "There is no value definition named {1} for metric definition {0}",
+                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition", 
+                        "There is no value definition named {1} for metric definition {0}",
                         Metric.Definition.Name, valueDefinition.Name);
                 return;
 #endif
@@ -166,7 +168,8 @@ namespace Gibraltar.Monitor
 #else
                 //log and return, nothing we can do.
                 if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition","There is no value definition at index {1} for metric definition {0}",
+                    Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to add metric value to the current sample due to missing value definition",
+                        "There is no value definition at index {1} for metric definition {0}",
                         Metric.Definition.Name, valueIndex);
                 return;
 #endif

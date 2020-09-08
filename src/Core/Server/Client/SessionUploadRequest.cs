@@ -28,6 +28,8 @@ namespace Gibraltar.Server.Client
         private bool m_PerformCleanup;
         private int m_BytesWritten;
         private string m_TempSessionProgressFileNamePath; //the transfer tracking file.
+        private Stream m_SessionFileStream; //the actual file stream to be transfered.
+        private string m_SessionFileHash;
 
         private InterprocessLock m_SessionTransportLock;
         private bool m_DeleteTemporaryFilesOnDispose;
@@ -111,11 +113,11 @@ namespace Gibraltar.Server.Client
             if (releaseManaged)
             {
                 //we have to get rid of the lock if we have it.
-                if (m_SessionTransportLock != null)
-                {
-                    m_SessionTransportLock.Dispose();
-                    m_SessionTransportLock = null;
-                }
+                m_SessionTransportLock.SafeDispose();
+                m_SessionTransportLock = null;
+
+                m_SessionFileStream.SafeDispose();
+                m_SessionFileStream = null;
 
                 //and flush any temporary files we have if they aren't in a persistent repository.
                 if (m_DeleteTemporaryFilesOnDispose)
@@ -164,90 +166,69 @@ namespace Gibraltar.Server.Client
                 PerformCleanup(connection);
             }
 
-            //find the prepared session file
-            using (var sessionStream = Repository.LoadSessionFileStream(SessionId, FileId.Value))
+            var resourceUri = GenerateResourceUri();
+            var additionalHeaders = new List<NameValuePair<string>>();
+            if (string.IsNullOrEmpty(m_SessionFileHash) == false)
             {
-                //calculate our SHA1 Hash...
-                var additionalHeaders = new List<NameValuePair<string>>();
-                if (sessionStream.CanSeek)
+                additionalHeaders.Add(new NameValuePair<string>(HubConnection.SHA1HashHeader, m_SessionFileHash));
+            }
+
+            //if it's SMALL we just put the whole thing up as a single action.
+            if (m_SessionFileStream.Length < SinglePassCutoffBytes)
+            {
+                var sessionData = new byte[m_SessionFileStream.Length ];
+                await m_SessionFileStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
+                await connection.UploadData(resourceUri, HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
+            }
+            else
+            {
+                //we need to do a segmented post operation.  Note that we may be restarting a request after an error, so don't reset
+                //our bytes written.
+                m_SessionFileStream.Position = m_BytesWritten;
+                var restartCount = 0;
+                var sessionData = new byte[DefaultSegmentSizeBytes];
+                while (m_BytesWritten < m_SessionFileStream.Length)
                 {
+                    //Read the next segment which is either our segment size or the last fragment of the file, exactly sized.
+                    if ((m_SessionFileStream.Length - m_SessionFileStream.Position) < sessionData.Length)
+                    {
+                        //we're at the last block - resize our buffer down.
+                        sessionData = new byte[(m_SessionFileStream.Length - m_SessionFileStream.Position)];
+                    }
+
+                    await m_SessionFileStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
+
+                    var isComplete = (m_SessionFileStream.Position == m_SessionFileStream.Length);
+                    var requestUrl =
+                        $"{resourceUri}?Start={m_BytesWritten}&Complete={isComplete}&FileSize={m_SessionFileStream.Length}";
+
                     try
                     {
-                        using (var csp = SHA1.Create())
-                        {
-                            var hash = BitConverter.ToString(csp.ComputeHash(sessionStream));
-                            additionalHeaders.Add(new NameValuePair<string>(HubConnection.SHA1HashHeader, hash));
-                        }
+                        await connection.UploadData(requestUrl, HttpMethod.Post, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
 
-                        //now back up the stream to the beginning so we can send the actual data.
-                        sessionStream.Position = 0;
+                        //and now that we've written the bytes and not gotten an exception we can mark these bytes as done!
+                        m_BytesWritten = (int)m_SessionFileStream.Position;
+                        UpdateProgressTrackingFile();
                     }
-                    catch (Exception ex)
+                    catch (WebChannelBadRequestException ex)
                     {
                         if (!Log.SilentMode)
-                            Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Unable to calculate hash for session file due to " + ex.GetType() + " exception.", "The upload will proceed but without the hash to check the accuracy of the upload.\r\nException: {0}\r\n{1}\r\n", ex.GetType(), ex.Message);
-                    }
-                }
+                            Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Server exchange error, we will assume client and server are out of sync.",
+                                "The server returned a Bad Request Error (400) which generally means there is either a session-specific transfer problem that may be resolved by restarting the transfer from zero or an internal server problem.\r\nException: {0}", ex);
 
-                var resourceUri = GenerateResourceUri();
-
-                //if it's SMALL we just put the whole thing up as a single action.
-                if (sessionStream.Length < SinglePassCutoffBytes)
-                {
-                    var sessionData = new byte[ sessionStream.Length ];
-                    await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
-                    await connection.UploadData(resourceUri, HttpMethod.Put, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
-                }
-                else
-                {
-                    //we need to do a segmented post operation.  Note that we may be restarting a request after an error, so don't reset
-                    //our bytes written.
-                    sessionStream.Position = m_BytesWritten;
-                    var restartCount = 0;
-                    var sessionData = new byte[DefaultSegmentSizeBytes];
-                    while (m_BytesWritten < sessionStream.Length)
-                    {
-                        //Read the next segment which is either our segment size or the last fragment of the file, exactly sized.
-                        if ((sessionStream.Length - sessionStream.Position) < sessionData.Length)
+                        if (restartCount < 4)
                         {
-                            //we're at the last block - resize our buffer down.
-                            sessionData = new byte[(sessionStream.Length - sessionStream.Position)];
-                        }
-
-                        await sessionStream.ReadAsync(sessionData, 0, sessionData.Length).ConfigureAwait(false);
-
-                        var isComplete = (sessionStream.Position == sessionStream.Length);
-                        var requestUrl =
-                            $"{resourceUri}?Start={m_BytesWritten}&Complete={isComplete}&FileSize={sessionStream.Length}";
-
-                        try
-                        {
-                            await connection.UploadData(requestUrl, HttpMethod.Post, BinaryContentType, sessionData, additionalHeaders).ConfigureAwait(false);
-
-                            //and now that we've written the bytes and not gotten an exception we can mark these bytes as done!
-                            m_BytesWritten = (int)sessionStream.Position;
+                            //if we experience this type of Server-level transport error, assume there's some out of sync condition and start again.
+                            restartCount++;
+                            PerformCleanup(connection);
+                            m_SessionFileStream.Position = 0;
+                            m_BytesWritten = 0;
                             UpdateProgressTrackingFile();
                         }
-                        catch (WebChannelBadRequestException ex)
+                        else
                         {
-                            if (!Log.SilentMode)
-                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Server exchange error, we will assume client and server are out of sync.",
-                                    "The server returned a Bad Request Error (400) which generally means there is either a session-specific transfer problem that may be resolved by restarting the transfer from zero or an internal server problem.\r\nException: {0}", ex);
-
-                            if (restartCount < 4)
-                            {
-                                //if we experience this type of Server-level transport error, assume there's some out of sync condition and start again.
-                                restartCount++;
-                                PerformCleanup(connection);
-                                sessionStream.Position = 0;
-                                m_BytesWritten = 0;
-                                UpdateProgressTrackingFile();
-                            }
-                            else
-                            {
-                                //we didn't find a reason to restart the transfer, we need to let the exception fly.
-                                throw;
-                            }
+                            //we didn't find a reason to restart the transfer, we need to let the exception fly.
+                            throw;
                         }
                     }
                 }
@@ -407,6 +388,26 @@ namespace Gibraltar.Server.Client
             //we aren't waiting to see if we can get the lock - if anyone else has it they must be transferring the session.
             if (m_SessionTransportLock != null)
             {
+                //grab a lock on the actual data file - if it's not there, no point in continuing.
+                m_SessionFileStream = Repository.LoadSessionFileStream(SessionId, FileId.Value);
+
+                //calculate our SHA1 Hash...
+                try
+                {
+                    using (var csp = SHA1.Create())
+                    {
+                        m_SessionFileHash = BitConverter.ToString(csp.ComputeHash(m_SessionFileStream));
+                    }
+
+                    //now back up the stream to the beginning so we can send the actual data.
+                    m_SessionFileStream.Position = 0;
+                }
+                catch (Exception ex)
+                {
+                    if (!Log.SilentMode)
+                        Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, RepositoryPublishClient.LogCategory, "Unable to calculate hash for session file due to " + ex.GetType() + " exception.", "The upload will proceed but without the hash to check the accuracy of the upload.\r\nException: {0}\r\n{1}\r\n", ex.GetType(), ex.Message);
+                }
+
                 //Lets figure out if we're restarting a previous send or starting a new one.
                 m_TempSessionProgressFileNamePath = sessionWorkingFileNamePath;
 

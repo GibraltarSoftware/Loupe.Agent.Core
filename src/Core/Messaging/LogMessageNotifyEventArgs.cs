@@ -1,6 +1,7 @@
 ﻿
 using System;
-
+using Gibraltar.Monitor.Serialization;
+using Loupe.Extensibility.Data;
 
 
 namespace Gibraltar.Messaging
@@ -11,13 +12,13 @@ namespace Gibraltar.Messaging
     internal class LogMessageNotifyEventArgs : EventArgs
     {
         /// <summary>
-        /// The IMessengerPacket for the log message being notified about.
+        /// The ILogMessage being notified.
         /// </summary>
-        internal readonly IMessengerPacket Packet;
+        internal readonly LogMessagePacket Message;
 
-        internal LogMessageNotifyEventArgs(IMessengerPacket packet)
+        internal LogMessageNotifyEventArgs(LogMessagePacket message)
         {
-            Packet = packet;
+            Message = message;
         }
     }
 }
