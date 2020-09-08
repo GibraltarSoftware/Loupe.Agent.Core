@@ -317,7 +317,7 @@ namespace Gibraltar.Monitor
                     lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
                     {
                         if (s_MessageAlertNotifier == null) // Double-check that it's actually still null.
-                            s_MessageAlertNotifier = new Notifier(LogMessageSeverity.Warning, "Message Alert");
+                            s_MessageAlertNotifier = new Notifier(s_Publisher, LogMessageSeverity.Warning, "Message Alert");
                     }
                 }
 
@@ -337,7 +337,7 @@ namespace Gibraltar.Monitor
                     lock (s_NotifierLock) // Must get the lock to make sure only one thread can try this at a time.
                     {
                         if (s_MessageNotifier == null) // Double-check that it's actually still null.
-                            s_MessageNotifier = new Notifier(LogMessageSeverity.Verbose, "Messages", false);
+                            s_MessageNotifier = new Notifier(s_Publisher, LogMessageSeverity.Verbose, "Messages", false);
                     }
                 }
 
@@ -2022,20 +2022,12 @@ namespace Gibraltar.Monitor
                         }
 
                         publishEngine = s_PublishEngine;
-
-                        if (s_RunningConfiguration.Server.AutoSendOnError)
-                        {
-                            var notifier = MessageAlertNotifier; //poking this creates our background threads.
-                        }
                     }
 
                     System.Threading.Monitor.PulseAll(s_SyncObject);
                 }
 
-                if (publishEngine != null)
-                {
-                    publishEngine.Start();
-                }
+                publishEngine?.Start();
             }
             catch (Exception ex)
             {
