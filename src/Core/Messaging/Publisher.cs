@@ -636,7 +636,7 @@ namespace Gibraltar.Messaging
                             {
                                 //we never want to log this because we're in the middle of the publisher pipeline..
                             }
-                            m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultNotificationDelay);
+                            m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultSendDelay);
                         }
                         else
                         {

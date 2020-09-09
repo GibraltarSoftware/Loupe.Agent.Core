@@ -16,7 +16,7 @@ namespace Gibraltar.Messaging
     /// </summary>
     public class Notifier : IDisposable
     {
-        internal static TimeSpan DefaultNotificationDelay = new TimeSpan(0, 5, 0);
+        internal static TimeSpan DefaultSendDelay = new TimeSpan(0, 5, 0);
         private const string NotifierCategoryBase = "Gibraltar.Agent.Notifier";
         private const string NotifierThreadBase = "Gibraltar Notifier";
         private const int BurstMillisecondLatency = 28;
@@ -195,10 +195,10 @@ namespace Gibraltar.Messaging
                                         now.AddMilliseconds(10); // Then allow a minimum wait in case of lag.
                             }
 
-                            if (m_NextNotifyAfter < m_BurstCollectionWait && m_BurstCollectionWait > now)
+                            if ((m_NextNotifyAfter < m_BurstCollectionWait) && (m_BurstCollectionWait > now))
                                 m_NextNotifyAfter = m_BurstCollectionWait; // Wait for a burst to collect.
 
-                            while (m_NextNotifyAfter > now && m_MessageQueue.Count > 0)
+                            while ((m_NextNotifyAfter > now) && (m_MessageQueue.Count > 0))
                             {
                                 TimeSpan waitTime = m_NextNotifyAfter - now; // How long must we wait to notify again?
                                 System.Threading.Monitor.Wait(m_MessageQueueLock, waitTime); // Wait the timeout.
@@ -226,7 +226,6 @@ namespace Gibraltar.Messaging
                     {
                         // Fire the event from outside the lock.
                         NotificationEventArgs eventArgs = new NotificationEventArgs(messages, m_MinimumWaitNextNotify);
-                        eventArgs.MinimumNotificationDelay = DefaultNotificationDelay;
 
                         try
                         {
@@ -244,6 +243,9 @@ namespace Gibraltar.Messaging
 
                             if (eventArgs.SendSession) // Did they signal us to send the current session now?
                             {
+                                //we guard against sending too often.
+                                m_MinimumWaitNextNotify = m_MinimumWaitNextNotify < DefaultSendDelay ? DefaultSendDelay : m_MinimumWaitNextNotify;
+
                                 Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true));
                             }
 

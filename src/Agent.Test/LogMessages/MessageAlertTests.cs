@@ -27,6 +27,8 @@ namespace Loupe.Agent.Test.LogMessages
 
                 System.Threading.Monitor.PulseAll(m_Lock);
             }
+
+            //e.MinimumDelay = TimeSpan.Zero; //for our unit tests we don't want to hold things.
         }
 
         private int WaitForEvent(out TimeSpan latency, out TimeSpan span)
@@ -37,14 +39,12 @@ namespace Loupe.Agent.Test.LogMessages
             DateTimeOffset endTime = startTime + timeoutWait;
             lock (m_Lock)
             {
-                DateTimeOffset now = DateTimeOffset.UtcNow; // Grab it again; we don't know how long we waited for the lock.
-                timeoutWait = endTime - now;
+                timeoutWait = endTime - DateTimeOffset.UtcNow; // Grab it again; we don't know how long we waited for the lock.
                 while (m_Count == 0 && timeoutWait > TimeSpan.Zero)
                 {
                     System.Threading.Monitor.Wait(m_Lock, timeoutWait);
 
-                    now = DateTimeOffset.UtcNow;
-                    timeoutWait = endTime - now;
+                    timeoutWait = endTime - DateTimeOffset.UtcNow;
                 }
 
                 latency = m_Latency;
@@ -98,7 +98,7 @@ namespace Loupe.Agent.Test.LogMessages
                 Log.Information("Gibraltar.Agent.Unit Tests.MessageAlert", "Single information to test Message Alert", null);
                 count = WaitForEvent(out latency, out span);
                 Assert.AreNotEqual(0, count, "Message Alert event didn't fire within 1 second timeout.");
-                Assert.LessOrEqual(latency.TotalMilliseconds, 75, "Event latency exceeded 72 ms");
+                Assert.LessOrEqual(latency.TotalMilliseconds, 75, "Event latency exceeded 75 ms");
 
                 Log.Error("Gibraltar.Agent.Unit Tests.MessageAlert", "Triple error to test Message Alert", "1 of 3");
                 Log.Verbose("Gibraltar.Agent.Unit Tests.MessageAlert", "Single verbose to test Message Alert", null);
