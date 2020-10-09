@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Threading.Tasks;
+using Loupe.Agent.AspNetCore.Handlers;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -10,8 +14,22 @@ namespace Loupe.Agent.AspNetCore
         /// <summary>
         /// Add a Loupe middleware to time requests and log errors.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/> instance.</returns>
         public static IApplicationBuilder UseLoupe(this IApplicationBuilder app) => app.UseMiddleware<LoupeMiddleware>();
+        
+        /// <summary>
+        /// Add Loupe session cookies to all requests
+        /// </summary>
+        public static IApplicationBuilder AddLoupeCookies(this IApplicationBuilder app) => app.Use(CookieMiddleware);
+
+        private static async Task CookieMiddleware(HttpContext context, Func<Task> next)
+        {
+            if (context.Request.IsInteresting())
+            {
+                CookieHandler.Handle(context);
+                HeaderHandler.Handle(context);
+            }
+
+            await next();
+        }
     }
 }
