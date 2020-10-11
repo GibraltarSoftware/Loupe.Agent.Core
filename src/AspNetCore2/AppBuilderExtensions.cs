@@ -19,7 +19,7 @@ namespace Loupe.Agent.AspNetCore
         /// <summary>
         /// Add Loupe session cookies to all requests
         /// </summary>
-        public static IApplicationBuilder AddLoupeCookies(this IApplicationBuilder app) => app.Use(CookieMiddleware);
+        public static IApplicationBuilder UseLoupeCookies(this IApplicationBuilder app) => app.Use(CookieMiddleware);
 
         private static async Task CookieMiddleware(HttpContext context, Func<Task> next)
         {

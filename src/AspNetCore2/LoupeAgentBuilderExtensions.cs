@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Security.Principal;
 using Gibraltar.Monitor;
+using Loupe.Agent.AspNetCore.Infrastructure;
 using Loupe.Agent.AspNetCore.Metrics;
 using Loupe.Agent.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -53,6 +55,18 @@ namespace Loupe.Agent.AspNetCore
                 ? builder.AddApplicationUserProvider<ClaimsPrincipalApplicationUserProvider>()
                 : builder.AddApplicationUserProvider(applicationUserFunc);
 
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds services required for client-side logging endpoint
+        /// </summary>
+        public static ILoupeAgentBuilder AddClientLogging(this ILoupeAgentBuilder builder)
+        {
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<RequestProcessor>();
+            builder.Services.AddSingleton<ILoupeLog, DefaultLoupeLog>();
+            builder.Services.AddSingleton<JavaScriptLogger>();
             return builder;
         }
     }

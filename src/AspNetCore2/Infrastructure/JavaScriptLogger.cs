@@ -25,20 +25,11 @@ using Loupe.Agent.AspNetCore.Models;
 
 namespace Loupe.Agent.AspNetCore.Infrastructure
 {
-    internal class DefaultJavaScriptLog : IJavaScriptLog
-    {
-        public void Write(LogMessageSeverity severity, string system, IMessageSourceProvider messageSource, IPrincipal? user, JavaScriptException? jsException,
-            LogWriteMode mode, string detailsBlock, string? category, string? caption, string? description, object[]? parameters)
-        {
-            Log.Write(severity, system, messageSource, user, jsException, mode, detailsBlock, category, caption, description, parameters);
-        }
-    }
-
     public class JavaScriptLogger
     {
-        private readonly IJavaScriptLog _log;
+        private readonly ILoupeLog _log;
 
-        public JavaScriptLogger(IJavaScriptLog log)
+        public JavaScriptLogger(ILoupeLog log)
         {
             _log = log;
         }
