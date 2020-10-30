@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using Gibraltar.Monitor;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Loupe.Agent.Core.Services
 {
@@ -57,5 +58,6 @@ namespace Loupe.Agent.Core.Services
         /// <returns>The builder instance.</returns>
         ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func);
 
+        IServiceCollection Services { get; }
     }
 }
