@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Security.Principal;
 
@@ -48,17 +49,17 @@ namespace Gibraltar.Agent
         /// <summary>
         /// Should return the simple name of the method which issued the log message.
         /// </summary>
-        string MethodName { get; }
+        string? MethodName { get; }
 
         /// <summary>
         /// Should return the full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        string ClassName { get; }
+        string? ClassName { get; }
 
         /// <summary>
         /// Should return the name of the file containing the method which issued the log message.
         /// </summary>
-        string FileName { get; }
+        string? FileName { get; }
 
         /// <summary>
         /// Should return the line within the file at which the log message was issued.
