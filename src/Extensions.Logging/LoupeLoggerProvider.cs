@@ -21,10 +21,20 @@ namespace Loupe.Extensions.Logging
         /// Initializes a new instance of the <see cref="LoupeLoggerProvider"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public LoupeLoggerProvider(IConfiguration configuration)
+        /// <param name="globalProperties">Global properties to apply to all log messages.</param>
+        public LoupeLoggerProvider(IConfiguration configuration, LoupeGlobalProperties globalProperties)
         {
             var agentConfiguration = new AgentConfiguration();
             configuration.GetSection("Loupe").Bind(agentConfiguration);
+
+            if (!(globalProperties.Properties is null))
+            {
+                foreach (var property in globalProperties.Properties)
+                {
+                    agentConfiguration.Properties.Add(property.Key, property.Value);
+                }
+            }
+            
             Log.StartSession(agentConfiguration);
         }
 
