@@ -27,9 +27,9 @@ namespace Loupe.Agent.AspNetCore
         /// </summary>
         /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/></param>
         /// <param name="pattern">The URL pattern for the endpoint. Defaults to <c>/loupe/log</c></param>
-        public static void MapLoupeClientLogger(this IEndpointRouteBuilder endpoints, string pattern = "/loupe/log")
+        public static IEndpointConventionBuilder MapLoupeClientLogger(this IEndpointRouteBuilder endpoints, string pattern = "/loupe/log")
         {
-            endpoints.MapPost(pattern, Log);
+            return endpoints.MapPost(pattern, Log);
         }
 #else
         /// <summary>
@@ -38,7 +38,7 @@ namespace Loupe.Agent.AspNetCore
         /// <param name="app"></param>
         /// <param name="pattern">The URL pattern for the endpoint. Defaults to <c>/loupe/log</c></param>
         /// <returns></returns>
-        public static IApplicationBuilder AddLoupeClientLogger(this IApplicationBuilder app, string pattern = "/loupe/log")
+        public static IApplicationBuilder UseLoupeClientLogger(this IApplicationBuilder app, string pattern = "/loupe/log")
         {
             var path = new PathString(pattern);
             
