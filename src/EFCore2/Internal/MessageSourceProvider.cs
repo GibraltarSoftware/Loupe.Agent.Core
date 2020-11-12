@@ -270,17 +270,17 @@ namespace Gibraltar.Agent.EntityFramework.Internal
         /// <summary>
         /// The simple name of the method which issued the log message.
         /// </summary>
-        public string MethodName { get { return _methodName; } }
+        public string? MethodName { get { return _methodName; } }
 
         /// <summary>
         /// The full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        public string ClassName { get { return _className; } }
+        public string? ClassName { get { return _className; } }
 
         /// <summary>
         /// The name of the file containing the method which issued the log message.
         /// </summary>
-        public string FileName { get { return _fileName; } }
+        public string? FileName { get { return _fileName; } }
 
         /// <summary>
         /// The line within the file at which the log message was issued.

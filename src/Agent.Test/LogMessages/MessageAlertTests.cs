@@ -173,7 +173,5 @@ namespace Loupe.Agent.Test.LogMessages
                 e.MinimumDelay = new TimeSpan(0, 5, 0); //5 minutes
             }
         }
-
-        private bool m_MessageAlertProcessed;
     }
 }

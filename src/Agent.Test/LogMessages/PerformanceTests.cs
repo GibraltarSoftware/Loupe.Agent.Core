@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics;
 using System.IO;
 using Gibraltar.Agent;
@@ -244,7 +245,7 @@ namespace Loupe.Agent.Test.LogMessages
 
     public class DummyMessageSourceProvider : IMessageSourceProvider
     {
-        public DummyMessageSourceProvider(string className, string methodName, string fileName, int lineNumber)
+        public DummyMessageSourceProvider(string className, string methodName, string? fileName, int lineNumber)
         {
             ClassName = className;
             MethodName = methodName;
@@ -255,17 +256,17 @@ namespace Loupe.Agent.Test.LogMessages
         /// <summary>
         /// Should return the simple name of the method which issued the log message.
         /// </summary>
-        public string MethodName { get; private set; }
+        public string? MethodName { get; private set; }
 
         /// <summary>
         /// Should return the full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        public string ClassName { get; private set; }
+        public string? ClassName { get; private set; }
 
         /// <summary>
         /// Should return the name of the file containing the method which issued the log message.
         /// </summary>
-        public string FileName { get; private set; }
+        public string? FileName { get; private set; }
 
         /// <summary>
         /// Should return the line within the file at which the log message was issued.
@@ -279,24 +280,15 @@ namespace Loupe.Agent.Test.LogMessages
     public class DumbFileLogger
     {
         /// <summary>
-        /// The name of the file to which this Logger is writing.
-        /// </summary>
-        private String _fileName;
-
-        /// <summary>
         /// Gets and sets the file name.
         /// </summary>
-        public String FileName
-        {
-            get { return _fileName; }
-            set { _fileName = value; }
-        }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Create a new instance of FileLogger.
         /// </summary>
         /// <param name="aFileName">The name of the file to which this Logger should write.</param>
-        public DumbFileLogger(String aFileName)
+        public DumbFileLogger(string aFileName)
         {
             FileName = aFileName;
         }
@@ -344,7 +336,7 @@ namespace Loupe.Agent.Test.LogMessages
         /// <returns>true upon success, false upon failure.</returns>
         public bool WriteToLog(String s)
         {
-            StreamWriter writer = null;
+            StreamWriter? writer = null;
             try
             {
                 writer = GetStreamWriter();

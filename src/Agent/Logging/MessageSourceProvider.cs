@@ -1,4 +1,5 @@
 ﻿
+#nullable enable
 using System.Runtime.CompilerServices;
 
 
@@ -14,9 +15,9 @@ namespace Gibraltar.Agent.Logging
     /// </remarks>
     public class MessageSourceProvider : IMessageSourceProvider
     {
-        private readonly string m_MethodName;
-        private readonly string m_ClassName;
-        private readonly string m_FileName;
+        private readonly string? m_MethodName;
+        private readonly string? m_ClassName;
+        private readonly string? m_FileName;
         private readonly int m_LineNumber;
 
         /// <summary>
@@ -86,17 +87,17 @@ namespace Gibraltar.Agent.Logging
         /// <summary>
         /// The simple name of the method which issued the log message.
         /// </summary>
-        public string MethodName { get { return m_MethodName; } }
+        public string? MethodName { get { return m_MethodName; } }
 
         /// <summary>
         /// The full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        public string ClassName { get { return m_ClassName; } }
+        public string? ClassName { get { return m_ClassName; } }
 
         /// <summary>
         /// The name of the file containing the method which issued the log message.
         /// </summary>
-        public string FileName { get { return m_FileName; } }
+        public string? FileName { get { return m_FileName; } }
 
         /// <summary>
         /// The line within the file at which the log message was issued.
