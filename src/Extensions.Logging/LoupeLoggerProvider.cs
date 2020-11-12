@@ -64,7 +64,7 @@ namespace Loupe.Extensions.Logging
         /// Starts a new Scope.
         /// </summary>
         /// <param name="state">The state from <see cref="ILogger.BeginScope{TState}"/>.</param>
-        /// <typeparam name="T">The type of the <see cref="state"/> parameter.</typeparam>
+        /// <typeparam name="T">The type of the state parameter.</typeparam>
         /// <returns>A new logging scope.</returns>
         internal IDisposable BeginScope<T>(T state)
         {

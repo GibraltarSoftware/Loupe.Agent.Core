@@ -4,7 +4,11 @@ using Gibraltar.Data;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 using System.Diagnostics;
+#if NET5_0
+using System.IO.Compression;
+#else
 using Ionic.Zlib;
+#endif
 
 #pragma warning disable 1591
 
@@ -90,10 +94,14 @@ namespace Gibraltar.Monitor.Serialization
             if (majorVersion > 1)
             {
                 //Be sure whatever GZipStream you use supports flushing..
+#if NET5_0
+                m_PacketStream = new GZipStream(m_OutputStream, CompressionLevel.Fastest, true);
+#else
                 m_PacketStream = new GZipStream(m_OutputStream, CompressionMode.Compress, CompressionLevel.Default, true)
                 {
                     FlushMode = FlushType.Sync
                 };
+#endif
             }
             else
             {
@@ -261,7 +269,7 @@ namespace Gibraltar.Monitor.Serialization
 
         public SessionHeader SessionHeader { get { return m_SessionHeader; } }
 
-        #region IDisposable Members
+#region IDisposable Members
 
         ///<summary>
         ///Performs application-defined tasks associated with freeing, releasing, or resetting managed resources.
@@ -302,6 +310,6 @@ namespace Gibraltar.Monitor.Serialization
             }
         }
 
-        #endregion
+#endregion
     }
 }

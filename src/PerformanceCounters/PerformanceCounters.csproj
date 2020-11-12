@@ -1,51 +1,63 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
-    <AssemblyName>Loupe.Agent.PerformanceCounters</AssemblyName>
-    <RootNamespace>Loupe.Agent.PerformanceCounters</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.9.0.0</Version>
-    <FileVersion>4.9.0.0</FileVersion>
-    <AssemblyVersion>4.8.0.0</AssemblyVersion>
-    <Authors>Gibraltar Software, Inc.</Authors>
-    <Product>Loupe</Product>
-    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
-    <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIcon>loupe-192x192.png</PackageIcon>
-    <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <Description>The Loupe Agent for Windows Performance Counters - automatically record key performance counters to Loupe for analysis along with the rest of your session's data.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>bin\Loupe.Agent.PerformanceCounters.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net461;net5.0-windows</TargetFrameworks>
+		<AssemblyName>Loupe.Agent.PerformanceCounters</AssemblyName>
+		<RootNamespace>Loupe.Agent.PerformanceCounters</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>4.9.0.0</Version>
+		<FileVersion>4.9.0.0</FileVersion>
+		<AssemblyVersion>4.8.0.0</AssemblyVersion>
+		<Authors>Gibraltar Software, Inc.</Authors>
+		<Product>Loupe</Product>
+		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
+		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+		<PackageIcon>loupe-192x192.png</PackageIcon>
+		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<Description>The Loupe Agent for Windows Performance Counters - automatically record key performance counters to Loupe for analysis along with the rest of your session's data.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+		<DocumentationFile>bin\Loupe.Agent.PerformanceCounters.xml</DocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Internal\**" />
-    <EmbeddedResource Remove="Internal\**" />
-    <None Remove="Internal\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Internal\**" />
+		<EmbeddedResource Remove="Internal\**" />
+		<None Remove="Internal\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
-    <ProjectReference Include="..\Services\Services.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Extensibility\Extensibility.csproj" />
+		<ProjectReference Include="..\Services\Services.csproj" />
+	</ItemGroup>
+	<Choose>
+		<When Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net461'">
+			<ItemGroup>
+				<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
-  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
 </Project>

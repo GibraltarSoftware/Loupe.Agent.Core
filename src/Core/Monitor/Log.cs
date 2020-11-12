@@ -1704,7 +1704,7 @@ namespace Gibraltar.Monitor
         private static string GetPackagerFileNamePath()
         {
             //assume the packager assembly is in our directory, what path would that be?
-            string proposedPath = typeof(Log).GetTypeInfo().Assembly.CodeBase;
+            string proposedPath = typeof(Log).GetTypeInfo().Assembly.Location;
 
             //get rid of the standard code base prefix if it's there.
             if (proposedPath.StartsWith(@"file:", StringComparison.OrdinalIgnoreCase))
