@@ -27,6 +27,7 @@ jobs:
       SourceFolder: '$(Agent.TempDirectory)'
       Contents: 'loupe.agent.snk'
       TargetFolder: '$(Build.SourcesDirectory)'
+      overWrite: true
 
   - task: NuGetToolInstaller@1
 
