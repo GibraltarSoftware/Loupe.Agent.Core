@@ -2,10 +2,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RootNamespace>AspNetCore.Tests</RootNamespace>
+    <RootNamespace>Loupe.AspNetCore.Tests</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\loupe.test.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>Loupe.AspNetCore.Tests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
