@@ -1,4 +1,4 @@
-﻿#if(NETCORE3)
+﻿#if(!NETCOREAPP2_1)
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
