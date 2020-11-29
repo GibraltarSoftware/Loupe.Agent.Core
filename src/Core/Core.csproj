@@ -1,59 +1,77 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <AssemblyName>Loupe.Core.NETCore</AssemblyName>
-    <RootNamespace>Gibraltar</RootNamespace>
-    <Version>4.9.0.0</Version>
-    <FileVersion>4.9.0.0</FileVersion>
-    <AssemblyVersion>4.8.0.0</AssemblyVersion>
-    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
-    <Description>Internal functionality for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
-    <Product>Loupe</Product>
-    <Company>Gibraltar Software, Inc.</Company>
-    <Authors>Gibraltar Software, Inc.</Authors>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Loupe.Agent.Core.Internal</PackageId>
-    <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-    <PackageIcon>loupe-192x192.png</PackageIcon>
-    <DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net461;net5.0;</TargetFrameworks>
+		<AssemblyName>Loupe.Core.NETCore</AssemblyName>
+		<RootNamespace>Gibraltar</RootNamespace>
+		<Version>4.9.0.0</Version>
+		<FileVersion>4.9.0.0</FileVersion>
+		<AssemblyVersion>4.8.0.0</AssemblyVersion>
+		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
+		<Description>Internal functionality for the Loupe Agent for .NET Core.  Add Loupe.Agent.Core to your project to use Loupe.</Description>
+		<Product>Loupe</Product>
+		<Company>Gibraltar Software, Inc.</Company>
+		<Authors>Gibraltar Software, Inc.</Authors>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageId>Loupe.Agent.Core.Internal</PackageId>
+		<DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+		<PackageIcon>loupe-192x192.png</PackageIcon>
+		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<PackageTags>Loupe,logging,diagnostics</PackageTags>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Server\Data\**" />
+		<EmbeddedResource Remove="Server\Data\**" />
+		<None Remove="Server\Data\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Server\Data\**" />
-    <EmbeddedResource Remove="Server\Data\**" />
-    <None Remove="Server\Data\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Server\Client\Data\Repository.xsd" />
+		<None Remove="Server\Client\Data\RepositoryGen.bat" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Server\Client\Data\Repository.xsd" />
-    <None Remove="Server\Client\Data\RepositoryGen.bat" />
-  </ItemGroup>
+	<Choose>
+		<When Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net461'">
+			<ItemGroup>
+				<PackageReference Include="DotNetZip" Version="1.13.3" />
+				<PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+				<PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DotNetZip" Version="1.13.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Extensibility\Extensibility.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,52 +1,71 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
-    <RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
-    <Version>4.9.0.0</Version>
-    <FileVersion>4.9.0.0</FileVersion>
-    <AssemblyVersion>4.8.0.0</AssemblyVersion>
-    <Authors>Gibraltar Software, Inc.</Authors>
-    <Product>Loupe</Product>
-    <Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
-    <PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
-    <PackageIcon>loupe-192x192.png</PackageIcon>
-    <RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <Description>The Loupe Agent for Entity Framework Core - automatically record performance and diagnostic information for EF Core data access.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Agent\Agent.csproj" />
-    <ProjectReference Include="..\Extensibility\Extensibility.csproj">
-      <Project>{151676AD-A855-4717-8E1B-C113E5E5C89A}</Project>
-      <Name>Extensibility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Services\Services.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
+		<RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
+		<Version>4.9.0.0</Version>
+		<FileVersion>4.9.0.0</FileVersion>
+		<AssemblyVersion>4.8.0.0</AssemblyVersion>
+		<Authors>Gibraltar Software, Inc.</Authors>
+		<Product>Loupe</Product>
+		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
+		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+		<PackageIcon>loupe-192x192.png</PackageIcon>
+		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<Description>The Loupe Agent for Entity Framework Core - automatically record performance and diagnostic information for EF Core data access.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+		<DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
+		<PackageTags>Loupe,entity-framework-core,EFCore,logging,diagnostics</PackageTags>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+	<Choose>
+		<When Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net461'">
+			<ItemGroup>
+				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.0" />
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="5.0.0-preview.3.20215.2" />
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Agent\Agent.csproj" />
+		<ProjectReference Include="..\Extensibility\Extensibility.csproj">
+			<Project>{151676AD-A855-4717-8E1B-C113E5E5C89A}</Project>
+			<Name>Extensibility</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Services\Services.csproj" />
+	</ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿#if(!NETCORE3)
+﻿#if(NETCOREAPP2_1)
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
