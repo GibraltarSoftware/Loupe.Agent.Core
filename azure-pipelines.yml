@@ -7,7 +7,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   major: 4
-  minor: 9
+  minor: 10
   revision: 0
   fileVersion: '$(Build.BuildNumber)'
 
@@ -45,7 +45,9 @@ jobs:
   - task: CopyFiles@2
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)/src'
-      contents: '**/*.nupkg'
+      contents: |
+        '**/*.nupkg'
+        '**/*.snupkg'
       flattenFolders: true
       targetFolder: '$(Build.ArtifactStagingDirectory)/packages'
 

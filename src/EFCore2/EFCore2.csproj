@@ -26,6 +26,7 @@
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
+		<PackageTags>Loupe,entity-framework-core,EFCore,logging,diagnostics</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

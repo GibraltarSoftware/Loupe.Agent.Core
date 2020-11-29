@@ -29,6 +29,7 @@
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<PackageTags>Loupe,logging,diagnostics</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

@@ -28,6 +28,7 @@
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<DocumentationFile>bin\Loupe.Agent.AspNetCore.xml</DocumentationFile>
 		<Nullable>enable</Nullable>
+		<PackageTags>Loupe,logging,diagnostics,aspnetcore</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

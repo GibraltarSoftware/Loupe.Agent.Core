@@ -25,6 +25,7 @@
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<DocumentationFile>bin\Loupe.Agent.PerformanceCounters.xml</DocumentationFile>
+		<PackageTags>Loupe,diagnostics,performance</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
