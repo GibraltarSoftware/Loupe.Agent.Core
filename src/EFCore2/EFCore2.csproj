@@ -4,9 +4,9 @@
 		<LangVersion>latest</LangVersion>
 		<AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
 		<RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
-		<Version>4.9.0.0</Version>
-		<FileVersion>4.9.0.0</FileVersion>
-		<AssemblyVersion>4.8.0.0</AssemblyVersion>
+		<Version>4.10.0.0</Version>
+		<FileVersion>4.10.0.0</FileVersion>
+		<AssemblyVersion>4.10.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Product>Loupe</Product>
 		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
@@ -47,7 +47,7 @@
 		</When>
 		<Otherwise>
 			<ItemGroup>
-				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="5.0.0-preview.3.20215.2" />
+				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />
 				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0" />
 			</ItemGroup>
 		</Otherwise>

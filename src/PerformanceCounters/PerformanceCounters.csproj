@@ -5,9 +5,9 @@
 		<AssemblyName>Loupe.Agent.PerformanceCounters</AssemblyName>
 		<RootNamespace>Loupe.Agent.PerformanceCounters</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>4.9.0.0</Version>
-		<FileVersion>4.9.0.0</FileVersion>
-		<AssemblyVersion>4.8.0.0</AssemblyVersion>
+		<Version>4.10.0.0</Version>
+		<FileVersion>4.10.0.0</FileVersion>
+		<AssemblyVersion>4.10.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Product>Loupe</Product>
 		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
