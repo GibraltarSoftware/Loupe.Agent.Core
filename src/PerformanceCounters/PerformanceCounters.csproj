@@ -16,6 +16,9 @@
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<Description>The Loupe Agent for Windows Performance Counters - automatically record key performance counters to Loupe for analysis along with the rest of your session's data.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<SignAssembly>true</SignAssembly>
@@ -23,7 +26,9 @@
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<DocumentationFile>bin\Loupe.Agent.PerformanceCounters.xml</DocumentationFile>
 	</PropertyGroup>
-
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="Internal\**" />
 		<EmbeddedResource Remove="Internal\**" />

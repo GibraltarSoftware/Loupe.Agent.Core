@@ -16,8 +16,11 @@
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageId>Loupe.Agent.Core.Internal</PackageId>
 		<DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -27,7 +30,9 @@
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
 	</PropertyGroup>
-
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
 	</ItemGroup>
