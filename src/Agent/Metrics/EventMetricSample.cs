@@ -11,6 +11,8 @@ namespace Gibraltar.Agent.Metrics
     /// metric implementation.</remarks>
     public sealed class EventMetricSample : IComparable<EventMetricSample>, IEquatable<EventMetricSample>
     {
+        private const string LogCategory = "Loupe.Event Metric";
+
         private readonly EventMetric m_Metric;
         private readonly Monitor.EventMetricSample m_WrappedSample;
 
@@ -58,7 +60,7 @@ namespace Gibraltar.Agent.Metrics
                 throw new ArgumentOutOfRangeException(nameof(name), name);
 #else
                 //trace log and return, nothing we can do.
-                Log.Warning("Unable to add metric value because the value definition could not be found.",
+                Log.Warning(LogCategory, "Unable to add metric value because the value definition could not be found.",
                     "Unable to add metric value to the current sample because there is no value definition named {1} for metric definition {0}",
                     Metric.Definition.Key, name);
                 return;
@@ -113,7 +115,7 @@ namespace Gibraltar.Agent.Metrics
                 throw new ArgumentOutOfRangeException(nameof(valueIndex), valueIndex.ToString(CultureInfo.CurrentCulture));
 #else
                 //trace log and return, nothing we can do.
-                Log.Warning("Unable to add metric value because the value definition could not be found.",
+                Log.Warning(LogCategory, "Unable to add metric value because the value definition could not be found.",
                     "There is no value definition at index {1} for metric definition {0}",
                     Metric.Definition.Key, valueIndex);
                 return;

@@ -18,7 +18,7 @@ namespace Gibraltar.Monitor
     /// metric implementation.</remarks>
     public class EventMetricSample : MetricSample, IComparable<EventMetricSample>, IEquatable<EventMetricSample>, IEventMetricSample
     {
-        private const string LogCategory = "Loupe";
+        private const string LogCategory = "Loupe.Event Metric";
 
         /// <summary>
         /// Create a new Event metric sample object for the provided metric and raw sample packet.
