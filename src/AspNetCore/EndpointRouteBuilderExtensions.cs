@@ -20,18 +20,8 @@ namespace Loupe.Agent.AspNetCore
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        
-#if (NETCOREAPP3_1)
-        /// <summary>
-        /// Add the Loupe JS client logging endpoint
-        /// </summary>
-        /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/></param>
-        /// <param name="pattern">The URL pattern for the endpoint. Defaults to <c>/loupe/log</c></param>
-        public static IEndpointConventionBuilder MapLoupeClientLogger(this IEndpointRouteBuilder endpoints, string pattern = "/loupe/log")
-        {
-            return endpoints.MapPost(pattern, Log);
-        }
-#else
+
+#if (NETCOREAPP2_1)
         /// <summary>
         /// Add the Loupe JS client logging endpoint
         /// </summary>
@@ -41,7 +31,7 @@ namespace Loupe.Agent.AspNetCore
         public static IApplicationBuilder UseLoupeClientLogger(this IApplicationBuilder app, string pattern = "/loupe/log")
         {
             var path = new PathString(pattern);
-            
+
             return app.Use(async (context, next) =>
             {
                 if (context.Request.Path.Equals(path))
@@ -52,6 +42,16 @@ namespace Loupe.Agent.AspNetCore
 
                 await next();
             });
+        }
+#else
+        /// <summary>
+        /// Add the Loupe JS client logging endpoint
+        /// </summary>
+        /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/></param>
+        /// <param name="pattern">The URL pattern for the endpoint. Defaults to <c>/loupe/log</c></param>
+        public static IEndpointConventionBuilder MapLoupeClientLogger(this IEndpointRouteBuilder endpoints, string pattern = "/loupe/log")
+        {
+            return endpoints.MapPost(pattern, Log);
         }
 #endif
 

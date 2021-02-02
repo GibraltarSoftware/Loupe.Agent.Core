@@ -65,6 +65,8 @@ namespace AspNetCore3.Sandbox
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                
+                endpoints.MapLoupeClientLogger(); //This enables the Loupe endpoint for remote logging to this web API.
             });
         }
     }
