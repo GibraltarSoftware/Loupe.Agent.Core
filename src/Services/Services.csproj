@@ -67,7 +67,6 @@
 				<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
 				<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
 				<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />
 				<PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
 			</ItemGroup>
 		</Otherwise>
