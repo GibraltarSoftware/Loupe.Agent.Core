@@ -1,8 +1,14 @@
-﻿#if(!NETCORE3)
+﻿#if  !(NETCOREAPP2_1)
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using Gibraltar.Agent;
 using Loupe.Agent.Core.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DiagnosticAdapter;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
@@ -11,9 +17,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
     /// Listener for ASP.NET Core diagnostics.
     /// </summary>
     /// <seealso cref="ILoupeDiagnosticListener" />
-    public class ActionDiagnosticListener : ILoupeDiagnosticListener
+    public class ActionDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
     {
-        private readonly ActionMetricFactory _actionMetricFactory;
+        private readonly RequestMetricFactory _requestMetricFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionDiagnosticListener"/> class.
@@ -21,119 +27,105 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <param name="agent">The Loupe agent.</param>
         public ActionDiagnosticListener(LoupeAgent agent)
         {
-            _actionMetricFactory = new ActionMetricFactory();
+            _requestMetricFactory = new RequestMetricFactory();
         }
 
-        /// <summary>
-        /// Called when a request begins.
-        /// </summary>
-        /// <param name="httpContext">The HTTP context.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
-        public virtual void BeginRequest(HttpContext httpContext)
-        {
-            httpContext?.Features.Set(_actionMetricFactory.Start(httpContext));
-        }
-
-        /// <summary>
-        /// Called when a request ends.
-        /// </summary>
-        /// <param name="httpContext">The HTTP context.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.EndRequest")]
-        public virtual void EndRequest(IProxyHttpContext httpContext)
-        {
-            httpContext?.Features.Get<ActionMetric>()?.Stop();
-        }
-
-        /// <summary>
-        /// Called before an Action is executed.
-        /// </summary>
-        /// <param name="actionExecutingContext">The action executing context.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnActionExecution")]
-        public virtual void BeforeOnActionExecution(ActionExecutingContext actionExecutingContext)
-        {
-            actionExecutingContext?.HttpContext?.Features.Set(new RequestMetric(actionExecutingContext));
-        }
-
-        /// <summary>
-        /// Called after an Action has been executed.
-        /// </summary>
-        /// <param name="actionExecutedContext">The action executed context.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnActionExecution")]
-        public virtual void AfterOnActionExecution(ActionExecutedContext actionExecutedContext)
-        {
-            actionExecutedContext?.HttpContext?.Features.Get<RequestMetric>()?.Record(actionExecutedContext);
-        }
-
-        /// <summary>
-        /// Called before a Resource is executed.
-        /// </summary>
-        /// <param name="resourceExecutingContext">The resource executing context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecuting")]
-        public virtual void BeforeOnResourceExecuting(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
-        {
-            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution(actionDescriptor);
-        }
-
-        /// <summary>
-        /// Called after a Resource has been executed.
-        /// </summary>
-        /// <param name="resourceExecutedContext">The resource executed context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecuted")]
-        public virtual void AfterOnResourceExecuted(IProxyActionContext resourceExecutedContext, IProxyActionDescriptor actionDescriptor)
-        {
-            resourceExecutedContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestExecution();
-        }
-
-        /// <summary>
-        /// Called before a Resource is executed.
-        /// </summary>
-        /// <param name="resourceExecutingContext">The resource executing context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnResourceExecution")]
-        public virtual void BeforeOnResourceExecution(IProxyActionContext resourceExecutingContext, IProxyActionDescriptor actionDescriptor)
-        {
-            resourceExecutingContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestExecution(actionDescriptor);
-        }
-
-        /// <summary>
-        /// Called after a Resource has been executed.
-        /// </summary>
-        /// <param name="resourceExecutedContext">The resource executed context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnResourceExecution")]
-        public virtual void AfterOnResourceExecution(IProxyActionContext resourceExecutedContext, IProxyActionDescriptor actionDescriptor)
-        {
-            resourceExecutedContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestExecution();
-        }
-
-        /// <summary>
-        /// Called before a request is authorized.
-        /// </summary>
-        /// <param name="actionContext">The action context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnAuthorization")]
-        public virtual void BeforeOnAuthorization(IProxyActionContext actionContext, IProxyActionDescriptor actionDescriptor)
-        {
-            actionContext?.HttpContext?.Features.Get<ActionMetric>()?.StartRequestAuthorization();
-        }
-
-        /// <summary>
-        /// Called after request authorization is completed.
-        /// </summary>
-        /// <param name="actionContext">The action context.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterOnAuthorization")]
-        public virtual void AfterOnAuthorization(IProxyActionContext actionContext, IProxyActionDescriptor actionDescriptor)
-        {
-            actionContext?.HttpContext?.Features.Get<ActionMetric>()?.StopRequestAuthorization();
-        }
-
-        /// <summary>
-        /// Returns the name of the <see cref="T:System.Diagnostics.DiagnosticSource" /> this implementation targets.
-        /// </summary>
+        /// <inheritdoc />
         public string Name => "Microsoft.AspNetCore";
+
+        /// <inheritdoc />
+        public void OnCompleted()
+        {
+        }
+
+        /// <inheritdoc />
+        public void OnError(Exception error)
+        {
+            Log.Error(error, LogWriteMode.Queued, "AspNetCoreDiagnosticListener", error.Message, "LoupeDiagnosticListener");
+        }
+
+        /// <inheritdoc />
+        public void OnNext(KeyValuePair<string, object> value)
+        {
+            try
+            {
+                switch (value.Value)
+                {
+                    case HttpContext httpContext:
+                        HandleHttpContextDiagnostic(httpContext, value.Key);
+                        break;
+                    case BeforeActionEventData beforeActionEventData:
+                        var requestMetric = beforeActionEventData.HttpContext.Features.Get<RequestMetric>();
+                        if (requestMetric == null)
+                            break;
+
+                        ActionMetricBase actionMetric = null;
+
+                        //create the right action metric for our and associate it with our request metric.
+                        switch (beforeActionEventData.ActionDescriptor)
+                        {
+                            case ControllerActionDescriptor controllerActionDescriptor:
+                                actionMetric = new ControllerMetric(beforeActionEventData.HttpContext, controllerActionDescriptor);
+                                break;
+                            case PageActionDescriptor pageActionDescriptor:
+                                actionMetric = new PageMetric(beforeActionEventData.HttpContext, pageActionDescriptor);
+                                break;
+                        }
+
+                        if (actionMetric != null)
+                        {
+                            requestMetric.ActionMetric = actionMetric;
+                        }
+
+                        break;
+                    case AfterActionEventData afterActionEventData:
+                        var metric = afterActionEventData.HttpContext.Features.Get<RequestMetric>();
+
+                        if (metric?.ActionMetric == null) break;
+
+                        metric.ActionMetric.Stop(Activity.Current);
+                        break;
+                    case BeforeAuthorizationFilterOnAuthorizationEventData beforeAuthorization:
+                        beforeAuthorization.AuthorizationContext.HttpContext.Features
+                            .Get<RequestMetric>()?.StartRequestAuthorization();
+                        break;
+                    case AfterAuthorizationFilterOnAuthorizationEventData afterAuthorization:
+                        afterAuthorization.AuthorizationContext.HttpContext.Features
+                            .Get<RequestMetric>()?.StopRequestAuthorization();
+                        break;
+                    case BeforeActionFilterOnActionExecutingEventData beforeActionExecuting:
+                        beforeActionExecuting.ActionExecutingContext.HttpContext.Features
+                            .Get<RequestMetric>()?.StartRequestExecution(beforeActionExecuting.ActionDescriptor.DisplayName
+                            ?? string.Empty);
+                        break;
+                    case AfterActionFilterOnActionExecutedEventData afterActionExecuted:
+                        afterActionExecuted.ActionExecutedContext.HttpContext.Features
+                            .Get<RequestMetric>()?.StopRequestExecution();
+                        break;
+                    case BeforeExceptionFilterOnException onException:
+                        onException.ExceptionContext.HttpContext.Features.Get<RequestMetric>()
+                            ?.SetException(onException.ExceptionContext.Exception);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                OnError(e);
+            }
+        }
+
+        private void HandleHttpContextDiagnostic(HttpContext httpContext, string key)
+        {
+            switch (key)
+            {
+                case "Microsoft.AspNetCore.Hosting.HttpRequestIn.Start":
+                    httpContext.Features.Set(_requestMetricFactory.Start(httpContext));
+                    break;
+                case "Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop":
+                    httpContext.Features.Get<RequestMetric>()?.Stop();
+                    break;
+            }
+        }
     }
 }
 #endif
