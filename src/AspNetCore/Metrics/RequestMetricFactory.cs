@@ -6,20 +6,20 @@ namespace Loupe.Agent.AspNetCore.Metrics
     /// <summary>
     /// Factory to create action metrics for requests as they start
     /// </summary>
-    public class ActionMetricFactory
+    public class RequestMetricFactory
     {
         private const string MetricCategory = "Web Site.Requests";
-        private const string MetricName = "Page Hit";
-        private const string MetricCaption = "Page Hit";
-        private const string MetricDescription = "Performance tracking data about every web page hit";
+        private const string MetricName = "request";
+        private const string MetricCaption = "Request";
+        private const string MetricDescription = "Performance tracking data about static content & external requests";
         private const string MetricSystem = "Gibraltar";
 
         private readonly EventMetric _metric;
 
         /// <summary>
-        /// Create a new action metric factory fur the current applciation
+        /// Create a new action metric factory fur the current application
         /// </summary>
-        public ActionMetricFactory()
+        public RequestMetricFactory()
         {
             var definition = GetMetricDefinition();
             _metric = EventMetric.Register(definition, null);
@@ -30,9 +30,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public ActionMetric Start(HttpContext context)
+        public RequestMetric Start(HttpContext context)
         {
-            return new ActionMetric(_metric, context);
+            return new RequestMetric(_metric, context);
         }
 
         private static EventMetricDefinition GetMetricDefinition()
@@ -108,6 +108,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
 
                 EventMetricDefinition.Register(ref eventMetricDefinition);
             }
+
             return eventMetricDefinition;
         }
     }

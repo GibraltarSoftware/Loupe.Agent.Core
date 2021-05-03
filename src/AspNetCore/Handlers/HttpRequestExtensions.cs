@@ -19,7 +19,7 @@ namespace Loupe.Agent.AspNetCore.Handlers
             && !IsBrowserLink(request);
         
         private static bool IsBrowserLink(HttpRequest request) =>
-            !(request.Path.HasValue && request.Path.Value.Contains("__browserLink", StringComparison.OrdinalIgnoreCase));
+            (request.Path.HasValue && request.Path.Value.Contains("__browserLink", StringComparison.OrdinalIgnoreCase));
         
         private static string PathExtension(HttpRequest request)
         {

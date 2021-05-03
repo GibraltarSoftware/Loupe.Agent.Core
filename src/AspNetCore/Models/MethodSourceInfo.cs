@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace Loupe.Agent.AspNetCore.Models
 {
+    /// <summary>
+    /// The Method Source Info for a client application
+    /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class MethodSourceInfo
     {
@@ -14,7 +17,7 @@ namespace Loupe.Agent.AspNetCore.Models
         public string? File { get; set; }
 
         /// <summary>
-        /// Class that the error occured in
+        /// Class that the error occurred in
         /// </summary>
         /// <value>The class.</value>
         public string? Class { get; set; }

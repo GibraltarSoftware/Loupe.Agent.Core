@@ -29,12 +29,6 @@ namespace AspNetCore3.Sandbox
         {
             services.AddHttpContextAccessor();
 
-            //In this sample we're doing Loupe initialization all in the Program IHostBuilder area.
-            //services.AddLoupe()
-            //    .AddAspNetCoreDiagnostics();
-
-            //services.AddLoupeLogging();
-
             services.AddControllersWithViews();
         }
 
@@ -55,6 +49,8 @@ namespace AspNetCore3.Sandbox
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseLoupeCookies(); //Add Loupe cookie-handling
+            
             app.UseRouting();
 
             app.UseAuthorization();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Gibraltar.Monitor;
+using Loupe.Extensibility.Data;
 
 namespace Loupe.Agent.Core.Services
 {
@@ -53,14 +55,24 @@ namespace Loupe.Agent.Core.Services
             foreach (var listener in _listeners)
             {
                 if (listener.Name != value.Name) continue;
+
                 if (listener is IObserver<KeyValuePair<string, object>> observer)
                 {
                     _subscriptions.Add(value.Subscribe(observer));
                 }
+#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
                 else
                 {
                     value.SubscribeWithAdapter(listener);
                 }
+#else
+                else
+                {
+                    //in .NET 5 we don't have the diagnostic adapter we used to.
+                    Gibraltar.Monitor.Log.Write(LogMessageSeverity.Information, "Loupe", "Skipping diagnostic source that isn't observable",
+                        "In .NET 5 and later we no longer have the adapter to read these.\r\n{0}", value.GetType().FullName);
+                }
+#endif
             }
         }
 
