@@ -12,7 +12,7 @@
 		<Company>Gibraltar Software, Inc.Gibraltar Software, Inc.</Company>
 		<Product>Loupe</Product>
 		<Description>Command line utility for sending Loupe data files to a Loupe server or packaging them into a Loupe package file for transport.</Description>
-		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
+		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
 		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>

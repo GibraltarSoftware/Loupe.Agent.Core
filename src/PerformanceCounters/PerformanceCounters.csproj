@@ -10,7 +10,7 @@
 		<AssemblyVersion>4.11.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Product>Loupe</Product>
-		<Copyright>Copyright © 2008-2020 Gibraltar Software, Inc.</Copyright>
+		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
 		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
