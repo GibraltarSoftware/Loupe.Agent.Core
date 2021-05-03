@@ -71,6 +71,7 @@ namespace Loupe.Agent.AspNetCore
             return valueString;
         }
 
+/*
         /// <summary>
         /// Store a request metric into the HTTP context for later use
         /// </summary>
@@ -121,6 +122,7 @@ namespace Loupe.Agent.AspNetCore
         {
             return context.Properties[HttpContextMetricPrefix] as TMetric;
         }
+*/
 
         internal static string? GetSessionId(this HttpContext context)
         {
