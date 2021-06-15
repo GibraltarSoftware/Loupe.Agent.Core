@@ -5,8 +5,16 @@ using Xunit;
 
 namespace Extensions.Logging.Tests
 {
+    [Collection("Loupe")]
     public class LoupeLogEnricherTests
     {
+        private readonly LoupeTestFixture _fixture;
+
+        public LoupeLogEnricherTests(LoupeTestFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
         [Fact]
         public void CreatesJsonFromScope()
         {

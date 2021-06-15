@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Threading;
 using Gibraltar.Agent;
 using Loupe.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Loupe.Extensions.Logging
 {
@@ -17,6 +19,9 @@ namespace Loupe.Extensions.Logging
 #endif
     public class LoupeLoggerProvider : ILoggerProvider
     {
+        private readonly ConcurrentDictionary<string, LoupeLogger> _loggers =
+            new ConcurrentDictionary<string, LoupeLogger>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LoupeLoggerProvider"/> class.
         /// </summary>
@@ -24,7 +29,7 @@ namespace Loupe.Extensions.Logging
         public LoupeLoggerProvider(IConfiguration configuration)
         {
             var agentConfiguration = new AgentConfiguration();
-            configuration.GetSection("Loupe").Bind(agentConfiguration);
+            configuration?.GetSection("Loupe")?.Bind(agentConfiguration);
             Log.StartSession(agentConfiguration);
         }
 
@@ -49,8 +54,10 @@ namespace Loupe.Extensions.Logging
         /// </summary>
         /// <param name="categoryName">The category name for messages produced by the logger.</param>
         /// <returns>A new <see cref="ILogger"/> instance.</returns>
-        public ILogger CreateLogger(string categoryName) => new LoupeLogger(this, categoryName);
-
+        public ILogger CreateLogger(string categoryName) => _loggers.TryGetValue(categoryName, out var provider)
+            ? provider
+            : _loggers.GetOrAdd(categoryName, new LoupeLogger(this, categoryName));
+    
         // AsyncLocal field to hold CurrentScope
         private readonly AsyncLocal<LoupeLoggerScope> _scope = new AsyncLocal<LoupeLoggerScope>();
 
@@ -70,5 +77,7 @@ namespace Loupe.Extensions.Logging
         {
             return new LoupeLoggerScope(this, state);
         }
+
+
     }
 }
