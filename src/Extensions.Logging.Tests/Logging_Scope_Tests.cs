@@ -38,9 +38,9 @@ namespace Extensions.Logging.Tests
 
             using (logger.BeginScope(new Dictionary<string, object>
             {
-                {"First", "This is the first scope value"},
-                {"Second", 2000},
-                {"Third", DateTimeOffset.UtcNow}
+                {"Order", "This is the first scope value"},
+                {"OrderQuantity", 2000},
+                {"OrderTimestamp", DateTimeOffset.UtcNow}
             }))
             {
                 logger.LogInformation("This log message will have three scope elements associated with it.");
