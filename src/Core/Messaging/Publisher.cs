@@ -628,6 +628,7 @@ namespace Gibraltar.Messaging
                         //OK, but *can* we?  We don't want to go too often...
                         if (m_NextAutoSendAllowed < DateTimeOffset.UtcNow)
                         {
+                            m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultSendDelay);
                             try
                             {
                                 Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true));
@@ -636,7 +637,6 @@ namespace Gibraltar.Messaging
                             {
                                 //we never want to log this because we're in the middle of the publisher pipeline..
                             }
-                            m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultSendDelay);
                         }
                         else
                         {
