@@ -1142,7 +1142,7 @@ namespace Gibraltar.Monitor
             if (s_Initialized == false)
                 return;
 
-            EndFile(1, reason); // Pass on reason, attribute it to our immediate caller.
+            EndFile(1, reason, false); // Pass on reason, attribute it to our immediate caller.
         }
 
         /// <summary>
@@ -1155,6 +1155,24 @@ namespace Gibraltar.Monitor
         /// <param name="skipFrames">The number of stack frames to skip out to find the original caller.</param>
         /// <param name="reason">An optionally-declared reason for invoking this operation (may be null or empty).</param>
         public static void EndFile(int skipFrames, string reason)
+        {
+            if (s_Initialized == false)
+                return;
+
+            EndFile(1, reason, false); // Pass on reason, attribute it to our immediate caller.
+        }
+
+        /// <summary>
+        /// End the current log file (but not the session) and open a new file to continue logging.
+        /// </summary>
+        /// <remarks>This method is provided to support user-initiated roll-over to a new log file
+        /// (instead of waiting for an automatic maintenance roll-over) in order to allow the logs of
+        /// an ongoing session up to that point to be collected and submitted (or opened in the viewer)
+        /// for analysis without shutting down the subject application.</remarks>
+        /// <param name="skipFrames">The number of stack frames to skip out to find the original caller.</param>
+        /// <param name="reason">An optionally-declared reason for invoking this operation (may be null or empty).</param>
+        /// <param name="suppressLogging">True to disable all log messages.</param>
+        internal static void EndFile(int skipFrames, string reason, bool suppressLogging)
         {
             if (s_Initialized == false)
                 return;
@@ -1183,21 +1201,30 @@ namespace Gibraltar.Monitor
                 formatArg1 = reason;
             }
 
-            // Make a packet to mark the end of the current log file and why it ended there.
-            IMessengerPacket endPacket = MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
-                                                       sourceProvider, null, null, null,
-                                                       string.Format(endFormat, formatArg0, formatArg1), null);
+            var packetList = new List<IMessengerPacket>(3);
+
+            if (!suppressLogging)
+            {
+                // Make a packet to mark the end of the current log file and why it ended there.
+                packetList.Add(MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
+                    sourceProvider, null, null, null,
+                    string.Format(endFormat, formatArg0, formatArg1), null));
+            }
+
 
             // Make a command packet to trigger the actual file close.
-            IMessengerPacket commandPacket = new CommandPacket(MessagingCommand.CloseFile);
+            packetList.Add(new CommandPacket(MessagingCommand.CloseFile));
 
-            // Make a packet to force a new file open, mark why it rolled over, and key off of for completion.
-            IMessengerPacket newPacket = MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
-                                                       sourceProvider, null, null, null,
-                                                       string.Format(newFormat, formatArg0, formatArg1), null);
+            if (!suppressLogging)
+            {
+                // Make a packet to force a new file open, mark why it rolled over, and key off of for completion.
+                packetList.Add(MakeLogPacket(LogMessageSeverity.Information, ThisLogSystem, Category,
+                    sourceProvider, null, null, null,
+                    string.Format(newFormat, formatArg0, formatArg1), null));
+            }
 
             // Now send them as a batch to enforce back-to-back processing, and wait for the last one to commit to disk.
-            Write(new [] { endPacket, commandPacket, newPacket }, LogWriteMode.WaitForCommit);
+            Write(packetList.ToArray(), LogWriteMode.WaitForCommit);
         }
 
         /// <summary>
@@ -1345,6 +1372,7 @@ namespace Gibraltar.Monitor
             StartSession(configuration, new MessageSourceProvider(skipFrames + 1, true), reason);
         }
 
+
         /// <summary>
         /// Called to activate the logging system.  If it is already active then this has no effect.
         /// </summary>
@@ -1385,11 +1413,25 @@ namespace Gibraltar.Monitor
         /// <param name="asyncSend"></param>
         /// <returns>True if the send was processed, false if it was not due to configuration or another active send</returns>
         /// <remarks>Either a criteria or sessionMatchPredicate must be provided</remarks>
-        public static async Task<bool> SendSessions(SessionCriteria? criteria, Predicate<ISessionSummary> sessionMatchPredicate, bool asyncSend)
+        public static Task<bool> SendSessions(SessionCriteria? criteria,
+            Predicate<ISessionSummary> sessionMatchPredicate, bool asyncSend) =>
+            SendSessions(criteria, sessionMatchPredicate, asyncSend, false);
+
+        /// <summary>
+        /// Send sessions using packager
+        /// </summary>
+        /// <param name="criteria">Optional.  A session criteria to use</param>
+        /// <param name="sessionMatchPredicate">Optional.  A session match predicate to use</param>
+        /// <param name="asyncSend"></param>
+        /// <param name="suppressLogging">True for internal calls to disable logging</param>
+        /// <returns>True if the send was processed, false if it was not due to configuration or another active send</returns>
+        /// <remarks>Either a criteria or sessionMatchPredicate must be provided</remarks>
+        internal static async Task<bool> SendSessions(SessionCriteria? criteria, Predicate<ISessionSummary> sessionMatchPredicate, bool asyncSend, bool suppressLogging)
         {
             if ((criteria.HasValue == false) && (sessionMatchPredicate == null))
             {
-                Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to no criteria specified", "A session match predicate wasn't provided so nothing would be selected to send, skipping the send.");
+                if (!suppressLogging)
+                    Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to no criteria specified", "A session match predicate wasn't provided so nothing would be selected to send, skipping the send.");
                 return false;
             }
 
@@ -1410,7 +1452,9 @@ namespace Gibraltar.Monitor
             if (newPackager == null)
             {
                 //someone else is sending
-                Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to ongoing send", "There is already a packager session send going on for the current application so this second request will be ignored to prevent interference.");
+                if (!suppressLogging)
+                    Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to ongoing send", 
+                        "There is already a packager session send going on for the current application so this second request will be ignored to prevent interference.");
             }
             else
             {
@@ -1432,9 +1476,9 @@ namespace Gibraltar.Monitor
                         newPackager.EndSend += Packager_EndSend;
 
                         if (criteria.HasValue)
-                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, asyncSend);
+                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, asyncSend, suppressLogging);
                         else
-                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, asyncSend);
+                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, asyncSend, suppressLogging);
 
                         result = true;
                     }
@@ -1445,8 +1489,9 @@ namespace Gibraltar.Monitor
                             ? message
                             : connectionStatus?.Message;
 
-                        Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to configuration", 
-                            description);
+                        if (!suppressLogging)
+                            Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to configuration", 
+                                description);
 
                         //no good, dispose and clear the packager.
                         lock(s_SyncObject)

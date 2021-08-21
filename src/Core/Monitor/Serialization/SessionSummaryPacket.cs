@@ -672,7 +672,7 @@ namespace Gibraltar.Monitor.Serialization
         {
             int myHash = base.GetHashCode(); // Fold in hash code for inherited base type
 
-            if (m_ComputerId != null)
+            if (m_ComputerId != Guid.Empty)
                 myHash ^= m_ComputerId.GetHashCode(); // Fold in hash code for string ProductName
 
             if (m_ProductName != null)

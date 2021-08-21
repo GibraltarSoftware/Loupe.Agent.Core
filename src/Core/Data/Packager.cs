@@ -236,7 +236,31 @@ namespace Gibraltar.Data
                 return;
 
             AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
-                new object[] { sessions, markAsRead, purgeSentSessions, serverConfiguration }, 
+                new object[] { sessions, markAsRead, purgeSentSessions, serverConfiguration, false }, 
+                asyncSend);
+        }
+
+        /// <summary>
+        /// Send the specified packages to our session data server as configured
+        /// </summary>
+        /// <param name="sessions">The set of match rules to apply to sessions to determine what to send.</param>
+        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="suppressLogging">True to disable activity logging (typically because this is an automatic packager operation)</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
+        /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
+        /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
+        /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
+        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
+        internal void SendToServer(SessionCriteria sessions, bool markAsRead, bool purgeSentSessions, bool asyncSend, bool suppressLogging,
+            ServerConfiguration serverConfiguration = null)
+        {
+            if (sessions == SessionCriteria.None)
+                return;
+
+            AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
+                new object[] { sessions, markAsRead, purgeSentSessions, serverConfiguration, suppressLogging },
                 asyncSend);
         }
 
@@ -259,7 +283,32 @@ namespace Gibraltar.Data
                 throw new ArgumentNullException(nameof(sessionMatchPredicate));
 
             AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
-                new object[] { sessionMatchPredicate, markAsRead, purgeSentSessions, serverConfiguration },
+                new object[] { sessionMatchPredicate, markAsRead, purgeSentSessions, serverConfiguration, false },
+                asyncSend);
+        }
+
+
+        /// <summary>
+        /// Send the specified packages to our session data server as configured
+        /// </summary>
+        /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
+        /// <param name="markAsRead">True to have every included session marked as read upon successful completion.</param>
+        /// <param name="purgeSentSessions">True to have every included session removed from the local repository upon successful completion.</param>
+        /// <param name="serverConfiguration">Optional.  The connection options to use instead of the current configured server connection</param>
+        /// <param name="asyncSend">True to have the package and send process run asynchronously.</param>
+        /// <param name="suppressLogging">True to disable activity logging (typically because this is an automatic packager operation)</param>
+        /// <returns>The Package Send Event Arguments object that was also used for the EndSend event.</returns>
+        /// <remarks>The EndSend event will be raised when the send operation completes.</remarks>
+        /// <exception cref="GibraltarException">The server couldn't be contacted or there was a communication error.</exception>
+        /// <exception cref="ArgumentException">The server configuration specified is invalid.</exception>
+        internal void SendToServer(Predicate<ISessionSummary> sessionMatchPredicate, bool markAsRead, bool purgeSentSessions, bool asyncSend, bool suppressLogging,
+            ServerConfiguration serverConfiguration = null)
+        {
+            if (sessionMatchPredicate == null)
+                throw new ArgumentNullException(nameof(sessionMatchPredicate));
+
+            AsyncTaskExecute(AsyncSendToServer, "Sending Sessions",
+                new object[] { sessionMatchPredicate, markAsRead, purgeSentSessions, serverConfiguration, suppressLogging },
                 asyncSend);
         }
 
@@ -367,11 +416,9 @@ namespace Gibraltar.Data
         /// <summary>
         /// Get a dataset of all of the sessions that should be included in our package
         /// </summary>
-        /// <param name="sessionCriteria"></param>
-        /// <param name="progressMonitors"></param>
-        /// <param name="hasProblemSessions"></param>
         /// <returns></returns>
-        protected ISessionSummaryCollection FindPackageSessions(SessionCriteria sessionCriteria, ProgressMonitorStack progressMonitors, out bool hasProblemSessions)
+        protected ISessionSummaryCollection FindPackageSessions(SessionCriteria sessionCriteria, ProgressMonitorStack progressMonitors, 
+            bool suppressLogging, out bool hasProblemSessions)
         {
             if (sessionCriteria == SessionCriteria.None)
             {
@@ -389,7 +436,7 @@ namespace Gibraltar.Data
                 //special case:  if session criteria includes active session then we have to split the file.
                 //Go ahead and end the current file.  We need to be sure that there is an up to date file when the copy runs.
                 if ((SessionCriteria.ActiveSession & sessionCriteria) == SessionCriteria.ActiveSession)
-                    Log.EndFile("Creating Package including active session");
+                    Log.EndFile( 0,"Creating Package including active session", suppressLogging);
 
                 //run the maintenance merge to make sure we have the latest sessions.
                 ourMonitor.Update("Updating Session List", completedSteps++);
@@ -411,7 +458,8 @@ namespace Gibraltar.Data
         /// Get a dataset of all of the sessions that should be included in our package
         /// </summary>
         /// <returns></returns>
-        protected ISessionSummaryCollection FindPackageSessions(Predicate<ISessionSummary> sessionPredicate, ProgressMonitorStack progressMonitors, out bool hasProblemSessions)
+        protected ISessionSummaryCollection FindPackageSessions(Predicate<ISessionSummary> sessionPredicate, ProgressMonitorStack progressMonitors, 
+            bool suppressLogging, out bool hasProblemSessions)
         {
             if (sessionPredicate == null)
             {
@@ -427,7 +475,7 @@ namespace Gibraltar.Data
             using (ProgressMonitor ourMonitor = progressMonitors.NewMonitor(this, "Finding Sessions to Report", 3))
             {
                 //Go ahead and end the current file - we will assume the caller may want it.  We need to be sure that there is an up to date file when the copy runs.
-                Log.EndFile("Creating Package including active session");
+                Log.EndFile(0, "Creating Package including active session", suppressLogging);
 
                 //run the maintenance merge to make sure we have the latest sessions.
                 ourMonitor.Update("Updating Session List", completedSteps++);
@@ -1063,8 +1111,8 @@ namespace Gibraltar.Data
                 try //so we can be sure we dispose the file transport package
                 {
                     bool hasProblemSessions;
-                    var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out hasProblemSessions)
-                        : FindPackageSessions(sessionPredicate, progressMonitors, out hasProblemSessions);
+                    var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, false, out hasProblemSessions)
+                        : FindPackageSessions(sessionPredicate, progressMonitors, false, out hasProblemSessions);
 
                     //see if there's anything to actually package...
                     if ((selectedSessions != null) && (selectedSessions.Count > 0))
@@ -1195,6 +1243,7 @@ namespace Gibraltar.Data
             bool markAsRead;
             bool purgeSentSessions;
             ProgressMonitorStack progressMonitors;
+            bool suppressLogging = false;
 
             ServerConfiguration serverConfiguration = null;
 
@@ -1215,6 +1264,7 @@ namespace Gibraltar.Data
                 markAsRead = (bool)arguments[1];
                 purgeSentSessions = (bool)arguments[2];
                 serverConfiguration = (ServerConfiguration)arguments[3];
+                suppressLogging = (bool) arguments[4];
                 progressMonitors = asyncTaskArguments.ProgressMonitors;
             }
             else
@@ -1233,9 +1283,11 @@ namespace Gibraltar.Data
                 purgeSentSessions = (bool)arguments[2];
                 serverConfiguration = (ServerConfiguration)arguments[3];
                 progressMonitors = (ProgressMonitorStack)arguments[4];
+                suppressLogging = (bool)arguments[5];
             }
 
-            LogSendToServer(markAsRead, purgeSentSessions, serverConfiguration);
+            if (!suppressLogging)
+                LogSendToServer(markAsRead, purgeSentSessions, serverConfiguration);
 
             //before we waste any time, lets see if we're going to be successful.
             if (serverConfiguration != null)
@@ -1262,8 +1314,8 @@ namespace Gibraltar.Data
                 ourMonitor.Update("Finding sessions...", 0);
 
                 bool hasProblemSessions;
-                var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, out hasProblemSessions)
-                    : FindPackageSessions(sessionPredicate, progressMonitors, out hasProblemSessions);
+                var selectedSessions = sessionCriteria.HasValue ? FindPackageSessions(sessionCriteria.Value, progressMonitors, suppressLogging, out hasProblemSessions)
+                    : FindPackageSessions(sessionPredicate, progressMonitors, suppressLogging, out hasProblemSessions);
 
                 //see if there's anything to actually package...
                 if ((selectedSessions != null) && (selectedSessions.Count > 0))

@@ -37,9 +37,6 @@
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<WarningsAsErrors />
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-		<DefineConstants>NETCORE3</DefineConstants>
-	</PropertyGroup>
 	<Choose>
 		<When Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
 			<ItemGroup>

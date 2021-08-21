@@ -631,7 +631,7 @@ namespace Gibraltar.Messaging
                             m_NextAutoSendAllowed = DateTimeOffset.UtcNow.Add(Notifier.DefaultSendDelay);
                             try
                             {
-                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true));
+                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true, Log.SilentMode));
                             }
                             catch (Exception)
                             {

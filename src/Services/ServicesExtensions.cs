@@ -89,6 +89,7 @@ namespace Loupe.Agent.Core.Services
                 services.AddSingleton(_ => new LoupeAgentConfigurationCallback(configure));
             }
 
+#if NET461 || NETSTANDARD2_0
             // Set up options for AgentConfiguration with callback and default ApplicationName from IHostingEnvironment
             services.AddOptions<AgentConfiguration>().Configure<IConfiguration, IHostingEnvironment, LoupeAgentConfigurationCallback>(
                 (options, configuration, hostingEnvironment, callback) =>
@@ -104,6 +105,23 @@ namespace Loupe.Agent.Core.Services
                         options.Packager.ApplicationName = hostingEnvironment.ApplicationName;
                     }
                 });
+#else
+            // Set up options for AgentConfiguration with callback and default ApplicationName from IHostingEnvironment
+            services.AddOptions<AgentConfiguration>().Configure<IConfiguration, IHostEnvironment, LoupeAgentConfigurationCallback>(
+                (options, configuration, hostEnvironment, callback) =>
+                {
+                    configuration.Bind("Loupe", options);
+                    callback?.Invoke(options);
+                    if (options.Packager == null)
+                    {
+                        options.Packager = new PackagerConfiguration { ApplicationName = hostEnvironment.ApplicationName };
+                    }
+                    else if (options.Packager.ApplicationName == null)
+                    {
+                        options.Packager.ApplicationName = hostEnvironment.ApplicationName;
+                    }
+                });
+#endif
         }
     }
 }

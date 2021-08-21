@@ -8,7 +8,7 @@ using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-#if NETCORE3
+#if !NETCOREAPP2_1
 using Microsoft.Extensions.Hosting;
 #endif
 
@@ -24,7 +24,7 @@ namespace Loupe.Agent.AspNetCore
         private readonly RequestDelegate _next;
         private readonly EventMetric _requestMetric;
 
-#if NETCORE3
+#if !NETCOREAPP2_1
         /// <summary>
         /// Constructs and instance of <see cref="LoupeMiddleware"/>.
         /// </summary>

@@ -7,7 +7,13 @@ namespace Loupe.Agent.AspNetCore.DetailBuilders
     {
         private readonly IRequestDetailBuilder _requestDetailBuilder;
 
-        const string DetailsFormat = "<UserAgent>{0}</UserAgent><ContentType>{1}</ContentType><ContentLength>{2}</ContentLength><IsLocal>{3}</IsLocal><IsSecureConnection>{4}</IsSecureConnection><UserHostAddress>{5}</UserHostAddress><UserHostName>{6}</UserHostName>";
+        const string DetailsFormat = "<UserAgent>{0}</UserAgent>\r\n" +
+                                     "<ContentType>{1}</ContentType>\r\n" +
+                                     "<ContentLength>{2}</ContentLength>\r\n" +
+                                     "<IsLocal>{3}</IsLocal>\r\n" +
+                                     "<IsSecureConnection>{4}</IsSecureConnection>\r\n" +
+                                     "<UserHostAddress>{5}</UserHostAddress>\r\n" +
+                                     "<UserHostName>{6}</UserHostName>";
 
         public RequestBlockBuilder(IRequestDetailBuilder requestDetailBuilder)
         {
