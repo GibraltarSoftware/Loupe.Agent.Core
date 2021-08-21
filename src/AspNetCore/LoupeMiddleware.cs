@@ -24,7 +24,7 @@ namespace Loupe.Agent.AspNetCore
         private readonly RequestDelegate _next;
         private readonly EventMetric _requestMetric;
 
-#if NETCORE3
+#if !NETCOREAPP2_1
         /// <summary>
         /// Constructs and instance of <see cref="LoupeMiddleware"/>.
         /// </summary>
