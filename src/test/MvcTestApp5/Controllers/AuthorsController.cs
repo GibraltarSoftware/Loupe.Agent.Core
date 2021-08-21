@@ -45,8 +45,7 @@ namespace MvcTestApp5.Controllers
 
             if (author == null)
             {
-                //throw new ArgumentOutOfRangeException("unable to find author by key");
-                Gibraltar.Agent.Log.SendSessions(SessionCriteria.ActiveSession);
+                throw new ArgumentOutOfRangeException("unable to find author by key");
                 return NotFound(key);
             }
 
