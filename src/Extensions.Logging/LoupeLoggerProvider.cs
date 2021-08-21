@@ -14,7 +14,7 @@ namespace Loupe.Extensions.Logging
     /// Loupe implementation of <see cref="ILoggerProvider"/>.
     /// </summary>
     /// <seealso cref="ILoggerProvider" />
-#if(NETCOREAPP2_0 || NETSTANDARD2_0)
+#if (NETCOREAPP2_0 || NETSTANDARD2_0 || NETSTANDARD2_1)
     [ProviderAlias("Loupe")]
 #endif
     public class LoupeLoggerProvider : ILoggerProvider

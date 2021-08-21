@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Loupe.Agent.PerformanceCounters;
 
 namespace MvcTestApp
 {
@@ -24,6 +25,7 @@ namespace MvcTestApp
             Host.CreateDefaultBuilder(args)
                 .AddLoupe(builder => builder.AddAspNetCoreDiagnostics()
                     .AddClientLogging() //The Loupe endpoint feature for your ASP.NET API
+                    .AddPerformanceCounters()
                     .AddEntityFrameworkCoreDiagnostics())//EF Core monitoring
                 .AddLoupeLogging()
                 .ConfigureWebHostDefaults(webBuilder =>

@@ -22,11 +22,14 @@ namespace MvcTestApp.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogInformation("The index was requested.\r\nThis message should be attributed to the authenticated user.");
             return View();
         }
 
         public IActionResult Privacy()
         {
+            _logger.LogInformation("The privacy page was requested.\r\nThis message should be attributed to the authenticated user.");
+
             return View();
         }
 
