@@ -4,7 +4,7 @@ using Gibraltar.Data;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 using System.Diagnostics;
-#if NET5_0
+#if NET5_0 || NETSTANDARD2_0_OR_GREATER
 using System.IO.Compression;
 #else
 using Ionic.Zlib;
@@ -94,13 +94,13 @@ namespace Gibraltar.Monitor.Serialization
             if (majorVersion > 1)
             {
                 //Be sure whatever GZipStream you use supports flushing..
-#if NET5_0
-                m_PacketStream = new GZipStream(m_OutputStream, CompressionLevel.Fastest, true);
-#else
+#if NET461 || NET462 || NET47 || NET471 || NET472 || NET48 
                 m_PacketStream = new GZipStream(m_OutputStream, CompressionMode.Compress, CompressionLevel.Default, true)
                 {
                     FlushMode = FlushType.Sync
                 };
+#else
+                m_PacketStream = new GZipStream(m_OutputStream, CompressionLevel.Fastest, true);
 #endif
             }
             else

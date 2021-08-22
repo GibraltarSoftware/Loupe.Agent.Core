@@ -1,13 +1,13 @@
 name: $(major).$(minor).$(revision)$(Rev:.r)
 trigger:
-- master
+- main
 
 variables:
   agentSolution: 'src/Agent.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   major: 4
-  minor: 11
+  minor: 12
   revision: 0
   fileVersion: '$(Build.BuildNumber)'
 
