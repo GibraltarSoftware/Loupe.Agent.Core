@@ -6,6 +6,7 @@ namespace Gibraltar.Monitor.Serialization
 {
     public class SessionPacketFactory : IPacketFactory
     {
+        private readonly string m_AssemblyInfoPacketType;
         private readonly string m_SessionStartInfoPacketType;
         private readonly string m_SessionEndInfoPacketType;
         private readonly string m_SessionFilePacketType;
@@ -15,6 +16,7 @@ namespace Gibraltar.Monitor.Serialization
         {
             //resolve the names of all the types we want to be able to get packets for
             //this lets us do a faster switch in CreatePacket
+            m_AssemblyInfoPacketType = typeof(AssemblyInfoPacket).Name;
             m_SessionStartInfoPacketType = typeof(SessionSummaryPacket).Name;
             m_SessionEndInfoPacketType = typeof(SessionClosePacket).Name;
             m_SessionFilePacketType = typeof(SessionFragmentPacket).Name;
@@ -36,6 +38,10 @@ namespace Gibraltar.Monitor.Serialization
             if (definition.TypeName == m_ThreadInfoPacketType)
             {
                 packet = new ThreadInfoPacket();
+            }
+            else if (definition.TypeName == m_AssemblyInfoPacketType)
+            {
+                packet = new AssemblyInfoPacket();
             }
             else if (definition.TypeName == m_SessionStartInfoPacketType)
             {
@@ -68,6 +74,7 @@ namespace Gibraltar.Monitor.Serialization
         /// <param name="packetReader"></param>
         public void Register(IPacketReader packetReader)
         {
+            packetReader.RegisterFactory(m_AssemblyInfoPacketType, this);
             packetReader.RegisterFactory(m_SessionStartInfoPacketType, this);
             packetReader.RegisterFactory(m_SessionEndInfoPacketType, this);
             packetReader.RegisterFactory(m_SessionFilePacketType, this);

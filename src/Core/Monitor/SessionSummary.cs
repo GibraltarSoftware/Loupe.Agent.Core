@@ -163,32 +163,10 @@ namespace Gibraltar.Monitor
                 m_Packet.DnsDomainName = string.Empty;
             }
 
-#if (NETCOREAPP2_0 || NETSTANDARD2_0)
             var os = System.Environment.OSVersion;
             m_Packet.OSPlatformCode = (int) os.Platform; //we copied this enum for our value.
             m_Packet.OSVersion = os.Version;
             m_Packet.OSServicePack = os.ServicePack;
-#else
-            var osDescription = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                m_Packet.OSPlatformCode = 2; //Win32NT
-                m_Packet.OSVersion = new Version(0,0); // BUG
-                m_Packet.OSServicePack = string.Empty; // BUG
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                m_Packet.OSPlatformCode = 4; //Unix
-                m_Packet.OSVersion = new Version(0, 0); // BUG
-                m_Packet.OSServicePack = string.Empty; // BUG
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                m_Packet.OSPlatformCode = 6; //OSX
-                m_Packet.OSVersion = new Version(0, 0); // BUG
-                m_Packet.OSServicePack = string.Empty; // BUG
-            }
-#endif
 
             try
             {
@@ -231,11 +209,7 @@ namespace Gibraltar.Monitor
 
 
                 m_Packet.MemoryMB = 0; // BUG
-#if (NETCOREAPP2_0 || NETSTANDARD2_0)
                 m_Packet.UserInteractive = System.Environment.UserInteractive;
-#else
-                m_Packet.UserInteractive = false; 
-#endif
 
                 //find the active screen resolution
                 if (m_AgentAppType == ApplicationType.Windows)

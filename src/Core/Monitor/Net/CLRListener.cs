@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -20,12 +21,18 @@ namespace Gibraltar.Monitor.Net
 
         private bool m_Disposed;
 
+        private bool m_AssemblyEventsEnabled; //protected by LOCK
+        private bool m_AssemblyLoadFailureEventsEnabled; //protected by LOCK
         private bool m_NetworkEventsEnabled; //protected by LOCK
+
+        //The assemblies dictionary is protected by ASSEMBLYLOCK
+        private readonly Dictionary<string, SessionAssemblyInfo> m_Assemblies = new Dictionary<string, SessionAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
 
         //the network states dictionary is protected by NETWORKSTATESLOCK
         private readonly Dictionary<string, NetworkState> m_NetworkStates = new Dictionary<string, NetworkState>(StringComparer.OrdinalIgnoreCase);
 
         private readonly object m_Lock = new object();
+        private readonly object m_AssemblyLock = new object();
         private readonly object m_NetworkStatesLock = new object();
 
         #region Private Class MessageSource
@@ -182,6 +189,29 @@ namespace Gibraltar.Monitor.Net
         {
             lock (m_Lock)
             {
+                if (configuration.EnableAssemblyEvents)
+                {
+                    if (m_AssemblyEventsEnabled == false)
+                        RegisterAssemblyEvents();
+                }
+                else
+                {
+                    if (m_AssemblyEventsEnabled)
+                        UnregisterAssemblyEvents();
+                }
+
+                if (configuration.EnableAssemblyLoadFailureEvents)
+                {
+                    if (m_AssemblyLoadFailureEventsEnabled == false)
+                        RegisterAssemblyLoadFailureEvents();
+                }
+                else
+                {
+                    if (m_AssemblyLoadFailureEventsEnabled)
+                        UnregisterAssemblyLoadFailureEvents();
+                }
+
+
                 if (configuration.EnableNetworkEvents)
                 {
                     if (m_NetworkEventsEnabled == false)
@@ -234,6 +264,86 @@ namespace Gibraltar.Monitor.Net
         #region Private Properties and Methods
 
 
+        private void RegisterAssemblyEvents()
+        {
+            try
+            {
+                m_AssemblyEventsEnabled = true;
+
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+
+
+            try
+            {
+                //Now we need to ensure we've recorded the information on assemblies that have been loaded so far.
+                EnsureAssembliesRecorded();
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
+
+        private void UnregisterAssemblyEvents()
+        {
+            try
+            {
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.AssemblyLoad -= AppDomain_AssemblyLoad;
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+            finally
+            {
+                m_AssemblyEventsEnabled = false;
+            }
+        }
+
+        private void RegisterAssemblyLoadFailureEvents()
+        {
+            try
+            {
+                m_AssemblyLoadFailureEventsEnabled = true;
+
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
+
+        private void UnregisterAssemblyLoadFailureEvents()
+        {
+            try
+            {
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.AssemblyResolve -= AppDomain_AssemblyResolve;
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+            finally
+            {
+                m_AssemblyLoadFailureEventsEnabled = false;
+            }
+        }
+
         private void RegisterNetworkEvents()
         {
             try
@@ -275,10 +385,44 @@ namespace Gibraltar.Monitor.Net
             }
         }
 
+        /// <summary>
+        /// Make sure we've recorded an SessionAssemblyInfo object for every assembly.
+        /// </summary>
+        private void EnsureAssembliesRecorded()
+        {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+
+            //this is thread safe because we are getting an array of the assemblies, then iterating THAT.
+            foreach (Assembly curAssembly in currentDomain.GetAssemblies())
+            {
+                RecordAssembly(curAssembly);
+            }
+        }
+
         private void EnsureNetworkInterfacesRecorded()
         {
             RecordNetworkState(false); // false if we want to record the initial baseline state without logging it.
             // It may not log it anyway, because we get initialized during Log initialization, so it just drops the writes.
+        }
+
+        private SessionAssemblyInfo RecordAssembly(Assembly newAssembly)
+        {
+            SessionAssemblyInfo newSessionAssemblyInfo = null;
+
+            lock (m_AssemblyLock) // a little pathological locking in case we get an assembly load event.
+            {
+                string fullName = newAssembly.FullName;
+                if ((string.IsNullOrEmpty(fullName) == false) && (m_Assemblies.ContainsKey(fullName) == false))
+                {
+                    newSessionAssemblyInfo = new SessionAssemblyInfo(newAssembly, Log.SessionSummary.PrivacyEnabled == false);
+                    m_Assemblies.Add(fullName, newSessionAssemblyInfo);
+                    Log.Write(newSessionAssemblyInfo.Packet);
+                }
+
+                System.Threading.Monitor.PulseAll(m_AssemblyLock);
+            }
+
+            return newSessionAssemblyInfo;
         }
 
         /// <summary>
@@ -767,6 +911,56 @@ namespace Gibraltar.Monitor.Net
 
         #region Event Handlers
 
+        private void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+        {
+            try
+            {
+                SessionAssemblyInfo newAssembly = RecordAssembly(args.LoadedAssembly);
+
+                //only log it if we got a new assembly back - otherwise it was a dupe or irrelevant.
+                if (newAssembly != null)
+                {
+                    string location = newAssembly.Location;
+                    if (string.IsNullOrEmpty(location))
+                    {
+                        if (Log.SessionSummary.PrivacyEnabled)
+                            location = "(suppressed for privacy)";
+                        else
+                            location = "(unknown)";
+                    }
+
+                    LogEvent(LogMessageSeverity.Verbose, "System.Events.Assembly",
+                        (string.IsNullOrEmpty(newAssembly.Name) ? "New Assembly Loaded" : "New Assembly Loaded - " + newAssembly.Name),
+                        "Name: {0}\r\nFull name: {1}\r\nLocation: {2}\r\n",
+                        newAssembly.Name, newAssembly.FullName, location);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private Assembly AppDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            try
+            {
+                bool ignoreResolution = false;
+                //wait:  the .NET runtime is constantly generating this event for XML Serialization...
+                if (args.Name.Contains(".XmlSerializers"))
+                    ignoreResolution = true;
+
+                if (ignoreResolution == false)
+                {
+                    LogEvent(LogMessageSeverity.Warning, "System.Events.Assembly", string.Format("Assembly '{0}' Not Found", args.Name),
+                             "The .NET runtime is attempting to load a referenced assembly and couldn't find it using normal resolution methods.\r\nIf the application supports dynamic assembly registration through the AssemblyResolve event it may still be located, in which case a log message indicating it was loaded will be recorded after this message.");
+                }
+            }
+            catch
+            {
+            }
+            return null; //we aren't modifying the state of whether it could resolve or not.
+        }
+
         private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
         {
             try
@@ -774,9 +968,8 @@ namespace Gibraltar.Monitor.Net
                 //we don't get any specific information from the event so we'll have to figure it out.
                 RecordNetworkState(true);
             }
-            catch (Exception ex)
+            catch
             {
-                GC.KeepAlive(ex);
             }
         }
 
