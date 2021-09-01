@@ -22,7 +22,10 @@ namespace Gibraltar.Monitor
         {
             m_Packet = new AssemblyInfoPacket();
             m_Packet.FullName = target.FullName;
+
+#if NET461 || NET462 || NET47 || NET471 || NET472 || NET48 
             m_Packet.GlobalAssemblyCache = target.GlobalAssemblyCache;
+#endif
             m_Packet.ImageRuntimeVersion = target.ImageRuntimeVersion;
 
             // Location path could contain user identity, so suppress it in privacy mode.
