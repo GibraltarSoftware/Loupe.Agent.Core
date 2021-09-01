@@ -6,7 +6,11 @@ namespace Loupe.Agent.AspNetCore.Handlers
 {
     internal static class CookieHandler
     {
-        public static void Handle(HttpContext context)
+        /// <summary>
+        /// Get the session Id from request cookies, if present.
+        /// </summary>
+        /// <param name="context"></param>
+        public static string GetSessionId(HttpContext context)
         {
             if (!context.Request.Cookies.TryGetValue(Constants.SessionId, out var sessionId))
             {
@@ -14,6 +18,8 @@ namespace Loupe.Agent.AspNetCore.Handlers
             }
 
             context.Items[Constants.SessionId] = sessionId;
+
+            return sessionId;
         }
 
         private static string SetSessionCookie(HttpContext context)

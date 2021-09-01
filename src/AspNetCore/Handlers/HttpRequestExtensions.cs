@@ -19,14 +19,14 @@ namespace Loupe.Agent.AspNetCore.Handlers
             && !IsBrowserLink(request);
         
         private static bool IsBrowserLink(HttpRequest request) =>
-            (request.Path.HasValue && request.Path.Value.Contains("__browserLink", StringComparison.OrdinalIgnoreCase));
+            (request.Path.HasValue && request.Path.Value!.Contains("__browserLink", StringComparison.OrdinalIgnoreCase));
         
         private static string PathExtension(HttpRequest request)
         {
             if (!request.Path.HasValue) return string.Empty;
             
             var pathValue = request.Path.Value;
-            var lastSlash = pathValue.LastIndexOf('/');
+            var lastSlash = pathValue!.LastIndexOf('/');
             if (lastSlash < 0) lastSlash = 0;
             var lastPeriod = pathValue.LastIndexOf('.', lastSlash);
             

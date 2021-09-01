@@ -65,7 +65,7 @@ namespace Loupe.Extensions.Logging
             if (!(state is IEnumerable<KeyValuePair<string, object>> pairs)) return;
             
             buffer = new ByteBufferWriter();
-            jsonWriter = new Utf8JsonWriter(buffer);
+            jsonWriter = new Utf8JsonWriter(buffer, new JsonWriterOptions {Indented = true});
             jsonWriter.WriteStartObject();
             
             Write(jsonWriter, propertySet, pairs);
