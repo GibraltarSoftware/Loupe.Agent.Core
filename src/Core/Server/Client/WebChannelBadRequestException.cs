@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 namespace Gibraltar.Server.Client
 {
+    /// <summary>
+    /// A Bad Request (400) Exception
+    /// </summary>
     public class WebChannelBadRequestException : WebChannelException
     {
         /// <summary>

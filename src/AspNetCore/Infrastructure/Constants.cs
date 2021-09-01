@@ -24,6 +24,6 @@ namespace Loupe.Agent.AspNetCore.Infrastructure {
         public const string AgentSessionId = "LoupeAgentSessionId";
         public const string ClientHeaderName = "loupe-agent-sessionId";
         internal const string LogSystem = "Loupe";
-        internal const string Category = "Loupe.Internal";
+        internal const string Category = "Loupe.AspNet";
     }
 }

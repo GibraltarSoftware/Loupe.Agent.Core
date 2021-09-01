@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using Loupe.Agent.AspNetCore.Infrastructure;
 using Loupe.Agent.AspNetCore.Metrics;
 using Microsoft.AspNetCore.Http;
 
@@ -126,13 +127,13 @@ namespace Loupe.Agent.AspNetCore
 
         internal static string? GetSessionId(this HttpContext context)
         {
-            return context.Items["LoupeSessionId"] as string;
+            return context.Items[Constants.SessionId] as string;
     
         }
 
         internal static string? GetAgentSessionId(this HttpContext context)
         {
-            return context.Items["LoupeAgentSessionId"] as string;
+            return context.Items[Constants.AgentSessionId] as string;
         }
     }
 }

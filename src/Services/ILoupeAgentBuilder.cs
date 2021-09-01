@@ -58,6 +58,9 @@ namespace Loupe.Agent.Core.Services
         /// <returns>The builder instance.</returns>
         ILoupeAgentBuilder AddApplicationUserProvider(Func<IPrincipal, Lazy<ApplicationUser>, bool> func);
 
+        /// <summary>
+        /// The .NET Dependency Injection Services Collection
+        /// </summary>
         IServiceCollection Services { get; }
     }
 }
