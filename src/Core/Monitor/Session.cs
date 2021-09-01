@@ -27,6 +27,7 @@ namespace Gibraltar.Monitor
         private readonly SessionFragmentCollection m_Fragments;
         private readonly ThreadInfoCollection m_Threads = new ThreadInfoCollection();
         private readonly ApplicationUserCollection m_Users = new ApplicationUserCollection();
+        private readonly SortedDictionary<string, SessionAssemblyInfo> m_Assemblies = new SortedDictionary<string, SessionAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
         private readonly LogMessageCollection m_Messages;
         private readonly MetricDefinitionCollection m_MetricDefinitions = new MetricDefinitionCollection();
 
@@ -296,6 +297,7 @@ namespace Gibraltar.Monitor
                         SessionClosePacket sessionClosePacket;
                         SessionFragmentPacket sessionFragmentPacket;
                         ThreadInfoPacket threadInfoPacket;
+                        AssemblyInfoPacket assemblyInfoPacket;
                         LogMessagePacket logMessagePacket;
                         MetricPacket metricPacket;
                         MetricSamplePacket metricSamplePacket;
@@ -410,6 +412,14 @@ namespace Gibraltar.Monitor
                             if (m_Threads.Contains(threadInfo) == false)
                             {
                                 m_Threads.Add(threadInfo);
+                            }
+                        }
+                        else if ((assemblyInfoPacket = nextPacket as AssemblyInfoPacket) != null)
+                        {
+                            var sessionAssemblyInfo = new SessionAssemblyInfo(assemblyInfoPacket);
+                            if (m_Assemblies.ContainsKey(sessionAssemblyInfo.FullName) == false)
+                            {
+                                m_Assemblies.Add(sessionAssemblyInfo.FullName, sessionAssemblyInfo);
                             }
                         }
                         else if ((applicationUserPacket = nextPacket as ApplicationUserPacket) != null)
@@ -752,6 +762,20 @@ namespace Gibraltar.Monitor
             {
                 //in this case we do NOT want to force data to load because we may be running in the iterator
                 return m_Users;
+            }
+        }
+
+        /// <summary>
+        /// The list of assemblies associated with this session.  Assemblies are sorted by their unique full names.
+        /// </summary>
+        public SortedDictionary<string, SessionAssemblyInfo> Assemblies
+        {
+            get
+            {
+                //make sure all files are loaded
+                EnsureDataLoaded(); //this is very fast if all are already loaded
+
+                return m_Assemblies;
             }
         }
 
