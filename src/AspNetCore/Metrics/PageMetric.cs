@@ -26,8 +26,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
         internal PageMetric(AspNetConfiguration options,
             ObjectPool<StringBuilder> stringBuilderPool, 
             HttpContext httpContext, 
-            PageActionDescriptor pageDescriptor)
-            : base(options, stringBuilderPool, httpContext, pageDescriptor)
+            PageActionDescriptor pageDescriptor,
+            ActionMetricBase? rootActionMetric)
+            : base(options, stringBuilderPool, httpContext, pageDescriptor, rootActionMetric)
         {
             Path = pageDescriptor.RelativePath;
             AreaName = pageDescriptor.AreaName;

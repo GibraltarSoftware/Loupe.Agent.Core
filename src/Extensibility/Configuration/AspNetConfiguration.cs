@@ -16,7 +16,9 @@ namespace Loupe.Configuration
         public AspNetConfiguration()
         {
             Enabled = true;
+            LogBadRequests = true;
             LogRequests = true;
+            LogRequestFailures = true;
             LogRequestMetrics = true;
             LogRequestParameters = true;
             LogRequestParameterDetails = false;
@@ -36,6 +38,16 @@ namespace Loupe.Configuration
         public bool LogRequests { get; set; }
 
         /// <summary>
+        /// Determines if a log message is written for each request that returns a 400-series response code.  Defaults to true.
+        /// </summary>
+        public bool LogBadRequests { get; set; }
+
+        /// <summary>
+        /// Determines if a log message is written for each request that returns a 500-series response code or throws an exception.  Defaults to true.
+        /// </summary>
+        public bool LogRequestFailures { get; set; }
+
+        /// <summary>
         /// Determines if an event metric is written to Loupe for each request handled by a controller. Defaults to true.
         /// </summary>
         public bool LogRequestMetrics { get; set; }
@@ -52,7 +64,7 @@ namespace Loupe.Configuration
         public bool LogRequestParameterDetails { get; set; }
 
         /// <summary>
-        /// The severity used for log messages for the start of each request handled by MVC and Web API. Defaults to Verbose.
+        /// The severity used for log messages for the start of each request handled by MVC and Web API. Defaults to Information.
         /// </summary>
         public LogMessageSeverity RequestMessageSeverity { get; set; }
     }

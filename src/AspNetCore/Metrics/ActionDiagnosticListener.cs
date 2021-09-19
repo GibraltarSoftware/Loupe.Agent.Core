@@ -122,30 +122,24 @@ namespace Loupe.Agent.AspNetCore.Metrics
                     if (requestMetric == null)
                         break;
 
-                    if (requestMetric.ActionMetric != null)
-                    {
-                        //this is a secondary action - like an error page being displayed. Ignore it for now.
-                        break;
-                    }
-
-                    ActionMetricBase actionMetric = null;
+                    ActionMetricBase? actionMetric = null;
 
                     //create the right action metric for our and associate it with our request metric.
                     switch (beforeActionEventData.ActionDescriptor)
                     {
                         case ControllerActionDescriptor controllerActionDescriptor:
                             actionMetric = new ControllerMetric(_options, StringBuilderPool, beforeActionEventData.HttpContext,
-                                controllerActionDescriptor);
+                                controllerActionDescriptor, requestMetric.RootActionMetric);
                             break;
                         case PageActionDescriptor pageActionDescriptor:
                             actionMetric = new PageMetric(_options, StringBuilderPool, beforeActionEventData.HttpContext,
-                                pageActionDescriptor);
+                                pageActionDescriptor, requestMetric.RootActionMetric);
                             break;
                     }
 
                     if (actionMetric != null)
                     {
-                        requestMetric.ActionMetric = actionMetric;
+                        requestMetric.SetActionMetric(actionMetric);
                     }
 
                     break;
@@ -153,9 +147,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
                 {
                     var metric = afterActionEventData.HttpContext.Features.Get<RequestMetric>();
 
-                    if (metric?.ActionMetric == null) break;
-
-                    metric.ActionMetric.Stop(Activity.Current);
+                    metric?.CurrentActionMetric?.Stop(Activity.Current);
                     break;
                 }
                 case BeforeAuthorizationFilterOnAuthorizationEventData beforeAuthorization:
@@ -173,13 +165,13 @@ namespace Loupe.Agent.AspNetCore.Metrics
 
                     if (metric == null) break;
 
-                    if (metric.ActionMetric != null && _options.LogRequests && _options.LogRequestParameters)
+                    if (metric.CurrentActionMetric != null && _options.LogRequests && _options.LogRequestParameters)
                     {
-                        metric.ActionMetric.SetParameterDetails(beforeActionExecuting.ActionArguments);
+                        metric.CurrentActionMetric.SetParameterDetails(beforeActionExecuting.ActionArguments);
                     }
 
                     //since we're about to execute, record the request.
-                    metric.ActionMetric?.RecordRequest();
+                    metric.CurrentActionMetric?.RecordRequest();
 
                     metric.StartRequestExecution(beforeActionExecuting.ActionContext.ActionDescriptor.DisplayName
                                                  ?? string.Empty);

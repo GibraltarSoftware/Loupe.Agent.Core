@@ -43,10 +43,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
         internal ActionMetricBase(AspNetConfiguration options,
             ObjectPool<StringBuilder> stringBuilderPool,
             HttpContext httpContext, 
-            ActionDescriptor actionDescriptor)
+            ActionDescriptor actionDescriptor,
+            ActionMetricBase? rootActionMetric)
         {
             Options = options;
             _stringBuilderPool = stringBuilderPool;
+            RootActionMetric = rootActionMetric;
 
             StartTimestamp = DateTimeOffset.Now;
             _startTicks = Stopwatch.GetTimestamp();
@@ -236,6 +238,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// The exception, if any, thrown at the completion of the routine
         /// </summary>
         [EventMetricValue("exception", SummaryFunction.Count, null, Caption = "Exception", Description = "The exception, if any, thrown at the completion of the routine")]
+        [JsonIgnore]//System.Text.Json doesn't like varying types, and we would want to only serialize the type name.
         public Exception? Exception { get; set; }
 
         /// <summary>
@@ -337,10 +340,19 @@ namespace Loupe.Agent.AspNetCore.Metrics
 #endif
 
         /// <summary>
-        /// THe active configuration for the Asp.NET Agent.
+        /// The active configuration for the Asp.NET Agent.
         /// </summary>
         [JsonIgnore]
         protected AspNetConfiguration Options { get; }
+
+        /// <summary>
+        /// The action metric for the original client request, if not this metric
+        /// </summary>
+        /// <remarks>Due to pipeline changes, exception handling, or other advanced
+        /// scenarios a secondary action may be invoked in the same request. When that
+        /// happens, this represents the original request.</remarks>
+        [JsonIgnore]
+        protected ActionMetricBase? RootActionMetric { get; }
 
         /// <summary>
         /// Record the request start information (just before user code executes)

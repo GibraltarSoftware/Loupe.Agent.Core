@@ -34,8 +34,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
         internal ControllerMetric(AspNetConfiguration options, 
             ObjectPool<StringBuilder> stringBuilderPool,
             HttpContext httpContext, 
-            ControllerActionDescriptor controllerDescriptor)
-            :base(options, stringBuilderPool, httpContext, controllerDescriptor)
+            ControllerActionDescriptor controllerDescriptor,
+            ActionMetricBase? rootActionMetric)
+            : base(options, stringBuilderPool, httpContext, controllerDescriptor, rootActionMetric)
         {
             _stringBuilderPool = stringBuilderPool;
             ControllerName = controllerDescriptor.ControllerName;
@@ -66,7 +67,17 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <inheritdoc />
         protected override void OnLogRequest()
         {
-            var caption = string.Format("Api {0} {1} Requested", ControllerName, ActionName);
+            //Customize the caption based on whether we're the root request or not.
+            string caption;
+            if (RootActionMetric == null)
+            {
+                //that means *we* are the root.
+                caption = string.Format("Api {0} {1} Requested", ControllerName, ActionName);
+            }
+            else
+            {
+                caption = string.Format("Request switched to Api {0} {1}", ControllerName, ActionName);
+            }
 
             var descriptionBuilder = _stringBuilderPool.Get();
 
@@ -118,6 +129,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
             if (ResponseCode < 400)
                 return;
 
+            if (ResponseCode < 500 && Options.LogBadRequests == false)
+                return;
+
+            if (Options.LogRequestFailures == false)
+                return; 
+
             string responseMessage = ReasonPhrases.GetReasonPhrase(ResponseCode);
 
             LogMessageSeverity severity;
@@ -133,12 +150,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
 
                 if (Exception != null)
                 {
-                    caption = string.Format("Api {0} {1} Failed due to {4} - {2} ({3})", ControllerName, ActionName, responseMessage, ResponseCode,
+                    caption = string.Format("{2} ({3}) - Api {0} {1} Failed due to {4}", ControllerName, ActionName, responseMessage, ResponseCode,
                         Exception.GetBaseException().GetType().Name);
                 }
                 else
                 {
-                    caption = string.Format("Api {0} {1} Failed - {2} ({3})", ControllerName, ActionName, responseMessage, ResponseCode);
+                    caption = string.Format("{2} ({3}) - Api {0} {1} Failed", ControllerName, ActionName, responseMessage, ResponseCode);
                 }
             }
 
