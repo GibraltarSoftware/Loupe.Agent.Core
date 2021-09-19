@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Loupe.Configuration;
 
-namespace Loupe.Agent.PerformanceCounters
+namespace Loupe.Configuration
 {
     /// <summary>
     /// Configuration information for performance monitoring

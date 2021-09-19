@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Routing;
 namespace Loupe.Agent.AspNetCore.Metrics
 {
     /// <summary>
-    /// Metric for requests not handled by controllers - typically static content.
+    /// Metric for all requests to ASP.NET
     /// </summary>
     public class RequestMetric
     {
@@ -31,7 +31,26 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <summary>
         /// Optional.  An action metric associated with this request.
         /// </summary>
-        public ActionMetricBase? ActionMetric { get; internal set; }
+        public ActionMetricBase? CurrentActionMetric { get; private set; }
+
+        /// <summary>
+        /// Optional.  An action metric associated with this request.
+        /// </summary>
+        public ActionMetricBase? RootActionMetric { get; private set; }
+
+        /// <summary>
+        /// set the current action metric
+        /// </summary>
+        /// <param name="metric"></param>
+        public void SetActionMetric(ActionMetricBase metric)
+        {
+            if (RootActionMetric == null)
+            {
+                RootActionMetric = metric;
+            }
+
+            CurrentActionMetric = metric;
+        }
 
         public void StartRequestAuthorization()
         {
@@ -44,9 +63,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
             {
                 _requestAuthorization = Stopwatch.GetTimestamp() - _requestAuthorization;
 
-                if (ActionMetric != null)
+                if (RootActionMetric != null)
                 {
-                    ActionMetric.AuthorizeRequestDuration = new TimeSpan(_requestAuthorization);
+                    RootActionMetric.AuthorizeRequestDuration = new TimeSpan(_requestAuthorization);
                 }
             }
         }
@@ -83,10 +102,10 @@ namespace Loupe.Agent.AspNetCore.Metrics
         {
             _request = Stopwatch.GetTimestamp() - _request;
 
-            if (ActionMetric != null)
+            if (RootActionMetric != null)
             {
-                ActionMetric.Duration = new TimeSpan(_request);
-                ActionMetric.Record(_context);
+                RootActionMetric.Duration = new TimeSpan(_request);
+                RootActionMetric.Record(_context);
                 return; //if it's an action we don't bother recording anything else.
             }
 
@@ -118,8 +137,8 @@ namespace Loupe.Agent.AspNetCore.Metrics
         {
             Exception = exception;
 
-            if (ActionMetric != null)
-                ActionMetric.Exception = exception;
+            if (RootActionMetric != null)
+                RootActionMetric.Exception = exception;
         }
     }
 }

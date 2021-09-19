@@ -25,7 +25,7 @@
         /// <summary>
         /// The key sequence used to pop up the packager.
         /// </summary>
-        public string HotKey { get; set; }
+        public string? HotKey { get; set; }
 
         /// <summary>
         /// When true the user will be allowed to save the package to a file.
@@ -51,13 +51,13 @@
         /// The email address to use as the sender&apos;s address
         /// </summary>
         /// <remarks>If specified, the user will not be given the option to override it.</remarks>
-        public string FromEmailAddress { get; set; }
+        public string? FromEmailAddress { get; set; }
 
         /// <summary>
         /// The address to send the email to.
         /// </summary>
         /// <remarks>If specified, the user will not be given the option to override it.</remarks>
-        public string DestinationEmailAddress { get; set; }
+        public string? DestinationEmailAddress { get; set; }
 
         /// <summary>
         /// The product name to use instead of the current application.
@@ -68,7 +68,7 @@
         /// <para>To limit the package to one application within a product specify the applicationName as well
         /// as the productName.  Specifying just the product name will cause the package to contain all applications
         /// for the specified product.</para></remarks>
-        public string ProductName { get; set; }
+        public string? ProductName { get; set; }
 
         /// <summary>
         /// The application name to use instead of the current application.
@@ -77,7 +77,7 @@
         /// you want to package information for instead of the current application.  If specified, the name
         /// must exactly match the name shown in Loupe for the application.</para>
         /// <para>Application name is ignored if product name is not also specified.</para></remarks>
-        public string ApplicationName { get; set; }
+        public string? ApplicationName { get; set; }
 
 
         /// <summary>

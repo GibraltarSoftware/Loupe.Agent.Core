@@ -2,9 +2,13 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,18 +21,40 @@ namespace Loupe.Agent.AspNetCore.Metrics
     /// </summary>
     public abstract class ActionMetricBase : IMessageSourceProvider
     {
+        private readonly ObjectPool<StringBuilder> _stringBuilderPool;
         private readonly long _startTicks;
+
+        /// <summary>
+        /// Default serializer options
+        /// </summary>
+        protected static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+        {
+#if NETCOREAPP2_1 || NETCOREAPP3_1
+            IgnoreNullValues = true,
+#else
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+#endif
+            WriteIndented = true
+        };
 
         /// <summary>
         /// Constructor for .NET Core 3 and later
         /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="actionDescriptor"></param>
-        internal ActionMetricBase(HttpContext httpContext, ActionDescriptor actionDescriptor)
+        internal ActionMetricBase(AspNetConfiguration options,
+            ObjectPool<StringBuilder> stringBuilderPool,
+            HttpContext httpContext, 
+            ActionDescriptor actionDescriptor,
+            ActionMetricBase? rootActionMetric)
         {
+            Options = options;
+            _stringBuilderPool = stringBuilderPool;
+            RootActionMetric = rootActionMetric;
 
             StartTimestamp = DateTimeOffset.Now;
             _startTicks = Stopwatch.GetTimestamp();
+
+            ConnectionId = httpContext.Connection.Id;
+            RequestId = httpContext.TraceIdentifier;
 
             SessionId = httpContext.GetSessionId();
             AgentSessionId = httpContext.GetAgentSessionId();
@@ -41,13 +67,21 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <summary>
         /// Constructor for .NET Core 2
         /// </summary>
-        /// <param name="actionExecutingContext"></param>
-        internal ActionMetricBase(ActionExecutingContext actionExecutingContext)
+        internal ActionMetricBase(AspNetConfiguration options,
+            ObjectPool<StringBuilder> stringBuilderPool,
+            ActionExecutingContext actionExecutingContext)
         {
+            Options = options;
+            _stringBuilderPool = stringBuilderPool;
+
             StartTimestamp = DateTimeOffset.Now;
             _startTicks = Stopwatch.GetTimestamp();
 
             var httpContext = actionExecutingContext.HttpContext;
+
+            ConnectionId = httpContext.Connection.Id;
+            RequestId = httpContext.TraceIdentifier;
+
             SessionId = httpContext.GetSessionId();
             AgentSessionId = httpContext.GetAgentSessionId();
 
@@ -56,9 +90,31 @@ namespace Loupe.Agent.AspNetCore.Metrics
             Parameters = StringifyParameterNames(actionExecutingContext.ActionDescriptor.Parameters);
         }
 
+        internal void SetParameterDetails(IReadOnlyDictionary<string, object> actionArguments)
+        {
+            if (actionArguments.Count == 0) return;
+
+            //calculate these now because we don't keep the context around.
+            var parameterBuilder = _stringBuilderPool.Get();
+            try
+            {
+                parameterBuilder.AppendLine("Parameters:");
+                foreach (var argument in actionArguments)
+                {
+                    parameterBuilder.AppendFormat("- {0}: {1}\r\n", argument.Key,
+                        Extensions.ObjectToString(argument.Value, Options.LogRequestParameterDetails));
+                }
+
+                ParameterDetails = parameterBuilder.ToString();
+            }
+            finally
+            {
+                _stringBuilderPool.Return(parameterBuilder);
+            }
+        }
+
         private static string StringifyParameterNames(IList<ParameterDescriptor> actionDescriptorParameters)
         {
-            new DefaultObjectPoolProvider().Create<StringBuilder>(new StringBuilderPooledObjectPolicy());
             int count = actionDescriptorParameters.Count;
 
             if (count == 0)
@@ -76,8 +132,6 @@ namespace Loupe.Agent.AspNetCore.Metrics
             {
                 length += actionDescriptorParameters[i].Name.Length + 2;
             }
-
-            var builder = new StringBuilder();
 
             var buffer = ArrayPool<char>.Shared.Rent(length);
             try
@@ -107,6 +161,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// Timestamp the request started
         /// </summary>
         [EventMetricValue("startTimestamp", SummaryFunction.Count, null, Caption = "Started", Description = "Timestamp the request started")]
+        [JsonIgnore]
         public DateTimeOffset StartTimestamp { get; }
 
         /// <summary>
@@ -115,6 +170,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <remarks>Once the request has been told to record it the timer duration will stop increasing.</remarks>
         [EventMetricValue("totalDuration", SummaryFunction.Average, "ms", Caption = "Total Request Duration", 
             Description = "The entire time spent processing the request, excluding time to return the response", IsDefaultValue = true)]
+        [JsonIgnore]
         public TimeSpan Duration { get; internal set; }
 
         /// <summary>
@@ -123,6 +179,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// <remarks>The action is typically the controller or page's internal code.</remarks>
         [EventMetricValue("actionDuration", SummaryFunction.Average, "ms", Caption = "Action Duration",
             Description = "The time spent in the Action or Page")]
+        [JsonIgnore]
         public TimeSpan? ActionDuration { get; private set; }
 
         /// <summary>
@@ -130,6 +187,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// </summary>
         [EventMetricValue("authorizeRequestDuration", SummaryFunction.Average, "ms", Caption = "Authorize Request Duration",
             Description = "The time it took for the request to be authorized")]
+        [JsonIgnore]
         public TimeSpan? AuthorizeRequestDuration { get; internal set; }
 
         /// <summary>
@@ -153,7 +211,15 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// </summary>
         /// <remarks></remarks>
         [EventMetricValue("parameters", SummaryFunction.Count, null, Caption = "Parameters", Description = "The list of parameters used for this action")]
-        public string Parameters { get; }
+        [JsonIgnore]
+        public string? Parameters { get; }
+
+        /// <summary>
+        /// A multi-line string describing the content of the parameters.
+        /// </summary>
+        /// <remarks>Only set if LogParameterDetails is enabled</remarks>
+        [JsonIgnore]
+        public string? ParameterDetails { get; protected set; }
 
         /// <summary>
         /// The Http Response Code for the request.
@@ -165,18 +231,21 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// The user name for the action being performed.
         /// </summary>
         [EventMetricValue("userName", SummaryFunction.Count, null, Caption = "User", Description = "The user associated with the action being performed")]
+        [JsonIgnore]
         public string? UserName { get; set; }
 
         /// <summary>
         /// The exception, if any, thrown at the completion of the routine
         /// </summary>
         [EventMetricValue("exception", SummaryFunction.Count, null, Caption = "Exception", Description = "The exception, if any, thrown at the completion of the routine")]
+        [JsonIgnore]//System.Text.Json doesn't like varying types, and we would want to only serialize the type name.
         public Exception? Exception { get; set; }
 
         /// <summary>
         /// Id to identify a user session from the web browser
         /// </summary>
         [EventMetricValue("SessionId", SummaryFunction.Count, null, Caption = "Session Id", Description = "Session Id associated with action being performed")]
+        [JsonPropertyName("LoupeSessionId")] //match MEL
         public string? SessionId { get; }
 
         /// <summary>
@@ -184,6 +253,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// </summary>
         [EventMetricValue("AgentSessionId", SummaryFunction.Count, null, Caption = "Agent Session Id", Description = "Id from JavaScript agent for session")]
         public string? AgentSessionId { get; }
+
+        /// <summary>
+        /// The unique Id of the Http connection that provided the request
+        /// </summary>
+        [EventMetricValue("ConnectionId", SummaryFunction.Count, null, Caption = "Connection Id", Description = "The unique Id of the Http connection that provided the request")]
+        public string ConnectionId { get; set; }
 
         /// <summary>
         /// The unique Id of the request being executed
@@ -264,24 +339,83 @@ namespace Loupe.Agent.AspNetCore.Metrics
         }
 #endif
 
+        /// <summary>
+        /// The active configuration for the Asp.NET Agent.
+        /// </summary>
+        [JsonIgnore]
+        protected AspNetConfiguration Options { get; }
+
+        /// <summary>
+        /// The action metric for the original client request, if not this metric
+        /// </summary>
+        /// <remarks>Due to pipeline changes, exception handling, or other advanced
+        /// scenarios a secondary action may be invoked in the same request. When that
+        /// happens, this represents the original request.</remarks>
+        [JsonIgnore]
+        protected ActionMetricBase? RootActionMetric { get; }
+
+        /// <summary>
+        /// Record the request start information (just before user code executes)
+        /// </summary>
+        /// <remarks>Logs the request if logging is enabled.</remarks>
+        public void RecordRequest()
+        {
+            if (Options.Enabled == false || Options.LogRequests == false)
+                return;
+
+            OnLogRequest();
+        }
+
+        /// <summary>
+        /// Record the request completion information
+        /// </summary>
+        /// <param name="context"></param>
+        /// <remarks>Writes an event metric for the request if metrics are enabled</remarks>
         public void Record(HttpContext context)
         {
             var response = context.Response;
             ResponseCode = response.StatusCode;
-            EventMetric.Write(this);
+
+            if (Options.Enabled == false)
+                return;
+
+            if (Options.LogRequests)
+                OnLogRequestCompletion();
+
+            if (Options.LogRequestMetrics)
+                EventMetric.Write(this);
+        }
+
+        /// <summary>
+        /// Record the request to the log just before the controller executes.
+        /// </summary>
+        protected virtual void OnLogRequest()
+        {
+
+        }
+
+        /// <summary>
+        /// Record the outcome of the request to the log.
+        /// </summary>
+        protected virtual void OnLogRequestCompletion()
+        {
+
         }
 
         /// <inheritdoc />
+        [JsonIgnore]
         public string? MethodName { get; set; }
 
         /// <inheritdoc />
+        [JsonIgnore]
         public string? ClassName { get; set; }
 
         /// <inheritdoc />
+        [JsonIgnore]
         public string? FileName { get; set; }
 
         /// <inheritdoc />
+        [JsonIgnore]
         public int LineNumber { get; set; }
-
     }
 }

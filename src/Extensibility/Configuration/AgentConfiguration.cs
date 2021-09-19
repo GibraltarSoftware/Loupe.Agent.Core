@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Loupe.Agent.PerformanceCounters;
 
 namespace Loupe.Configuration
 {
@@ -62,8 +61,7 @@ namespace Loupe.Configuration
         /// </summary>
         public AgentConfiguration()
         {
-            // MR: We've traditionally created these by default so the app can just walk properties to get defaults, but 
-            // is that conventional for .NET Core?  Or should we make them create them.
+            AspNet = new AspNetConfiguration();
             Listener = new ListenerConfiguration();
             NetworkViewer = new NetworkViewerConfiguration();
             Packager = new PackagerConfiguration();
@@ -81,6 +79,7 @@ namespace Loupe.Configuration
         /// <remarks>Inferring this from usage in <c>Gibraltar.Agent.Log</c>.</remarks>
         public AgentConfiguration(AgentConfiguration configuration)
         {
+            AspNet = configuration.AspNet;
             Listener = configuration.Listener;
             NetworkViewer = configuration.NetworkViewer;
             Packager = configuration.Packager;
@@ -121,6 +120,11 @@ namespace Loupe.Configuration
         public NetworkViewerConfiguration NetworkViewer { get; set; }
 
         /// <summary>
+        /// Configures the ASP.NET Agent
+        /// </summary>
+        public AspNetConfiguration AspNet { get; set; }
+
+        /// <summary>
         /// Performance monitoring options
         /// </summary>
         public PerformanceConfiguration Performance { get; set; }
@@ -136,11 +140,17 @@ namespace Loupe.Configuration
         public void Sanitize()
         {
             //we want to force everyone to load and sanitize so we know it's completed.
-            NetworkViewer.Sanitize();
-            Packager.Sanitize();
-            Publisher.Sanitize();
-            SessionFile.Sanitize();
-            Server.Sanitize();
+            NetworkViewer ??= new NetworkViewerConfiguration();
+            Packager ??= new PackagerConfiguration();
+            Publisher ??= new PublisherConfiguration();
+            SessionFile ??= new SessionFileConfiguration();
+            Server ??= new ServerConfiguration();
+
+            NetworkViewer?.Sanitize();
+            Packager?.Sanitize();
+            Publisher?.Sanitize();
+            SessionFile?.Sanitize();
+            Server?.Sanitize();
         }
 
         /// <inheritdoc />
