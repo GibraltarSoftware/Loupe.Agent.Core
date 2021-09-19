@@ -4,6 +4,8 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using Gibraltar.Agent.Metrics;
+using Loupe.Agent.AspNetCore.Infrastructure;
+using Loupe.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,17 +16,19 @@ namespace Loupe.Agent.AspNetCore.Metrics
     /// <summary>
     /// Tracking metric for an ASP.NET controller request
     /// </summary>
-    [EventMetric("Loupe", "Web Site.Requests", "Page Action", Caption = "Page Action", 
+    [EventMetric(Constants.LogSystem, Constants.MetricCategory, "Page Action", Caption = "Page Action", 
         Description = "Performance data for every page call in the application")]
     public class PageMetric : ActionMetricBase
     {
         /// <summary>
         /// Constructor for .NET Core 3 and later
         /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="pageDescriptor"></param>
-        internal PageMetric(HttpContext httpContext, PageActionDescriptor pageDescriptor)
-            : base(httpContext, pageDescriptor)
+        internal PageMetric(AspNetConfiguration options,
+            ObjectPool<StringBuilder> stringBuilderPool, 
+            HttpContext httpContext, 
+            PageActionDescriptor pageDescriptor,
+            ActionMetricBase? rootActionMetric)
+            : base(options, stringBuilderPool, httpContext, pageDescriptor, rootActionMetric)
         {
             Path = pageDescriptor.RelativePath;
             AreaName = pageDescriptor.AreaName;
@@ -32,55 +36,8 @@ namespace Loupe.Agent.AspNetCore.Metrics
             DisplayName = pageDescriptor.DisplayName;
         }
 
-        private static string StringifyParameterNames(IList<ParameterDescriptor> actionDescriptorParameters)
-        {
-            new DefaultObjectPoolProvider().Create<StringBuilder>(new StringBuilderPooledObjectPolicy());
-            int count = actionDescriptorParameters.Count;
-
-            if (count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (count == 1)
-            {
-                return actionDescriptorParameters[0].Name;
-            }
-
-            int length = 0;
-            for (int i = 0; i < count; i++)
-            {
-                length += actionDescriptorParameters[i].Name.Length + 2;
-            }
-
-            var builder = new StringBuilder();
-
-            var buffer = ArrayPool<char>.Shared.Rent(length);
-            try
-            {
-                string name = actionDescriptorParameters[0].Name;
-                name.CopyTo(0, buffer, 0, name.Length);
-                int index = name.Length;
-
-                for (int i = 1; i < count; i++)
-                {
-                    buffer[index++] = ',';
-                    buffer[index++] = ' ';
-                    name = actionDescriptorParameters[i].Name;
-                    name.CopyTo(0, buffer, index, name.Length);
-                    index += name.Length;
-                }
-
-                return new string(buffer, 0, index);
-            }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-        }
-
         /// <summary>
-        /// Gets/Sets the name of the controller this action belongs to
+        /// The relative path from the application root for the page 
         /// </summary>
         [EventMetricValue("path", SummaryFunction.Count, null, Caption = "Path", Description = "The relative path from the application root for the page")]
         public string Path { get; }
@@ -92,7 +49,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         public string? AreaName { get; }
 
         /// <summary>
-        /// The area name for this page.
+        /// A display name for the page
         /// </summary>
         [EventMetricValue("displayName", SummaryFunction.Count, null, Caption = "Display Name", Description = "A display name for the page")]
         public string? DisplayName { get; } 

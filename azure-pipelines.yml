@@ -7,7 +7,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   major: 4
-  minor: 12
+  minor: 13
   revision: 0
   fileVersion: '$(Build.BuildNumber)'
 

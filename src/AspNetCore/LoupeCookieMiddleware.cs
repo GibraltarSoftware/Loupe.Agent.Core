@@ -20,7 +20,7 @@ namespace Loupe.Agent.AspNetCore
         private readonly RequestDelegate _next;
 
         /// <summary>
-        /// Constructs and instance of <see cref="LoupeMiddleware"/>.
+        /// Constructs and instance of <see cref="LoupeCookieMiddleware"/>.
         /// </summary>
         /// <param name="next"></param>
         /// <param name="loggerFactory"></param>

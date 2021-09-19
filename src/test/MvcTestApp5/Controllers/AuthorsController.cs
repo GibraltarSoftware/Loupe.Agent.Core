@@ -45,7 +45,11 @@ namespace MvcTestApp5.Controllers
 
             if (author == null)
             {
-                throw new ArgumentOutOfRangeException("unable to find author by key");
+                //just for demo purposes..
+                if (key == 5)
+                    throw new ArgumentOutOfRangeException("unable to find author by key");
+
+                //but this is a more appropriate response.
                 return NotFound(key);
             }
 

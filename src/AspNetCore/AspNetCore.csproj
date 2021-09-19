@@ -98,4 +98,7 @@
 		</ProjectReference>
 		<ProjectReference Include="..\Services\Services.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Configuration\" />
+	</ItemGroup>
 </Project>

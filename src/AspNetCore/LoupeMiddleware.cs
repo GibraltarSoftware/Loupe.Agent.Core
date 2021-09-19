@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Gibraltar.Agent;
 using Gibraltar.Agent.Metrics;
+using Loupe.Agent.AspNetCore.Infrastructure;
 using Loupe.Agent.Core.Services;
 using Loupe.Extensibility.Data;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +42,7 @@ namespace Loupe.Agent.AspNetCore
             applicationLifetime.ApplicationStarted.Register(StartSession);
             applicationLifetime.ApplicationStopped.Register(OnApplicationStopping);
 
-            var requestMetricDefinition = DefineRequestMetric(agent.ApplicationName);
+            var requestMetricDefinition = DefineRequestMetric();
             _requestMetric = EventMetric.Register(requestMetricDefinition, null);
         }
 #else
@@ -61,7 +62,7 @@ namespace Loupe.Agent.AspNetCore
             applicationLifetime.ApplicationStarted.Register(StartSession);
             applicationLifetime.ApplicationStopped.Register(OnApplicationStopping);
 
-            var requestMetricDefinition = DefineRequestMetric(agent.ApplicationName);
+            var requestMetricDefinition = DefineRequestMetric();
             _requestMetric = EventMetric.Register(requestMetricDefinition, null);
         }
 #endif
@@ -124,10 +125,10 @@ namespace Loupe.Agent.AspNetCore
             }
         }
 
-        private static EventMetricDefinition DefineRequestMetric(string applicationName)
+        private static EventMetricDefinition DefineRequestMetric()
         {
             
-            var definition = new EventMetricDefinition(applicationName, "AspNetCore", "Request");
+            var definition = new EventMetricDefinition(Constants.LogSystem, Constants.MetricCategory, "Request");
             definition.AddValue("request", typeof(string), SummaryFunction.Count, "Request", "Request",
                 "The query that was executed.");
             definition.AddValue("duration", typeof(TimeSpan), SummaryFunction.Average, "Duration", "Duration",

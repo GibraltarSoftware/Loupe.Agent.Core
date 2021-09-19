@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Reflection;
 using Loupe.Agent.AspNetCore.Infrastructure;
 using Loupe.Agent.AspNetCore.Metrics;
 using Microsoft.AspNetCore.Http;
@@ -72,58 +73,18 @@ namespace Loupe.Agent.AspNetCore
             return valueString;
         }
 
-/*
         /// <summary>
-        /// Store a request metric into the HTTP context for later use
+        /// Read a property from an object by name, typically because it's an anonymous type.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="metricTracker"></param>
-        internal static void Store(this HttpContext context, RequestMetric metricTracker)
+        /// <typeparam name="T"></typeparam>
+        /// <param name="anonymousObject"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        internal static T? GetProperty<T>(this object anonymousObject, string propertyName) where T: class
         {
-            string key = HttpContextMetricPrefix + metricTracker.UniqueId;
-            context.Items[key] = metricTracker;
+            return anonymousObject.GetType().GetTypeInfo().GetDeclaredProperty(propertyName)?.GetValue(anonymousObject) as T;
         }
 
-        /// <summary>
-        /// Retrieve a request metric from the HTTP context
-        /// </summary>
-        /// <typeparam name="TMetric">The specific type of request metric to return</typeparam>
-        /// <param name="context">The current HTTP context</param>
-        /// <param name="uniqueId">the unique id of the request to retrieve the metric for</param>
-        /// <returns>The request metric or null if it couldn't be found or was of an incompatible type</returns>
-        internal static TMetric? Retrieve<TMetric>(this HttpContext context, string uniqueId)
-            where TMetric : RequestMetric
-        {
-            if (string.IsNullOrWhiteSpace(uniqueId))
-                throw new ArgumentNullException("uniqueId");
-
-            string key = HttpContextMetricPrefix + uniqueId;
-
-            return context.Items[key] as TMetric;
-        }
-
-        /// <summary>
-        /// Store a request metric into the HTTP context for later use
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="metricTracker"></param>
-        internal static void Store(this HttpRequestMessage context, RequestMetric metricTracker)
-        {
-            context.Properties[HttpContextMetricPrefix] = metricTracker;
-        }
-
-        /// <summary>
-        /// Retrieve a request metric from the HTTP context
-        /// </summary>
-        /// <typeparam name="TMetric">The specific type of request metric to return</typeparam>
-        /// <param name="context">The current HTTP context</param>
-        /// <returns>The request metric or null if it couldn't be found or was of an incompatible type</returns>
-        internal static TMetric? Retrieve<TMetric>(this HttpRequestMessage context)
-            where TMetric : RequestMetric
-        {
-            return context.Properties[HttpContextMetricPrefix] as TMetric;
-        }
-*/
 
         internal static string? GetSessionId(this HttpContext context)
         {
