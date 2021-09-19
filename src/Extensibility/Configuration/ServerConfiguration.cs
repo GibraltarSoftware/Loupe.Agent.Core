@@ -164,12 +164,12 @@ namespace Loupe.Configuration
         /// <remarks>Application keys identify the specific repository and optionally an application environment service
         /// for this session's data to be associated with.  The server administrator can determine by application key
         /// whether to accept the session data or not.</remarks>
-        public string ApplicationKey { get; set; }
+        public string? ApplicationKey { get; set; }
 
         /// <summary>
         /// The unique customer name when using the Gibraltar Loupe Service
         /// </summary>
-        public string CustomerName { get; set; }
+        public string? CustomerName { get; set; }
 
         /// <summary>
         /// Indicates if the Gibraltar Loupe Service should be used instead of a private Loupe Server
@@ -187,7 +187,7 @@ namespace Loupe.Configuration
         /// The full DNS name of the server where the Loupe Server is located
         /// </summary>
         /// <remarks>Only applies to a private Loupe Server.</remarks>
-        public string Server { get; set; }
+        public string? Server { get; set; }
 
         /// <summary>
         ///  An optional port number override for the server
@@ -199,13 +199,13 @@ namespace Loupe.Configuration
         /// The virtual directory on the host for the private Loupe Server
         /// </summary>
         /// <remarks>Only applies to a private Loupe Server.</remarks>
-        public string ApplicationBaseDirectory { get; set; }
+        public string? ApplicationBaseDirectory { get; set; }
 
         /// <summary>
         /// The specific repository on the server to send the session to
         /// </summary>
         /// <remarks>Only applies to a private Loupe Server running Enterprise Edition.</remarks>
-        public string Repository { get; set; }
+        public string? Repository { get; set; }
 
         /// <summary>
         /// Check the current configuration information to see if it's valid for a connection, throwing relevant exceptions if not.

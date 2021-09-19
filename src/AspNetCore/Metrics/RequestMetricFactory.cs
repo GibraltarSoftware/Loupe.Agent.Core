@@ -1,4 +1,5 @@
 ﻿using Gibraltar.Agent.Metrics;
+using Loupe.Agent.AspNetCore.Infrastructure;
 using Microsoft.AspNetCore.Http;
 
 namespace Loupe.Agent.AspNetCore.Metrics
@@ -8,11 +9,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
     /// </summary>
     public class RequestMetricFactory
     {
-        private const string MetricCategory = "Web Site.Requests";
         private const string MetricName = "request";
         private const string MetricCaption = "Request";
         private const string MetricDescription = "Performance tracking data about static content & external requests";
-        private const string MetricSystem = "Gibraltar";
 
         private readonly EventMetric _metric;
 
@@ -37,9 +36,9 @@ namespace Loupe.Agent.AspNetCore.Metrics
 
         private static EventMetricDefinition GetMetricDefinition()
         {
-            if (!EventMetricDefinition.TryGetValue(MetricSystem, MetricCategory, MetricCaption, out var eventMetricDefinition))
+            if (!EventMetricDefinition.TryGetValue(Constants.LogSystem, Constants.MetricCategory, MetricCaption, out var eventMetricDefinition))
             {
-                eventMetricDefinition = new EventMetricDefinition(MetricSystem, MetricCategory, MetricName)
+                eventMetricDefinition = new EventMetricDefinition(Constants.LogSystem, Constants.MetricCategory, MetricName)
                 {
                     Caption = MetricCaption,
                     Description = MetricDescription

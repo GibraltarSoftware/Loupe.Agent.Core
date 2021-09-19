@@ -28,7 +28,7 @@ namespace Loupe.Configuration
         /// <remarks>Generally unnecessary for windows services, console apps, and WinForm applications.
         /// Useful for web applications where there is no reasonable way of automatically determining
         /// product name from the assemblies that initiate logging.</remarks>
-        public string ProductName { get; set; }
+        public string? ProductName { get; set; }
 
         /// <summary>
         /// Optional.  A description of the application to include with the session information.
@@ -36,7 +36,7 @@ namespace Loupe.Configuration
         /// <remarks>Generally unnecessary for windows services, console apps, and WinForm applications.
         /// Useful for web applications where there is no reasonable way of automatically determining
         /// application description from the assemblies that initiate logging.</remarks>
-        public string ApplicationDescription { get; set; }
+        public string? ApplicationDescription { get; set; }
 
         /// <summary>
         /// Optional.  The name of the application for logging purposes.
@@ -44,7 +44,7 @@ namespace Loupe.Configuration
         /// <remarks>Generally unnecessary for windows services, console apps, and WinForm applications.
         /// Useful for web applications where there is no reasonable way of automatically determining
         /// product name from the assemblies that initiate logging.</remarks>
-        public string ApplicationName { get; set; }
+        public string? ApplicationName { get; set; }
 
         /// <summary>
         /// Optional.  The ApplicationType to treat the application as, overriding the Agent's automatic determination.
@@ -62,7 +62,7 @@ namespace Loupe.Configuration
         /// <remarks><para>Generally unnecessary for windows services, console apps, and WinForm applications.
         /// Useful for web applications where there is no reasonable way of automatically determining
         /// product name from the assemblies that initiate logging.</para></remarks>
-        public Version ApplicationVersion { get; set; }
+        public Version? ApplicationVersion { get; set; }
 
         /// <summary>
         /// We need this to load from JSON, because there's currently no custom binding
@@ -71,10 +71,10 @@ namespace Loupe.Configuration
         /// <remarks>Added Attributes to hide in IntelliSense.</remarks>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string ApplicationVersionNumber
+        public string? ApplicationVersionNumber
         {
             get => ApplicationVersion?.ToString();
-            set => ApplicationVersion = Version.Parse(value);
+            set => ApplicationVersion = (value == null) ? null : Version.Parse(value);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Loupe.Configuration
         /// indicate the hosting environment. If a value is provided it will be 
         /// carried with the session data to upstream servers and clients.  If the 
         /// corresponding entry does not exist it will be automatically created.</remarks>
-        public string EnvironmentName { get; set; }
+        public string? EnvironmentName { get; set; }
 
         /// <summary>
         /// Optional.  The promotion level of the session.
@@ -93,7 +93,7 @@ namespace Loupe.Configuration
         /// indicate whether it was run in development, staging, or production. 
         /// If a value is provided it will be carried with the session data to upstream servers and clients.  
         /// If the corresponding entry does not exist it will be automatically created.</remarks>
-        public string PromotionLevelName { get; set; }
+        public string? PromotionLevelName { get; set; }
 
         /// <summary>
         /// When true, the publisher will treat all publish requests as write-through requests.

@@ -20,7 +20,6 @@ namespace Loupe.Agent.Core.Services
     public sealed class LoupeAgent : IDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly AgentConfiguration _agentConfiguration;
         private readonly LoupeDiagnosticListener _diagnosticListener;
 
 #if NETSTANDARD2_0 || NET461
@@ -38,8 +37,7 @@ namespace Loupe.Agent.Core.Services
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             _serviceProvider = serviceProvider;
-            _agentConfiguration = options.Value;
-            ApplicationName = _agentConfiguration.Packager.ApplicationName;
+            Configuration = options.Value;
             _diagnosticListener = new LoupeDiagnosticListener();
             applicationLifetime.ApplicationStarted.Register(Start);
             applicationLifetime.ApplicationStopped.Register(() => End(SessionStatus.Normal, "ApplicationStopped"));
@@ -59,8 +57,7 @@ namespace Loupe.Agent.Core.Services
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             _serviceProvider = serviceProvider;
-            _agentConfiguration = options.Value;
-            ApplicationName = _agentConfiguration.Packager.ApplicationName;
+            Configuration = options.Value;
             _diagnosticListener = new LoupeDiagnosticListener();
             applicationLifetime.ApplicationStarted.Register(Start);
             applicationLifetime.ApplicationStopped.Register(() => End(SessionStatus.Normal, "ApplicationStopped"));
@@ -69,7 +66,7 @@ namespace Loupe.Agent.Core.Services
         /// <summary>Starts this Agent instance.</summary>
         public void Start()
         {
-            Log.StartSession(_agentConfiguration);
+            Log.StartSession(Configuration);
             foreach (var listener in _serviceProvider.GetServices<ILoupeDiagnosticListener>())
             {
                 _diagnosticListener.Add(listener);
@@ -99,6 +96,11 @@ namespace Loupe.Agent.Core.Services
             }
         }
 
+        /// <summary>
+        /// The configuration used for the Loupe Agent
+        /// </summary>
+        public AgentConfiguration Configuration { get; }
+
         /// <summary>Stops this Agent instance.</summary>
         /// <param name="status">The session status.</param>
         /// <param name="reason">The reason.</param>
@@ -112,9 +114,5 @@ namespace Loupe.Agent.Core.Services
         {
             _diagnosticListener.Dispose();
         }
-
-        /// <summary>Gets the name of the application.</summary>
-        /// <value>The name of the application.</value>
-        public string ApplicationName { get; }
     }
 }

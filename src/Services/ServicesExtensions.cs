@@ -96,14 +96,6 @@ namespace Loupe.Agent.Core.Services
                 {
                     configuration.Bind("Loupe", options);
                     callback?.Invoke(options);
-                    if (options.Packager == null)
-                    {
-                        options.Packager = new PackagerConfiguration {ApplicationName = hostingEnvironment.ApplicationName};
-                    }
-                    else if (options.Packager.ApplicationName == null)
-                    {
-                        options.Packager.ApplicationName = hostingEnvironment.ApplicationName;
-                    }
                 });
 #else
             // Set up options for AgentConfiguration with callback and default ApplicationName from IHostingEnvironment
@@ -112,14 +104,6 @@ namespace Loupe.Agent.Core.Services
                 {
                     configuration.Bind("Loupe", options);
                     callback?.Invoke(options);
-                    if (options.Packager == null)
-                    {
-                        options.Packager = new PackagerConfiguration { ApplicationName = hostEnvironment.ApplicationName };
-                    }
-                    else if (options.Packager.ApplicationName == null)
-                    {
-                        options.Packager.ApplicationName = hostEnvironment.ApplicationName;
-                    }
                 });
 #endif
         }

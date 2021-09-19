@@ -37,7 +37,7 @@ namespace Loupe.Configuration
         /// The folder to store session files in unless explicitly overridden at runtime.
         /// </summary>
         /// <remarks>If null or empty, files will be stored in a central local application data folder which is the preferred setting.</remarks>
-        public string Folder { get; set; }
+        public string? Folder { get; set; }
 
         /// <summary>
         /// The number of seconds between index updates.

@@ -1,9 +1,12 @@
 ﻿#if NETCOREAPP2_1
 using System.Diagnostics;
+using System.Text;
 using Loupe.Agent.Core.Services;
+using Loupe.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DiagnosticAdapter;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Loupe.Agent.AspNetCore.Metrics
 {
@@ -15,6 +18,8 @@ namespace Loupe.Agent.AspNetCore.Metrics
     public class ActionDiagnosticListener : ILoupeDiagnosticListener
     {
         private readonly RequestMetricFactory _actionMetricFactory;
+        private readonly AspNetConfiguration _options;
+        private static readonly ObjectPool<StringBuilder> StringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionDiagnosticListener"/> class.
@@ -52,7 +57,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeOnActionExecution")]
         public virtual void BeforeOnActionExecution(ActionExecutingContext actionExecutingContext)
         {
-            actionExecutingContext?.HttpContext?.Features.Set(new ControllerMetric(actionExecutingContext));
+            actionExecutingContext?.HttpContext?.Features.Set(new ControllerMetric(_options, StringBuilderPool, actionExecutingContext));
         }
 
         /// <summary>

@@ -2,6 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<LangVersion>8.0</LangVersion>
 		<PackageId>Loupe.Agent.Core.Extensibility</PackageId>
 		<Version>4.12.0.0</Version>
 		<FileVersion>4.12.0.0</FileVersion>
@@ -34,11 +36,12 @@
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	  <Compile Remove="Properties\**" />
+	  <EmbeddedResource Remove="Properties\**" />
+	  <None Remove="Properties\**" />
 	</ItemGroup>
-
 	<ItemGroup>
-		<Folder Include="Properties\" />
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 	<ItemGroup>
