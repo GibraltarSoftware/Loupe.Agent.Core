@@ -122,6 +122,12 @@ namespace Loupe.Agent.AspNetCore.Metrics
                     if (requestMetric == null)
                         break;
 
+                    if (requestMetric.ActionMetric != null)
+                    {
+                        //this is a secondary action - like an error page being displayed. Ignore it for now.
+                        break;
+                    }
+
                     ActionMetricBase actionMetric = null;
 
                     //create the right action metric for our and associate it with our request metric.
@@ -160,27 +166,27 @@ namespace Loupe.Agent.AspNetCore.Metrics
                     afterAuthorization.AuthorizationContext.HttpContext.Features
                         .Get<RequestMetric>()?.StopRequestAuthorization();
                     break;
-                case BeforeActionFilterOnActionExecutingEventData beforeActionExecuting:
+                case BeforeControllerActionMethodEventData beforeActionExecuting:
                 {
-                    var metric = beforeActionExecuting.ActionExecutingContext.HttpContext.Features
+                    var metric = beforeActionExecuting.ActionContext.HttpContext.Features
                         .Get<RequestMetric>();
 
                     if (metric == null) break;
 
                     if (metric.ActionMetric != null && _options.LogRequests && _options.LogRequestParameters)
                     {
-                        metric.ActionMetric.SetParameterDetails(beforeActionExecuting.ActionExecutingContext.ActionArguments);
+                        metric.ActionMetric.SetParameterDetails(beforeActionExecuting.ActionArguments);
                     }
 
                     //since we're about to execute, record the request.
                     metric.ActionMetric?.RecordRequest();
 
-                    metric.StartRequestExecution(beforeActionExecuting.ActionDescriptor.DisplayName
+                    metric.StartRequestExecution(beforeActionExecuting.ActionContext.ActionDescriptor.DisplayName
                                                  ?? string.Empty);
                     break;
                 }
-                case AfterActionFilterOnActionExecutedEventData afterActionExecuted:
-                    afterActionExecuted.ActionExecutedContext.HttpContext.Features
+                case AfterControllerActionMethodEventData afterActionExecuted:
+                    afterActionExecuted.ActionContext.HttpContext.Features
                         .Get<RequestMetric>()?.StopRequestExecution();
                     break;
                 case BeforeExceptionFilterOnException onException:

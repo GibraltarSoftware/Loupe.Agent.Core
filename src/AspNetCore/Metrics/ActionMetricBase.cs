@@ -88,7 +88,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
             Parameters = StringifyParameterNames(actionExecutingContext.ActionDescriptor.Parameters);
         }
 
-        internal void SetParameterDetails(IDictionary<string, object> actionArguments)
+        internal void SetParameterDetails(IReadOnlyDictionary<string, object> actionArguments)
         {
             if (actionArguments.Count == 0) return;
 
