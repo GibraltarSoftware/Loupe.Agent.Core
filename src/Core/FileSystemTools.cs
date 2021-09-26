@@ -144,6 +144,29 @@ namespace Gibraltar
         }
 
         /// <summary>
+        /// Get a unique temp file name
+        /// </summary>
+        /// <returns>The temp file name, which will point to a zero byte file.</returns>
+        /// <remarks>Ensures the temp path exists.</remarks>
+        public static string GetTempFileName()
+        {
+            string fileName;
+            try
+            {
+                fileName = Path.GetTempFileName();
+            }
+            catch (IOException ex)
+            {
+                //it's possible for the temp path to get deleted and get temp file name won't re-create it.
+                var tempDir = Path.GetTempPath();
+                Directory.CreateDirectory(tempDir);
+                fileName = Path.GetTempFileName();
+            }
+
+            return fileName;
+        }
+
+        /// <summary>
         /// Open a temporary file for read and write and return the open FileStream.
         /// </summary>
         /// <param name="fileName">The full file name path created.</param>
@@ -152,7 +175,8 @@ namespace Gibraltar
         /// <returns>An open read-write FileStream.</returns>
         public static FileStream GetTempFileStream(out string fileName, bool deleteOnClose)
         {
-            fileName = Path.GetTempFileName();
+            fileName = GetTempFileName();
+
             FileOptions options = deleteOnClose ? FileOptions.DeleteOnClose : FileOptions.None;
             FileStream stream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, DefaultFileBufferSize, options);
             return stream;

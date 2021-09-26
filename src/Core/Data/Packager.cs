@@ -690,7 +690,7 @@ namespace Gibraltar.Data
             SimplePackage newPackage = new SimplePackage();
 
             //calculate a temporary file to put the package in.
-            string temporaryFileNamePath = Path.GetTempFileName();
+            string temporaryFileNamePath = FileSystemTools.GetTempFileName();
             //it just made a file in that location, best to blow it away before we go further (get temp file name creates a 0 byte file)
             File.Delete(temporaryFileNamePath);
 

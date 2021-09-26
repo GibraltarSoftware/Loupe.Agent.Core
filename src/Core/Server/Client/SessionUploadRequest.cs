@@ -341,7 +341,7 @@ namespace Gibraltar.Server.Client
             }
             else
             {
-                tempDirectory = Path.GetTempFileName();
+                tempDirectory = FileSystemTools.GetTempFileName();
                 File.Delete(tempDirectory); //we just want it as a directory, not a file.
                 m_DeleteTemporaryFilesOnDispose = true;
             }
