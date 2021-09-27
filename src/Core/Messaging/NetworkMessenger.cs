@@ -90,7 +90,8 @@ namespace Gibraltar.Messaging
         {
             try
             {
-                if (await Log.SendSessions(sendSessionCommand.Criteria, null, true).ConfigureAwait(false) == false) //we love async!
+                if (await Log.SendSessions(sendSessionCommand.Criteria, null, true)
+                    .ConfigureAwait(false) == false) //we love async!
                 {
                     //since we can't send sessions to the server we'll just roll over the log file for local access.
                     Log.EndFile("Remote Live Sessions client requested the log file be rolled over");

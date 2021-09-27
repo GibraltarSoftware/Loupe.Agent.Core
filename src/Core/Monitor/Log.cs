@@ -75,7 +75,6 @@ namespace Gibraltar.Monitor
         private static SessionSummary s_SessionStartInfo;
         private static Publisher s_Publisher;         //Our one and only publisher
         private static RepositoryPublishEngine s_PublishEngine; //We have zero or one publish engine
-        private static Packager s_ActivePackager; //PROTECTED BY LOCK
         private static LocalRepository s_Repository;
         private static IApplicationUserProvider s_ApplicationUserProvider; //PROTECTED BY LOCK
         private static IPrincipalResolver s_PrincipalResolver = new DefaultPrincipalResolver(); //PROTECTED BY LOCK
@@ -1426,91 +1425,82 @@ namespace Gibraltar.Monitor
         /// <param name="suppressLogging">True for internal calls to disable logging</param>
         /// <returns>True if the send was processed, false if it was not due to configuration or another active send</returns>
         /// <remarks>Either a criteria or sessionMatchPredicate must be provided</remarks>
-        internal static async Task<bool> SendSessions(SessionCriteria? criteria, Predicate<ISessionSummary> sessionMatchPredicate, bool asyncSend, bool suppressLogging)
+        internal static async Task<bool> SendSessions(SessionCriteria? criteria,
+            Predicate<ISessionSummary> sessionMatchPredicate, bool asyncSend, bool suppressLogging)
         {
+            //Safe send wrapper - we need to be sure we dispose the packager on completion
+            //or we'll never send again.
+            void InternalSend(ServerConfiguration configuration)
+            {
+                Packager packager = null;
+                try
+                {
+                    packager = new Packager();
+                    if (criteria.HasValue)
+                        packager.SendToServer(criteria.Value, true, configuration.PurgeSentSessions,
+                            false, suppressLogging);
+                    else
+                        packager.SendToServer(sessionMatchPredicate, true, configuration.PurgeSentSessions,
+                            false, suppressLogging);
+                }
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch (Exception)
+                {
+                }
+                finally
+                {
+                    packager.SafeDispose();
+                }
+            }
+
             if ((criteria.HasValue == false) && (sessionMatchPredicate == null))
             {
                 if (!suppressLogging)
-                    Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to no criteria specified", "A session match predicate wasn't provided so nothing would be selected to send, skipping the send.");
+                    Write(LogMessageSeverity.Information, Packager.LogCategory,
+                        "Send session command ignored due to no criteria specified",
+                        "A session match predicate wasn't provided so nothing would be selected to send, skipping the send.");
                 return false;
             }
 
             bool result = false;
-            Packager newPackager = null;
-            lock(s_SyncObject)
+            string message = null;
+            HubConnectionStatus connectionStatus = null;
+
+            var configured = IsHubSubmissionConfigured(ref message);
+            if (configured)
             {
-                if (s_ActivePackager == null)
-                {
-                    //we aren't doing a package, lets create a new one and process with it
-                    newPackager = new Packager();
-                    s_ActivePackager = newPackager; //this claims our spot
-                }
-            
-                System.Threading.Monitor.PulseAll(s_SyncObject);
+                connectionStatus = await Packager.CanSendToServer().ConfigureAwait(false);
             }
 
-            if (newPackager == null)
+            if (configured && (connectionStatus?.IsValid ?? false))
             {
-                //someone else is sending
-                if (!suppressLogging)
-                    Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to ongoing send", 
-                        "There is already a packager session send going on for the current application so this second request will be ignored to prevent interference.");
+                //we DON'T release the active packager here, we do it in the event handler.
+                var config = s_RunningConfiguration.Server;
+                if (asyncSend)
+                {
+                    //we're going to dispatch this to a task to make it truly asynchronous.
+#pragma warning disable 4014
+                    Task.Run(() => InternalSend(config));
+#pragma warning restore 4014
+                }
+                else
+                {
+                    InternalSend(config);
+                }
+
+                result = true;
             }
             else
             {
-                try
-                {
-                    string message = null;
-                    HubConnectionStatus connectionStatus = null;
+                //we can't send.
+                var description = configured == false
+                    ? message
+                    : connectionStatus?.Message;
 
-                    var configured = IsHubSubmissionConfigured(ref message);
-                    if (configured)
-                    {
-                        connectionStatus = await Packager.CanSendToServer().ConfigureAwait(false);
-                    }
-                    
-                    if (configured && (connectionStatus?.IsValid ?? false))
-                    {
-                        //we DON'T release the active packager here, we do it in the event handler.
-                        ServerConfiguration config = s_RunningConfiguration.Server;
-                        newPackager.EndSend += Packager_EndSend;
-
-                        if (criteria.HasValue)
-                            newPackager.SendToServer(criteria.Value, true, config.PurgeSentSessions, asyncSend, suppressLogging);
-                        else
-                            newPackager.SendToServer(sessionMatchPredicate, true, config.PurgeSentSessions, asyncSend, suppressLogging);
-
-                        result = true;
-                    }
-                    else
-                    {
-                        //we can't send.
-                        var description = configured == false
-                            ? message
-                            : connectionStatus?.Message;
-
-                        if (!suppressLogging)
-                            Write(LogMessageSeverity.Information, Packager.LogCategory, "Send session command ignored due to configuration", 
-                                description);
-
-                        //no good, dispose and clear the packager.
-                        lock(s_SyncObject)
-                        {
-                            newPackager.Dispose();
-                            s_ActivePackager = null;
-                        
-                            System.Threading.Monitor.PulseAll(s_SyncObject);
-                        }
-                    }
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch
-                    // ReSharper restore EmptyGeneralCatchClause
-                {
-                    // That should never throw an exception, but it would not be good if it killed NotifyDispatchMain() and
-                    // skipped setting the next notify time.  So we'll swallow any exceptions here.
-                }
-
+                if (!suppressLogging)
+                    Write(LogMessageSeverity.Information, Packager.LogCategory,
+                        "Send session command ignored due to configuration",
+                        description);
             }
 
             return result;
@@ -2110,32 +2100,6 @@ namespace Gibraltar.Monitor
 #endif
 
                 }
-            }
-        }
-
-        #endregion
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Used to get rid of our active packager handle when it's done.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private static void Packager_EndSend(object sender, PackageSendEventArgs args)
-        {
-            lock(s_SyncObject)
-            {
-                Packager caller = (Packager)sender;
-
-                if (ReferenceEquals(caller, s_ActivePackager))
-                {
-                    //outstanding! we can clear our pointer now.
-                    s_ActivePackager.EndSend -= Packager_EndSend;
-                    s_ActivePackager = null;
-                }
-
-                System.Threading.Monitor.PulseAll(s_SyncObject);
             }
         }
 

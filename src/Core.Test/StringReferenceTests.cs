@@ -32,10 +32,8 @@ namespace Loupe.Core.Test
 
             StringReference.WeakStringCollection testCollection = new StringReference.WeakStringCollection(primeZero);
             Assert.AreEqual(1, testCollection.Count);
-            primeZero = null;
-            GC.Collect(); // And make sure GC kills it.
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            primeZero = null; //clear the reference so it can be GC'd.
+            GarbageCollection(); // And make sure GC kills it.
             Assert.AreEqual(0, testCollection.Pack()); // Confirm that it's gone.
             primeZero = GetTestString(0);
             Assert.AreEqual(1, testCollection.PackAndOrAdd(ref primeZero)); // Add it back.

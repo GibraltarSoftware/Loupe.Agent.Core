@@ -110,6 +110,9 @@ namespace Loupe.Core.Test.Data
                 return;
             }
 
+            if (File.Exists(m_OutputFileNamePath))
+                File.Delete(m_OutputFileNamePath);
+
             using (Packager newPackager = new Packager(Log.SessionSummary.Product))
             {
                 //create the package
@@ -130,6 +133,9 @@ namespace Loupe.Core.Test.Data
                 //we MIGHT still be good - if none of our new sessions are still there.
                 foreach (var newSession in newSessions)
                 {
+                    //if this is *our* session, skip it - it is still new.
+                    if (newSession.Id.Equals(Log.SessionSummary.Id)) continue;
+
                     //this session Id better not be in the new list....
                     Assert.AreEqual(null, newSessionsPost.Find(new Predicate<ISessionSummary>(x => x.Id == newSession.Id)), "The session {0} is still in the index as new and should have been marked sent.", newSession.Id); //null is not found
                 }
@@ -240,21 +246,6 @@ namespace Loupe.Core.Test.Data
 
         private static ISessionSummaryCollection GetNewSessions()
         {
-            /*
-            DataSet allSessions = RepositoryManager.Collection.GetSessions();
-
-            string productName, applicationName, applicationDescription;
-            Version applicationVersion;
-            ContextSummary.GetApplicationNameSafe(out productName, out applicationName, out applicationVersion, out applicationDescription);
-
-            string whereClause = string.Format(CultureInfo.InvariantCulture, "[Product_Name] = '{0}' AND [Application_Name] = '{1}' AND [Status_Name] <> 'running' AND [Is_New] = 1",
-                                               productName, applicationName);
-
-            //filter the set of sessions to just new sessions
-            DataView newSessions = new DataView(allSessions.Tables[0], whereClause, null, DataViewRowState.CurrentRows);
-            return newSessions;
-             * */
-
             var localRepository = new LocalRepository(Log.SessionSummary.Product);
             return localRepository.Find(new SessionCriteriaPredicate(Log.SessionSummary.Product, null, SessionCriteria.NewSessions).Predicate);
         }

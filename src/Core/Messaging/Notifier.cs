@@ -246,7 +246,8 @@ namespace Gibraltar.Messaging
                                 //we guard against sending too often.
                                 m_MinimumWaitNextNotify = m_MinimumWaitNextNotify < DefaultSendDelay ? DefaultSendDelay : m_MinimumWaitNextNotify;
 
-                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, true, Log.SilentMode));
+                                //to be 100% sure we're not blocking, we'll chuck this to a task.
+                                Task.Run(() => Log.SendSessions(SessionCriteria.ActiveSession, null, false, Log.SilentMode));
                             }
 
                             m_LastNotifyCompleted = DateTimeOffset.UtcNow;

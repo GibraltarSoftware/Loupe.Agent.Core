@@ -806,8 +806,7 @@ namespace Gibraltar.Monitor
 
             try
             {
-                FileStream sourceFile = null;
-                using (sourceFile = FileHelper.OpenFileStream(sessionFileNamePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var sourceFile = FileHelper.OpenFileStream(sessionFileNamePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     if (sourceFile == null)
                     {

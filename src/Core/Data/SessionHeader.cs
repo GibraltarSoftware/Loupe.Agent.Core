@@ -15,6 +15,7 @@ namespace Gibraltar.Data
     /// <remarks>The session header subsumes a SessionStartInfoPacket, but both should be included
     /// in a stream because the SessionHeader is really a cache of the session start info packet that
     /// is easy to access.</remarks>
+    [DebuggerDisplay("{Product} {Application} ({Id})")]
     public sealed class SessionHeader: ISessionSummary, IEquatable<SessionHeader>
     {
         private readonly object m_Lock = new object();

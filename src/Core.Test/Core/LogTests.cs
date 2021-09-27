@@ -245,6 +245,7 @@ namespace Loupe.Core.Test.Core
                 Interlocked.Increment(ref _ResolutionRequests);
 
                 var user = applicationUser.Value;
+                var realUser = user.Key; //be sure to initialize it, otherwise it doesn't count.
                 return true;
             }
 

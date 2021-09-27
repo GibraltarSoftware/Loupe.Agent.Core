@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Loupe.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -24,6 +26,9 @@ namespace Extensions.Logging.Tests
             using (logger.BeginScope("Number: {Number}", 42))
             {
                 json = LoupeLogEnricher.GetJson((object) null, provider);
+
+                //eliminate all whitespace for comparison to avoid formatting variations.
+                json = EliminateWhiteSpaceCharacters(json);
             }
 
             Assert.Equal("{\"Number\":42}", json);
@@ -40,6 +45,10 @@ namespace Extensions.Logging.Tests
                 ["Decimal"] = 23.3m
             };
             var json = LoupeLogEnricher.GetJson(state, provider);
+
+            //eliminate all whitespace for comparison to avoid formatting variations.
+            json = EliminateWhiteSpaceCharacters(json);
+
             Assert.Contains("\"Word\":\"Hello\"", json);
             Assert.Contains("\"Integer\":42", json);
             Assert.Contains("\"Decimal\":23.3", json);
@@ -58,6 +67,9 @@ namespace Extensions.Logging.Tests
                     ["Number"] = 23,
                 };
                 json = LoupeLogEnricher.GetJson(state, provider);
+
+                //eliminate all whitespace for comparison to avoid formatting variations.
+                json = EliminateWhiteSpaceCharacters(json);
             }
             Assert.Equal("{\"Number\":23}", json);
         }
@@ -76,8 +88,19 @@ namespace Extensions.Logging.Tests
                 ["Value"] = 23,
             };
             var json = LoupeLogEnricher.GetJson(state, provider);
+
+            //eliminate all whitespace for comparison to avoid formatting variations.
+            json = EliminateWhiteSpaceCharacters(json);
+
             Assert.Equal("{\"Value\":23}", json);
             
+        }
+
+        private string EliminateWhiteSpaceCharacters(string original)
+        {
+            return new string(original.ToCharArray()
+                .Where(c => !char.IsWhiteSpace(c))
+                .ToArray());
         }
     }
 }
