@@ -41,7 +41,7 @@ namespace Loupe.Agent.Core.Services
 
 #if !NETSTANDARD2_0 && !NET461
         /// <summary>
-        /// Adds the Loupe provider for <c>Microsoft.Extensions.Logging</c>.
+        /// Adds the main Loupe Agent.
         /// </summary>
         /// <param name="builder">The <see cref="IHostBuilder"/>.</param>
         /// <param name="configure">Optional.  An Agent configuration delegate</param>
@@ -57,7 +57,7 @@ namespace Loupe.Agent.Core.Services
         }
 
         /// <summary>
-        /// Adds the Loupe provider for <c>Microsoft.Extensions.Logging</c>.
+        /// Adds the main Loupe Agent.
         /// </summary>
         /// <param name="builder">The <see cref="IHostBuilder"/>.</param>
         /// <param name="agentBuilder">A Loupe Agent builder delegate</param>

@@ -37,6 +37,8 @@ namespace Loupe.Agent.EntityFrameworkCore
         public EntityFrameworkCoreDiagnosticListener(LoupeAgent agent, EntityFrameworkConfiguration configuration = null)
         {
             _configuration = configuration ?? new EntityFrameworkConfiguration();
+            LogCallStack = _configuration.LogCallStack;
+            LogExceptions = _configuration.LogExceptions;
         }
 
         /// <summary>
