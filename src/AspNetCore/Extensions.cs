@@ -88,7 +88,7 @@ namespace Loupe.Agent.AspNetCore
 
         internal static string? GetSessionId(this HttpContext context)
         {
-            return context.Items[Constants.SessionId] as string;
+            return context.Items[Constants.SessionIdCookie] as string;
     
         }
 
