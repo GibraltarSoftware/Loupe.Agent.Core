@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Loupe.Agent.AspNetCore.Infrastructure;
 using Microsoft.AspNetCore.Http;
 
@@ -10,26 +11,54 @@ namespace Loupe.Agent.AspNetCore.Handlers
         /// Get the session Id from request cookies, if present.
         /// </summary>
         /// <param name="context"></param>
-        public static string GetSessionId(HttpContext context)
+        public static string GetSessionId(HttpContext context, CookieOptions cookieOptions)
         {
-            if (!context.Request.Cookies.TryGetValue(Constants.SessionId, out var sessionId))
+            string sessionId = null;
+            
+            // Check the loupe-sessionid header
+            if (context.Request.Headers.TryGetValue(Constants.SessionIdHeaderName, out var sessionIdHeader))
             {
-                sessionId = SetSessionCookie(context);
+                if (sessionIdHeader.Count > 0)
+                {
+                    sessionId = sessionIdHeader[0];
+                }
             }
 
-            context.Items[Constants.SessionId] = sessionId;
+            // If not in the header, try the cookie
+            if (sessionId is null)
+            {
+                if (!context.Request.Cookies.TryGetValue(Constants.SessionIdCookie, out sessionId))
+                {
+                    sessionId = NewSessionId(context, cookieOptions);
+                }
+            }
+            else
+            {
+                // Make sure the cookie is set
+                if (!context.Request.Cookies.ContainsKey(Constants.SessionIdCookie))
+                {
+                    SetSessionIdCookie(context, sessionId, cookieOptions);
+                }
+            }
+            
+            context.Items[Constants.SessionIdKey] = sessionId;
 
             return sessionId;
         }
 
-        private static string SetSessionCookie(HttpContext context)
+        private static string NewSessionId(HttpContext context, CookieOptions options)
         {
             var sessionId = Guid.NewGuid().ToString();
-            context.Response.Cookies.Append(Constants.SessionId, sessionId, new CookieOptions
-            {
-                HttpOnly = true
-            });
+
+            context.Response.Headers.Add(Constants.SessionIdHeaderName, sessionId);
+            context.Response.Cookies.Append(Constants.SessionIdCookie, sessionId, options);
+            
             return sessionId;
+        }
+
+        private static void SetSessionIdCookie(HttpContext context, string sessionId, CookieOptions options)
+        {
+            context.Response.Cookies.Append(Constants.SessionIdCookie, sessionId, options);
         }
     }
 }

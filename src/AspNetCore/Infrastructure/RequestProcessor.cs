@@ -69,7 +69,7 @@ namespace Loupe.Agent.AspNetCore.Infrastructure
 
         private void CacheClientDetails(HttpContext context, LogRequest logRequest)
         {
-            if (context.Items[Constants.SessionId] is string sessionId && logRequest.Session?.Client != null)
+            if (context.Items[Constants.SessionIdCookie] is string sessionId && logRequest.Session?.Client != null)
             {
                 var clientDetailsBuilder = new ClientDetailsBuilder();
 
@@ -83,7 +83,7 @@ namespace Loupe.Agent.AspNetCore.Infrastructure
 
         private void AddSessionId(HttpContext context, LogRequest logRequest)
         {
-            var sessionId = context.Items[Constants.SessionId] as string;
+            var sessionId = context.Items[Constants.SessionIdCookie] as string;
             var agentSessionId = context.Items[Constants.AgentSessionId] as string;
 
             if (string.IsNullOrWhiteSpace(agentSessionId) && logRequest.Session != null &&
