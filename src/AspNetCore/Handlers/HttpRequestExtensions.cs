@@ -14,8 +14,8 @@ namespace Loupe.Agent.AspNetCore.Handlers
         };
 
         public static bool IsInteresting(this HttpRequest request) =>
-            !request.Headers.ContainsKey("Origin")
-            && ValidExtensions.Contains(PathExtension(request))
+            // !request.Headers.ContainsKey("Origin")
+            ValidExtensions.Contains(PathExtension(request))
             && !IsBrowserLink(request);
         
         private static bool IsBrowserLink(HttpRequest request) =>

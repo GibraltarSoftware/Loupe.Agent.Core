@@ -18,6 +18,7 @@ namespace Loupe.Agent.AspNetCore
     {
         private readonly ILoggerFactory? _loggerFactory;
         private readonly RequestDelegate _next;
+        private readonly CookieOptions? _cookieOptions;
 
         /// <summary>
         /// Constructs and instance of <see cref="LoupeCookieMiddleware"/>.
@@ -25,10 +26,11 @@ namespace Loupe.Agent.AspNetCore
         /// <param name="next"></param>
         /// <param name="loggerFactory"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public LoupeCookieMiddleware(RequestDelegate next, ILoggerFactory? loggerFactory = null)
+        public LoupeCookieMiddleware(RequestDelegate next, CookieOptions? cookieOptions, ILoggerFactory? loggerFactory = null)
         {
             _loggerFactory = loggerFactory;
             _next = next ?? throw new ArgumentNullException(nameof(next));
+            _cookieOptions = cookieOptions;
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Loupe.Agent.AspNetCore
             {
                 if (context.Request.IsInteresting())
                 {
-                    var sessionId = CookieHandler.GetSessionId(context);
+                    var sessionId = CookieHandler.GetSessionId(context, _cookieOptions);
                     var agentSessionId = HeaderHandler.GetAgentSessionId(context);
 
                     //only grab session ids if we could possibly log them...
@@ -54,7 +56,7 @@ namespace Loupe.Agent.AspNetCore
                         if (!string.IsNullOrEmpty(sessionId))
                         {
                             requestProperties ??= new List<KeyValuePair<string, object>>();
-                            requestProperties.Add(new KeyValuePair<string, object>(Constants.SessionId, sessionId));
+                            requestProperties.Add(new KeyValuePair<string, object>(Constants.SessionIdCookie, sessionId));
                         }
 
                         if (!string.IsNullOrEmpty(agentSessionId))
