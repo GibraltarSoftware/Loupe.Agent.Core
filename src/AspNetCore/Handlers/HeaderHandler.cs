@@ -12,7 +12,7 @@ namespace Loupe.Agent.AspNetCore.Handlers
         /// <returns>The header value or null of no header was present.</returns>
         public static string GetAgentSessionId(HttpContext context)
         {
-            if (context.Request.Headers.TryGetValue(Constants.ClientHeaderName, out var header) && header.Count > 0)
+            if (context.Request.Headers.TryGetValue(Constants.AgentSessionIdHeaderName, out var header) && header.Count > 0)
             {
                 context.Items[Constants.AgentSessionId] = header[0];
                 return header;

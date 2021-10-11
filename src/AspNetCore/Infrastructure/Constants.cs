@@ -22,9 +22,9 @@ namespace Loupe.Agent.AspNetCore.Infrastructure {
     internal class Constants {
         public const string SessionIdKey = "LoupeSessionId";
         public const string SessionIdCookie = "LoupeSessionId";
-        public const string SessionIdHeaderName = "loupe-sessionid";
+        public const string SessionIdHeaderName = "loupesessionid"; //for legacy reasons, this is without hyphens.
         public const string AgentSessionId = "LoupeAgentSessionId";
-        public const string ClientHeaderName = "loupe-agent-sessionId";
+        public const string AgentSessionIdHeaderName = "loupe-agent-sessionId";
         internal const string LogSystem = "Loupe";
         internal const string MetricCategory = "Web Site.Requests";
         internal const string Category = "Loupe.AspNet";
