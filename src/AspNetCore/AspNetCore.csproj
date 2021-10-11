@@ -82,6 +82,11 @@
 		</Otherwise>
 	</Choose>
 	<ItemGroup>
+	  <Compile Remove="Configuration\**" />
+	  <EmbeddedResource Remove="Configuration\**" />
+	  <None Remove="Configuration\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
@@ -97,8 +102,5 @@
 			<Name>Extensibility</Name>
 		</ProjectReference>
 		<ProjectReference Include="..\Services\Services.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Configuration\" />
 	</ItemGroup>
 </Project>

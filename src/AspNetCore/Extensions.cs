@@ -85,16 +85,24 @@ namespace Loupe.Agent.AspNetCore
             return anonymousObject.GetType().GetTypeInfo().GetDeclaredProperty(propertyName)?.GetValue(anonymousObject) as T;
         }
 
-
         internal static string? GetSessionId(this HttpContext context)
         {
-            return context.Items[Constants.SessionIdCookie] as string;
-    
+            return context.Items[Constants.SessionIdKey] as string;
+        }
+
+        internal static void SetSessionId(this HttpContext context, string? sessionId)
+        {
+            context.Items[Constants.SessionIdKey] = sessionId;
         }
 
         internal static string? GetAgentSessionId(this HttpContext context)
         {
-            return context.Items[Constants.AgentSessionId] as string;
+            return context.Items[Constants.AgentSessionIdKey] as string;
+        }
+
+        internal static void SetAgentSessionId(this HttpContext context, string? sessionId)
+        {
+            context.Items[Constants.AgentSessionIdKey] = sessionId;
         }
     }
 }

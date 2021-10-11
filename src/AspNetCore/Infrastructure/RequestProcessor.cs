@@ -84,12 +84,12 @@ namespace Loupe.Agent.AspNetCore.Infrastructure
         private void AddSessionId(HttpContext context, LogRequest logRequest)
         {
             var sessionId = context.Items[Constants.SessionIdCookie] as string;
-            var agentSessionId = context.Items[Constants.AgentSessionId] as string;
+            var agentSessionId = context.Items[Constants.AgentSessionIdKey] as string;
 
             if (string.IsNullOrWhiteSpace(agentSessionId) && logRequest.Session != null &&
                 !string.IsNullOrWhiteSpace(logRequest.Session.CurrentAgentSessionId))
             {
-                context.Items[Constants.AgentSessionId] = logRequest.Session.CurrentAgentSessionId;
+                context.Items[Constants.AgentSessionIdKey] = logRequest.Session.CurrentAgentSessionId;
             }
 
             if (logRequest.LogMessages is null) return;
