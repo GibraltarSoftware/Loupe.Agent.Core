@@ -23,8 +23,8 @@ namespace Loupe.Agent.AspNetCore.Infrastructure {
         public const string SessionIdKey = "LoupeSessionId";
         public const string SessionIdCookie = "LoupeSessionId";
         public const string SessionIdHeaderName = "loupesessionid"; //for legacy reasons, this is without hyphens.
-        public const string AgentSessionId = "LoupeAgentSessionId";
-        public const string AgentSessionIdHeaderName = "loupe-agent-sessionId";
+        public const string AgentSessionIdKey = "LoupeAgentSessionId";
+        public const string AgentSessionIdHeaderName = "loupe-agent-sessionid";
         internal const string LogSystem = "Loupe";
         internal const string MetricCategory = "Web Site.Requests";
         internal const string Category = "Loupe.AspNet";

@@ -10,12 +10,11 @@ namespace Loupe.Agent.AspNetCore.Handlers
         /// <summary>
         /// Get the session Id from request cookies, if present.
         /// </summary>
-        /// <param name="context"></param>
         public static string GetSessionId(HttpContext context, CookieOptions cookieOptions)
         {
             string sessionId = null;
             
-            // Check the loupe-sessionid header
+            // Check the loupesessionid header
             if (context.Request.Headers.TryGetValue(Constants.SessionIdHeaderName, out var sessionIdHeader))
             {
                 if (sessionIdHeader.Count > 0)
@@ -35,13 +34,10 @@ namespace Loupe.Agent.AspNetCore.Handlers
             else
             {
                 // Make sure the cookie is set
-                if (!context.Request.Cookies.ContainsKey(Constants.SessionIdCookie))
-                {
-                    SetSessionIdCookie(context, sessionId, cookieOptions);
-                }
+                SetSessionIdCookie(context, sessionId, cookieOptions);
             }
             
-            context.Items[Constants.SessionIdKey] = sessionId;
+            context.SetSessionId(sessionId);
 
             return sessionId;
         }
