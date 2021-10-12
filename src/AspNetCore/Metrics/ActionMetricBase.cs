@@ -252,6 +252,7 @@ namespace Loupe.Agent.AspNetCore.Metrics
         /// Id from JavaScript agent for session
         /// </summary>
         [EventMetricValue("AgentSessionId", SummaryFunction.Count, null, Caption = "Agent Session Id", Description = "Id from JavaScript agent for session")]
+        [JsonPropertyName("LoupeAgentSessionId")] //match MEL
         public string? AgentSessionId { get; }
 
         /// <summary>
