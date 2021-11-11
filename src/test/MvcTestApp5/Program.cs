@@ -25,8 +25,9 @@ namespace MvcTestApp
             Host.CreateDefaultBuilder(args)
                 .AddLoupe(builder => builder.AddAspNetCoreDiagnostics()
                     .AddClientLogging() //The Loupe endpoint feature for your ASP.NET API
-                    .AddPerformanceCounters()
-                    .AddEntityFrameworkCoreDiagnostics())//EF Core monitoring
+                    .AddPerformanceCounters() //Windows Perf Counters
+                    .AddEntityFrameworkCoreDiagnostics(), //EF Core monitoring
+                    config => config.Properties.Add("Run Id", Guid.NewGuid().ToString()))
                 .AddLoupeLogging()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

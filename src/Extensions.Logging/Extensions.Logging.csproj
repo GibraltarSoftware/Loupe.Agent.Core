@@ -73,6 +73,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Agent\Agent.csproj" />
+		<ProjectReference Include="..\Services\Services.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

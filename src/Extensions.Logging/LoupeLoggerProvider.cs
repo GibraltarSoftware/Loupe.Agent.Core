@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Threading;
 using Gibraltar.Agent;
+using Loupe.Agent.Core.Services;
 using Loupe.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -25,11 +26,14 @@ namespace Loupe.Extensions.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="LoupeLoggerProvider"/> class.
         /// </summary>
-        /// <param name="configuration">The configuration.</param>
-        public LoupeLoggerProvider(IConfiguration configuration)
+        /// <param name="configuration">Optional. The application configuration.</param>
+        /// <param name="configure">Optional.  An action to modify the Loupe agent configuration.</param>
+        public LoupeLoggerProvider(IConfiguration configuration, LoupeAgentConfigurationCallback configure = null)
         {
             var agentConfiguration = new AgentConfiguration();
             configuration?.GetSection("Loupe")?.Bind(agentConfiguration);
+            configure?.Invoke(agentConfiguration);
+
             Log.StartSession(agentConfiguration);
         }
 
