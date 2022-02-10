@@ -1250,12 +1250,17 @@ namespace Gibraltar.Monitor
                         {
                             var destinationFileNamePath = Path.Combine(destinationDirectory, fragment.Name);
 
-                            //make sure there isn't a file already there (can happen in rare race conditions)
-                            FileHelper.SafeDeleteFile(destinationFileNamePath);
-
                             //and then move the file to the new location.
                             Directory.CreateDirectory(destinationDirectory);
-                            fragment.MoveTo(Path.Combine(destinationDirectory, fragment.Name));
+
+                            //we've seen an odd problem in Azure Service Plans with FileInfo.MoveTo, switching to File.Move.
+#if NET5_0_OR_GREATER
+                            File.Move(fragment.FullName, destinationFileNamePath, true);
+#else
+                            //make sure there isn't a file already there (can happen in rare race conditions)
+                            FileHelper.SafeDeleteFile(destinationFileNamePath);
+                            File.Move(fragment.FullName, destinationFileNamePath);
+#endif
                             modifiedAnyFile = true;
                         }
                     }
@@ -1280,6 +1285,6 @@ namespace Gibraltar.Monitor
             return modifiedAnyFile;
         }
 
-        #endregion
+#endregion
     }
 }

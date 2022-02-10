@@ -500,7 +500,7 @@ namespace Gibraltar.Data.Internal
             await m_HubConnection.ExecuteRequest(uploadRequest, -1).ConfigureAwait(false);
 
             //and if we were successful (must have been - we got to here) then mark the session as not being new any more.
-            m_SourceRepository.SetSessionsNew(new[] { sessionId }, false);
+            m_SourceRepository.SetSessionNew(sessionId, false);
         }
 
         /// <summary>
