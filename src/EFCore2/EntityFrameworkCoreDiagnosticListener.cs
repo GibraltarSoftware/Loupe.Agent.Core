@@ -20,7 +20,7 @@ namespace Loupe.Agent.EntityFrameworkCore
     /// Diagnostic listener for EF Core events.
     /// </summary>
     /// <seealso cref="Loupe.Agent.Core.Services.ILoupeDiagnosticListener" />
-    internal class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
+    public class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
     {
         private const string LogSystem = "Loupe";
         private const string LogCategory = EntityFrameworkConfiguration.LogCategory + ".Query";

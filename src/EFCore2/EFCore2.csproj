@@ -4,9 +4,9 @@
 		<LangVersion>8.0</LangVersion>
 		<AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
 		<RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
-		<Version>4.12.0.0</Version>
-		<FileVersion>4.12.0.0</FileVersion>
-		<AssemblyVersion>4.12.0.0</AssemblyVersion>
+		<Version>4.13.0.0</Version>
+		<FileVersion>4.13.0.0</FileVersion>
+		<AssemblyVersion>4.13.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Product>Loupe</Product>
 		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
@@ -27,6 +27,7 @@
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
 		<PackageTags>Loupe,entity-framework-core,EFCore,logging,diagnostics</PackageTags>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
