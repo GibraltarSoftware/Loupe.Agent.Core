@@ -1369,7 +1369,7 @@ namespace Gibraltar.Data
                                         var localRepository = publishClient.Repository;
                                         try
                                         {
-                                            localRepository.SetSessionsNew(new[] { session.Id }, false);
+                                            localRepository.SetSessionNew(session.Id, false);
                                         }
                                         catch (Exception ex)
                                         {

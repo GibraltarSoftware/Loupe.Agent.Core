@@ -12,6 +12,7 @@ namespace Loupe.Agent.Core.Services
     /// </summary>
     public static class ServicesExtensions
     {
+        /*
         /// <summary>
         /// Adds Loupe to the services with a configuration callback.
         /// </summary>
@@ -27,16 +28,56 @@ namespace Loupe.Agent.Core.Services
         }
 
         /// <summary>
-        /// Adds Loupe to the services with a configuration callback.
+        /// Adds Loupe to the services collection.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>An instance of <see cref="ILoupeAgentBuilder"/> for further customization.</returns>
+        [Obsolete("Returns nonstandard type")]
         public static ILoupeAgentBuilder AddLoupe(this IServiceCollection services)
         {
             AddOptions(services);
             services.AddSingleton<IHostedService, LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
             return new LoupeAgentServicesCollectionBuilder(services);
+        }
+        */
+
+        /// <summary>
+        /// Adds Loupe to the services collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The modified <see cref="IServiceCollection"/></returns>
+        public static IServiceCollection AddLoupe(this IServiceCollection services, Action<AgentConfiguration> configure = null)
+        {
+            AddOptions(services, configure);
+            services.AddSingleton<IHostedService, LoupeAgentService>();
+            services.AddSingleton<LoupeAgent>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds Loupe to the services collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="agentBuilder">The <see cref="ILoupeAgentBuilder"/> delegate for further customization.</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The modified <see cref="IServiceCollection"/></returns>
+        public static IServiceCollection AddLoupe(this IServiceCollection services,
+            Action<ILoupeAgentBuilder> agentBuilder, Action<AgentConfiguration> configure = null)
+        {
+            AddOptions(services, configure);
+            services.AddSingleton<IHostedService, LoupeAgentService>();
+            services.AddSingleton<LoupeAgent>();
+
+            if (agentBuilder != null)
+            {
+                var agentServices = new LoupeAgentServicesCollectionBuilder(services);
+                agentBuilder(agentServices);
+            }
+
+            return services;
         }
 
 #if !NETSTANDARD2_0 && !NET461
