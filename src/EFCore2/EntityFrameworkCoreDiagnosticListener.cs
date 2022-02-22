@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Text;
 using Gibraltar.Agent;
 using Gibraltar.Agent.EntityFramework.Internal;
@@ -19,11 +20,13 @@ namespace Loupe.Agent.EntityFrameworkCore
     /// <summary>
     /// Diagnostic listener for EF Core events.
     /// </summary>
-    /// <seealso cref="Loupe.Agent.Core.Services.ILoupeDiagnosticListener" />
-    public class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>
+    /// <seealso cref="ILoupeDiagnosticListener" />
+    public class EntityFrameworkCoreDiagnosticListener : ILoupeDiagnosticListener, IObserver<KeyValuePair<string, object>>, IObserver<DiagnosticListener>
     {
         private const string LogSystem = "Loupe";
         private const string LogCategory = EntityFrameworkConfiguration.LogCategory + ".Query";
+
+        private readonly List<IDisposable> _subscriptions = new List<IDisposable>(); //only used when we're directly used as a diagnostic listener
 
         private readonly EntityFrameworkConfiguration _configuration;
         private readonly ConcurrentDictionary<Guid, DatabaseMetric> _commands = new ConcurrentDictionary<Guid, DatabaseMetric>();
@@ -46,26 +49,35 @@ namespace Loupe.Agent.EntityFrameworkCore
         /// </summary>
         public string Name => "Microsoft.EntityFrameworkCore";
 
-        /// <summary>
-        /// Notifies the observer that the provider has finished sending push-based notifications.
-        /// </summary>
-        public void OnCompleted()
+        /// <inheritdoc />
+        void IObserver<DiagnosticListener>.OnCompleted()
+        {
+            //This is only used if the listener is directly used as a diagnostic listener
+            _subscriptions.ForEach(x => x.Dispose());
+            _subscriptions.Clear();
+        }
+
+        /// <inheritdoc />
+        void IObserver<KeyValuePair<string, object>>.OnCompleted()
         {
         }
 
-        /// <summary>
-        /// Notifies the observer that the provider has experienced an error condition.
-        /// </summary>
-        /// <param name="error">An object that provides additional information about the error.</param>
+        /// <inheritdoc cref="IObserver{T}.OnError" />
         public void OnError(Exception error)
         {
             Log.Error(error, LogWriteMode.Queued, "EntityFrameworkCoreDiagnosticListener", error.Message, "LoupeDiagnosticListener");
         }
 
-        /// <summary>
-        /// Provides the observer with new data.
-        /// </summary>
-        /// <param name="value">The current notification information.</param>
+        /// <inheritdoc />
+        void IObserver<DiagnosticListener>.OnNext(DiagnosticListener diagnosticListener)
+        {
+            if (diagnosticListener.Name.Equals(Name))
+            {
+                _subscriptions.Add(diagnosticListener.Subscribe(this));
+            }
+        }
+
+        /// <inheritdoc />
         public void OnNext(KeyValuePair<string, object> value)
         {
             switch (value.Value)
