@@ -45,6 +45,17 @@ namespace Loupe.Agent.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="EntityFrameworkCoreDiagnosticListener"/> class.
+        /// </summary>
+        /// <param name="configuration">Optional. The framework for the listener</param>
+        public EntityFrameworkCoreDiagnosticListener(EntityFrameworkConfiguration configuration = null)
+        {
+            _configuration = configuration ?? new EntityFrameworkConfiguration();
+            LogCallStack = _configuration.LogCallStack;
+            LogExceptions = _configuration.LogExceptions;
+        }
+
+        /// <summary>
         /// Returns the name of the <see cref="T:System.Diagnostics.DiagnosticSource" /> this implementation targets.
         /// </summary>
         public string Name => "Microsoft.EntityFrameworkCore";
