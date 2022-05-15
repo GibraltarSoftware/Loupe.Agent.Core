@@ -64,5 +64,5 @@ jobs:
         **/bin/Release/**/*.Tests.dll
         !EntityFramework.Tests.dll
       searchFolder: '$(Build.SourcesDirectory)'
-      vsTestVersion: '17.0'
+      vsTestVersion: 'latest'
       codeCoverageEnabled: true
