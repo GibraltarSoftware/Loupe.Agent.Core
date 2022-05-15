@@ -62,6 +62,7 @@ jobs:
       testAssemblyVer2: |
         **/bin/Release/**/*.Test.dll
         **/bin/Release/**/*.Tests.dll
+        !EntityFramework.Tests.dll
       searchFolder: '$(Build.SourcesDirectory)'
-      vsTestVersion: '16.0'
+      vsTestVersion: '17.0'
       codeCoverageEnabled: true
