@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Loupe.Configuration
 {
@@ -306,13 +307,39 @@ namespace Loupe.Configuration
         /// <inheritdoc />
         public override string ToString()
         {
+            var stringBuilder = new StringBuilder();
+
             if (UseGibraltarService)
-                return string.Format("Loupe Cloud-Hosted Subscription '{0}'", CustomerName);
+            {
 
-            if (string.IsNullOrWhiteSpace(Repository))
-                return string.Format("Loupe Server '{0}'", Server);
+                stringBuilder.AppendFormat("\tLoupe Cloud-Hosted Subscription '{0}'\r\n", CustomerName);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Repository))
+                {
+                    stringBuilder.AppendFormat("\tLoupe Server '{0}'", Server);
+                }
+                else
+                {
+                    stringBuilder.AppendFormat("\tLoupe Server '{0}' repository '{1}'", Server, Repository);
+                }
+                stringBuilder.AppendFormat("\tUse Ssl: {0}\r\n", UseSsl);
 
-            return string.Format("Loupe Server '{0}' repository '{1}'", Server, Repository);
+                if (Port != 0)
+                    stringBuilder.AppendFormat("\tPort: {0}\r\n", Port);
+            }
+
+            if (string.IsNullOrEmpty(ApplicationKey) == false)
+                stringBuilder.AppendFormat("\tApplication Key: {0}\r\n", ApplicationKey);
+
+            stringBuilder.AppendFormat("\tAuto Send Sessions: {0}\r\n", AutoSendSessions);
+            stringBuilder.AppendFormat("\tSend All Applications: {0}\r\n", SendAllApplications);
+            stringBuilder.AppendFormat("\tPurge Sent Sessions: {0}\r\n", PurgeSentSessions);
+
+            stringBuilder.AppendFormat("\tAuto Send On Error: {0}\r\n", AutoSendOnError);
+
+            return stringBuilder.ToString();
         }
     }
 }
