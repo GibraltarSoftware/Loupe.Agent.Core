@@ -52,7 +52,7 @@ namespace MvcTestApp
             services.AddRazorPages()
                  .AddMicrosoftIdentityUI();
 
-            services.AddLoupe().AddEntityFrameworkCoreDiagnostics();
+            services.AddLoupe( builder => builder.AddEntityFrameworkCoreDiagnostics());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
