@@ -8,7 +8,7 @@ namespace Loupe.Agent.PerformanceCounters
     /// <summary>
     /// Extension methods for Performance Counters
     /// </summary>
-    public static class Extensions
+    public static class LoupeAgentBuilderExtensions
     {
         /// <summary>
         /// Add performance counter monitoring to the Loupe Agent

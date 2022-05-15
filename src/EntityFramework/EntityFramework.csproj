@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>8.0</LangVersion>
+		<AssemblyName>Loupe.Agent.EntityFramework</AssemblyName>
+		<RootNamespace>Loupe.Agent.EntityFramework</RootNamespace>
+		<Version>4.12.0.0</Version>
+		<FileVersion>4.12.0.0</FileVersion>
+		<AssemblyVersion>4.12.0.0</AssemblyVersion>
+		<Authors>Gibraltar Software, Inc.</Authors>
+		<Product>Loupe</Product>
+		<Copyright>Copyright © 2008-2022 Gibraltar Software, Inc.</Copyright>
+		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+		<PackageIcon>loupe-192x192.png</PackageIcon>
+		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<Description>The Loupe Agent for Entity Framework 6 - automatically record performance and diagnostic information for EF data access.  Download additional agent extensions for extended integration with different .NET Core subsystems and third party libraries.</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+		<DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
+		<PackageTags>Loupe,entity-framework,logging,diagnostics</PackageTags>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="EntityFramework" Version="6.3.0" />
+	  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Agent\Agent.csproj" />
+	  <ProjectReference Include="..\Services\Services.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+</Project>

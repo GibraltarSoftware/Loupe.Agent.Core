@@ -9,8 +9,6 @@ namespace Loupe.Agent.AspNetCore
 {
     internal static class Extensions
     {
-        private const string HttpContextMetricPrefix = "Loupe Request Metric";
-
         /// <summary>
         /// Process an arbitrary object instance into a string representation.
         /// </summary>

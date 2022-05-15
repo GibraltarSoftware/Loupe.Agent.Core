@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Loupe.Agent.AspNetCore;
+using Loupe.Agent.Core.Services;
+using Loupe.Agent.EntityFrameworkCore;
 
 namespace MvcTestApp
 {
@@ -49,6 +51,8 @@ namespace MvcTestApp
             });
             services.AddRazorPages()
                  .AddMicrosoftIdentityUI();
+
+            services.AddLoupe().AddEntityFrameworkCoreDiagnostics();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
