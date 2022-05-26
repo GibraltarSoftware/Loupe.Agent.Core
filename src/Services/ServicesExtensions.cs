@@ -51,7 +51,7 @@ namespace Loupe.Agent.Core.Services
         public static IServiceCollection AddLoupe(this IServiceCollection services, Action<AgentConfiguration> configure = null)
         {
             AddOptions(services, configure);
-            services.AddSingleton<IHostedService, LoupeAgentService>();
+            services.AddHostedService<LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
 
             return services;
@@ -68,7 +68,7 @@ namespace Loupe.Agent.Core.Services
             Action<ILoupeAgentBuilder> agentBuilder, Action<AgentConfiguration> configure = null)
         {
             AddOptions(services, configure);
-            services.AddSingleton<IHostedService, LoupeAgentService>();
+            services.AddHostedService<LoupeAgentService>();
             services.AddSingleton<LoupeAgent>();
 
             if (agentBuilder != null)
@@ -92,7 +92,7 @@ namespace Loupe.Agent.Core.Services
             return builder.ConfigureServices((context, services) =>
             {
                 AddOptions(services, configure);
-                services.AddSingleton<IHostedService, LoupeAgentService>();
+                services.AddHostedService<LoupeAgentService>();
                 services.AddSingleton<LoupeAgent>();
             });
         }
@@ -109,7 +109,7 @@ namespace Loupe.Agent.Core.Services
             return builder.ConfigureServices((context, services) =>
             {
                 AddOptions(services, configure);
-                services.AddSingleton<IHostedService, LoupeAgentService>();
+                services.AddHostedService<LoupeAgentService>();
                 services.AddSingleton<LoupeAgent>();
 
                 agentBuilder(new LoupeAgentServicesCollectionBuilder(services));
