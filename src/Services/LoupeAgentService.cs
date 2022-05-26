@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Loupe.Extensibility.Data;
 using Microsoft.Extensions.Hosting;
 
 namespace Loupe.Agent.Core.Services
@@ -9,7 +10,7 @@ namespace Loupe.Agent.Core.Services
     /// by the Dependency Injection container and to hold the reference until the application ends.
     /// </summary>
     /// <seealso cref="Microsoft.Extensions.Hosting.IHostedService" />
-    internal sealed class LoupeAgentService : IHostedService
+    internal sealed class LoupeAgentService : BackgroundService
     {
         private readonly LoupeAgent _agent;
 
@@ -22,18 +23,21 @@ namespace Loupe.Agent.Core.Services
             _agent = agent;
         }
 
-        /// <summary>
-        /// Triggered when the application host is ready to start the service.
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to abort the call.</param>
-        /// <returns>A completed <see cref="Task"/>.</returns>
-        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            stoppingToken.Register(() =>
+            {
+                _agent.End(SessionStatus.Normal, "ApplicationStopped");
+                tcs.SetResult(null);
+            });
+            return tcs.Task;
+        }
 
-        /// <summary>
-        /// Triggered when the application host is performing a graceful shutdown.
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to abort the call.</param>
-        /// <returns>A completed <see cref="Task"/>.</returns>
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public override void Dispose()
+        {
+            _agent.Dispose();
+            base.Dispose();
+        }
     }
 }
