@@ -6,8 +6,8 @@ variables:
   agentSolution: 'src/Agent.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  major: 4
-  minor: 14
+  major: 5
+  minor: 0
   revision: 0
   fileVersion: '$(Build.BuildNumber)'
 
