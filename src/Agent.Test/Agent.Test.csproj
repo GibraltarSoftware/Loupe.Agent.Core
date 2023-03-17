@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" xmlns:L="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp2.1;net461;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net461;net6.0</TargetFrameworks>
     <RootNamespace>Loupe.Agent.Test</RootNamespace>
     <AssemblyName>Loupe.Agent.Test</AssemblyName>
     <SignAssembly>true</SignAssembly>

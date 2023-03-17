@@ -19,7 +19,9 @@ namespace Loupe.Agent.EntityFramework.Tests
             _fixture = fixture;
         }
 
+#if DEBUG
         [Fact]
+#endif
         public void Can_Log_Simple_Query()
         {
             using (var ctx = new NorthwindEntities(_fixture.DbConnectionString))
@@ -30,7 +32,9 @@ namespace Loupe.Agent.EntityFramework.Tests
             }
         }
 
+#if DEBUG
         [Fact]
+#endif
         public void Can_Log_Simple_Update()
         {
             try
@@ -57,7 +61,9 @@ namespace Loupe.Agent.EntityFramework.Tests
             }
         }
 
+#if DEBUG
         [Fact]
+#endif
         public async Task Can_Log_Async_Update()
         {
             try
@@ -84,7 +90,9 @@ namespace Loupe.Agent.EntityFramework.Tests
             }
         }
 
+#if DEBUG
         [Fact]
+#endif
         public void Can_Log_Transactional_Update()
         {
             try

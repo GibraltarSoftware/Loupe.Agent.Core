@@ -16,7 +16,7 @@ namespace Gibraltar
         private readonly static bool g_IsNetNative = false;
         private readonly static bool g_IsNetCore = false;
 
-        private static bool g_SilentMode = false;
+        private static bool g_SilentMode = true; //so we are absolutely sure we initialize in this mode.
         private static volatile bool g_BreakPointEnable = false; // Can be changed in the debugger
 
         // Basic log implementation.
