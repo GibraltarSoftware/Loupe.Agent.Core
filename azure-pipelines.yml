@@ -18,11 +18,20 @@ jobs:
 
   steps:
   - task: DownloadSecureFile@1
+    displayName: 'Download Signing Key'  
     name: loupeAgentSigningKey
     inputs:
       secureFile: 'loupe.agent.snk'
 
+  - task: DownloadSecureFile@1
+    displayName: 'Download Code Signing Cert'  
+    name: GibraltarSoftwareCCC
+    inputs:
+      secureFile: 'GibraltarSoftwareCCC.pfx'
+      overWrite: true
+
   - task: CopyFiles@2
+    displayName: 'Copy Signing Key to Build Location'  
     inputs:
       SourceFolder: '$(Agent.TempDirectory)'
       Contents: 'loupe.agent.snk'
@@ -32,10 +41,12 @@ jobs:
   - task: NuGetToolInstaller@1
 
   - task: NuGetCommand@2
+    displayName: 'Restore NuGet Packages'  
     inputs:
       restoreSolution: '$(agentSolution)'
 
   - task: VSBuild@1
+    displayName: 'Build NuGet Packages'  
     inputs:
       solution: '$(agentSolution)'
       platform: '$(buildPlatform)'
@@ -43,11 +54,24 @@ jobs:
       msbuildArgs: '/p:CustomVersion=$(fileVersion) /p:CustomInformationalVersion=$(fileVersion) /p:PackageVersion=$(fileVersion)'
 
   - task: CopyFiles@2
+    displayName: 'Stage NuGet Packages'  
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)/src'
       contents: '**/*.*nupkg'
       flattenFolders: true
       targetFolder: '$(Build.ArtifactStagingDirectory)/packages'
+
+  - task: NuGetCommand@2
+    displayName: 'Sign NuGet Packages'  
+    inputs:
+      command: 'custom'
+      arguments: sign $(Build.ArtifactStagingDirectory)\packages\*.nupkg -CertificatePath $(Agent.TempDirectory)/GibraltarSoftwareCCC.pfx -CertificatePassword f4rd+GM% -Timestamper http://timestamp.comodoca.com -Verbosity detailed
+
+  - task: NuGetCommand@2
+    displayName: 'Sign NuGet Symbol Packages'  
+    inputs:
+      command: 'custom'
+      arguments: sign $(Build.ArtifactStagingDirectory)\packages\*.snupkg -CertificatePath $(Agent.TempDirectory)/GibraltarSoftwareCCC.pfx -CertificatePassword f4rd+GM% -Timestamper http://timestamp.comodoca.com -Verbosity detailed
 
   - task: PublishBuildArtifacts@1
     inputs:
