@@ -67,5 +67,25 @@ namespace Loupe.Configuration
         /// The severity used for log messages for the start of each request handled by MVC and Web API. Defaults to Information.
         /// </summary>
         public LogMessageSeverity RequestMessageSeverity { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
+            if (Enabled)
+            {
+                stringBuilder.AppendFormat("\tLog Requests: {0}\r\n", LogRequests);
+                stringBuilder.AppendFormat("\tRequest Message Severity: {0}\r\n", RequestMessageSeverity);
+                stringBuilder.AppendFormat("\tLog Bad Requests: {0}\r\n", LogBadRequests);
+                stringBuilder.AppendFormat("\tLog Request Failures: {0}\r\n", LogRequestFailures);
+                stringBuilder.AppendFormat("\tLog Request Metrics: {0}\r\n", LogRequestMetrics);
+                stringBuilder.AppendFormat("\tLog Request Parameters: {0}\r\n", LogRequestParameters);
+                stringBuilder.AppendFormat("\tLog Request Parameter Details: {0}\r\n", LogRequestParameterDetails);
+            }
+
+            return stringBuilder.ToString();
+        }
     }
 }

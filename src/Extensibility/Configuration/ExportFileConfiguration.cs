@@ -1,21 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Loupe.Configuration
 {
     /// <summary>
-    /// File Messenger Configuration
+    /// The application configuration information for storing session data to a text file.
     /// </summary>
-    public sealed class SessionFileConfiguration : IMessengerConfiguration
+    /// <remarks>This provides an alternate copy of the log to a text file.  At a minimum </remarks>
+    public class ExportFileConfiguration : IMessengerConfiguration
     {
         /// <summary>
-        /// Initialize the session file configuration from the application configuration
+        /// Initialize the export file configuration from the application configuration
         /// </summary>
-        public SessionFileConfiguration()
+        public ExportFileConfiguration()
         {
-            Enabled = true;
+            Enabled = false;
             AutoFlushInterval = 15;
-            IndexUpdateInterval = 15;
             MaxFileSize = 20;
             MaxFileDuration = 1440;
             EnableFilePruning = true;
@@ -36,16 +37,8 @@ namespace Loupe.Configuration
         /// <summary>
         /// The folder to store session files in unless explicitly overridden at runtime.
         /// </summary>
-        /// <remarks>If null or empty, files will be stored in a central local application data folder which is the preferred setting.</remarks>
-        public string? Folder { get; set; }
-
-        /// <summary>
-        /// The number of seconds between index updates.
-        /// </summary>
-        /// <remarks>An index is maintained of session information including the number and types
-        /// of messages and session status.  It is updated automatically when a session is stopped
-        /// and in some other situations.</remarks>
-        public int IndexUpdateInterval { get; set; }
+        /// <remarks>If null or empty the export file will be disabled.</remarks>
+        public string Folder { get; set; }
 
         /// <summary>
         /// The maximum number of megabytes in a single session file before a new file is started.
@@ -72,21 +65,18 @@ namespace Loupe.Configuration
         public bool EnableFilePruning { get; set; }
 
         /// <summary>
-        /// The maximum number of megabytes for all log files in megabytes on the local drive before older files are purged.
+        /// The maximum number of megabytes for all session files in megabytes on the local drive before older files are purged.
         /// </summary>
-        /// <remarks><para>When the maximum local disk usage is approached, files are purged by selecting the oldest files first.
-        /// This limit may be exceeded temporarily by the maximum log size because the active file will not be purged.
-        /// Size is specified in megabytes.</para>
-        /// <para>Setting to any integer less than 1 will disable pruning by disk usage.</para></remarks>
+        /// <remarks>When the maximum local disk usage is approached, files are purged by selecting the oldest files first.
+        /// This limit may be exceeded temporarily by the maximum size because the active file will not be purged.
+        /// Size is specified in megabytes.</remarks>
         public int MaxLocalDiskUsage { get; set; }
 
         /// <summary>
-        /// The number of days that log files are retained.
+        /// The maximum age in days of a session file before it should be purged.
         /// </summary>
-        /// <remarks>
-        ///   <para>Log files that were collected longer than the retention interval ago will be removed regardless of space constraints.</para>
-        ///   <para>Setting to any integer less than 1 will disable pruning by age.</para>
-        /// </remarks>
+        /// <remarks>Any session file fragment that was closed longer than this number of days in the past will be
+        /// automatically purged.  Any value less than 1 will disable age pruning.</remarks>
         public int MaxLocalFileAge { get; set; }
 
         /// <summary>
@@ -95,6 +85,7 @@ namespace Loupe.Configuration
         /// <remarks>If the amount of free disk space falls below this value, existing log files will be removed to free space.
         /// If no more log files are available, logging will stop until adequate space is freed.</remarks>
         public int MinimumFreeDisk { get; set; }
+
 
         /// <summary>
         /// When true, the session file will treat all write requests as write-through requests.
@@ -120,19 +111,19 @@ namespace Loupe.Configuration
         /// or worrying about the default configuration.</remarks>
         public bool Enabled { get; set; }
 
-        /// <summary>
-        /// Normalize the configuration
-        /// </summary>
-        public void Sanitize()
+        string IMessengerConfiguration.MessengerTypeName => "Loupe.Agent.Messaging.Export.CsvFileMessenger, Loupe.Agent.ExportFile";
+
+
+        internal void Sanitize()
         {
             if (string.IsNullOrEmpty(Folder))
+            {
                 Folder = null;
+                Enabled = false; //if there is no folder then we can't be enabled.
+            }
 
             if (AutoFlushInterval <= 0)
                 AutoFlushInterval = 15;
-
-            if (IndexUpdateInterval <= 0)
-                IndexUpdateInterval = 15;
 
             if (MaxFileDuration < 1)
                 MaxFileDuration = 1576800; //three years, treated as infinite because really - is a process going to run longer than that?
@@ -163,8 +154,6 @@ namespace Loupe.Configuration
                 MaxQueueLength = 50000;
         }
 
-        /// <inheritdoc />
-        string IMessengerConfiguration.MessengerTypeName => "Gibraltar.Messaging.FileMessenger";
 
         /// <inheritdoc />
         public override string ToString()
@@ -176,7 +165,6 @@ namespace Loupe.Configuration
             if (Enabled)
             {
                 stringBuilder.AppendFormat("\tAuto Flush Interval: {0}\r\n", AutoFlushInterval);
-                stringBuilder.AppendFormat("\tIndex Update Interval: {0}\r\n", IndexUpdateInterval);
                 stringBuilder.AppendFormat("\tMax File Size: {0}\r\n", MaxFileSize);
                 stringBuilder.AppendFormat("\tMax File Duration: {0}\r\n", MaxFileDuration);
                 stringBuilder.AppendFormat("\tEnable File Pruning: {0}\r\n", EnableFilePruning);

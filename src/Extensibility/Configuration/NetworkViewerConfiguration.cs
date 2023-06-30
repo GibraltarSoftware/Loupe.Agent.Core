@@ -16,7 +16,6 @@ namespace Loupe.Configuration
             AllowLocalClients = true;
             AllowRemoteClients = false;
             MaxQueueLength = 2000;
-
         }
 
         /// <summary>
@@ -73,9 +72,12 @@ namespace Loupe.Configuration
             var stringBuilder = new StringBuilder();
 
             stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
-            stringBuilder.AppendFormat("\tAllow Local Clients: {0}\r\n", AllowLocalClients);
-            stringBuilder.AppendFormat("\tAllow Remote Clients: {0}\r\n", AllowRemoteClients);
-            stringBuilder.AppendFormat("\tMax Queue Length: {0}\r\n", MaxQueueLength);
+            if (Enabled)
+            {
+                stringBuilder.AppendFormat("\tAllow Local Clients: {0}\r\n", AllowLocalClients);
+                stringBuilder.AppendFormat("\tAllow Remote Clients: {0}\r\n", AllowRemoteClients);
+                stringBuilder.AppendFormat("\tMax Queue Length: {0}\r\n", MaxQueueLength);
+            }
 
             return stringBuilder.ToString();
         }
