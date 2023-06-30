@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using Loupe.Extensibility.Data;
 
@@ -8,6 +9,7 @@ namespace Loupe.Configuration
     /// <summary>
     /// The configuration of the publisher.
     /// </summary>
+    [DebuggerDisplay("{ProductName} - {ApplicationName}")]
     public sealed class PublisherConfiguration
     {
         /// <summary>

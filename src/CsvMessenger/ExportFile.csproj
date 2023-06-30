@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Version>4.13.0.0</Version>
+		<FileVersion>4.13.0.0</FileVersion>
+		<AssemblyVersion>4.13.0.0</AssemblyVersion>
+		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
+		<Description>Extends the Loupe Agent to record log message entries into a CSV file.</Description>
+		<Product>Loupe</Product>
+		<Company>Gibraltar Software, Inc.</Company>
+		<Authors>Gibraltar Software, Inc.</Authors>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageId>Loupe.Agent.ExportFile</PackageId>
+		<DisableImplicitAssetTargetFallback>true</DisableImplicitAssetTargetFallback>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
+		<PackageIcon>loupe-192x192.png</PackageIcon>
+		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<PackageTags>Loupe,logging,diagnostics</PackageTags>
+		<AssemblyName>Loupe.Agent.ExportFile</AssemblyName>
+		<RootNamespace>Loupe.Agent.Messaging.Export</RootNamespace>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CsvHelper" Version="30.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Extensibility\Extensibility.csproj" />
+	</ItemGroup>
+
+</Project>

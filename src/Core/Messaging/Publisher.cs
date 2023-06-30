@@ -547,6 +547,17 @@ namespace Gibraltar.Messaging
 
                 try
                 {
+                    if (m_Configuration.ExportFile.Enabled)
+                    {
+                        AddMessenger(m_Configuration.ExportFile);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                try
+                {
                     if (m_Configuration.NetworkViewer.Enabled)
                     {
                         AddMessenger(m_Configuration.NetworkViewer);

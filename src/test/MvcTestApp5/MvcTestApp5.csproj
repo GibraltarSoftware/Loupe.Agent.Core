@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AspNetCore\AspNetCore.csproj" />
+    <ProjectReference Include="..\..\CsvMessenger\ExportFile.csproj" />
     <ProjectReference Include="..\..\EFCore2\EFCore2.csproj" />
     <ProjectReference Include="..\..\Extensions.Logging\Extensions.Logging.csproj" />
     <ProjectReference Include="..\..\PerformanceCounters\PerformanceCounters.csproj" />
