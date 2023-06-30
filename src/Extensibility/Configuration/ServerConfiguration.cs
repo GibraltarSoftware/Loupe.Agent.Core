@@ -7,111 +7,8 @@ namespace Loupe.Configuration
     /// The application configuration information for sending session data to a Loupe Server
     /// </summary>
     /// <remarks>
-    /// 	<para>To configure integration with the Loupe Server you need to either:</para>
-    /// 	<list type="bullet">
-    /// 		<item>
-    ///             Set the <see cref="UseGibraltarService">UseGibraltarService</see> option to
-    ///             True and specify a <see cref="CustomerName">CustomerName</see>
-    /// 		</item>
-    /// 		<item>
-    ///             Set the <see cref="UseGibraltarService">UseGibraltarService</see> option to
-    ///             False and specify a <see cref="Server">Server</see>
-    /// 		</item>
-    /// 	</list>
-    /// 	<para><strong>Using the Gibraltar Loupe Service</strong></para>
-    /// 	<para>Just set the UseGibraltarService option to True and specify your Account name
-    ///     which you can find at <a href="http://www.GibraltarSoftware.com">www.GibraltarSoftware.com</a>.</para>
-    /// 	<para><strong>Using a Private Loupe Server</strong></para>
-    /// 	<para>You will need to know the connection information from when the server was
-    ///     installed to correctly configure some or all of the following values:</para>
-    /// 	<list type="bullet">
-    /// 		<item><strong>Server (required):</strong> The full DNS name of the computer
-    ///         hosting the Loupe Server.</item>
-    /// 		<item><strong>ApplicationBaseDirectory (optional):</strong> The virtual
-    ///         directory on the server where the Loupe Server is installed. It may be empty,
-    ///         indicating the server is installed in the root of its web site.</item>
-    /// 		<item><strong>UseSsl (optional):</strong> Defaults to false; indicates if the
-    ///         connection with the server should be encrypted using Secure Sockets Layer
-    ///         (SSL). If no port is specified then port 443 (the standard for SSL) will be
-    ///         used.</item>
-    /// 		<item><strong>Port (optional):</strong> Used to specify a nonstandard port to
-    ///         communicate with the server.</item>
-    /// 	</list>
-    /// 	<para><strong>Automatically Sending Sessions</strong></para>
-    /// 	<para>The server configuration is used both to establish the connection information
-    ///     for the Loupe Server for on-demand transfer (such as with the Packager Dialog or
-    ///     Packager class) and also for automatic background session transfer. To enable
-    ///     automatic background transfer of all sessions:</para>
-    /// 	<list type="bullet">
-    /// 		<item>
-    ///             Set the <see cref="AutoSendSessions">AutoSendSessions</see> option to True
-    ///         </item>
-    /// 		<item>
-    ///             Optionally set the <see cref="SendAllApplications">SendAllApplications</see> option to send session data
-    ///             for any application that shares the same Product name as the current
-    ///             application.
-    ///         </item>
-    /// 		<item>
-    ///             Optionally set the <see cref="PurgeSentSessions">PurgeSentSessions</see>
-    ///             option to True to remove sessions from the local computer once they have
-    ///             been successfully sent to the Loupe Server.
-    ///         </item>
-    /// 	</list>
-    /// 	<para><strong>Testing your Configuration</strong></para>
-    /// 	<para>
-    ///         You can validate the current configuration at runtime by calling the <see cref="Validate">Validate</see> method. If there are any problems with the
-    ///         configuration data an exception will be thrown describing the issue. Some
-    ///         problems (like an invalid customer name or server name) may not be fully
-    ///         detectable in this routine.
-    ///     </para>
-    /// 	<para>
-    ///         If the configuration is not valid the <see cref="Enabled">Enabled</see>
-    ///         property is automatically set to False at the end of the Log.Initializing event. This isn't
-    ///         checked until the end of the initialization cycle so properties can be set in
-    ///         any order.
-    ///     </para>
+    /// For more details on how to configure Loupe, see the <a href="https://doc.onloupe.com">Loupe Documentation</a>
     /// </remarks>
-    /// <example>
-    /// 	<code lang="CS" title="Server Programmatic Configuration" description="You can configure the entire Loupe Server connection in the Log Initializing event of your application (not recommended for ASP.NET)">
-    /// 		<![CDATA[
-    /// /// <summary>
-    /// /// The primary program entry point.
-    /// /// </summary>
-    /// static class Program
-    /// {
-    ///     /// <summary>
-    ///     /// The main entry point for the application.
-    ///     /// </summary>
-    ///     [STAThread]
-    ///     public static void Main()
-    ///     {
-    ///         Log.Initializing += Log_Initializing;
-    ///  
-    ///         Application.EnableVisualStyles();
-    ///         Application.SetCompatibleTextRenderingDefault(false);
-    ///         Thread.CurrentThread.Name = "User Interface Main";  //set the thread name before our first call that logs on this thread.
-    ///  
-    ///         Log.StartSession("Starting Loupe Desktop");
-    ///  
-    ///         //here you actually start up your application
-    ///  
-    ///         //and if we got to this point, we done good and can mark the session as being not crashed :)
-    ///         Log.EndSession("Exiting Loupe Desktop");
-    ///     }
-    ///  
-    ///     static void Log_Initializing(object sender, LogInitializingEventArgs e)
-    ///     {
-    ///         //and configure Loupe Server Connection
-    ///         ServerConfiguration server = e.Configuration.Server;
-    ///         server.UseGibraltarService = true;
-    ///         server.CustomerName = "Gibraltar Software";
-    ///         server.AutoSendSessions = true;
-    ///         server.SendAllApplications = true;
-    ///         server.PurgeSentSessions = true;
-    ///     }
-    /// }]]>
-    /// 	</code>
-    /// </example>
     public class ServerConfiguration
     {
         /// <summary>
@@ -309,35 +206,40 @@ namespace Loupe.Configuration
         {
             var stringBuilder = new StringBuilder();
 
-            if (UseGibraltarService)
-            {
+            stringBuilder.AppendFormat("\tEnabled: {0}\r\n", Enabled);
 
-                stringBuilder.AppendFormat("\tLoupe Cloud-Hosted Subscription '{0}'\r\n", CustomerName);
-            }
-            else
+            if (Enabled)
             {
-                if (string.IsNullOrWhiteSpace(Repository))
+                if (UseGibraltarService)
                 {
-                    stringBuilder.AppendFormat("\tLoupe Server '{0}'", Server);
+                    stringBuilder.AppendFormat("\tLoupe Cloud-Hosted Subscription '{0}'\r\n", CustomerName);
                 }
                 else
                 {
-                    stringBuilder.AppendFormat("\tLoupe Server '{0}' repository '{1}'", Server, Repository);
+                    if (string.IsNullOrWhiteSpace(Repository))
+                    {
+                        stringBuilder.AppendFormat("\tLoupe Server '{0}'", Server);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat("\tLoupe Server '{0}' repository '{1}'", Server, Repository);
+                    }
+
+                    stringBuilder.AppendFormat("\tUse Ssl: {0}\r\n", UseSsl);
+
+                    if (Port != 0)
+                        stringBuilder.AppendFormat("\tPort: {0}\r\n", Port);
                 }
-                stringBuilder.AppendFormat("\tUse Ssl: {0}\r\n", UseSsl);
 
-                if (Port != 0)
-                    stringBuilder.AppendFormat("\tPort: {0}\r\n", Port);
+                if (string.IsNullOrEmpty(ApplicationKey) == false)
+                    stringBuilder.AppendFormat("\tApplication Key: {0}\r\n", ApplicationKey);
+
+                stringBuilder.AppendFormat("\tAuto Send Sessions: {0}\r\n", AutoSendSessions);
+                stringBuilder.AppendFormat("\tSend All Applications: {0}\r\n", SendAllApplications);
+                stringBuilder.AppendFormat("\tPurge Sent Sessions: {0}\r\n", PurgeSentSessions);
+
+                stringBuilder.AppendFormat("\tAuto Send On Error: {0}\r\n", AutoSendOnError);
             }
-
-            if (string.IsNullOrEmpty(ApplicationKey) == false)
-                stringBuilder.AppendFormat("\tApplication Key: {0}\r\n", ApplicationKey);
-
-            stringBuilder.AppendFormat("\tAuto Send Sessions: {0}\r\n", AutoSendSessions);
-            stringBuilder.AppendFormat("\tSend All Applications: {0}\r\n", SendAllApplications);
-            stringBuilder.AppendFormat("\tPurge Sent Sessions: {0}\r\n", PurgeSentSessions);
-
-            stringBuilder.AppendFormat("\tAuto Send On Error: {0}\r\n", AutoSendOnError);
 
             return stringBuilder.ToString();
         }

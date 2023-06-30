@@ -1,59 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Loupe.Configuration
 {
     /// <summary>
-    /// The top level configuration class for all Agent configuration. Supplied during a
-    /// Log.Initializing event.
+    /// The top level configuration class for configuring the Loupe Agent's built-in features.
     /// </summary>
     /// <remarks>
-    ///     This object is created by the agent and supplied to user code during the Log.Initializing event to allow for
-    ///     configuration to be determined in code at runtime. This configuration is applied
-    ///     over whatever has been configured in the application configuration file.
+    /// <para>You can provide configuration using the normal .NET configuration sources (like appsettings.json, environment variables, etc.)
+    /// and those values will be loaded first.  Then, you can modify the configuration using a builder expression provided to the AddLoupe
+    /// method as shown in the example below.</para>
+    /// <para>For more information, see the <a href="https://doc.onloupe.com">Loupe Documentation</a></para>
     /// </remarks>
     /// <example>
-    /// 	<code lang="CS" title="Programmatic Configuration" description="You can supply some or all of your configuration information during the Log.Initializing event. In this example, the Loupe Server configuration is being done at runtime during this event.">
+    /// 	<code lang="CS" title="Programmatic Configuration" description="You can supply some or all of your configuration information when setting up your host, just use a lambda expression in the AddLoupe call to provide a configuration builder expression.">
     /// 		<![CDATA[
-    /// /// <summary>
-    /// /// The primary program entry point.
-    /// /// </summary>
-    /// static class Program
-    /// {
-    ///     /// <summary>
-    ///     /// The main entry point for the application.
-    ///     /// </summary>
-    ///     [STAThread]
-    ///     public static void Main()
-    ///     {
-    ///         Log.Initializing += Log_Initializing;
-    ///  
-    ///         Application.EnableVisualStyles();
-    ///         Application.SetCompatibleTextRenderingDefault(false);
-    ///         Thread.CurrentThread.Name = "User Interface Main";  //set the thread name before our first call that logs on this thread.
-    ///  
-    ///         Log.StartSession("Starting Gibraltar Analyst");
-    ///  
-    ///         //here you actual start up your application
-    ///  
-    ///         //and if we got to this point, we done good and can mark the session as being not crashed :)
-    ///         Log.EndSession("Exiting Gibraltar Analyst");
-    ///     }
-    ///  
-    ///     static void Log_Initializing(object sender, LogInitializingEventArgs e)
-    ///     {
-    ///         //and configure Loupe Server Connection
-    ///         ServerConfiguration server = e.Configuration.Server;
-    ///         server.UseGibraltarService = true;
-    ///         server.CustomerName = "Gibraltar Software";
-    ///         server.AutoSendSessions = true;
-    ///         server.SendAllApplications = true;
-    ///         server.PurgeSentSessions = true;
-    ///     }
-    /// }]]>
+    ///public static IHostBuilder CreateHostBuilder(string[] args) =>
+    ///    Host.CreateDefaultBuilder(args)
+    ///        .AddLoupe(builder => builder.AddAspNetCoreDiagnostics()
+    ///            .AddClientLogging() //The Loupe endpoint for client logging
+    ///            .AddEntityFrameworkCoreDiagnostics() //EF Core monitoring
+    ///            .AddPerformanceCounters()) //Windows Perf Counter monitoring
+    ///        .AddLoupeLogging();
+    /// ]]>
     /// 	</code>
     /// </example>
+    /// 
     public sealed class AgentConfiguration
     {
         /// <summary>
@@ -62,6 +36,7 @@ namespace Loupe.Configuration
         public AgentConfiguration()
         {
             AspNet = new AspNetConfiguration();
+            ExportFile = new ExportFileConfiguration();
             Listener = new ListenerConfiguration();
             NetworkViewer = new NetworkViewerConfiguration();
             Packager = new PackagerConfiguration();
@@ -80,6 +55,7 @@ namespace Loupe.Configuration
         public AgentConfiguration(AgentConfiguration configuration)
         {
             AspNet = configuration.AspNet;
+            ExportFile = configuration.ExportFile;
             Listener = configuration.Listener;
             NetworkViewer = configuration.NetworkViewer;
             Packager = configuration.Packager;
@@ -95,9 +71,13 @@ namespace Loupe.Configuration
         /// </summary>
         public ListenerConfiguration Listener { get; set; }
 
-
         /// <summary>The session data file configuration</summary>
         public SessionFileConfiguration SessionFile { get; set; }
+
+        /// <summary>
+        /// The text log file configuration 
+        /// </summary>
+        public ExportFileConfiguration ExportFile { get; set; }
 
         /// <summary>
         /// The packager configuration
@@ -140,12 +120,14 @@ namespace Loupe.Configuration
         public void Sanitize()
         {
             //we want to force everyone to load and sanitize so we know it's completed.
+            ExportFile ??= new ExportFileConfiguration();
             NetworkViewer ??= new NetworkViewerConfiguration();
             Packager ??= new PackagerConfiguration();
             Publisher ??= new PublisherConfiguration();
             SessionFile ??= new SessionFileConfiguration();
             Server ??= new ServerConfiguration();
 
+            ExportFile?.Sanitize();
             NetworkViewer?.Sanitize();
             Packager?.Sanitize();
             Publisher?.Sanitize();
@@ -162,8 +144,14 @@ namespace Loupe.Configuration
             stringBuilder.AppendFormat("Listener:\r\n{0}\r\n", Listener);
             stringBuilder.AppendFormat("Performance:\r\n{0}\r\n", Performance);
             stringBuilder.AppendFormat("Session File:\r\n{0}\r\n", SessionFile);
+            stringBuilder.AppendFormat("Export File:\r\n{0}\r\n", ExportFile);
             stringBuilder.AppendFormat("Server:\r\n{0}\r\n", Server);
             stringBuilder.AppendFormat("Network Viewer:\r\n{0}\r\n", NetworkViewer);
+
+            if (AspNet?.Enabled == true)
+            {
+                stringBuilder.AppendFormat("Asp.NET:\r\n{0}\r\n", AspNet);
+            }
 
             if (Properties?.Count > 0)
             {

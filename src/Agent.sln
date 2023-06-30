@@ -43,9 +43,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcTestApp5", "test\MvcTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcTestApp", "test\MvcTestApp\MvcTestApp.csproj", "{65216BE9-1316-4EDE-B619-7511CD281C13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework", "EntityFramework\EntityFramework.csproj", "{8691C2CE-CC18-4BD7-86D5-55A6D11DE5A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFramework", "EntityFramework\EntityFramework.csproj", "{8691C2CE-CC18-4BD7-86D5-55A6D11DE5A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework.Tests", "EntityFramework.Tests\EntityFramework.Tests.csproj", "{D4552710-BE03-4EF7-94A8-BACC63484E7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFramework.Tests", "EntityFramework.Tests\EntityFramework.Tests.csproj", "{D4552710-BE03-4EF7-94A8-BACC63484E7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportFile", "CsvMessenger\ExportFile.csproj", "{10DFBA44-E324-4C46-903C-63E2AC370A91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -307,6 +309,18 @@ Global
 		{D4552710-BE03-4EF7-94A8-BACC63484E7D}.Release|x64.Build.0 = Release|Any CPU
 		{D4552710-BE03-4EF7-94A8-BACC63484E7D}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4552710-BE03-4EF7-94A8-BACC63484E7D}.Release|x86.Build.0 = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|x64.Build.0 = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Debug|x86.Build.0 = Debug|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|x64.ActiveCfg = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|x64.Build.0 = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|x86.ActiveCfg = Release|Any CPU
+		{10DFBA44-E324-4C46-903C-63E2AC370A91}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
