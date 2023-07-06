@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <RootNamespace>Loupe.AspNetCore.Tests</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -16,7 +16,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\test\MvcTestApp\MvcTestApp.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\test\MvcTestApp\MvcTestApp.csproj" />
+  </ItemGroup>
 </Project>
