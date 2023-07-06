@@ -142,13 +142,6 @@ namespace Gibraltar
         public static int FindMessageSource(int skipFrames, bool trustSkipFrames, Exception exception, out string className,
                                              out string methodName, out string fileName, out int lineNumber)
         {
-#if NETCOREAPP1_0 || NETCOREAPP1_1
-            methodName = null;
-            className = null;
-            fileName = null;
-            lineNumber = 0;
-            return -1;
-#else
             int selectedFrame = -1;
 
             try
@@ -301,7 +294,6 @@ namespace Gibraltar
             }
 
             return selectedFrame;
-#endif
         }
 
 
