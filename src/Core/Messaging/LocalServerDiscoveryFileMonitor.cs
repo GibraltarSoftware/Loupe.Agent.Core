@@ -43,6 +43,12 @@ namespace Gibraltar.Messaging
                 if (m_FileSystemWatcher == null)
                 {
                     string discoveryPath = PathManager.FindBestPath(PathType.Discovery);
+
+                    if (string.IsNullOrWhiteSpace(discoveryPath))
+                    {
+                        throw new InvalidOperationException("Unable to find a valid local discovery path");
+                    }
+
                     m_FileSystemWatcher = new FileSystemWatcher(discoveryPath, LocalServerDiscoveryFile.FileFilter);
                     m_FileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
                     m_FileSystemWatcher.Changed += FileSystemWatcherOnChanged;

@@ -264,7 +264,22 @@ namespace Gibraltar.Messaging
                 m_DiscoveryFileMonitor = new LocalServerDiscoveryFileMonitor();
                 m_DiscoveryFileMonitor.FileChanged += DiscoveryFileMonitorOnFileChanged;
                 m_DiscoveryFileMonitor.FileDeleted += DiscoveryFileMonitorOnFileDeleted;
-                m_DiscoveryFileMonitor.Start();
+
+                try
+                {
+                    m_DiscoveryFileMonitor.Start();
+                }
+                catch (Exception ex)
+                {
+                    if (!Log.SilentMode)
+                        Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, LogCategory,
+                            "Unable to set up local discovery due to " + ex.GetBaseException().GetType().Name, 
+                            "Any local clients won't be able to view our session.\r\nException: {0}", ex.Message);
+
+                    m_DiscoveryFileMonitor.FileChanged -= DiscoveryFileMonitorOnFileChanged;
+                    m_DiscoveryFileMonitor.FileDeleted -= DiscoveryFileMonitorOnFileDeleted;
+                    m_DiscoveryFileMonitor = null;
+                }
             }
 
             if (messengerConfiguration.AllowRemoteClients)
