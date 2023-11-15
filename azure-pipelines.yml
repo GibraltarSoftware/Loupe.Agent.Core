@@ -38,6 +38,10 @@ jobs:
       TargetFolder: '$(Build.SourcesDirectory)'
       overWrite: true
 
+  - task: UseDotNet@2
+    inputs:
+      version: '8.0.0'
+
   - task: NuGetToolInstaller@1
 
   - task: NuGetCommand@2
