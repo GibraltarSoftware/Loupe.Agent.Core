@@ -10,43 +10,43 @@ using ApplicationType = Loupe.Extensibility.Data.ApplicationType;
 
 namespace Loupe.AgentTest.Console
 {
-class CodeConfigProgram
-{
-    static void Main(string[] args)
+    public class CodeConfigProgram
     {
-        //create an AgentConfiguration object, specifying everything you want to override.
-        var loupeConfig = new AgentConfiguration
+        static void Main(string[] args)
         {
-            Publisher = new PublisherConfiguration
+            //create an AgentConfiguration object, specifying everything you want to override.
+            var loupeConfig = new AgentConfiguration
             {
-                ProductName = "Loupe",
-                ApplicationName = "Agent Text",
-                ApplicationType = ApplicationType.Console,
-                ApplicationDescription = "Console test application for .NET Core",
-                ApplicationVersion = new Version(2, 1)
-            },
-            Server = new ServerConfiguration
+                Publisher = new PublisherConfiguration
+                {
+                    ProductName = "Loupe",
+                    ApplicationName = "Agent Text",
+                    ApplicationType = ApplicationType.Console,
+                    ApplicationDescription = "Console test application for .NET Core",
+                    ApplicationVersion = new Version(2, 1)
+                },
+                Server = new ServerConfiguration
+                {
+                    UseGibraltarService = true,
+                    CustomerName = "Your_Service_Name"
+                }
+            };
+
+            Log.StartSession(loupeConfig, "Starting Loupe Console");
+
+            try
             {
-                UseGibraltarService = true,
-                CustomerName = "Your_Service_Name"
+                //Here is the body of your console application
             }
-        };
-
-        Log.StartSession(loupeConfig, "Starting Loupe Console");
-
-        try
-        {
-            //Here is the body of your console application
-        }
-        catch (Exception ex)
-        {
-            Log.RecordException(ex, "Main", false);
-            Log.EndSession(SessionStatus.Crashed, "Exiting due to unhandled exception");
-        }
-        finally
-        {
-            Log.EndSession(SessionStatus.Normal, "Exiting test application");
+            catch (Exception ex)
+            {
+                Log.RecordException(ex, "Main", false);
+                Log.EndSession(SessionStatus.Crashed, "Exiting due to unhandled exception");
+            }
+            finally
+            {
+                Log.EndSession(SessionStatus.Normal, "Exiting test application");
+            }
         }
     }
-}
 }

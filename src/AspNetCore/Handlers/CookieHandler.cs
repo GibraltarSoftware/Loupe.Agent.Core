@@ -46,7 +46,7 @@ namespace Loupe.Agent.AspNetCore.Handlers
         {
             var sessionId = Guid.NewGuid().ToString();
 
-            context.Response.Headers.Add(Constants.SessionIdHeaderName, sessionId);
+            context.Response.Headers.Append(Constants.SessionIdHeaderName, sessionId);
             context.Response.Cookies.Append(Constants.SessionIdCookie, sessionId, options);
             
             return sessionId;

@@ -26,7 +26,7 @@ namespace Gibraltar.Monitor
         {
             principal = ClaimsPrincipal.Current; //returns Thread.CurrentPrincipal by default.
 
-            if (principal == null && _IsWindows)
+            if (principal == null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 //fall back to the windows identity..
                 WindowsIdentity windowsIdentity;
