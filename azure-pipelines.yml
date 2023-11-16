@@ -39,6 +39,12 @@ jobs:
       overWrite: true
 
   - task: UseDotNet@2
+    displayName: 'Install .NET 6 (for test running)'
+    inputs:
+      version: '6.0.x'
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 8 (for building)'
     inputs:
       version: '8.0.x'
 
