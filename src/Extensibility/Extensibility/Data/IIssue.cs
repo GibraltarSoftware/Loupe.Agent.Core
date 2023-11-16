@@ -154,7 +154,7 @@ namespace Loupe.Extensibility.Data
         /// <param name="userName">Optional.  The user name of the user to credit the message to</param>
         /// <returns>The new note that has been added</returns>
         /// <remarks>If adding a system note no user name need be provided (and any specified will be ignored).</remarks>
-        IIssueNote AddNote(IssueNoteCategory category, string note, string userName = null);
+        IIssueNote AddNote(IssueNoteCategory category, string note, string? userName = null);
 
         /// <summary>
         /// Add a new link to this issue
@@ -170,7 +170,7 @@ namespace Loupe.Extensibility.Data
         /// </summary>
         /// <param name="note">Optional.  A text note of unlimited length.  Plain text is recommended.</param>
         /// <param name="userName">Optional.  The user name of the user to attribute the action to.</param>
-        void ReOpen(string note, string userName = null);
+        void ReOpen(string note, string? userName = null);
 
         /// <summary>
         /// Resolve an issue that is new or active
@@ -178,13 +178,13 @@ namespace Loupe.Extensibility.Data
         /// <param name="fixedInVersion">The application version where the fix for this issue was first included</param>
         /// <param name="note">Optional.  A text note of unlimited length.  Plain text is recommended.</param>
         /// <param name="userName">Optional.  The user name of the user to attribute the action to.</param>
-        void Resolve(IRepositoryApplicationVersion fixedInVersion, string note, string userName = null);
+        void Resolve(IRepositoryApplicationVersion fixedInVersion, string note, string? userName = null);
 
         /// <summary>
         /// Suppress an issue so it will not be automatically reopened if it recurs.
         /// </summary>
         /// <param name="note">Optional.  A text note of unlimited length.  Plain text is recommended.</param>
         /// <param name="userName">Optional.  The user name of the user to attribute the action to.</param>
-        void Suppress(string note, string userName = null);
+        void Suppress(string note, string? userName = null);
     }
 }

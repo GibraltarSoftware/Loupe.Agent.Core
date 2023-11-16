@@ -2,12 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>AgentTest</AssemblyName>
-    <StartupObject></StartupObject>
+    <StartupObject>Loupe.AgentTest.Console.CodeConfigProgram</StartupObject>
     <RootNamespace>Loupe.AgentTest.Console</RootNamespace>
     <RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

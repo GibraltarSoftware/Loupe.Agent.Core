@@ -47,23 +47,6 @@ namespace Loupe.Agent.AspNetCore.Metrics
             Path = httpContext.Request.Path;
         }
 
-        /// <summary>
-        /// Constructor for .NET Core 2
-        /// </summary>
-        internal ControllerMetric(AspNetConfiguration options,
-            ObjectPool<StringBuilder> stringBuilderPool, 
-            ActionExecutingContext actionExecutingContext)
-            :base(options, stringBuilderPool, actionExecutingContext)
-        {
-            if (actionExecutingContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
-            {
-                ControllerName = controllerActionDescriptor.ControllerName;
-                ActionName = controllerActionDescriptor.ActionName;
-                ClassName = controllerActionDescriptor.ControllerTypeInfo.FullName;
-                MethodName = controllerActionDescriptor.MethodInfo?.Name;
-            }
-        }
-
         /// <inheritdoc />
         protected override void OnLogRequest()
         {

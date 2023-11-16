@@ -172,7 +172,7 @@ namespace Loupe.Extensibility.Data
         /// <returns>The new issue</returns>
         /// <remarks>The application event must not be already related to an issue.</remarks>
         void AddIssue(string caption, string description, string workaround,
-            bool activate, bool isPublic, string publicCaption = null, string publicDescription = null, string publicWorkaround = null, string note = null,
-            string assignedUserName = null, string userName = null);
+            bool activate, bool isPublic, string? publicCaption = null, string? publicDescription = null, string? publicWorkaround = null, string? note = null,
+            string? assignedUserName = null, string? userName = null);
     }
 }
