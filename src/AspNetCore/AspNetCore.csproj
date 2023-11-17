@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<AssemblyName>Loupe.Agent.AspNetCore</AssemblyName>
 		<RootNamespace>Loupe.Agent.AspNetCore</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>4.13.0.0</Version>
-		<FileVersion>4.13.0.0</FileVersion>
-		<AssemblyVersion>4.13.0.0</AssemblyVersion>
+		<Version>5.0.0.0</Version>
+		<FileVersion>5.0.0.0</FileVersion>
+		<AssemblyVersion>5.0.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Company>Gibraltar Software, Inc.</Company>
 		<Product>Loupe</Product>
-		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
+		<Copyright>Copyright © 2008-2023 Gibraltar Software, Inc.</Copyright>
 		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
@@ -39,24 +39,6 @@
 		<WarningsAsErrors />
 	</PropertyGroup>
 	<Choose>
-		<When Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-			<ItemGroup>
-				<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.*" />
-				<PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.1.*" />
-				<PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.*" />
-				<PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.*" />
-				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
-				<PackageReference Include="System.Text.Json" Version="4.7.2" />
-			</ItemGroup>
-		</When>
 		<When Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
 			<ItemGroup>
 				<FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -69,16 +51,28 @@
 				<PackageReference Include="System.Text.Json" Version="4.7.2" />
 			</ItemGroup>
 		</When>
+		<When Condition="'$(TargetFramework)' == 'net6.0'">
+			<ItemGroup>
+				<FrameworkReference Include="Microsoft.AspNetCore.App" />
+				<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
+				<PackageReference Include="System.Text.Json" Version="6.0.0" />
+			</ItemGroup>
+		</When>
 		<Otherwise>
 			<ItemGroup>
 				<FrameworkReference Include="Microsoft.AspNetCore.App" />
-				<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-				<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-				<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-				<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
-				<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0" />
-				<PackageReference Include="System.Text.Json" Version="5.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+				<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+				<PackageReference Include="System.Text.Json" Version="8.0.0" />
 			</ItemGroup>
 		</Otherwise>
 	</Choose>
@@ -91,7 +85,7 @@
 		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

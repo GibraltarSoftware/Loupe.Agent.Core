@@ -56,7 +56,6 @@ namespace Gibraltar.Monitor
 
             AssemblyName targetName = target.GetName();
             m_Packet.Name = targetName.Name;
-            m_Packet.ProcessorArchitecture = targetName.ProcessorArchitecture; // Note: Could be null (or meaningless) under Mono?
             m_Packet.CultureName = targetName.CultureInfo.Name;
             m_Packet.Version = targetName.Version.ToString();
 

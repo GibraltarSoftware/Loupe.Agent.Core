@@ -644,7 +644,7 @@ namespace Gibraltar
         {
             try
             {
-                m_Logger.LogInformation("Background Directory Monitor Started\r\nThe background monitor thread for directory '{0}' is starting.");
+                m_Logger.LogInformation("Background Directory Monitor Started\r\nThe background monitor thread for directory '{0}' is starting.", m_Path);
 
                 while (m_Disposed == false)
                 {
@@ -669,7 +669,7 @@ namespace Gibraltar
             {
                 //Write a message to the trace log.  Note that we pass the exception twice:  The first is for a shorter message and the second is so Gibraltar can log the
                 //full rich exception information
-                m_Logger.LogInformation("Error Processing Async File System Monitor Request\r\nWhile processing a file system monitor request, an exception was thrown: {0}", ex.Message, ex);
+                m_Logger.LogInformation(ex, "Error Processing Async File System Monitor Request\r\nWhile processing a file system monitor request, an exception was thrown: {0}", ex.Message);
             }
         }
     }

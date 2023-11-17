@@ -147,7 +147,8 @@ namespace Gibraltar
             }
             catch (Exception ex)
             {
-                m_Logger.LogWarning("Unable to Load Data for File\r\nWhile attempting to load the data for '{0}' an exception was raised: {1}", FileNamePath, ex.Message, ex);
+                m_Logger.LogWarning(ex, "Unable to Load Data for File\r\nWhile attempting to load the data for '{0}' an exception was raised: {1}",
+                    FileNamePath, ex.Message);
                 Data = null;
             }
         }

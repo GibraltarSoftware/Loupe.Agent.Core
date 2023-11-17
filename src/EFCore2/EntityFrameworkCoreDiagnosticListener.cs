@@ -10,6 +10,7 @@ using Gibraltar.Agent.EntityFramework.Internal;
 using Gibraltar.Agent.Metrics;
 using Loupe.Agent.Core.Services;
 using Loupe.Agent.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using ILoupeDiagnosticListener = Loupe.Agent.Core.Services.ILoupeDiagnosticListener;

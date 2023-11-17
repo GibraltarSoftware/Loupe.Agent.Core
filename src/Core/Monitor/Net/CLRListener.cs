@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -94,7 +95,12 @@ namespace Gibraltar.Monitor.Net
                 {
                     ipProperties = nic.GetIPProperties();
                     DnsAddresses = ipProperties.DnsAddresses;
-                    WinsServersAddresses = ipProperties.WinsServersAddresses;
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        WinsServersAddresses = ipProperties.WinsServersAddresses;
+                    }
+
                     GatewayAddresses = ipProperties.GatewayAddresses;
                     UnicastIPAddresses = ipProperties.UnicastAddresses;
                 }
@@ -783,9 +789,9 @@ namespace Gibraltar.Monitor.Net
                 stringBuild.AppendFormat("IPV6 Addresses: {0}\r\n", FormatUnicastAddressList(adapterState.UnicastIPAddresses, AddressFamily.InterNetworkV6));
 
                 //check the quality of the IP addresses:
-                if (adapterState.UnicastIPAddresses != null)
+                if (adapterState.UnicastIPAddresses != null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    foreach (UnicastIPAddressInformation addressInformation in adapterState.UnicastIPAddresses)
+                    foreach (var addressInformation in adapterState.UnicastIPAddresses)
                     {
                         if ((addressInformation.DuplicateAddressDetectionState != DuplicateAddressDetectionState.Preferred)
                             && (addressInformation.DuplicateAddressDetectionState != DuplicateAddressDetectionState.Deprecated))

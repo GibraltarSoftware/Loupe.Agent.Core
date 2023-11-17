@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net461;net6.0;net8.0;</TargetFrameworks>
 		<LangVersion>8.0</LangVersion>
 		<AssemblyName>Loupe.Agent.EntityFrameworkCore</AssemblyName>
 		<RootNamespace>Loupe.Agent.EntityFrameworkCore</RootNamespace>
-		<Version>4.13.0.0</Version>
-		<FileVersion>4.13.0.0</FileVersion>
-		<AssemblyVersion>4.13.0.0</AssemblyVersion>
+		<Version>5.0.0.0</Version>
+		<FileVersion>5.0.0.0</FileVersion>
+		<AssemblyVersion>5.0.0.0</AssemblyVersion>
 		<Authors>Gibraltar Software, Inc.</Authors>
 		<Product>Loupe</Product>
-		<Copyright>Copyright © 2008-2021 Gibraltar Software, Inc.</Copyright>
+		<Copyright>Copyright © 2008-2023 Gibraltar Software, Inc.</Copyright>
 		<PackageProjectUrl>https://onloupe.com</PackageProjectUrl>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
 		<RepositoryUrl>https://github.com/gibraltarsoftware/loupe.agent.core</RepositoryUrl>
@@ -45,16 +45,21 @@
 				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
 			</ItemGroup>
 		</When>
+		<When Condition="'$(TargetFramework)' == 'net6.0'">
+			<ItemGroup>
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
+			</ItemGroup>
+		</When>
 		<Otherwise>
 			<ItemGroup>
-				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0" />
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
 			</ItemGroup>
 		</Otherwise>
 	</Choose>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

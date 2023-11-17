@@ -4,10 +4,10 @@ using Gibraltar.Data;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 using System.Diagnostics;
-#if NET5_0 || NETSTANDARD2_0_OR_GREATER
-using System.IO.Compression;
-#else
+#if NETFRAMEWORK
 using Ionic.Zlib;
+#else
+using System.IO.Compression;
 #endif
 
 #pragma warning disable 1591

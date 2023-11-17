@@ -1,44 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFrameworks>net461;net462;net472;net48;net6.0</TargetFrameworks>
-    <AssemblyName>Loupe.Core.Test</AssemblyName>
-    <RootNamespace>Loupe.Core.Test</RootNamespace>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>..\..\loupe.test.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net461;net462;net472;net48;net6.0</TargetFrameworks>
+		<AssemblyName>Loupe.Core.Test</AssemblyName>
+		<RootNamespace>Loupe.Core.Test</RootNamespace>
+		<SignAssembly>true</SignAssembly>
+		<DelaySign>false</DelaySign>
+		<AssemblyOriginatorKeyFile>..\..\loupe.test.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Content\NoisySession.glf" />
-    <None Remove="Content\SampleSession.glf" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Content\NoisySession.glf" />
+		<None Remove="Content\SampleSession.glf" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Content\NoisySession.glf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\SampleSession.glf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Content\NoisySession.glf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Content\SampleSession.glf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
-    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="NUnit" Version="3.14.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+		<PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+		<PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
+	</ItemGroup>
+	<Choose>
+		<When Condition="'$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48'">
+			<ItemGroup>
+			</ItemGroup>
+		</When>
+		<When Condition="'$(TargetFramework)' == 'net6.0'">
+			<ItemGroup>
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Extensibility\Extensibility.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Extensibility\Extensibility.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
+	<ItemGroup>
+		<Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+	</ItemGroup>
 
 </Project>
