@@ -1,13 +1,13 @@
-# Loupe Agent for .NET 5, .NET Core, and Xamarin #
+# Loupe Agent for .NET Standard / 6 / 8
 
-This repository has the modern Loupe Agents for .NET Standard (for Xamarin) and .NET Core / .NET 5.
+This repository has the modern Loupe Agents for .NET Standard and .NET Core / .NET 6+.
 The Loupe Agent provides a generic facility for capturing log messages, exceptions, and metrics
 from .NET applications.  It is supported by Gibraltar Software and replaces the original
 [Loupe Agent.](https://www.nuget.org/packages/Gibraltar.Agent/)
 
 ## How do I use Loupe with my Application? ##
 
-To add Loupe to your application we recommend referencing either the [Loupe.Extensions.Logging package](https://www.nuget.org/packages/Loupe.Extensions.Logging/)
+To add Loupe to your application, we recommend referencing either the [Loupe.Extensions.Logging package](https://www.nuget.org/packages/Loupe.Extensions.Logging/)
 or [Loupe.Agent.Core package](https://www.nuget.org/packages/Loupe.Agent.Core/).  These will pull in the related dependencies.
 
 For complete instructions, see the [Getting Started Guide](https://doc.onloupe.com/#GettingStarted_Introduction.html)
