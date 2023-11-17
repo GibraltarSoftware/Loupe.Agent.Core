@@ -26,7 +26,7 @@
 		<SignAssembly>true</SignAssembly>
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-		<DocumentationFile>bin\Loupe.Agent.AspNetCore.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
 		<PackageTags>Loupe,logging,diagnostics,aspnetcore</PackageTags>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>

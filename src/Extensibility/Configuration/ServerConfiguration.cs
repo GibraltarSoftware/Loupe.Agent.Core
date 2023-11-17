@@ -17,7 +17,7 @@ namespace Loupe.Configuration
         public ServerConfiguration()
         {
             Enabled = true;
-            AutoSendSessions = false;
+            AutoSendSessions = true;
             AutoSendOnError = true;
             SendAllApplications = false;
             PurgeSentSessions = false;
@@ -34,7 +34,7 @@ namespace Loupe.Configuration
         /// <summary>
         /// Indicates whether to automatically send session data to the server in the background.
         /// </summary>
-        /// <remarks>Defaults to false, indicating data will only be sent on request via packager.</remarks>
+        /// <remarks>Defaults to true.  If false, data will only be sent on request via the packager or Log.SendSessions.</remarks>
         public bool AutoSendSessions { get; set; }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Loupe.Configuration
             if (Port < 0)
                 Port = 0;
 
-            if ((UseGibraltarService && string.IsNullOrEmpty(CustomerName))
+            if ((UseGibraltarService && string.IsNullOrEmpty(CustomerName) && string.IsNullOrEmpty(ApplicationKey))
                 || (!UseGibraltarService && string.IsNullOrEmpty(Server)))
                 Enabled = false; //we can't be enabled because we aren't plausibly configured.
         }
