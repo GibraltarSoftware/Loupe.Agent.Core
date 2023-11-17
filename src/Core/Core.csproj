@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;net47;net471;net472;net48;net5.0;</TargetFrameworks>
 		<AssemblyName>Loupe.Core.NETCore</AssemblyName>
 		<RootNamespace>Gibraltar</RootNamespace>
@@ -27,9 +27,9 @@
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
-		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageTags>Loupe,logging,diagnostics</PackageTags>
-	  <CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
@@ -52,18 +52,18 @@
 	<Choose>
 		<When Condition="'$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net47'  Or '$(TargetFramework)' == 'net471'  Or '$(TargetFramework)' == 'net472'  Or '$(TargetFramework)' == 'net48'">
 			<ItemGroup>
-        <Reference Include="System.IO.Compression" Version="4.2.0.0" />
+				<Reference Include="System.IO.Compression" Version="4.2.0.0" />
 				<Reference Include="System.Net.Http" Version="4.0.0.0" />
-        <PackageReference Include="DotNetZip" Version="1.13.3" />
+				<PackageReference Include="DotNetZip" Version="1.13.3" />
 				<PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
 			</ItemGroup>
 		</When>
-    <When Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-        <PackageReference Include="System.Security.Principal.Windows" Version="4.5.0" />
-      </ItemGroup>
-    </When>
+		<When Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
+			<ItemGroup>
+				<PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+				<PackageReference Include="System.Security.Principal.Windows" Version="4.5.0" />
+			</ItemGroup>
+		</When>
 		<Otherwise>
 			<ItemGroup>
 				<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -72,7 +72,7 @@
 		</Otherwise>
 	</Choose>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

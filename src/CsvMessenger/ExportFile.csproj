@@ -26,7 +26,7 @@
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
-		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageTags>Loupe,logging,diagnostics</PackageTags>
 		<AssemblyName>Loupe.Agent.ExportFile</AssemblyName>
 		<RootNamespace>Loupe.Agent.Messaging.Export</RootNamespace>
@@ -43,7 +43,7 @@
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

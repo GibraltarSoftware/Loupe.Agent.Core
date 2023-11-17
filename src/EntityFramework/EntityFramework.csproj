@@ -26,7 +26,7 @@
 		<SignAssembly>true</SignAssembly>
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-		<DocumentationFile>bin\Loupe.Agent.EntityFrameworkCore.xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageTags>Loupe,entity-framework,logging,diagnostics</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
@@ -34,7 +34,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="EntityFramework" Version="6.3.0" />
-	  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+	  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
