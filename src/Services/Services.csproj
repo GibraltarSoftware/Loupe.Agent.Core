@@ -26,7 +26,7 @@
 		<SignAssembly>true</SignAssembly>
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
-		<DocumentationFile>bin\Loupe.Agent.Core.Services.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageTags>Loupe</PackageTags>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>

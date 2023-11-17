@@ -26,7 +26,7 @@
 		<DelaySign>false</DelaySign>
 		<AssemblyOriginatorKeyFile>..\..\loupe.agent.snk</AssemblyOriginatorKeyFile>
 		<PackageIcon>loupe-192x192.png</PackageIcon>
-		<DocumentationFile>bin\Loupe.Core.NETCore.xml</DocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageTags>Loupe,logging,diagnostics</PackageTags>
 		<AssemblyName>Loupe.Agent.ExportFile</AssemblyName>
 		<RootNamespace>Loupe.Agent.Messaging.Export</RootNamespace>
