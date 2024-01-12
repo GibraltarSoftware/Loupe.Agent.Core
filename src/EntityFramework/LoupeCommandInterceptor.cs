@@ -70,6 +70,7 @@ namespace Loupe.Agent.EntityFramework
 
             LogCallStack = _configuration.LogCallStack;
             LogExceptions = _configuration.LogExceptions;
+            LogQuery = _configuration.LogQuery;
         }
 
         /// <summary>
@@ -95,6 +96,11 @@ namespace Loupe.Agent.EntityFramework
         /// Indicates if the call stack to the operation should be included in the log message
         /// </summary>
         public bool LogCallStack { get; set; }
+
+        /// <summary>
+        /// Indicates if a log message should be written for each database operation before it is performed.
+        /// </summary>
+        public bool LogQuery { get; set; }
 
         /// <summary>
         /// Indicates if execution exceptions should be logged
@@ -234,7 +240,7 @@ namespace Loupe.Agent.EntityFramework
 
             try
             {
-                var messageBuilder = new StringBuilder(1024);
+                var messageBuilder = LogQuery ? new StringBuilder(1024) : null;
 
                 string caption, shortenedQuery;
                 if (command.CommandType == CommandType.StoredProcedure)
@@ -245,7 +251,7 @@ namespace Loupe.Agent.EntityFramework
                 else
                 {
                     //we want to make a more compact version of the SQL Query for the caption...
-                    var queryLines = command.CommandText.Split(new[] {'\r', '\n'});
+                    var queryLines = command.CommandText.Split(new[] { '\r', '\n' });
 
                     //now rip out any leading/trailing white space...
                     var cleanedUpLines = new List<string>(queryLines.Length);
@@ -267,36 +273,39 @@ namespace Loupe.Agent.EntityFramework
                     if (shortenedQuery.Length > 512)
                     {
                         shortenedQuery = shortenedQuery.Substring(0, 512) + "(...)";
-                        messageBuilder.AppendFormat("Full Query:\r\n\r\n{0}\r\n\r\n", command.CommandText);
+                        messageBuilder?.AppendFormat("Full Query:\r\n\r\n{0}\r\n\r\n", command.CommandText);
                     }
+
                     caption = string.Format("Executing Sql: '{0}'", shortenedQuery);
                 }
 
-                string paramString = null;
+                string? paramString = null;
                 if (command.Parameters.Count > 0)
                 {
-                    messageBuilder.AppendLine("Parameters:");
+                    messageBuilder?.AppendLine("Parameters:");
  
                     var paramStringBuilder = new StringBuilder(1024);
                     foreach (DbParameter parameter in command.Parameters)
                     {
                         string value = parameter.Value.FormatDbValue();
-                        messageBuilder.AppendFormat("    {0}: {1}\r\n", parameter.ParameterName, value);
+                        messageBuilder?.AppendFormat("    {0}: {1}\r\n", parameter.ParameterName, value);
                         paramStringBuilder.AppendFormat("{0}: {1}, ", parameter.ParameterName, value);
                     }
 
                     paramString = paramStringBuilder.ToString();
                     paramString = paramString.Substring(0, paramString.Length - 2); //get rid of the trailing comma
 
-                    messageBuilder.AppendLine();
+                    messageBuilder?.AppendLine();
                 }
 
-                var trackingMetric = new DatabaseMetric(shortenedQuery, command.CommandText);
-                trackingMetric.Parameters = paramString;
+                var trackingMetric = new DatabaseMetric(shortenedQuery, command.CommandText)
+                {
+                    Parameters = paramString
+                };
 
                 if (command.Transaction != null)
                 {
-                    messageBuilder.AppendFormat("Transaction:\r\n    Id: {0:X}\r\n    Isolation Level: {1}\r\n\r\n", command.Transaction.GetHashCode(), command.Transaction.IsolationLevel);
+                    messageBuilder?.AppendFormat("Transaction:\r\n    Id: {0:X}\r\n    Isolation Level: {1}\r\n\r\n", command.Transaction.GetHashCode(), command.Transaction.IsolationLevel);
                 }
 
                 var connection = command.Connection;
@@ -304,18 +313,22 @@ namespace Loupe.Agent.EntityFramework
                 {
                     trackingMetric.Server = connection.DataSource;
                     trackingMetric.Database = connection.Database;
-                    messageBuilder.AppendFormat("Server:\r\n    DataSource: {3}\r\n    Database: {4}\r\n    Connection Timeout: {2:N0} Seconds\r\n    Provider: {0}\r\n    Server Version: {1}\r\n\r\n",
+                    messageBuilder?.AppendFormat("Server:\r\n    DataSource: {3}\r\n    Database: {4}\r\n    Connection Timeout: {2:N0} Seconds\r\n    Provider: {0}\r\n    Server Version: {1}\r\n\r\n",
                                                 connection.GetType(), connection.ServerVersion, connection.ConnectionTimeout, connection.DataSource, connection.Database);
                 }
 
                 var messageSourceProvider = new MessageSourceProvider(2); //It's a minimum of two frames to our caller.
-                if (LogCallStack)
+                if (LogQuery && messageBuilder != null)
                 {
-                    messageBuilder.AppendFormat("Call Stack:\r\n{0}\r\n\r\n", messageSourceProvider.StackTrace);
-                }
+                    if (LogCallStack)
+                    {
+                        messageBuilder.AppendFormat("Call Stack:\r\n{0}\r\n\r\n", messageSourceProvider.StackTrace);
+                    }
 
-                Log.Write(_configuration.QueryMessageSeverity, LogSystem, messageSourceProvider, null, null, LogWriteMode.Queued, null, LogCategory, caption,
-                          messageBuilder.ToString());
+                    Log.Write(_configuration.QueryMessageSeverity, LogSystem, messageSourceProvider, null, null,
+                        LogWriteMode.Queued, null, LogCategory, caption,
+                        messageBuilder.ToString());
+                }
 
                 trackingMetric.MessageSourceProvider = messageSourceProvider;
 
@@ -346,8 +359,7 @@ namespace Loupe.Agent.EntityFramework
             string paramString = null;
 
             //see if we have a tracking metric for this command...
-            DatabaseMetric trackingMetric;
-            _databaseMetrics.TryRemove(command.GetHashCode(), out trackingMetric);
+            _databaseMetrics.TryRemove(command.GetHashCode(), out var trackingMetric);
             if (trackingMetric != null)
             {
                 trackingMetric.Stop();
@@ -394,10 +406,7 @@ namespace Loupe.Agent.EntityFramework
                 }
             }
 
-            if (trackingMetric != null)
-            {
-                trackingMetric.Record();
-            }
+            trackingMetric?.Record();
         }
     }
 }
