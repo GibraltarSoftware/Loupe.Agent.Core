@@ -359,8 +359,7 @@ namespace Loupe.Agent.EntityFramework
             string paramString = null;
 
             //see if we have a tracking metric for this command...
-            DatabaseMetric trackingMetric;
-            _databaseMetrics.TryRemove(command.GetHashCode(), out trackingMetric);
+            _databaseMetrics.TryRemove(command.GetHashCode(), out var trackingMetric);
             if (trackingMetric != null)
             {
                 trackingMetric.Stop();
@@ -407,10 +406,7 @@ namespace Loupe.Agent.EntityFramework
                 }
             }
 
-            if (trackingMetric != null)
-            {
-                trackingMetric.Record();
-            }
+            trackingMetric?.Record();
         }
     }
 }

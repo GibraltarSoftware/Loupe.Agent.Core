@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Gibraltar.Agent;
@@ -15,11 +16,7 @@ namespace Loupe.Agent.EntityFramework.Internal
     [DebuggerNonUserCode]
     internal class MessageSourceProvider : IMessageSourceProvider
     {
-        private string _methodName;
-        private string _className;
-        private string _fileName;
-        private int _lineNumber;
-        private string _formattedStackTrace;
+        private string? _formattedStackTrace;
 
         /// <summary>
         /// Creates a MessageSourceProvider object to be used as an IMessageSourceProvider.
@@ -27,14 +24,14 @@ namespace Loupe.Agent.EntityFramework.Internal
         /// <param name="className">The full name of the class (with namespace) whose method issued the log message.</param>
         /// <param name="methodName">The simple name of the method which issued the log message.</param>
         /// <remarks>This constructor is used only for the convenience of the Log class when it needs to generate
-        /// an IMessageSoruceProvider for construction of internally-generated packets without going through the
+        /// an IMessageSourceProvider for construction of internally-generated packets without going through the
         /// usual direct PublishToLog() mechanism.</remarks>
-        public MessageSourceProvider(string className, string methodName)
+        public MessageSourceProvider(string? className, string? methodName)
         {
-            _methodName = methodName;
-            _className = className;
-            _fileName = null;
-            _lineNumber = 0;
+            MethodName = methodName;
+            ClassName = className;
+            FileName = null;
+            LineNumber = 0;
         }
 
         /// <summary>
@@ -45,14 +42,14 @@ namespace Loupe.Agent.EntityFramework.Internal
         /// <param name="fileName">The name of the file containing the method which issued the log message.</param>
         /// <param name="lineNumber">The line within the file at which the log message was issued.</param>
         /// <remarks>This constructor is used only for the convenience of the Log class when it needs to generate
-        /// an IMessageSoruceProvider for construction of internally-generated packets without going through the
+        /// an IMessageSourceProvider for construction of internally-generated packets without going through the
         /// usual direct PublishToLog() mechanism.</remarks>
-        public MessageSourceProvider(string className, string methodName, string fileName, int lineNumber)
+        public MessageSourceProvider(string? className, string? methodName, string? fileName, int lineNumber)
         {
-            _methodName = methodName;
-            _className = className;
-            _fileName = fileName;
-            _lineNumber = lineNumber;
+            MethodName = methodName;
+            ClassName = className;
+            FileName = fileName;
+            LineNumber = lineNumber;
         }
 
         /// <summary>
@@ -71,7 +68,7 @@ namespace Loupe.Agent.EntityFramework.Internal
         /// <summary>
         /// The full adjusted stack trace from the bottom of the stack up through the frame we're attributing this message to
         /// </summary>
-        public string StackTrace
+        public string? StackTrace
         {
             [MethodImpl(MethodImplOptions.NoInlining)]
             get
@@ -111,8 +108,8 @@ namespace Loupe.Agent.EntityFramework.Internal
             try
             {
                 var stackTrace = new StackTrace(skipFrames + 1, true);
-                StackFrame frame = null;
-                MethodBase method = null;
+                StackFrame? frame = null;
+                MethodBase? method = null;
                 var selectedFrameIndex = 0;
 
                 var frameIndex = 0; // we already accounted for skipFrames in getting the stackTrace
@@ -130,11 +127,13 @@ namespace Loupe.Agent.EntityFramework.Internal
                         {
                             break; // We're presumably off the end of the stack, bail out of the loop!
                         }
-                        var frameNamespace = (method.DeclaringType == null) ? null : method.DeclaringType.FullName;
+                        var frameNamespace = method.DeclaringType?.FullName;
 
                         if (frameNamespace != null &&
-                            frameNamespace.StartsWith("System.") == false &&
-                            frameNamespace.StartsWith("Gibraltar.") == false)
+                            frameNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase) == false &&
+                            frameNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase) == false &&
+                            frameNamespace.StartsWith("Gibraltar.", StringComparison.InvariantCultureIgnoreCase) == false &&
+                            frameNamespace.StartsWith("Loupe.", StringComparison.InvariantCultureIgnoreCase) == false)
                         {
                             // This is the first frame outside of this adapter and the logging framework itself.
                             // So this must be the actual caller!  We can stop looking.
@@ -180,10 +179,10 @@ namespace Loupe.Agent.EntityFramework.Internal
                 if (method == null)
                 {
                     // Ack! We got nothing!  Invalidate all of these which depend on it and are thus meaningless.
-                    _methodName = null;
-                    _className = null;
-                    _fileName = null;
-                    _lineNumber = 0;
+                    MethodName = null;
+                    ClassName = null;
+                    FileName = null;
+                    LineNumber = 0;
                 }
                 else
                 {
@@ -191,32 +190,32 @@ namespace Loupe.Agent.EntityFramework.Internal
                     try
                     {
                         // MethodBase method = frame.GetMethod();
-                        _className = (method.DeclaringType == null) ? null : method.DeclaringType.FullName;
-                        _methodName = method.Name;
+                        ClassName = method.DeclaringType?.FullName;
+                        MethodName = method.Name;
                     }
                     catch
                     {
-                        _methodName = null;
-                        _className = null;
+                        MethodName = null;
+                        ClassName = null;
                     }
 
                     try
                     {
                         //now see if we have file information
-                        _fileName = frame.GetFileName();
-                        if (string.IsNullOrEmpty(_fileName) == false)
+                        FileName = frame?.GetFileName();
+                        if (string.IsNullOrEmpty(FileName) == false)
                         {
-                            _lineNumber = frame.GetFileLineNumber();
+                            LineNumber = frame?.GetFileLineNumber() ?? 0;
                         }
                         else
                         {
-                            _lineNumber = 0; // Not meaningful if there's no file name!
+                            LineNumber = 0; // Not meaningful if there's no file name!
                         }
                     }
                     catch
                     {
-                        _fileName = null;
-                        _lineNumber = 0;
+                        FileName = null;
+                        LineNumber = 0;
                     }
                 }
             }
@@ -225,10 +224,10 @@ namespace Loupe.Agent.EntityFramework.Internal
                 // Bleagh!  We got an unexpected failure (not caught and handled by a lower catch block as being expected).
                 DebugBreak(); // Stop the debugger here (if it's running, otherwise we won't alert on it).
 
-                _methodName = null;
-                _className = null;
-                _fileName = null;
-                _lineNumber = 0;
+                MethodName = null;
+                ClassName = null;
+                FileName = null;
+                LineNumber = 0;
             }
         }
         /// <summary>
@@ -252,22 +251,22 @@ namespace Loupe.Agent.EntityFramework.Internal
         /// <summary>
         /// The simple name of the method which issued the log message.
         /// </summary>
-        public string MethodName { get { return _methodName; } }
+        public string? MethodName { get; private set; }
 
         /// <summary>
         /// The full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        public string ClassName { get { return _className; } }
+        public string? ClassName { get; private set; }
 
         /// <summary>
         /// The name of the file containing the method which issued the log message.
         /// </summary>
-        public string FileName { get { return _fileName; } }
+        public string? FileName { get; private set; }
 
         /// <summary>
         /// The line within the file at which the log message was issued.
         /// </summary>
-        public int LineNumber { get { return _lineNumber; } }
+        public int LineNumber { get; private set; }
 
         #endregion
     }
