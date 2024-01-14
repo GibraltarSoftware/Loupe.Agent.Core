@@ -18,6 +18,7 @@ namespace Loupe.Agent.EntityFramework
         public EntityFrameworkConfiguration()
         {
             Enabled = true;
+            LogQuery = true;
             LogCallStack = false;
             QueryMessageSeverity = LogMessageSeverity.Verbose;
             LogExceptions = true;
@@ -36,6 +37,14 @@ namespace Loupe.Agent.EntityFramework
         /// </summary>
         /// <remarks>This is useful for determining what application code causes each query</remarks>
         public bool LogCallStack { get; set; }
+
+        /// <summary>
+        /// Determines if the agent writes a log message for each SQL operation.  Defaults to true.
+        /// </summary>
+        /// <remarks>Set to false to disable writing log messages for each SQL operation before they are run.
+        /// For database-heavy applications this can create a significant volume of log data, but does not
+        /// affect overall application performance.</remarks>
+        public bool LogQuery { get; set; }
 
         /// <summary>
         /// The severity used for log messages for the Entity Framework trace message. Defaults to Verbose.
