@@ -28,7 +28,6 @@ namespace Loupe.Agent.PerformanceCounters
 
         private PerfCounterCollection m_DiskCounters;
         private PerfCounterCollection m_NetworkCounters;
-        private PerfCounterCollection m_ProcessCounters;
         private PerfCounterCollection m_SystemCounters;
         private PerfCounterCollection m_MemoryCounters;
 
@@ -39,8 +38,6 @@ namespace Loupe.Agent.PerformanceCounters
         private bool m_EnableNetworkCounters;
         private bool m_EnableSystemCounters;
         private bool m_EnableMemoryCounters;
-
-        #region Public Properties and Methods
 
         /// <summary>
         /// Create a performance monitor with the default configuration
@@ -212,10 +209,6 @@ namespace Loupe.Agent.PerformanceCounters
         }
 
 
-        #endregion
-
-        #region Private Properties and Methods
-
         private void InitializeDiskCounters()
         {
             //create a performance counter group for these guys
@@ -324,7 +317,7 @@ namespace Loupe.Agent.PerformanceCounters
 
         private void InitializeMemoryCounters()
         {
-            if (CommonCentralLogic.IsNetFramework)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 //create a performance counter group for these guys
                 m_MemoryCounters = new PerfCounterCollection(".NET Memory Counters",
@@ -383,41 +376,5 @@ namespace Loupe.Agent.PerformanceCounters
                           exception.GetType().FullName, exception.Message);
             }
         }
-
-        /// <summary>
-        /// Performance counters for the current process
-        /// </summary>
-        private void InitializeProcessCounters()
-        {
-            //create our process-specific counter group
-            m_ProcessCounters = new PerfCounterCollection("Process Counters", "Performance counters we capture that are specific to our process");
-
-            try
-            {
-                m_ProcessCounters.Add("Process", "% Processor Time", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "% User Time", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "% Privileged Time", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Handle Count", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Page Faults/sec", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Page File Bytes", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Pool Nonpaged Bytes", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Pool Paged Bytes", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Private Bytes", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Thread Count", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "Virtual Bytes", PerfCounterInstanceAlias.CurrentProcess);
-                m_ProcessCounters.Add("Process", "IO Data Bytes/sec", PerfCounterInstanceAlias.CurrentProcess);
-            }
-            catch (Exception exception)
-            {
-                GC.KeepAlive(exception);
-                Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, exception, "Gibraltar.Agent",
-                          "Unable to record performance information for process performance counters",
-                          "Specific exception: {0}\r\nException message: {1}",
-                          exception.GetType().FullName, exception.Message);
-            }            
-        }
-
-        #endregion
-
     }
 }
