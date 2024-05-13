@@ -51,7 +51,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Create a new session summary as the live collection session for the current process
         /// </summary>
-        /// <remarks>This constructor figures out all of the summary information when invoked, which can take a moment.</remarks>
+        /// <remarks>This constructor figures out all the summary information when invoked, which can take a moment.</remarks>
         internal SessionSummary(AgentConfiguration configuration)
         {
             m_IsLive = true;
@@ -100,11 +100,9 @@ namespace Gibraltar.Monitor
                 }
 
                 m_Packet.ApplicationType = m_AgentAppType; // Finally, set the application type from our determined type.
-                if (m_AgentAppType != ApplicationType.AspNet)
-                {
-                    //we want to find our entry assembly and get default product/app info from it.
-                    GetApplicationNameSafe(out productName, out applicationName, out applicationVersion, out applicationDescription);                    
-                }
+
+                //we want to find our entry assembly and get default product/app info from it.
+                GetApplicationNameSafe(out productName, out applicationName, out applicationVersion, out applicationDescription);                    
 
                 //OK, now apply configuration overrides or what we discovered...
                 m_Packet.ProductName = string.IsNullOrEmpty(publisherConfig.ProductName) ? productName : publisherConfig.ProductName;
@@ -131,7 +129,14 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
             }
 
-            if (m_PrivacyEnabled == false)
+            bool isContainer = IsRunningInContainer();
+
+            if (isContainer)
+            {
+                m_Packet.HostName = "container";
+                m_Packet.DnsDomainName = string.Empty;
+            }
+            else if (m_PrivacyEnabled == false)
             {
                 try
                 {
@@ -163,6 +168,12 @@ namespace Gibraltar.Monitor
                 m_Packet.DnsDomainName = string.Empty;
             }
 
+            // If the configuration has a host name it overrides everything.
+            if (!string.IsNullOrEmpty(configuration.Publisher.HostName))
+            {
+                m_Packet.HostName = configuration.Publisher.HostName;
+            }
+
             var os = System.Environment.OSVersion;
             m_Packet.OSPlatformCode = (int) os.Platform; //we copied this enum for our value.
             m_Packet.OSVersion = os.Version;
@@ -180,7 +191,7 @@ namespace Gibraltar.Monitor
                 m_Packet.OSBootMode = OSBootMode.Normal;
 
                 m_Packet.Processors = System.Environment.ProcessorCount;
-                m_Packet.ProcessorCores = m_Packet.Processors; //BUG
+                m_Packet.ProcessorCores = System.Environment.ProcessorCount; //No universal way to get this now.
 
                 try
                 {
@@ -206,7 +217,6 @@ namespace Gibraltar.Monitor
                     GC.KeepAlive(ex);
                     m_Packet.RuntimeVersion = new Version(0, 0);
                 }
-
 
                 m_Packet.MemoryMB = 0; // BUG
                 m_Packet.UserInteractive = System.Environment.UserInteractive;
@@ -817,9 +827,28 @@ namespace Gibraltar.Monitor
 
         private static Version GetAgentVersionSafe()
         {
-            Version version = new Version(4, 0);
+            Version version;
+            try
+            {
+                version = Assembly.GetExecutingAssembly().GetName().Version;
+            }
+            catch (Exception)
+            {
+
+                version = new Version(5, 0);
+            }
 
             return version;
+        }
+
+        /// <summary>
+        /// Indicates if the current process is running in a container.
+        /// </summary>
+        private static bool IsRunningInContainer()
+        {
+            var runningInContainer = System.Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER");
+
+            return !string.IsNullOrEmpty(runningInContainer) && runningInContainer.ToLowerInvariant() == "true";
         }
 
         private static Guid GetComputerIdSafe(string product, AgentConfiguration configuration)

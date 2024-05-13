@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Gibraltar
@@ -12,10 +11,6 @@ namespace Gibraltar
     /// </summary>
     public static class CommonCentralLogic
     {
-        private readonly static bool g_IsNetFramework = false;
-        private readonly static bool g_IsNetNative = false;
-        private readonly static bool g_IsNetCore = false;
-
         private static bool g_SilentMode = true; //so we are absolutely sure we initialize in this mode.
         private static volatile bool g_BreakPointEnable = false; // Can be changed in the debugger
 
@@ -25,20 +20,6 @@ namespace Gibraltar
 
         static CommonCentralLogic()
         {
-            var frameworkDescription = RuntimeInformation.FrameworkDescription;
-
-            if (frameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-            {
-                g_IsNetCore = true;
-            }
-            else if (frameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase))
-            {
-                g_IsNetFramework = true;
-            }
-            else if (frameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase))
-            {
-                g_IsNetNative = true;
-            }
         }
 
         /// <summary>
@@ -70,22 +51,6 @@ namespace Gibraltar
         /// Reports whether EndSession() has completed flushing the end-session command to the log.
         /// </summary>
         public static bool IsSessionEnded => g_SessionEnded;
-
-        /// <summary>
-        /// True if the underlying runtime is the .NET Framework
-        /// </summary>
-        public static bool IsNetFramework => g_IsNetFramework;
-
-        /// <summary>
-        /// True if the underlying runtime is .NET Native
-        /// </summary>
-        public static bool IsNetNative => g_IsNetNative;
-
-        /// <summary>
-        /// True if the underlying runtime is .NET Core.
-        /// </summary>
-        public static bool IsNetCore => g_IsNetCore;
-
 
         /// <summary>
         /// Sets the SessionEnding flag to true.  (Can't be reversed once set.)

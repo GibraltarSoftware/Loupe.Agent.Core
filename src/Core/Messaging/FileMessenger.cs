@@ -193,7 +193,7 @@ namespace Gibraltar.Messaging
 
             //do we need to request maintenance?
             //This is duplicated from the OnWrite so we can trigger roll over *even when there are no messages*
-            if (m_CurrentFile.Length > m_MaxFileSizeBytes)
+            if (m_CurrentFile?.Length > m_MaxFileSizeBytes)
             {
                 maintenanceRequested = MaintenanceModeRequest.Regular;
             }

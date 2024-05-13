@@ -98,6 +98,13 @@ namespace Loupe.Configuration
         public string? PromotionLevelName { get; set; }
 
         /// <summary>
+        /// Optional.  The host name to use for the session instead of automatically determining it.
+        /// </summary>
+        /// <remarks>When running within a container, app service, or other scenario where the host name is randomly
+        /// generated or not useful an alternate value can be provided to identify sessions running on a common host.</remarks>
+        public string? HostName { get; set; }
+
+        /// <summary>
         /// When true, the publisher will treat all publish requests as write-through requests.
         /// </summary>
         /// <remarks>This overrides the write through request flag for all published requests, acting
