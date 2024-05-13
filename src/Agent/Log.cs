@@ -2801,16 +2801,13 @@ namespace Gibraltar.Agent
         }
 
         /// <summary>
-        /// Safely send sessions to the Loupe Server or via email.  Only one send request will be processed at a time.
+        /// Safely send sessions to the Loupe Server .  Only one send request will be processed at a time.
         /// </summary>
         /// <param name="criteria">The criteria to match for the sessions to send</param>
         /// <returns>True if the send was processed, false if it was not due to configuration or another active send</returns>
         /// <remarks>
-        /// <para>This method uses the same logic to determine how to transport data as SendSessionsOnExit. 
-        /// If a Loupe Server connection is configured and the server can be contacted it will be used.
-        /// Otherwise if packaging via email is configured the package will be sent that way.</para>
-        /// <para>If there is no way to send the information (either due to configuration or the 
-        /// server being unreachable) this method will return false.  Otherwise the method will 
+        ///  <para>If there is no way to send the information (either due to configuration or the 
+        /// server being unreachable) this method will return false.  Otherwise, the method will 
         /// return when it completes sending.</para>
         /// <para>If another send attempt is currently being processed this method will complete
         /// immediately and return false.  This prevents multiple simultaneous send attempts from
@@ -2826,16 +2823,13 @@ namespace Gibraltar.Agent
         }
 
         /// <summary>
-        /// Safely send sessions to the Loupe Server or via email.  Only one send request will be processed at a time.
+        /// Safely send sessions to the Loupe Server.  Only one send request will be processed at a time.
         /// </summary>
         /// <param name="sessionMatchPredicate">A delegate to evaluate sessions and determine which ones to send.</param>
         /// <returns>True if the send was processed, false if it was not due to configuration or another active send</returns>
         /// <remarks>
-        /// <para>This method uses the same logic to determine how to transport data as SendSessionsOnExit. 
-        /// If a Loupe Server connection is configured and the server can be contacted it will be used.
-        /// Otherwise if packaging via email is configured the package will be sent that way.</para>
         /// <para>If there is no way to send the information (either due to configuration or the 
-        /// server being unreachable) this method will return false.  Otherwise the method will 
+        /// server being unreachable) this method will return false.  Otherwise, the method will 
         /// return when it completes sending.</para>
         /// <para>If another send attempt is currently being processed this method will complete
         /// immediately and return false.  This prevents multiple simultaneous send attempts from
