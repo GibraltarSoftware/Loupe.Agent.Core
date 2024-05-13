@@ -32,6 +32,7 @@ namespace Loupe.Agent.PerformanceCounters
         private PerfCounterCollection m_MemoryCounters;
 
         private bool m_Initialized; //we use this because we initialize asynchronously.
+        private bool m_Enabled;
         private bool m_BusyPolling;  //used so we know if we're in the middle of a poll.
 
         private bool m_EnableDiskCounters;
@@ -73,9 +74,6 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         public void Initialize(Publisher publisher)
         {
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (isWindows == false)
-                return; 
 #if DEBUG
             //don't log during initialize in a lock, we will probably deadlock.
             Log.Write(LogMessageSeverity.Information, "Gibraltar.Agent", "Starting asynchronous performance monitoring initialization", null);
@@ -84,23 +82,38 @@ namespace Loupe.Agent.PerformanceCounters
             //we want to make sure anything that might want to mess with our data will wait until we're done initializing
             lock (m_Lock)
             {
-                if ((m_Configuration.EnableDiskMetrics) && (m_DiskCounters == null))
-                    InitializeDiskCounters();
+                // we only can do performance counters on windows, so check that first.
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                if (isWindows)
+                {
+                    m_Enabled = true;
 
-                if ((m_Configuration.EnableNetworkMetrics) && (m_NetworkCounters == null))
-                    InitializeNetworkCounters();
+                    if ((m_Configuration.EnableDiskMetrics) && (m_DiskCounters == null))
+                        InitializeDiskCounters();
 
-                if ((m_Configuration.EnableSystemMetrics) && (m_SystemCounters == null))
-                    InitializeSystemCounters();
+                    if ((m_Configuration.EnableNetworkMetrics) && (m_NetworkCounters == null))
+                        InitializeNetworkCounters();
 
-                if ((m_Configuration.EnableMemoryMetrics) && (m_MemoryCounters == null))
-                    InitializeMemoryCounters();
+                    if ((m_Configuration.EnableSystemMetrics) && (m_SystemCounters == null))
+                        InitializeSystemCounters();
 
-                //copy the configuration to ensure invariance...
-                m_EnableDiskCounters = m_Configuration.EnableDiskMetrics;
-                m_EnableMemoryCounters = m_Configuration.EnableMemoryMetrics;
-                m_EnableNetworkCounters = m_Configuration.EnableNetworkMetrics;
-                m_EnableSystemCounters = m_Configuration.EnableSystemMetrics;
+                    if ((m_Configuration.EnableMemoryMetrics) && (m_MemoryCounters == null))
+                        InitializeMemoryCounters();
+
+                    //copy the configuration to ensure invariance...
+                    m_EnableDiskCounters = m_Configuration.EnableDiskMetrics;
+                    m_EnableMemoryCounters = m_Configuration.EnableMemoryMetrics;
+                    m_EnableNetworkCounters = m_Configuration.EnableNetworkMetrics;
+                    m_EnableSystemCounters = m_Configuration.EnableSystemMetrics;
+                }
+                else
+                {
+                    m_Enabled = false;
+                    m_EnableDiskCounters = false;
+                    m_EnableMemoryCounters = false;
+                    m_EnableNetworkCounters = false;
+                    m_EnableSystemCounters = false;
+                }
 
                 //and now we're done initializing
                 m_Initialized = true;
@@ -115,7 +128,7 @@ namespace Loupe.Agent.PerformanceCounters
         }
 
         /// <summary>
-        /// Poll all of the actively configured counters.
+        /// Poll all the actively configured counters.
         /// </summary>
         public void Poll()
         {
@@ -126,6 +139,10 @@ namespace Loupe.Agent.PerformanceCounters
             {
                 Log.Write(LogMessageSeverity.Warning, "Gibraltar.Agent", "Skipping counter poll because object is not yet initialized.",
                           "This shouldn't happen unless the Performance Monitor is being misused.");
+            }
+            else if (m_Enabled == false)
+            {
+                return;
             }
             else if (m_BusyPolling)
             {
