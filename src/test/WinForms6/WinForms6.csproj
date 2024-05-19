@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Agent\Agent.csproj" />
     <ProjectReference Include="..\..\Extensions.Logging\Extensions.Logging.csproj" />
     <ProjectReference Include="..\..\PerformanceCounters\PerformanceCounters.csproj" />
     <ProjectReference Include="..\..\Services\Services.csproj" />
