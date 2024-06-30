@@ -853,11 +853,16 @@ namespace Gibraltar.Monitor
 
         private static Guid GetComputerIdSafe(string product, AgentConfiguration configuration)
         {
-            Guid computerId = Guid.Empty;  //we can't fail, this is a good default value since upstream items will treat it as a "don't know"
+            var computerId = Guid.Empty;  //we can't fail, this is a good default value since upstream items will treat it as a "don't know"
             try
             {
+                //If we're in a container we want to use the log storage folder - the computer Id will be transient
+                //which can cause problems with our upload process (registering the same session to many computers).
+                //So on a container we want to use the local repository.
+                var preferredPath = IsRunningInContainer() ? LocalRepository.CalculateRepositoryPath(product, configuration.SessionFile.Folder) 
+                    : PathManager.FindBestPath(PathType.Collection);
+
                 //first see if we have a GUID file in the system-wide location.
-                var preferredPath = PathManager.FindBestPath(PathType.Collection);
                 var computerIdFile = Path.Combine(preferredPath, LocalRepository.ComputerKeyFile);
 
                 if (!File.Exists(computerIdFile))
@@ -885,12 +890,12 @@ namespace Gibraltar.Monitor
 
                 if (File.Exists(computerIdFile))
                 {
-                    //read back the existing repository id
-                    string rawComputerId = File.ReadAllText(computerIdFile, Encoding.UTF8);
+                    //read back the existing computer id
+                    var rawComputerId = File.ReadAllText(computerIdFile, Encoding.UTF8);
                     computerId = new Guid(rawComputerId);
                 }
 
-                //create a new repository id
+                //create a new computer id
                 if (computerId == Guid.Empty)
                 {
                     computerId = Guid.NewGuid();
