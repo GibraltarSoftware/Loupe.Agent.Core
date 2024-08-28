@@ -12,14 +12,14 @@ namespace Gibraltar.Monitor.Serialization
     public class SessionSummaryCollection : ISessionSummaryCollection
     {
         private readonly object m_Lock = new object();
-        private readonly IRepository m_Repository;
+        private readonly LocalRepository m_Repository;
         private readonly List<ISessionSummary> m_List = new List<ISessionSummary>();
         private readonly Dictionary<Guid, ISessionSummary> m_Dictionary = new Dictionary<Guid, ISessionSummary>();
 
         /// <summary>
         /// Create an empty session summary collection
         /// </summary>
-        public SessionSummaryCollection(IRepository repository)
+        public SessionSummaryCollection(LocalRepository repository)
         {
             m_Repository = repository;
         }
@@ -27,7 +27,7 @@ namespace Gibraltar.Monitor.Serialization
         /// <summary>
         /// Create a new collection by loading the provided summaries.
         /// </summary>
-        public SessionSummaryCollection(IRepository repository, IList<ISessionSummary> sessions)
+        public SessionSummaryCollection(LocalRepository repository, IList<ISessionSummary> sessions)
         {
             m_Repository = repository;
 

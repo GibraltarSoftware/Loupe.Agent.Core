@@ -16,7 +16,7 @@ namespace Gibraltar.Monitor
     /// within Gibraltar libraries, and acts as its own IMessageSourceProvider when handing it off to the central Log.
     /// Thus, this object must be created while still within the same call stack as the origination of the log message.
     /// Used internally by our CLR listener (etc).</remarks>
-    internal class LocalLogMessage : LogMessageBase
+    public class LocalLogMessage : LogMessageBase
     {
         /// <summary>
         /// Creates a LocalLogMessage object with default LogWriteMode behavior and an XML details string.
@@ -37,7 +37,7 @@ namespace Gibraltar.Monitor
         /// <param name="description">Optional.  A multiline description to use which can be a format string for for the arguments.  Can be null.</param>
         /// <param name="args">Optional additional args to match up with the formatting string.</param>
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
-        internal LocalLogMessage(LogMessageSeverity severity, string logSystem, string categoryName, int skipFrames,
+        public LocalLogMessage(LogMessageSeverity severity, string logSystem, string categoryName, int skipFrames,
                                  string detailsXml, string caption, string description, params object[] args)
             : this(severity, LogWriteMode.Queued, logSystem, categoryName, skipFrames + 1, detailsXml, caption,
                    description, args)
@@ -64,7 +64,7 @@ namespace Gibraltar.Monitor
         /// <param name="description">Optional.  A multiline description to use which can be a format string for for the arguments.  Can be null.</param>
         /// <param name="args">Optional additional args to match up with the formatting string.</param>
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
-        internal LocalLogMessage(LogMessageSeverity severity, LogWriteMode writeMode, string logSystem, string categoryName,
+        public LocalLogMessage(LogMessageSeverity severity, LogWriteMode writeMode, string logSystem, string categoryName,
                                  int skipFrames, string detailsXml, string caption, string description, params object[] args)
             : this(severity, writeMode, logSystem, categoryName, skipFrames + 1, null, false, detailsXml, caption, description, args)
         {
@@ -92,7 +92,7 @@ namespace Gibraltar.Monitor
         /// <param name="description">Optional.  A multiline description to use which can be a format string for for the arguments.  Can be null.</param>
         /// <param name="args">Optional additional args to match up with the formatting string.</param>
         [MethodImplAttribute(MethodImplOptions.NoInlining)]
-        internal LocalLogMessage(LogMessageSeverity severity, LogWriteMode writeMode, string logSystem, string categoryName,
+        public LocalLogMessage(LogMessageSeverity severity, LogWriteMode writeMode, string logSystem, string categoryName,
                                  int skipFrames, Exception exception, bool attributeToException, string detailsXml, string caption,
                                  string description, params object[] args)
             : base(severity, logSystem, categoryName, skipFrames + 1, true, attributeToException, exception)

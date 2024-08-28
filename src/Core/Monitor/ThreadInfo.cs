@@ -5,12 +5,13 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using Gibraltar.Monitor.Serialization;
+using Loupe.Extensibility.Data;
 
 #pragma warning disable 1591
 namespace Gibraltar.Monitor
 {
     [DebuggerDisplay("(Thread #{ThreadIndex} : {Description})")]
-    public class ThreadInfo : IDisplayable, IComparable<ThreadInfo>, IEquatable<ThreadInfo>
+    public class ThreadInfo : IDisplayable, IThreadInfo, IComparable<ThreadInfo>, IEquatable<ThreadInfo>
     {
         private readonly ThreadInfoPacket m_Packet;
         private volatile int m_ThreadInstance; // Used to distinguish threads with the same name.
@@ -24,13 +25,13 @@ namespace Gibraltar.Monitor
             m_Packet = new ThreadInfoPacket();
             m_Packet.ThreadIndex = ThreadToken.GetCurrentThreadIndex(); // Each ThreadInfo we create gets a unique index value.
 
-            Thread thread = Thread.CurrentThread;
+            var thread = Thread.CurrentThread;
             m_Packet.ThreadId = thread.ManagedThreadId; // These can get recycled, so they aren't domain-lifetime unique.
             m_Packet.ThreadName = thread.Name ?? string.Empty; // prevent null, but let empty name pass through
-            m_Packet.DomainId = 0;
-            m_Packet.DomainName = string.Empty;
+            m_Packet.DomainId = Thread.GetDomainID();
+            m_Packet.DomainName = Thread.GetDomain().FriendlyName;
             m_Packet.IsBackground = thread.IsBackground;
-            m_Packet.IsThreadPoolThread = false;
+            m_Packet.IsThreadPoolThread = thread.IsThreadPoolThread;
             m_ThreadInstance = 0;
             m_Caption = null;
             m_Description = null;
@@ -60,7 +61,7 @@ namespace Gibraltar.Monitor
                     {
                         buffer.Append(m_Packet.ThreadName);
                     }
-                    
+
                     if (m_ThreadInstance > 0)
                         buffer.AppendFormat(" #{0}", m_ThreadInstance);
 
@@ -104,18 +105,20 @@ namespace Gibraltar.Monitor
             }
         }
 
-        public Guid Id { get { return m_Packet.ID; } }
-        
-        public int ThreadId { get { return m_Packet.ThreadId; } }
-        
-        public int ThreadIndex { get { return m_Packet.ThreadIndex; } }
-        
+        public Guid Id => m_Packet.ID;
+
+        public ISession Session => throw new NotSupportedException("ThreadInfo doesn't implement conversion of Session to ISession");
+
+        public int ThreadId => m_Packet.ThreadId;
+
+        public int ThreadIndex => m_Packet.ThreadIndex;
+
         /// <summary>
         /// A uniquifier for display purposes (set by Analyst)
         /// </summary>
         public int ThreadInstance
         {
-            get { return m_ThreadInstance; }
+            get => m_ThreadInstance;
             set
             {
                 if (m_ThreadInstance != value)
@@ -127,12 +130,9 @@ namespace Gibraltar.Monitor
             }
         }
 
-        public string ThreadName 
-        { 
-            get 
-            {
-                return m_Packet.ThreadName;
-            }
+        public string ThreadName
+        {
+            get => m_Packet.ThreadName;
             set
             {
                 if (m_Packet.ThreadName != value)
@@ -145,23 +145,23 @@ namespace Gibraltar.Monitor
             }
         }
 
-        public int DomainId { get { return m_Packet.DomainId; } }
+        public int DomainId => m_Packet.DomainId;
 
-        public string DomainName { get { return m_Packet.DomainName; } }
+        public string DomainName => m_Packet.DomainName;
 
-        public bool IsBackground { get { return m_Packet.IsBackground; } }
+        public bool IsBackground => m_Packet.IsBackground;
 
-        public bool IsThreadPoolThread { get { return m_Packet.IsThreadPoolThread; } }
+        public bool IsThreadPoolThread => m_Packet.IsThreadPoolThread;
 
         #endregion
 
-        internal ThreadInfoPacket Packet { get { return m_Packet; } }
+        internal ThreadInfoPacket Packet => m_Packet;
 
         /// <summary>
         /// Is the thread this instance is about still active in memory?  Only legitimate within the session where
         /// the thread was running.  Do not query this for playback outside the original running session.
         /// </summary>
-        internal bool IsStillAlive { get { return ThreadToken.IsThreadStillAlive(ThreadIndex); } }
+        internal bool IsStillAlive => ThreadToken.IsThreadStillAlive(ThreadIndex);
 
         /// <summary>
         /// Is the thread with the specified threadIndex still active in memory?  Only legitimate within the session where
@@ -307,9 +307,9 @@ namespace Gibraltar.Monitor
             if (ReferenceEquals(left, null))
             {
                 // If right is also null, we're equal; otherwise, we're unequal!
-                return ! ReferenceEquals(right, null);
+                return !ReferenceEquals(right, null);
             }
-            return ! left.Equals(right);
+            return !left.Equals(right);
         }
 
         /// <summary>
@@ -362,7 +362,7 @@ namespace Gibraltar.Monitor
             /// <summary>
             /// Get the unique-within-this-session ThreadIndex value.
             /// </summary>
-            private int ThreadIndex { get { return m_ThreadIndex; } }
+            private int ThreadIndex => m_ThreadIndex;
 
             /// <summary>
             /// Register the current thread so that we can detect when it no longer exists, and return its unique ThreadIndex.
@@ -391,7 +391,7 @@ namespace Gibraltar.Monitor
             }
 
             /// <summary>
-            /// Determine whether an identifed thread likely still exists or definitely no longer exists in this process.
+            /// Determine whether an identified thread likely still exists or definitely no longer exists in this process.
             /// </summary>
             /// <param name="threadIndex">The unique ThreadIndex value which the Agent assigned to the thread in question.</param>
             /// <returns>Reports true if the managed thread which was assigned the specified threadIndex still exists

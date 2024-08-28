@@ -23,6 +23,6 @@
         /// <summary>
         /// The subscription is actively transferring data
         /// </summary>
-        TransferingData = 3
+        TransferringData = 3
     }
 }

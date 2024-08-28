@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Gibraltar
@@ -6,24 +7,26 @@ namespace Gibraltar
     /// <summary>
     /// Execute an asynchronous execution task without any user interface.
     /// </summary>
-    public class AsynchronousTask
+    public class AsynchronousTask : IAsynchronousTask
     {
         private ProgressMonitorStack m_ProgressMonitors;
         private bool m_ReadOnly; //prevents subsequent events from displaying if they come after our canceled or complete event.
 
-        #region Public Properties and Methods
-
-        /// <summary>
-        /// Execute the requested delegate asynchronously with the specified arguments.
-        /// </summary>
-        /// <remarks>A progress dialog is displayed after a few moments and updated asynchronously as the task continues.  If the user
-        /// elects ot cancel the task, execution attempts to stop immediately and True is returned indicating the user canceled.</remarks>
-        /// <param name="callBack">The method to be executed asynchronously</param>
-        /// <param name="title">An end-user display title for this task.</param>
-        /// <param name="state">Arguments to pass to the callBack delegate</param>
+        /// <inheritdoc />
         public void Execute(WaitCallback callBack, string title, object state)
         {
-            var arguments = new AsyncTaskArguments(title, state);
+            Execute(callBack, new AsyncTaskArguments(title, state), true);
+        }
+
+        /// <inheritdoc />
+        public bool Execute(WaitCallback callBack, AsyncTaskArguments arguments)
+        {
+            return Execute(callBack, arguments, true);
+        }
+
+        /// <inheritdoc />
+        public bool Execute(WaitCallback callBack, AsyncTaskArguments arguments, bool cancelable)
+        {
             m_ProgressMonitors = arguments.ProgressMonitors;
 
             //and initialize our different UI elements
@@ -32,9 +35,10 @@ namespace Gibraltar
 
             //we are going to have the thread pool asynchronously execute our async interface.
 
-            ThreadPool.QueueUserWorkItem(AsyncTaskExec, new object[] {callBack, arguments});
+            ThreadPool.QueueUserWorkItem(AsyncTaskExec, new object[] { callBack, arguments });
 
             //and we return right away.  The whole point is that the caller can check status as they wish.
+            return false;
         }
 
         /// <summary>
@@ -52,10 +56,6 @@ namespace Gibraltar
         /// </summary>
         public AsyncTaskResultEventArgs TaskResults { get; private set; }
 
-        #endregion
-
-
-        #region Private Properties and Methods
 
         /// <summary>
         /// Executes the application's callback function
@@ -75,6 +75,7 @@ namespace Gibraltar
                 if ((callBack == null) || (arguments == null))
                 {
                     //we can't execute, this isn't a valid state
+                    Trace.TraceError("Unable to execute progress dialog task because one of the arguments is null.  This represents an implementation defect.");
                     return;
                 }
 
@@ -88,6 +89,9 @@ namespace Gibraltar
             {
                 try //while it seems really unlikely we'll get an exception here, we need to be extra cautious because we're called from the tread pool
                 {
+#if DEBUG
+                    Trace.TraceError("User task threw exception {0}:\r\n{1}", ex.GetType().Name, ex.Message, ex);
+#endif
                     //set a result..
                     TaskResults = new AsyncTaskResultEventArgs(AsyncTaskResult.Error, ex.Message, ex);
                     CancelProgress(); //if we don't the caller will spin forever.
@@ -121,10 +125,6 @@ namespace Gibraltar
             Completed = true;
         }
 
-        #endregion
-
-
-        #region Event Handlers
 
         private void Monitors_Canceled(object sender, ProgressMonitorStackEventArgs e)
         {
@@ -136,6 +136,9 @@ namespace Gibraltar
             CompleteProgress();
         }
 
-        #endregion
+        /// <inheritdoc />
+        public void Dispose()
+        {
+        }
     }
 }

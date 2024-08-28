@@ -47,7 +47,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int MessageCount { get; }
+        long MessageCount { get; }
 
         /// <summary>
         /// The number of critical messages in the messages collection.
@@ -56,7 +56,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int CriticalCount { get; }
+        long CriticalCount { get; }
 
         /// <summary>
         /// The number of error messages in the messages collection.
@@ -65,7 +65,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int ErrorCount { get; }
+        long ErrorCount { get; }
 
         /// <summary>
         /// The number of warning messages in the messages collection.
@@ -74,7 +74,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int WarningCount { get; }
+        long WarningCount { get; }
 
         /// <summary>
         /// Summary and common information about this session

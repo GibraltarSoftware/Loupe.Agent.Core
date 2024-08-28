@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor
 {
     /// <summary>
     /// A (sorted) collection of Application User objects
     /// </summary>
-    public sealed class ApplicationUserCollection : IList<ApplicationUser>
+    public sealed class ApplicationUserCollection : IApplicationUserCollection
     {
-        private readonly Dictionary<Guid, ApplicationUser> m_ApplicationUserByGuid = new Dictionary<Guid, ApplicationUser>();
-        private readonly Dictionary<string, ApplicationUser> m_ApplicationUserByKey = new Dictionary<string, ApplicationUser>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, ApplicationUser> m_ApplicationUserByUserName = new Dictionary<string, ApplicationUser>(StringComparer.OrdinalIgnoreCase);
-        private readonly List<ApplicationUser> m_SortedApplicationUser = new List<ApplicationUser>();
+        private readonly Dictionary<Guid, IApplicationUser> m_ApplicationUserByGuid = new Dictionary<Guid, IApplicationUser>();
+        private readonly Dictionary<string, IApplicationUser> m_ApplicationUserByKey = new Dictionary<string, IApplicationUser>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IApplicationUser> m_ApplicationUserByUserName = new Dictionary<string, IApplicationUser>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<IApplicationUser> m_SortedApplicationUser = new List<IApplicationUser>();
         private readonly object m_Lock = new object();
 
         private bool m_SortNeeded;
-        private ApplicationUser m_CachedApplicationUser; //this is a tetchy little performance optimization to save us thread info lookup time
+        private IApplicationUser m_CachedApplicationUser; //this is a tetchy little performance optimization to save us thread info lookup time
 
         /// <summary>
         /// Create a new empty ApplicationUserCollection.
@@ -46,39 +47,53 @@ namespace Gibraltar.Monitor
         /// Adds an item to the ApplicationUserCollection.
         /// </summary>
         /// <param name="item">The ApplicationUser item to add.</param>
-        public void Add(ApplicationUser item)
+        public void Add(IApplicationUser item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item), "A null ApplicationUser can not be added to the collection.");
+                throw new ArgumentNullException("item", "A null ApplicationUser can not be added to the collection.");
 
             if (string.IsNullOrEmpty(item.FullyQualifiedUserName))
-                throw new ArgumentNullException(nameof(item), "An ApplicationUser with a null username can not be added to the collection.");
+                throw new ArgumentNullException("item", "An ApplicationUser with a null username can not be added to the collection.");
+
+            var applicationUser = item as ApplicationUser;
+            if (applicationUser == null)
+                throw new InvalidOperationException("Only ApplicationUser concrete instances can be added");
 
             lock (m_Lock)
             {
-                if (m_ApplicationUserByGuid.ContainsKey(item.Id))
+                if (m_ApplicationUserByGuid.ContainsKey(applicationUser.Id))
                     throw new InvalidOperationException("The collection already contains the ApplicationUser item being added.");
 
-                if (string.IsNullOrEmpty(item.Key))
+                if (string.IsNullOrEmpty(applicationUser.Key))
                 {
-                    if (m_ApplicationUserByUserName.ContainsKey(item.FullyQualifiedUserName))
+                    if (m_ApplicationUserByUserName.ContainsKey(applicationUser.FullyQualifiedUserName))
                         throw new InvalidOperationException("The collection already contains the ApplicationUser item being added.");
 
-                    m_ApplicationUserByUserName.Add(item.FullyQualifiedUserName, item);
+                    m_ApplicationUserByUserName.Add(applicationUser.FullyQualifiedUserName, applicationUser);
                 }
                 else
                 {
-                    if (m_ApplicationUserByKey.ContainsKey(item.Key))
+                    if (m_ApplicationUserByKey.ContainsKey(applicationUser.Key))
                         throw new InvalidOperationException("The collection already contains the ApplicationUser item being added.");
 
-                    m_ApplicationUserByKey.Add(item.Key, item);
-                    m_ApplicationUserByUserName[item.FullyQualifiedUserName] = item; // we will overwrite whatever's there because we're a better match.
+                    m_ApplicationUserByKey.Add(applicationUser.Key, applicationUser);
+                    m_ApplicationUserByUserName[applicationUser.FullyQualifiedUserName] = applicationUser; // we will overwrite whatever's there because we're a better match.
                 }
 
-                m_ApplicationUserByGuid.Add(item.Id, item);
-                m_SortedApplicationUser.Add(item);
+                m_ApplicationUserByGuid.Add(applicationUser.Id, applicationUser);
+                m_SortedApplicationUser.Add(applicationUser);
                 m_SortNeeded = true; // Mark that we've added a new item which isn't yet sorted.
             }
+        }
+
+        void IApplicationUserCollection.Remove(IApplicationUser item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IApplicationUserCollection.Insert(int index, IApplicationUser item)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -101,14 +116,18 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="item">The ApplicationUser item of interest.</param>
         /// <returns>True if present, false if not.</returns>
-        public bool Contains(ApplicationUser item)
+        public bool Contains(IApplicationUser item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item), "A null ApplicationUser can not be queried in the collection.");
+                throw new ArgumentNullException("item", "A null ApplicationUser can not be queried in the collection.");
+
+            var applicationUser = item as ApplicationUser;
+            if (applicationUser == null)
+                throw new InvalidOperationException("Only ApplicationUser concrete instances can be verified");
 
             lock (m_Lock)
             {
-                return m_ApplicationUserByGuid.ContainsKey(item.Id);
+                return m_ApplicationUserByGuid.ContainsKey(applicationUser.Id);
             }
         }
 
@@ -156,15 +175,15 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="array">The target array (must be large enough to hold the Count of items starting at arrayIndex).</param>
         /// <param name="arrayIndex">The starting index in the target array at which to begin copying.</param>
-        public void CopyTo(ApplicationUser[] array, int arrayIndex)
+        public void CopyTo(IApplicationUser[] array, int arrayIndex)
         {
             if (array == null)
-                throw new ArgumentNullException(nameof(array), "Can not CopyTo a null array");
+                throw new ArgumentNullException("array", "Can not CopyTo a null array");
 
             lock (m_Lock)
             {
                 EnsureSorted();
-                ((ICollection<ApplicationUser>)m_SortedApplicationUser).CopyTo(array, arrayIndex);
+                m_SortedApplicationUser.CopyTo(array, arrayIndex);
             }
         }
 
@@ -195,21 +214,25 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="item">The ApplicationUser item to remove.</param>
         /// <returns>True if item was found and removed from the ApplicationUserCollection, false if not found.</returns>
-        public bool Remove(ApplicationUser item)
+        public bool Remove(IApplicationUser item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item), "A null ApplicationUser can not be removed from the collection.");
+                throw new ArgumentNullException("item", "A null ApplicationUser can not be removed from the collection.");
+
+            var applicationUser = item as ApplicationUser;
+            if (applicationUser == null)
+                throw new InvalidOperationException("Only ApplicationUser concrete instances can be removed");
 
             lock (m_Lock)
             {
-                if (m_ApplicationUserByGuid.ContainsKey(item.Id))
+                if (m_ApplicationUserByGuid.ContainsKey(applicationUser.Id))
                 {
-                    m_SortedApplicationUser.Remove(item); // We don't need to re-sort after a removal (unless already needed).
-                    m_ApplicationUserByGuid.Remove(item.Id);
-                    m_ApplicationUserByUserName.Remove(item.FullyQualifiedUserName);
+                    m_SortedApplicationUser.Remove(applicationUser); // We don't need to re-sort after a removal (unless already needed).
+                    m_ApplicationUserByGuid.Remove(applicationUser.Id);
+                    m_ApplicationUserByUserName.Remove(applicationUser.FullyQualifiedUserName);
 
-                    if (string.IsNullOrEmpty(item.Key) == false)
-                        m_ApplicationUserByKey.Remove(item.Key);
+                    if (string.IsNullOrEmpty(applicationUser.Key) == false)
+                        m_ApplicationUserByKey.Remove(applicationUser.Key);
 
                     return true;
                 }
@@ -226,8 +249,7 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                ApplicationUser item;
-                if (m_ApplicationUserByGuid.TryGetValue(id, out item))
+                if (m_ApplicationUserByGuid.TryGetValue(id, out var item))
                 {
                     m_SortedApplicationUser.Remove(item);
                     m_ApplicationUserByGuid.Remove(id);
@@ -258,14 +280,15 @@ namespace Gibraltar.Monitor
             }
         }
 
-        /// <summary>
-        /// ApplicationUserCollection is sorted and does not support direct modification.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="item"></param>
-        public void Insert(int index, ApplicationUser item)
+        /// <inheritdoc />
+        public int IndexOf(IApplicationUser item)
         {
-            throw new NotSupportedException("ApplicationUserCollection is sorted and does not support direct modification.");
+            throw new NotImplementedException();
+        }
+
+        void IList<IApplicationUser>.Insert(int index, IApplicationUser item)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -277,7 +300,7 @@ namespace Gibraltar.Monitor
             lock (m_Lock)
             {
                 EnsureSorted();
-                ApplicationUser victim = m_SortedApplicationUser[index];
+                var victim = m_SortedApplicationUser[index];
                 Remove(victim);
             }
         }
@@ -287,7 +310,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="sortIndex">The index (in the sorted order) of a ApplicationUser item to extract.</param>
         /// <returns>The ApplicationUser item at that index in the sorted order of this ApplicationUserCollection.</returns>
-        ApplicationUser IList<ApplicationUser>.this[int sortIndex]
+        IApplicationUser IList<IApplicationUser>.this[int sortIndex]
         {
             get { return this[sortIndex]; }
             set { throw new NotSupportedException("ApplicationUserCollection is sorted and does not support direct modification."); }
@@ -299,7 +322,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="sortIndex">The index (in the sorted order) of a ApplicationUser item to extract.</param>
         /// <returns>The ApplicationUser item at that index in the sorted order of this ApplicationUserCollection.</returns>
-        public ApplicationUser this[int sortIndex]
+        public IApplicationUser this[int sortIndex]
         {
             get
             {
@@ -319,7 +342,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <param name="id">The Guid ID of the desired ApplicationUser.</param>
         /// <returns>The ApplicationUser item with the specified Guid ID.</returns>
-        public ApplicationUser this[Guid id]
+        public IApplicationUser this[Guid id]
         {
             get
             {
@@ -336,7 +359,7 @@ namespace Gibraltar.Monitor
         /// <param name="id">The Guid ID of the desired ApplicationUser.</param>
         /// <param name="applicationUser">Gets the ApplicationUser with the specified Guid ID if it exists in the ApplicationUserCollection.</param>
         /// <returns>True if found, false if not found.</returns>
-        public bool TryGetValue(Guid id, out ApplicationUser applicationUser)
+        public bool TryGetValue(Guid id, out IApplicationUser applicationUser)
         {
             lock (m_Lock)
             {
@@ -345,15 +368,36 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
+        /// Get the ApplicationUser with a specified Guid ID.
+        /// </summary>
+        /// <param name="id">The Guid ID of the desired ApplicationUser.</param>
+        /// <param name="applicationUser">Gets the ApplicationUser with the specified Guid ID if it exists in the ApplicationUserCollection.</param>
+        /// <returns>True if found, false if not found.</returns>
+        public bool TryGetValue(Guid id, out ApplicationUser applicationUser)
+        {
+            var found = TryGetValue(id, out IApplicationUser appUser);
+            if (found)
+            {
+                applicationUser = appUser as ApplicationUser;
+            }
+            else
+            {
+                applicationUser = null;
+            }
+
+            return (applicationUser != null);
+        }
+
+        /// <summary>
         /// Get the ApplicationUser with a specified Key. (Use TryFindUserName() to look up by fully qualified user name.)
         /// </summary>
         /// <param name="key">The unique key of the desired ApplicationUser.</param>
         /// <param name="applicationUser">Gets the ApplicationUser with the specified key if it exists in the ApplicationUserCollection.</param>
         /// <returns>True if found, false if not found.</returns>
-        public bool TryGetValue(string key, out ApplicationUser applicationUser)
+        public bool TryGetValue(string key, out IApplicationUser applicationUser)
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
+                throw new ArgumentNullException("key");
 
             //this method gets *hammered* so we do a cheap one element cache.
             applicationUser = m_CachedApplicationUser; //yep, outside the lock - because we're going to verify it in a second and we don't care what value it had.
@@ -370,6 +414,27 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
+        /// Get the ApplicationUser with a specified Key. (Use TryFindUserName() to look up by fully qualified user name.)
+        /// </summary>
+        /// <param name="key">The unique key of the desired ApplicationUser.</param>
+        /// <param name="applicationUser">Gets the ApplicationUser with the specified key if it exists in the ApplicationUserCollection.</param>
+        /// <returns>True if found, false if not found.</returns>
+        public bool TryGetValue(string key, out ApplicationUser applicationUser)
+        {
+            var found = TryGetValue(key, out IApplicationUser appUser);
+            if (found)
+            {
+                applicationUser = appUser as ApplicationUser;
+            }
+            else
+            {
+                applicationUser = null;
+            }
+
+            return (applicationUser != null);
+        }
+
+        /// <summary>
         /// Get the ApplicationUser with a specified fully qualified user name.
         /// </summary>
         /// <param name="userName">The fully qualified user name of the desired ApplicationUser.</param>
@@ -378,13 +443,16 @@ namespace Gibraltar.Monitor
         public bool TryFindUserName(string userName, out ApplicationUser applicationUser)
         {
             if (string.IsNullOrEmpty(userName))
-                throw new ArgumentNullException(nameof(userName));
+                throw new ArgumentNullException("userName");
 
+            IApplicationUser appUser = null;
             lock (m_Lock)
             {
-                var returnVal = m_ApplicationUserByUserName.TryGetValue(userName, out applicationUser);
-                return returnVal;
+                m_ApplicationUserByUserName.TryGetValue(userName, out appUser);
             }
+
+            applicationUser = appUser as ApplicationUser;
+            return (applicationUser != null);
         }
 
         /// <summary>
@@ -395,24 +463,24 @@ namespace Gibraltar.Monitor
         internal ApplicationUser TrySetValue(ApplicationUser user)
         {
             if (ReferenceEquals(user, null))
-                throw new ArgumentNullException(nameof(user));
+                throw new ArgumentNullException("user");
 
             if (string.IsNullOrEmpty(user.FullyQualifiedUserName))
                 throw new InvalidOperationException("The provided user has no fully qualified user name");
 
-            lock(m_Lock)
+            lock (m_Lock)
             {
-                ApplicationUser existingUser;
+                IApplicationUser existingUser;
                 if (string.IsNullOrEmpty(user.Key) == false)
                 {
                     //see if it exists already by key; if so we return that.
                     if (m_ApplicationUserByKey.TryGetValue(user.Key, out existingUser))
-                        return existingUser;
+                        return existingUser as ApplicationUser;
                 }
 
                 //see if it exists already by user name; if so we return that.
                 if (m_ApplicationUserByUserName.TryGetValue(user.FullyQualifiedUserName, out existingUser))
-                    return existingUser;
+                    return existingUser as ApplicationUser;
 
                 //If we got this far then it's not in our collection..
                 Add(user);
@@ -431,12 +499,12 @@ namespace Gibraltar.Monitor
         /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
         /// </returns>
         /// <filterpriority>1</filterpriority>
-        public IEnumerator<ApplicationUser> GetEnumerator()
+        public IEnumerator<IApplicationUser> GetEnumerator()
         {
             lock (m_Lock)
             {
                 EnsureSorted();
-                return ((ICollection<ApplicationUser>)m_SortedApplicationUser).GetEnumerator();
+                return ((ICollection<IApplicationUser>)m_SortedApplicationUser).GetEnumerator();
             }
         }
 

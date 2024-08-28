@@ -21,8 +21,13 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public const string SHA1HashHeader = "X-Gibraltar-Hash";
 
-        internal const string LogCategory = "Loupe.Repository.Hub";
-        internal const string LoupeServiceServerName = "hub.gibraltarsoftware.com";
+        private const string LogCategory = "Loupe.Repository.Hub";
+
+        /// <summary>
+        /// The well known DNS name of the Loupe Server Service entry point
+        /// </summary>
+        public const string LoupeServiceServerName = "hub.gibraltarsoftware.com";
+
         private const string LoupeServiceEntryPath = "Customers/{0}";
         private const string ApplicationKeyEntryPath = "Agent/{0}/";
 
@@ -37,9 +42,19 @@ namespace Gibraltar.Server.Client
         public static readonly Version Hub38ProtocolVersion = new Version(1, 4);
 
         /// <summary>
+        /// The version number for the new Loupe 4.8 features
+        /// </summary>
+        public static readonly Version Hub48ProtocolVersion = new Version(1, 5);
+
+        /// <summary>
+        /// The version number for the new Loupe 5.0 features
+        /// </summary>
+        public static readonly Version Hub50ProtocolVersion = new Version(1, 6);
+
+        /// <summary>
         /// The latest version of the protocol we understand
         /// </summary>
-        public static readonly Version ClientProtocolVersion = Hub38ProtocolVersion;
+        public static readonly Version ClientProtocolVersion = Hub48ProtocolVersion;
 
         private readonly object m_Lock = new object();
         private readonly object m_ChannelLock = new object();
@@ -90,7 +105,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public bool EnableLogging
         {
-            get { return m_EnableLogging; }
+            get => m_EnableLogging;
             set
             {
                 lock (m_Lock)
@@ -163,7 +178,7 @@ namespace Gibraltar.Server.Client
                     await currentChannel.ExecuteRequest(configurationGetRequest, 1).ConfigureAwait(false); //we'd like it to succeed, so we'll give it one retry 
 
                     //now, if we got back a redirect we need to go THERE to get the status.
-                    HubConfigurationXml configurationXml = configurationGetRequest.Configuration;
+                    var configurationXml = configurationGetRequest.Configuration;
                     if ((configurationXml.redirectRequested == false) && (configurationXml.status == HubStatusXml.available))
                     {
                         //we can just keep using this connection, so lets do that.
@@ -229,10 +244,7 @@ namespace Gibraltar.Server.Client
                 }
             }
 
-            if (connectionStatus.Channel != null)
-            {
-                connectionStatus.Channel.Dispose();
-            }
+            connectionStatus.Channel?.Dispose();
 
             //we don't want to return the status we got because it has a real channel on it.
             return new HubConnectionStatus(configuration, null, connectionStatus.Repository, connectionStatus.IsValid, connectionStatus.Status, connectionStatus.Message);
@@ -246,11 +258,11 @@ namespace Gibraltar.Server.Client
         public async Task ExecuteRequest(IWebRequest newRequest, int maxRetries)
         {
             //make sure we have a channel
-            WebChannel channel = await GetCurrentChannel().ConfigureAwait(false); //this throws exceptions when it can't connect and is thread safe.
+            var channel = await GetCurrentChannel().ConfigureAwait(false); //this throws exceptions when it can't connect and is thread safe.
 
             //if we have a channel and NOW get an exception, here is where we would recheck the status of our connection.
-            bool retryAuthentication = false;
-            bool resetAndRetry = false;
+            var retryAuthentication = false;
+            var resetAndRetry = false;
             try
             {
                 await channel.ExecuteRequest(newRequest, maxRetries).ConfigureAwait(false);
@@ -327,7 +339,36 @@ namespace Gibraltar.Server.Client
 
             return request.ResponseRepository;
         }
-        
+
+        /// <summary>
+        /// Create a new subscription to this hub for the supplied repository information and API Key.
+        /// </summary>
+        /// <param name="repositoryXml"></param>
+        /// <param name="sharedSecret"></param>
+        /// <remarks></remarks>
+        /// <returns>The client repository information retrieved from the server.</returns>
+        public async Task<ClientRepositoryXml> CreateSubscription(ClientRepositoryXml repositoryXml, string sharedSecret)
+        {
+            var request = new ClientRepositoryUploadRequest(repositoryXml);
+
+            //we have to use distinct credentials for this so we have to swap the credentials on the connection.
+            var channel = await GetCurrentChannel().ConfigureAwait(false);
+            var previousProvider = channel.AuthenticationProvider;
+            channel.AuthenticationProvider = new SharedSecretAuthenticationProvider(sharedSecret);
+
+            try
+            {
+                await channel.ExecuteRequest(request, 1).ConfigureAwait(false);
+            }
+            finally
+            {
+                //reset the authentication provider
+                channel.AuthenticationProvider = previousProvider;
+            }
+
+            return request.ResponseRepository;
+        }
+
         /// <summary>
         /// Authenticate now (instead of waiting for a request to fail)
         /// </summary>
@@ -339,6 +380,18 @@ namespace Gibraltar.Server.Client
         }
 
         /// <summary>
+        /// Request the user provide updated credentials for this connection.
+        /// </summary>
+        /// <param name="repositoryId">The unique Id of the local repository this connection is associated with</param>
+        public void UpdateCredentials(Guid repositoryId)
+        {
+            //code duplication - we're relying on our internal knowledge of how the DNS name gets assembled.
+            var hostName = m_RootConfiguration.UseGibraltarService ? LoupeServiceServerName : m_RootConfiguration.Server;
+            var entryUri = CachedCredentialsManager.GetEntryUri(hostName);
+            CachedCredentialsManager.UpdateCredentials(entryUri, repositoryId, true);
+        }
+
+        /// <summary>
         /// Indicates if the connection is currently authenticated.
         /// </summary>
         /// <value>False if no connection, connection doesn't support authentication, or connection is not authenticated.</value>
@@ -346,11 +399,11 @@ namespace Gibraltar.Server.Client
         {
             get
             {
-                bool isAuthenticated = false;
+                var isAuthenticated = false;
 
                 lock (m_ChannelLock)
                 {
-                    if ((m_CurrentChannel != null) && (m_CurrentChannel.AuthenticationProvider != null))
+                    if (m_CurrentChannel?.AuthenticationProvider != null)
                     {
                         isAuthenticated = m_CurrentChannel.AuthenticationProvider.IsAuthenticated;
                     }
@@ -370,7 +423,7 @@ namespace Gibraltar.Server.Client
         {
             get
             {
-                bool isConnected = false;
+                var isConnected = false;
 
                 lock (m_ChannelLock)
                 {
@@ -379,7 +432,7 @@ namespace Gibraltar.Server.Client
                         switch (m_CurrentChannel.ConnectionState)
                         {
                             case ChannelConnectionState.Connected:
-                            case ChannelConnectionState.TransferingData:
+                            case ChannelConnectionState.TransferringData:
                                 isConnected = true;
                                 break;
                         }
@@ -400,7 +453,7 @@ namespace Gibraltar.Server.Client
         public async Task<HubRepository> GetRepository()
         {
             await EnsureConnectAttempted().ConfigureAwait(false);
-            lock(m_StatusLock)
+            lock (m_StatusLock)
             {
                 return m_HubRepository;
             }
@@ -413,7 +466,7 @@ namespace Gibraltar.Server.Client
         public async Task<HubConnectionStatus> GetStatus()
         {
             await EnsureConnectAttempted().ConfigureAwait(false);
-            lock(m_StatusLock)
+            lock (m_StatusLock)
             {
                 return m_HubStatus;
             }
@@ -425,6 +478,34 @@ namespace Gibraltar.Server.Client
         public async Task Reconnect()
         {
             await ResetChannel().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Check the provided configuration information to see if it is valid for a connection, throwing relevant exceptions if not.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the configuration is invalid with the specific problem indicated in the message</exception>
+        public static void ValidateConfiguration(ServerConfiguration configuration)
+        {
+            //check a special case:  There is NO configuration information to speak of.
+            if ((configuration.UseGibraltarService == false) && (string.IsNullOrEmpty(configuration.CustomerName)) && (string.IsNullOrEmpty(configuration.Server)))
+            {
+                //no way you even tried to configure the SDS.  lets use a different message.
+                throw new InvalidOperationException("No server connection configuration could be found");
+            }
+
+            if (configuration.UseGibraltarService)
+            {
+                if (string.IsNullOrWhiteSpace(configuration.CustomerName) && string.IsNullOrWhiteSpace(configuration.ApplicationKey) && string.IsNullOrWhiteSpace(configuration.Repository))
+                    throw new InvalidOperationException("A customer name or API key is required to use the Loupe Service,");
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(configuration.Server))
+                    throw new InvalidOperationException("When using a Loupe Server a full server name is required");
+
+                if (configuration.Port < 0)
+                    throw new InvalidOperationException("When overriding the connection port, a positive number must be specified.  Use zero to accept the default port.");
+            }
         }
 
         /// <summary>
@@ -459,11 +540,11 @@ namespace Gibraltar.Server.Client
         /// <remarks>Note to inheritors:  be sure to call the base implementation to ensure the event is raised.</remarks>
         protected virtual void OnConnectionStateChanged(ChannelConnectionState state)
         {
-            ChannelConnectionStateChangedEventHandler tempEvent = ConnectionStateChanged;
+            var tempEvent = ConnectionStateChanged;
 
             if (tempEvent != null)
             {
-                ChannelConnectionStateChangedEventArgs e = new ChannelConnectionStateChangedEventArgs(state);
+                var e = new ChannelConnectionStateChangedEventArgs(state);
                 tempEvent.Invoke(this, e);
             }
         }
@@ -501,7 +582,7 @@ namespace Gibraltar.Server.Client
                     //try to connect.
                     var connectionStatus = await Connect().ConfigureAwait(false);
 
-                    WebChannel newChannel = connectionStatus.Channel;
+                    var newChannel = connectionStatus.Channel;
 
                     //before we return, lets set our status to track what we just calculated.
                     lock (m_StatusLock)
@@ -578,7 +659,7 @@ namespace Gibraltar.Server.Client
                         connectionStatusTask.Wait(new TimeSpan(0, 0, 15));
 
                         //if we weren't able to connect fully we will have gotten a null channel; create just a configured channel with the parameters.
-                        if ((connectionStatusTask.Result == null) || (connectionStatusTask.Result.Channel == null))
+                        if (connectionStatusTask.Result?.Channel == null)
                         {
                             channel = CreateChannel(m_RootConfiguration);
                         }
@@ -587,16 +668,15 @@ namespace Gibraltar.Server.Client
                             channel = connectionStatusTask.Result.Channel;
                         }
 
-                        fullHubUrl = channel.EntryUri;
+                        fullHubUrl = channel.EntryUri?.ToString();
                     }
                     finally
                     {
-                        if (channel != null)
-                            channel.Dispose();
+                        channel?.Dispose();
                     }
 
                     //if this is a hub URL we need to pull off the HUB suffix to make it a valid HTML URL.
-                    if (String.IsNullOrEmpty(fullHubUrl) == false)
+                    if (string.IsNullOrEmpty(fullHubUrl) == false)
                     {
                         if (fullHubUrl.EndsWith("HUB", StringComparison.OrdinalIgnoreCase))
                         {
@@ -619,8 +699,8 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public string UpdateUrl
         {
-            get 
-            { 
+            get
+            {
                 var testUrl = EndUserTestUrl; //we are relying on the implementation of this pointing to the base of the tenant.
                 return testUrl + "Hub/VersionInfo.ini";
             }
@@ -674,12 +754,12 @@ namespace Gibraltar.Server.Client
         private static async Task<HubConnectionStatus> Connect(ServerConfiguration configuration)
         {
             WebChannel channel = null;
-            bool canConnect = true;
-            HubStatus status = HubStatus.Maintenance; //a reasonable default.
+            var canConnect = true;
+            var status = HubStatus.Maintenance; //a reasonable default.
             string statusMessage = null;
             Guid? serverRepositoryId = null;
             DateTimeOffset? expirationDt = null;
-            Version protocolVersion = new Version(0,0);
+            var protocolVersion = new Version(0, 0);
             NetworkConnectionOptions agentLiveStream = null;
             NetworkConnectionOptions clientLiveStream = null;
 
@@ -687,7 +767,7 @@ namespace Gibraltar.Server.Client
             HubConnectionStatus connectionStatus;
             try
             {
-                configuration.Validate();
+                ValidateConfiguration(configuration);
             }
             catch (Exception ex)
             {
@@ -717,7 +797,7 @@ namespace Gibraltar.Server.Client
                 else
                 {
                     //set the right status message
-                    status = (HubStatus) configurationXml.status;
+                    status = (HubStatus)configurationXml.status;
 
                     switch (status)
                     {
@@ -747,24 +827,26 @@ namespace Gibraltar.Server.Client
                         expirationDt = DataConverter.FromDateTimeOffsetXml(configurationXml.expirationDt);
                     }
 
-                    string publicKey = configurationXml.publicKey;
+                    var publicKey = configurationXml.publicKey;
 
                     if (string.IsNullOrEmpty(configurationXml.protocolVersion) == false)
                     {
                         protocolVersion = new Version(configurationXml.protocolVersion);
                     }
 
-                    LiveStreamServerXml liveStreamConfig = configurationXml.liveStream;
+                    var liveStreamConfig = configurationXml.liveStream;
                     if (liveStreamConfig != null)
                     {
                         agentLiveStream = new NetworkConnectionOptions
                         {
-                            HostName = channel.HostName, Port = liveStreamConfig.agentPort,
+                            HostName = channel.HostName,
+                            Port = liveStreamConfig.agentPort,
                             UseSsl = liveStreamConfig.useSsl
                         };
                         clientLiveStream = new NetworkConnectionOptions
                         {
-                            HostName = channel.HostName, Port = liveStreamConfig.clientPort,
+                            HostName = channel.HostName,
+                            Port = liveStreamConfig.clientPort,
                             UseSsl = liveStreamConfig.useSsl
                         };
                     }
@@ -835,9 +917,9 @@ namespace Gibraltar.Server.Client
 
             if (configuration.UseGibraltarService)
             {
-                string entryPath = string.IsNullOrEmpty(configuration.ApplicationKey)
-                    ? string.Format(LoupeServiceEntryPath, configuration.CustomerName)
-                    : string.Format(ApplicationKeyEntryPath, configuration.ApplicationKey);
+                var entryPath = string.IsNullOrEmpty(configuration.ApplicationKey)
+                                    ? string.Format(LoupeServiceEntryPath, configuration.CustomerName)
+                                    : string.Format(ApplicationKeyEntryPath, configuration.ApplicationKey);
 
 
                 channel = new WebChannel(Logger, true, LoupeServiceServerName, entryPath, ClientProtocolVersion);
@@ -845,7 +927,7 @@ namespace Gibraltar.Server.Client
             else
             {
                 //we need to create the right application base directory to get into Hub.
-                string entryPath = EffectiveApplicationBaseDirectory(configuration.ApplicationKey, configuration.ApplicationBaseDirectory, configuration.Repository);
+                var entryPath = EffectiveApplicationBaseDirectory(configuration.ApplicationKey, configuration.ApplicationBaseDirectory, configuration.Repository);
 
                 //and now we can actually create the channel!  Yay!
                 channel = new WebChannel(Logger, configuration.UseSsl, configuration.Server, configuration.Port, entryPath, ClientProtocolVersion);
@@ -859,7 +941,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         private static string EffectiveApplicationBaseDirectory(string applicationKey, string applicationBaseDirectory, string repository)
         {
-            string effectivePath = applicationBaseDirectory ?? string.Empty;
+            var effectivePath = applicationBaseDirectory ?? string.Empty;
 
             if (string.IsNullOrEmpty(effectivePath) == false)
             {
@@ -895,7 +977,7 @@ namespace Gibraltar.Server.Client
         /// <returns></returns>
         private bool IsRootHub(string hostName, int port, bool useSsl, string applicationBaseDirectory)
         {
-            bool isSameHub = true;
+            var isSameHub = true;
 
             if (String.IsNullOrEmpty(hostName))
             {
@@ -912,9 +994,9 @@ namespace Gibraltar.Server.Client
                         isSameHub = false;
                     }
 
-                    string entryPath = String.Format(LoupeServiceEntryPath, m_RootConfiguration.CustomerName);
+                    var entryPath = string.Format(LoupeServiceEntryPath, m_RootConfiguration.CustomerName);
 
-                    if (String.Equals(entryPath, applicationBaseDirectory) == false)
+                    if (string.Equals(entryPath, applicationBaseDirectory) == false)
                     {
                         //it isn't the same customer
                         isSameHub = false;
@@ -935,7 +1017,7 @@ namespace Gibraltar.Server.Client
                         //application base directory is more complicated - we have to take into account if we have a repository set or not.
                         var entryPath = EffectiveApplicationBaseDirectory(m_RootConfiguration.ApplicationKey, m_RootConfiguration.ApplicationBaseDirectory, m_RootConfiguration.Repository);
 
-                        if (String.Equals(entryPath, applicationBaseDirectory) == false)
+                        if (string.Equals(entryPath, applicationBaseDirectory) == false)
                         {
                             //it isn't the same repository
                             isSameHub = false;

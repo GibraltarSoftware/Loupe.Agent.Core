@@ -3,8 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using Gibraltar.Data;
 
-
-
 namespace Gibraltar.Messaging.Net
 {
     /// <summary>
@@ -22,7 +20,7 @@ namespace Gibraltar.Messaging.Net
 
         internal LiveViewStartCommandMessage()
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 TypeCode = NetworkMessageTypeCode.LiveViewStartCommand;
                 Version = new Version(1, 0);
@@ -39,7 +37,7 @@ namespace Gibraltar.Messaging.Net
         public LiveViewStartCommandMessage(Guid repositoryId, Guid sessionId, Guid channelId, long sequenceOffset = 0)
             : this()
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 m_RepositoryId = repositoryId;
                 m_SequenceOffset = sequenceOffset;
@@ -56,7 +54,7 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_ChannelId;
                 }
@@ -70,7 +68,7 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_SequenceOffset;
                 }
@@ -84,7 +82,7 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_SessionId;
                 }
@@ -98,7 +96,7 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_RepositoryId;
                 }
@@ -106,11 +104,11 @@ namespace Gibraltar.Messaging.Net
         }
 
         /// <summary>
-        /// Verify the command is fully populated and 
+        /// Verify the command is fully populated
         /// </summary>
         public void Validate()
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 if (ChannelId == Guid.Empty)
                     throw new InvalidOperationException("There is no channel Id specified");
@@ -126,7 +124,7 @@ namespace Gibraltar.Messaging.Net
         /// </summary>
         protected override void OnWrite(Stream stream)
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 BinarySerializer.SerializeValue(stream, m_RepositoryId);
                 BinarySerializer.SerializeValue(stream, m_SessionId);
@@ -140,7 +138,7 @@ namespace Gibraltar.Messaging.Net
         /// </summary>
         protected override void OnRead(Stream stream)
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 BinarySerializer.DeserializeValue(stream, out m_RepositoryId);
                 BinarySerializer.DeserializeValue(stream, out m_SessionId);

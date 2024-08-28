@@ -1,4 +1,5 @@
 ﻿#pragma warning disable 1591
+
 namespace Gibraltar.Messaging.Net
 {
     public enum NetworkMessageTypeCode
@@ -17,6 +18,16 @@ namespace Gibraltar.Messaging.Net
         /// <summary>
         /// Measures the clock drift and latency between two computers
         /// </summary>
-        ClockDrift = 10
+        ClockDrift = 10,
+
+        /// <summary>
+        /// Suspend sending session headers to the client
+        /// </summary>
+        PauseSessionHeaders = 11,
+
+        /// <summary>
+        /// Resume sending session headers to the client
+        /// </summary>
+        ResumeSessionHeaders = 12,
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 
@@ -18,7 +19,8 @@ namespace Gibraltar.Monitor
         private readonly string m_ClassName;
         private readonly string m_FileName;
         private readonly int m_LineNumber;
-        private readonly string m_FormattedStackTrace;
+        private string m_FormattedStackTrace;
+        private readonly int m_SelectedStackFrame;
 
         /// <summary>
         /// Parameterless constructor for derived classes.
@@ -80,10 +82,37 @@ namespace Gibraltar.Monitor
         {
             const bool trustSkipFrames = true; // Set true to trust skipFrames count and don't skip over Gibraltar libs.
 
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
-            CommonCentralLogic.FindMessageSource(skipFrames + 1, localOrigin || trustSkipFrames, null,
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            m_SelectedStackFrame = CommonCentralLogic.FindMessageSource(skipFrames + 1, localOrigin || trustSkipFrames, null,
                                               out m_ClassName, out m_MethodName, out m_FileName, out m_LineNumber);
 // ReSharper restore ConditionIsAlwaysTrueOrFalse
+        }
+
+        /// <summary>
+        /// The full adjusted stack trace from the bottom of the stack up through the frame we're attributing this message to
+        /// </summary>
+        public string StackTrace
+        {
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            get
+            {
+                lock (this)
+                {
+                    if (string.IsNullOrEmpty(m_FormattedStackTrace))
+                    {
+                        try
+                        {
+                            //we are one stack frame higher than FindMessageSource.
+                            m_FormattedStackTrace = new StackTrace(m_SelectedStackFrame + 1, true).ToString();
+                        }
+                        catch
+                        {
+                            m_FormattedStackTrace = null;
+                        }
+                    }
+                }
+                return m_FormattedStackTrace;
+            }
         }
 
         #region IMessageSourceProvider properties
@@ -91,22 +120,22 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The simple name of the method which issued the log message.
         /// </summary>
-        public string MethodName { get { return m_MethodName; } }
+        public string MethodName => m_MethodName;
 
         /// <summary>
         /// The full name of the class (with namespace) whose method issued the log message.
         /// </summary>
-        public string ClassName { get { return m_ClassName; } }
+        public string ClassName => m_ClassName;
 
         /// <summary>
         /// The name of the file containing the method which issued the log message.
         /// </summary>
-        public string FileName { get { return m_FileName; } }
+        public string FileName => m_FileName;
 
         /// <summary>
         /// The line within the file at which the log message was issued.
         /// </summary>
-        public int LineNumber { get { return m_LineNumber; } }
+        public int LineNumber => m_LineNumber;
 
         #endregion
     }

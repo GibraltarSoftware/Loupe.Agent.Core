@@ -286,7 +286,7 @@ namespace Gibraltar.Agent
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int MessageCount => m_WrappedSummary != null ? m_WrappedSummary.MessageCount : m_WrappedISessionSummary.MessageCount;
+        public long MessageCount => m_WrappedSummary != null ? m_WrappedSummary.MessageCount : m_WrappedISessionSummary.MessageCount;
 
         /// <summary>
         /// The number of critical messages in the messages collection.
@@ -295,7 +295,7 @@ namespace Gibraltar.Agent
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int CriticalCount => m_WrappedSummary != null ? m_WrappedSummary.CriticalCount : m_WrappedISessionSummary.CriticalCount;
+        public long CriticalCount => m_WrappedSummary != null ? m_WrappedSummary.CriticalCount : m_WrappedISessionSummary.CriticalCount;
 
         /// <summary>
         /// The number of error messages in the messages collection.
@@ -304,7 +304,7 @@ namespace Gibraltar.Agent
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int ErrorCount => m_WrappedSummary != null ? m_WrappedSummary.ErrorCount : m_WrappedISessionSummary.ErrorCount;
+        public long ErrorCount => m_WrappedSummary != null ? m_WrappedSummary.ErrorCount : m_WrappedISessionSummary.ErrorCount;
 
         /// <summary>
         /// The number of warning messages in the messages collection.
@@ -313,7 +313,7 @@ namespace Gibraltar.Agent
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int WarningCount => m_WrappedSummary != null ? m_WrappedSummary.WarningCount : m_WrappedISessionSummary.WarningCount;
+        public long WarningCount => m_WrappedSummary != null ? m_WrappedSummary.WarningCount : m_WrappedISessionSummary.WarningCount;
 
         /// <summary>
         /// A copy of the collection of application specific properties. (Set via configuration at logging startup.  Do not modify here.)

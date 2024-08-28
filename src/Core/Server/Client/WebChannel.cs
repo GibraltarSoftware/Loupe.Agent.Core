@@ -6,11 +6,13 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Gibraltar.Monitor;
 using Gibraltar.Server.Client.Internal;
 using Loupe.Extensibility.Data;
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace Gibraltar.Server.Client
@@ -24,9 +26,13 @@ namespace Gibraltar.Server.Client
         private int m_RetryDelaySeconds = MinimumRetryDelaySeconds;
         private const int MinimumRetryDelaySeconds = 1;
         private const int MaximumRetryDelaySeconds = 120;
-        private const int DefaultTimeooutSeconds = 120;
-        public const string HeaderRequestMethod = "X-Request-Method";
-        public const string HeaderRequestTimestamp = "X-Request-Timestamp";
+        private const int DefaultTimeoutSeconds = 120;
+        private const string HeaderRequestMethod = "X-Request-Method";
+        private const string HeaderRequestTimestamp = "X-Request-Timestamp";
+
+        /// <summary>
+        /// The HTTP Request header for application protocol version
+        /// </summary>
         public const string HeaderRequestAppProtocolVersion = "X-Request-App-Protocol";
 
         /// <summary>
@@ -37,6 +43,7 @@ namespace Gibraltar.Server.Client
         private readonly object m_Lock = new object();
         private static readonly Dictionary<string, bool> s_ServerUseCompatibilitySetting = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, bool> s_ServerUseHttpVersion10Setting = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        private static readonly JsonSerializerOptions JsonOptions = CreateJsonSerializerOptions();
 
         private CancellationTokenSource m_CancellationTokenSource; //PROTECTED BY LOCK
         private IWebAuthenticationProvider m_AuthenticationProvider; //PROTECTED BY LOCK
@@ -114,9 +121,10 @@ namespace Gibraltar.Server.Client
             }
 
             m_CancellationTokenSource = new CancellationTokenSource();
-        }
 
-        #region Public Properties and Methods
+            //enable TLS 1.2
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+        }
 
         /// <summary>
         /// Optional.  The version number to specify in the protocol header.
@@ -133,10 +141,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public IWebAuthenticationProvider AuthenticationProvider
         {
-            get
-            {
-                return m_AuthenticationProvider;
-            }
+            get => m_AuthenticationProvider;
             set
             {
                 lock (m_Lock)
@@ -151,40 +156,38 @@ namespace Gibraltar.Server.Client
         /// <summary>
         /// The DNS name of the server being connected to.
         /// </summary>
-        public string HostName { get { return m_HostName; } }
+        public string HostName => m_HostName;
 
         /// <summary>
         /// The port number being used
         /// </summary>
-        public int Port { get { return m_Port; } }
+        public int Port => m_Port;
 
         /// <summary>
         /// Indicates if the channel is encrypted using SSL
         /// </summary>
-        public bool UseSsl { get { return m_UseSsl; } }
+        public bool UseSsl => m_UseSsl;
 
         /// <summary>
         /// The path from the root of the web server to the start of the application (e.g. the virtual directory path)
         /// </summary>
-        public string ApplicationBaseDirectory { get { return m_ApplicationBaseDirectory; } }
+        public string ApplicationBaseDirectory => m_ApplicationBaseDirectory;
 
         /// <summary>
         /// The complete Uri to the start of all requests that can be executed on this channel.
         /// </summary>
-        public string EntryUri
-        {
-            get
-            {
-                return CalculateBaseAddress().ToString();
-            }
-        }
+        public Uri EntryUri => CalculateBaseAddress();
 
         /// <summary>
         /// The current connection state of the channel.
         /// </summary>
-        public ChannelConnectionState ConnectionState { get { return m_ConnectionState; } }
+        public ChannelConnectionState ConnectionState => m_ConnectionState;
 
-        private void EnsureRequestSuccessful(HttpResponseMessage response)
+        /// <summary>
+        /// Processes HttpResponseMessages to throw our dedicated exceptions.
+        /// </summary>
+        /// <param name="response"></param>
+        public static void EnsureRequestSuccessful(HttpResponseMessage response)
         {
             Uri requestUri = response.RequestMessage == null ? null : response.RequestMessage.RequestUri;
 
@@ -240,18 +243,56 @@ namespace Gibraltar.Server.Client
                         if (m_ConnectionState == ChannelConnectionState.Disconnected)
                             SetConnectionState(ChannelConnectionState.Connecting);
                         else if (m_ConnectionState == ChannelConnectionState.Connected)
-                            SetConnectionState(ChannelConnectionState.TransferingData);
+                            SetConnectionState(ChannelConnectionState.TransferringData);
 
-                        if ((newRequest.RequiresAuthentication) && (m_AuthenticationProvider.IsAuthenticated == false))
+                        try //this is for pre-processing our exceptions into a common set of types
                         {
-                            //no point in waiting for the failure, go ahead and authenticate now.
-                            await Authenticate().ConfigureAwait(false);
+                            if ((newRequest.RequiresAuthentication) &&
+                                (m_AuthenticationProvider.IsAuthenticated == false))
+                            {
+                                //no point in waiting for the failure, go ahead and authenticate now.
+                                await Authenticate().ConfigureAwait(false);
+                            }
+
+                            //Now, because we know we're not MT-safe we can do this "pass around"
+                            m_RequestSupportsAuthentication = newRequest.SupportsAuthentication;
+
+                            await newRequest.ProcessRequest(this).ConfigureAwait(false);
+                        }
+                        catch (TaskCanceledException ex)
+                        {
+                            //we timed out our request.  This is fatal (the caller *specified* the timeout after all) but we
+                            //want to translate it into a specific exception the caller can handle.
+                            throw new WebChannelTimeoutException(ex.Message, ex, null);
+                        }
+                        catch (HttpRequestException ex) //we want to swap these for more categorical exceptions
+                        {
+                            //we need to peek inside to see what the deal is.
+                            if (ex.InnerException is WebException webException)
+                            {
+                                switch (webException.Status)
+                                {
+                                    case WebExceptionStatus.ConnectFailure:
+                                    case WebExceptionStatus.ConnectionClosed:
+                                    case WebExceptionStatus.KeepAliveFailure:
+                                    case WebExceptionStatus.NameResolutionFailure:
+                                    case WebExceptionStatus.ProxyNameResolutionFailure:
+                                    case WebExceptionStatus.PipelineFailure:
+                                    case WebExceptionStatus.ReceiveFailure:
+                                    case WebExceptionStatus.RequestProhibitedByProxy:
+                                    case WebExceptionStatus.SecureChannelFailure:
+                                    case WebExceptionStatus.SendFailure:
+                                    case WebExceptionStatus.TrustFailure:
+                                        throw new WebChannelConnectFailureException(webException.Message, webException, null);
+                                    case WebExceptionStatus.Timeout:
+                                        throw new WebChannelTimeoutException(webException.Message, webException, null);
+                                }
+                            }
+
+                            //if we didn't carve them out above then we consider these fatal.
+                            throw new WebChannelException(ex.Message, ex, null);
                         }
 
-                        //Now, because we know we're not MT-safe we can do this "pass around"
-                        m_RequestSupportsAuthentication = newRequest.SupportsAuthentication;
-
-                        await newRequest.ProcessRequest(this).ConfigureAwait(false);
                         SetConnectionState(ChannelConnectionState.Connected);
                         requestComplete = true;
                     }
@@ -261,8 +302,9 @@ namespace Gibraltar.Server.Client
                         {
                             //most likely we did a delete or put and the caller doesn't support that, enable compatibility methods.
                             m_UseCompatibilityMethods = true;
-                            SetUseCompatiblilityMethodsOverride(m_HostName, m_UseCompatibilityMethods);
-                                //so we don't have to repeatedly run into this for this server
+                            //so we don't have to repeatedly run into this for this server
+                            SetUseCompatibilityMethodsOverride(m_HostName, m_UseCompatibilityMethods);
+
                             if (EnableLogging)
                                 m_Logger.Write(LogMessageSeverity.Information, ex, true, LogCategory,
                                     "Switching to HTTP method compatibility mode",
@@ -280,8 +322,7 @@ namespace Gibraltar.Server.Client
                         {
                             //most likely we are talking to an oddball proxy that doesn't support keepalive (like on a train or plane, seriously..)
                             m_UseHttpVersion10 = true;
-                            SetUseHttpVersion10Override(m_HostName, m_UseHttpVersion10);
-                                //so we don't have to repeatedly run into this for this server
+                            SetUseHttpVersion10Override(m_HostName, m_UseHttpVersion10); //so we don't have to repeatedly run into this for this server
                             if (EnableLogging)
                                 m_Logger.Write(LogMessageSeverity.Information, ex, true, LogCategory,
                                     "Switching to HTTP 1.0 compatibility mode",
@@ -318,24 +359,19 @@ namespace Gibraltar.Server.Client
                         //this is a real result, we don't want to retry.  But, if we got this then something didn't *expect* the null so keep the exception flying.
                         throw;
                     }
-                    catch (HttpRequestException)
+                    catch (WebChannelConnectFailureException ex)
                     {
-                        //if we didn't carve them out above then we consider these fatal.
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        //assume a retryable connection error
                         if (EnableLogging)
                             m_Logger.Write(LogMessageSeverity.Warning, ex, true, LogCategory,
                                 "Connection error while making web channel request",
                                 "We received a communication exception while executing the current request on our channel.  Since it isn't an authentication exception we're going to retry the request.\r\nRequest: {0}\r\nError Count: {1:N0}\r\nException: {2}",
                                 newRequest, errorCount, ex.Message);
+
                         SetConnectionState(ChannelConnectionState.Disconnected);
 
                         errorCount++;
                         lastCallWasAuthentication = false;
-                            //so if we get another request to authenticate we'll give it a shot.
+                        //so if we get another request to authenticate we'll give it a shot.
 
                         if (CanRetry(maxRetries, errorCount))
                         {
@@ -347,9 +383,8 @@ namespace Gibraltar.Server.Client
                         }
                         else
                         {
-                            throw new WebChannelException(ex.Message, ex, null);
+                            throw;
                         }
-                        break;
                     }
 
                     if (reAuthenticate)
@@ -372,7 +407,6 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public async Task Authenticate()
         {
-            if (EnableLogging) m_Logger.Write(LogMessageSeverity.Verbose, LogCategory, "Attempting to authenticate communication channel", null);
             IWebAuthenticationProvider authenticationProvider;
             lock (m_Lock)
             {
@@ -382,8 +416,13 @@ namespace Gibraltar.Server.Client
 
             if (authenticationProvider == null)
             {
-                if (EnableLogging) m_Logger.Write(LogMessageSeverity.Verbose, LogCategory, "Unable to authenticate communication channel", "There is no authentication provider available to process the current authentication request.");
+                if (EnableLogging)
+                    m_Logger.Write(LogMessageSeverity.Verbose, LogCategory, "Unable to authenticate communication channel", "There is no authentication provider available to process the current authentication request.");
                 return; //nothing to do.
+            }
+            else
+            {
+                if (EnableLogging) m_Logger.Write(LogMessageSeverity.Verbose, LogCategory, "Attempting to authenticate communication channel", "Provider: {0}", authenticationProvider);
             }
 
             EnsureConnectionInitialized();
@@ -396,7 +435,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         public void Cancel()
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 m_CancellationTokenSource.Cancel();
             }
@@ -423,7 +462,7 @@ namespace Gibraltar.Server.Client
         {
             var request = PreProcessRequest(ref relativeUrl, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
             {
@@ -452,7 +491,7 @@ namespace Gibraltar.Server.Client
         {
             var request = PreProcessRequest(ref relativeUrl, additionalHeaders);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
             {
@@ -469,6 +508,72 @@ namespace Gibraltar.Server.Client
             }
         }
 
+
+        /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="T">The result object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        public async Task<T> DownloadJsonData<T>(string relativeUrl, int? timeout)
+        {
+            var request = PreProcessRequest(ref relativeUrl, null);
+
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
+
+            using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
+            {
+                using (var linkedCts = timeoutCts == null ? null : CancellationTokenSource.CreateLinkedTokenSource(GetCommonCancellationToken(), timeoutCts.Token))
+                {
+                    var cancelToken = linkedCts == null ? GetCommonCancellationToken() : linkedCts.Token;
+                    using (var response = await m_Connection.SendAsync(request, cancelToken).ConfigureAwait(false))
+                    {
+                        EnsureRequestSuccessful(response);
+
+                        var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        return await JsonSerializer.DeserializeAsync<T>(stream, JsonOptions, cancelToken).ConfigureAwait(false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="TQ">The query object type</typeparam>
+        /// <typeparam name="TR">The result object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="query">The input to the remote method</param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        public async Task<TR> DownloadJsonData<TQ, TR>(string relativeUrl, TQ query, int? timeout)
+        {
+            var httpMethod = HttpMethod.Post;
+            var request = PreProcessRequest(ref relativeUrl, ref httpMethod, null);
+
+            // For compatibility with .NET Standard 2.0 use this somewhat longer form.
+            var jsonString = JsonSerializer.Serialize(query, JsonOptions);
+            request.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
+
+            using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
+            {
+                using (var linkedCts = timeoutCts == null ? null : CancellationTokenSource.CreateLinkedTokenSource(GetCommonCancellationToken(), timeoutCts.Token))
+                {
+                    var cancelToken = linkedCts == null ? GetCommonCancellationToken() : linkedCts.Token;
+                    using (var response = await m_Connection.SendAsync(request, cancelToken).ConfigureAwait(false))
+                    {
+                        EnsureRequestSuccessful(response);
+
+                        var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        return await JsonSerializer.DeserializeAsync<TR>(stream, JsonOptions, cancelToken).ConfigureAwait(false);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Downloads the resource with the specified URI to a local file.
         /// </summary>
@@ -479,7 +584,7 @@ namespace Gibraltar.Server.Client
         {
             var request = PreProcessRequest(ref relativeUrl, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
             {
@@ -489,14 +594,11 @@ namespace Gibraltar.Server.Client
                     using (var response = await m_Connection.SendAsync(request, cancelToken).ConfigureAwait(false))
                     {
                         EnsureRequestSuccessful(response);
-                        using (var resultTask = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                        using (var fileStream = File.Create(destinationFileName))
                         {
-                            using (var fileStream = File.Create(destinationFileName))
-                            {
-                                await response.Content.CopyToAsync(fileStream).ConfigureAwait(false);
-                                fileStream.Flush(true);
-                                fileStream.SetLength(fileStream.Position);
-                            }
+                            await response.Content.CopyToAsync(fileStream).ConfigureAwait(false);
+                            fileStream.Flush(true);
+                            fileStream.SetLength(fileStream.Position);
                         }
                     }
                 }
@@ -513,7 +615,7 @@ namespace Gibraltar.Server.Client
         {
             var request = PreProcessRequest(ref relativeUrl, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
             {
@@ -542,7 +644,7 @@ namespace Gibraltar.Server.Client
             method = method ?? HttpMethod.Get;
             var request = PreProcessRequest(ref relativeUrl, ref method, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
             {
@@ -573,7 +675,7 @@ namespace Gibraltar.Server.Client
             method = method ?? HttpMethod.Post;
             var request = PreProcessRequest(ref relativeUrl, ref method, additionalHeaders);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             request.Content = new ByteArrayContent(data);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
@@ -594,6 +696,38 @@ namespace Gibraltar.Server.Client
         }
 
         /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="T">The uploaded object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="data">The input to the remote method</param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        public async Task UploadJsonData<T>(string relativeUrl, T data, int? timeout)
+        {
+            var httpMethod = HttpMethod.Post;
+            var request = PreProcessRequest(ref relativeUrl, ref httpMethod, null);
+
+            // For compatibility with .NET Standard 2.0 use this somewhat longer form.
+            var jsonString = JsonSerializer.Serialize(data, JsonOptions);
+            request.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
+
+            using (var timeoutCts = effectiveTimeout <= 0 ? null : new CancellationTokenSource(effectiveTimeout * 1000))
+            {
+                using (var linkedCts = timeoutCts == null ? null : CancellationTokenSource.CreateLinkedTokenSource(GetCommonCancellationToken(), timeoutCts.Token))
+                {
+                    var cancelToken = linkedCts == null ? GetCommonCancellationToken() : linkedCts.Token;
+                    using (var response = await m_Connection.SendAsync(request, cancelToken).ConfigureAwait(false))
+                    {
+                        EnsureRequestSuccessful(response);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Uploads the specified local file to the specified URI using the specified method
         /// </summary>
         /// <param name="relativeUrl">The URI of the resource to receive the file. This URI must identify a resource that can accept a request sent with the method requested.</param>
@@ -607,7 +741,7 @@ namespace Gibraltar.Server.Client
             method = method ?? HttpMethod.Post;
             var request = PreProcessRequest(ref relativeUrl, ref method, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             using (var fileStream = File.OpenRead(sourceFileNamePath))
             {
@@ -644,7 +778,7 @@ namespace Gibraltar.Server.Client
             method = method ?? HttpMethod.Post;
             var request = PreProcessRequest(ref relativeUrl, ref method, null);
 
-            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeooutSeconds;
+            var effectiveTimeout = timeout.HasValue ? timeout.Value : DefaultTimeoutSeconds;
 
             request.Content = new StringContent(data);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
@@ -663,10 +797,6 @@ namespace Gibraltar.Server.Client
                 }
             }
         }
-
-        #endregion
-
-        #region Protected Properties and Methods
 
         /// <summary>
         /// Dispose managed objects
@@ -702,10 +832,6 @@ namespace Gibraltar.Server.Client
             }
         }
 
-        #endregion
-
-        #region Private Properties and Methods
-
         private void EnsureConnectionInitialized()
         {
             lock (m_Lock)
@@ -717,6 +843,18 @@ namespace Gibraltar.Server.Client
 
                     var requestHandler = new HttpClientHandler();
 
+                    /* this doesn't work for Desktop + Kerberos and breaks retry authentication for others.
+                                        //These options will support kerberos credentials if the other end wants them
+                                        requestHandler.UseDefaultCredentials = true;
+                                        requestHandler.PreAuthenticate = true; //minimize round trips - assume if they challenged us once, they will again
+                    */
+
+                    requestHandler.Proxy = WebRequest.DefaultWebProxy;
+                    if (requestHandler.Proxy == null)
+                    {
+                        requestHandler.Proxy = WebRequest.GetSystemWebProxy();
+                    }
+
                     if ((requestHandler.Proxy != null) && (requestHandler.Proxy.Credentials == null))
                     {
                         requestHandler.Proxy.Credentials = CredentialCache.DefaultCredentials;
@@ -727,16 +865,9 @@ namespace Gibraltar.Server.Client
                         requestHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
                     }
 
-                    if (!Log.SilentMode)
-                    {
-                        var clientLogger = new HttpClientLogger(m_Logger, requestHandler);
-                        m_Connection = new HttpClient(clientLogger);
-                    }
-                    else
-                    {
-                        m_Connection = new HttpClient();
-                    }
+                    var clientLogger = new HttpClientLogger(m_Logger, requestHandler);
 
+                    m_Connection = new HttpClient(clientLogger);
                     m_Connection.BaseAddress = m_BaseAddress;
                     m_Connection.Timeout = new TimeSpan(0, 2, 0);
                 }
@@ -845,7 +976,7 @@ namespace Gibraltar.Server.Client
                 }
             }
 
-            request.Version = (m_UseHttpVersion10) ? new Version(1, 0) : new Version(1, 1);
+            request.Version = (m_UseHttpVersion10) ? HttpVersion.Version10 : HttpVersion.Version11;
 
             //add our request timestamp so everyone agrees.
             request.Headers.Add(HeaderRequestTimestamp, DateTimeOffset.UtcNow.ToString("o"));
@@ -978,7 +1109,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         /// <param name="server">The DNS name of the server</param>
         /// <param name="useCompatibilityMethods">the new setting</param>
-        private void SetUseCompatiblilityMethodsOverride(string server, bool useCompatibilityMethods)
+        private void SetUseCompatibilityMethodsOverride(string server, bool useCompatibilityMethods)
         {
             //remember: generic collections are not thread safe.
             lock (s_ServerUseCompatibilitySetting)
@@ -1020,6 +1151,19 @@ namespace Gibraltar.Server.Client
             }
         }
 
-        #endregion
+        private static JsonSerializerOptions CreateJsonSerializerOptions()
+        {
+            var options = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Converters = 
+                {
+                    new JsonVersionConverter(),
+                    new JsonStringEnumConverter()
+                }
+            };
+
+            return options;
+        }
     }
 }

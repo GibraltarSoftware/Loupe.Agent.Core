@@ -28,7 +28,7 @@ namespace Gibraltar.Messaging.Net
         /// </summary>
         /// <param name="id"></param>
         public ClockDriftMessage(Guid id)
-            :this()
+            : this()
         {
             m_Id = id;
         }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Loupe.Extensibility.Data;
 
-
-
 namespace Gibraltar.Monitor
 {
     /// <summary>
@@ -13,22 +11,8 @@ namespace Gibraltar.Monitor
     public class LogMessageTree
     {
         private readonly Dictionary<string, LogMessageGroup> m_GroupFullNameCache = new Dictionary<string, LogMessageGroup>(StringComparer.OrdinalIgnoreCase);
-        private readonly LogMessageGroupDelegate m_MessageGroupDelegate;
-        private readonly LogMessageGroupFullNameDelegate m_FullNameDelegate;
-
-        /// <summary>
-        /// Delegate that can specify the fully qualified name for a single log message.
-        /// </summary>
-        /// <param name="message">The message being evaluated</param>
-        /// <returns>The fully qualified name for the log message</returns>
-        internal delegate string LogMessageGroupFullNameDelegate(LogMessage message);
-
-        /// <summary>
-        /// Delegate that can specify the hierarchy for a single log message.
-        /// </summary>
-        /// <param name="message">The message being evaluated</param>
-        /// <returns>A string array with one element for every group in the hierarchy</returns>
-        internal delegate string[] LogMessageGroupDelegate(LogMessage message);
+        private readonly Func<ILogMessage, string[]> m_MessageGroupFunc;
+        private readonly Func<ILogMessage, string> m_FullNameFunc;
 
         /// <summary>
         /// Create a new log message tree.
@@ -36,15 +20,15 @@ namespace Gibraltar.Monitor
         /// <param name="name"></param>
         /// <param name="caption"></param>
         /// <param name="description"></param>
-        /// <param name="fullNameDelegate"></param>
-        /// <param name="messageGroupDelegate"></param>
-        internal LogMessageTree(string name, string caption, string description,LogMessageGroupFullNameDelegate fullNameDelegate, LogMessageGroupDelegate messageGroupDelegate)
+        /// <param name="fullNameFunc">Function that provides the fully qualified name for a single log message.</param>
+        /// <param name="groupingFunc">Function that provides the hierarchy for a single log message.</param>
+        public LogMessageTree(string name, string caption, string description, Func<ILogMessage, string> fullNameFunc, Func<ILogMessage, string[]> groupingFunc)
         {
-            if (fullNameDelegate == null)
-                throw new ArgumentNullException(nameof(fullNameDelegate));
+            if (fullNameFunc == null)
+                throw new ArgumentNullException(nameof(fullNameFunc));
 
-            if (messageGroupDelegate == null)
-                throw new ArgumentNullException(nameof(messageGroupDelegate));
+            if (groupingFunc == null)
+                throw new ArgumentNullException(nameof(groupingFunc));
 
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -59,8 +43,8 @@ namespace Gibraltar.Monitor
             Caption = caption;
             Description = description;
 
-            m_FullNameDelegate = fullNameDelegate;
-            m_MessageGroupDelegate = messageGroupDelegate;
+            m_FullNameFunc = fullNameFunc;
+            m_MessageGroupFunc = groupingFunc;
 
             Groups = new LogMessageGroupCollection();
         }
@@ -69,12 +53,12 @@ namespace Gibraltar.Monitor
         /// Add the specified message to its group, calculated based on the data in the message as this call is made.
         /// </summary>
         /// <param name="message">The message being evaluated</param>
-        internal void AddMessage(LogMessage message)
+        public void AddMessage(ILogMessage message)
         {
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
-            string fullyQualifiedName = m_FullNameDelegate(message);
+            string fullyQualifiedName = m_FullNameFunc(message);
 
             if (string.IsNullOrEmpty(fullyQualifiedName))
                 //nothing to count.
@@ -87,7 +71,7 @@ namespace Gibraltar.Monitor
             if (m_GroupFullNameCache.TryGetValue(fullyQualifiedName, out leafGroup) == false)
             {
                 //nope, we will need to add it.
-                string[] groupNames = m_MessageGroupDelegate(message);
+                string[] groupNames = m_MessageGroupFunc(message);
 
                 LogMessageGroup parentGroup;
                 //manually check the first value, it doesn't cleanly fit into the loop.
@@ -112,7 +96,7 @@ namespace Gibraltar.Monitor
                     parentGroup = childGroup;
                 }
 
-                //and whatever our parent group now is actually is the leaf group because we've run thorugh all children.
+                //and whatever our parent group now is actually is the leaf group because we've run through all children.
                 leafGroup = parentGroup;
                 m_GroupFullNameCache.Add(fullyQualifiedName, leafGroup); // Remember it for next time, right? It wasn't doing this.
             }
@@ -154,5 +138,4 @@ namespace Gibraltar.Monitor
         /// </summary>
         public int MessageCount { get; private set; }
     }
-
 }

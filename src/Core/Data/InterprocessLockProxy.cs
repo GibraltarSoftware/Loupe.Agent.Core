@@ -685,13 +685,12 @@ namespace Gibraltar.Data
                                                 8192, (FileOptions)flags);
                 }
             }
-            //catch (ThreadAbortException) //not available in .NET Core 1.1
-            //{
-            //    if (fileStream != null)
-            //        fileStream.Dispose(); // Make sure this gets cleaned up if the requesting thread is aborting!
+            catch (ThreadAbortException) 
+            {
+                fileStream?.Dispose(); // Make sure this gets cleaned up if the requesting thread is aborting!
 
-            //    throw; 
-            //}
+                throw;
+            }
             catch
             {
                 fileStream = null;

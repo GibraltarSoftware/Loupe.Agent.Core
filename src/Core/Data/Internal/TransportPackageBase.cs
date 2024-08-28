@@ -67,7 +67,7 @@ namespace Gibraltar.Data.Internal
             {
                 if (!Log.SilentMode) Log.Write(LogMessageSeverity.Verbose, Packager.LogCategory, "Marking all sessions in the package as read", null);
 
-                IList<SessionHeader> allSessions = Package.GetSessions();
+                IList<SessionHeader> allSessions = Package.GetSessionHeaders();
 
                 if (allSessions.Count == 0)
                 {

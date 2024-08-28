@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 using Gibraltar.Data;
 using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
@@ -13,7 +14,7 @@ namespace Gibraltar.Monitor
     /// <summary>
     /// Contains the log information for a single execution cycle
     /// </summary>
-    /// <remarks>A session contains all of the thread, event, and metric information captured when it originally was executing
+    /// <remarks>A session contains the thread, event, and metric information captured when it originally was executing
     /// and can be extended with analysis information including comments and markers.</remarks>
     [DebuggerDisplay("{Caption} ({Id})")]
     public class Session : IDisplayable, IComparable<Session>, IEquatable<Session>, ISessionPacketCache, IDisposable
@@ -53,7 +54,7 @@ namespace Gibraltar.Monitor
         /// Create a new session by reading the specified packet stream
         /// </summary>
         /// <param name="dataReader">The data stream reader to load as all or part of a session</param>
-        internal Session( GLFReader dataReader )
+        public Session(GLFReader dataReader)
         {
             if (dataReader == null)
             {
@@ -136,7 +137,7 @@ namespace Gibraltar.Monitor
             else if (newStatus < Summary.Status)
             {
                 if (!Log.SilentMode) Log.Write(LogMessageSeverity.Warning, LogCategory, "Inconsistent session status change when integrating header",
-                    "Prior status for session: {0}\r\nStatus from new header: {1}\r\n"+
+                    "Prior status for session: {0}\r\nStatus from new header: {1}\r\n" +
                     "Violates status progression rules Running->Normal->Crashed, so new status will be ignored.\r\n",
                     Summary.Status, newStatus);
             }
@@ -174,7 +175,7 @@ namespace Gibraltar.Monitor
 
             try
             {
-                while(m_UnloadedPacketStreams.Count > 0)
+                while (m_UnloadedPacketStreams.Count > 0)
                 {
                     using (GLFReader glfReader = m_UnloadedPacketStreams[0]) //we want to dispose of these as we go to save RAM.
                     {
@@ -183,6 +184,12 @@ namespace Gibraltar.Monitor
                             //this is best effort- add this stream to our list of loaded streams BEFORE we try to process it
                             loadedStreams.Add(glfReader);
                             LoadPacketStream(glfReader);
+                        }
+                        catch (ThreadAbortException ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, LogCategory, "Aborting loading packet stream.", "A thread abort exception was thrown on our worker thread so we'll stop trying to load the session.");
+                            m_PacketsLostCount++; // there may be multiple packets lost, but there will be at least one;
                         }
                         catch (Exception ex)
                         {
@@ -256,12 +263,12 @@ namespace Gibraltar.Monitor
                 if (packetCount < 0) // Condition is never true, but this allows us to go here in debugger session
                 {
                     var b = new byte[stream.Length];
-                    stream.Read(b, 0, (int) stream.Length);
+                    stream.Read(b, 0, (int)stream.Length);
                     stream.Position = 0;
                     string s = "";
                     for (int i = 0; i < stream.Length; i++)
                     {
-                        var ch = (char) b[i];
+                        var ch = (char)b[i];
                         s += (b[i] > 20 && b[i] < 127) ? ch.ToString() : ".";
                     }
                     Console.WriteLine(s);
@@ -534,9 +541,9 @@ namespace Gibraltar.Monitor
                 }
             }
 
-            defaultCaption += " " + sessionSummary.StartDateTime.DateTime.ToString("d");
+            defaultCaption += " " + sessionSummary.StartDateTime.DateTime.ToShortDateString();
 
-            defaultCaption += " " + sessionSummary.StartDateTime.DateTime.ToString("t");
+            defaultCaption += " " + sessionSummary.StartDateTime.DateTime.ToShortTimeString();
 
             return defaultCaption;
         }
@@ -658,8 +665,12 @@ namespace Gibraltar.Monitor
                     foreach (ThreadInfo threadInfo in m_Threads)
                         writer.Write(threadInfo.Packet);
 
+                    //Assemblies
+                    foreach (KeyValuePair<string, SessionAssemblyInfo> pair in m_Assemblies)
+                        writer.Write(pair.Value.Packet);
+
                     //Log Message data (we should really serialize data last after metric definitions...
-                    foreach (LogMessage message in m_Messages)
+                    foreach (LogMessage message in (IList<LogMessage>)m_Messages)
                         writer.Write(message.MessagePacket);
 
                     //metric definitions and, internally, metric samples.
@@ -807,13 +818,13 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// A short end-user display caption 
         /// </summary>
-        public string Caption 
-        { 
-            get 
-            { 
-                return m_SessionSummary.Caption; 
-            } 
-            set 
+        public string Caption
+        {
+            get
+            {
+                return m_SessionSummary.Caption;
+            }
+            set
             {
                 if (m_SessionSummary.Caption != value)
                 {
@@ -822,7 +833,7 @@ namespace Gibraltar.Monitor
                     //and signal that we changed a property we expose
                     SendPropertyChanged("Caption");
                 }
-            } 
+            }
         }
 
         /// <summary>
@@ -918,7 +929,7 @@ namespace Gibraltar.Monitor
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int MessageCount { get { return m_SessionSummary.MessageCount; } }
+        public long MessageCount { get { return m_SessionSummary.MessageCount; } }
 
         /// <summary>
         /// The number of critical messages in the messages collection.
@@ -927,7 +938,7 @@ namespace Gibraltar.Monitor
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int CriticalCount { get { return m_SessionSummary.CriticalCount; } }
+        public long CriticalCount { get { return m_SessionSummary.CriticalCount; } }
 
         /// <summary>
         /// The number of error messages in the messages collection.
@@ -936,7 +947,7 @@ namespace Gibraltar.Monitor
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int ErrorCount { get { return m_SessionSummary.ErrorCount; } }
+        public long ErrorCount { get { return m_SessionSummary.ErrorCount; } }
 
         /// <summary>
         /// The number of error messages in the messages collection.
@@ -945,17 +956,17 @@ namespace Gibraltar.Monitor
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        public int WarningCount { get { return m_SessionSummary.WarningCount; } }
+        public long WarningCount { get { return m_SessionSummary.WarningCount; } }
 
 
         /// <summary>
         /// Indicates whether there are changes to this session that have not been saved.
         /// </summary>
-        public bool IsDirty 
-        { 
-            get 
+        public bool IsDirty
+        {
+            get
             {
-                return m_IsDirty; 
+                return m_IsDirty;
             }
             set
             {
@@ -966,11 +977,11 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Indicates whether a session is new to this package (has never been saved)
         /// </summary>
-        public bool IsNew 
-        { 
-            get 
-            { 
-                return m_IsNew; 
+        public bool IsNew
+        {
+            get
+            {
+                return m_IsNew;
             }
             set
             {
@@ -1058,12 +1069,12 @@ namespace Gibraltar.Monitor
             else
             {
                 //if start date & time are the same, sort by application name
-                result = string.Compare(m_SessionSummary.Product, other.Summary.Product, StringComparison.Ordinal);
+                result = string.Compare(m_SessionSummary.Product, other.Summary.Product, StringComparison.InvariantCulture);
 
                 //if start date & time are the same, sort by application name
                 if (result == 0)
                 {
-                    result = string.Compare(m_SessionSummary.Application, other.Summary.Application, StringComparison.Ordinal);
+                    result = string.Compare(m_SessionSummary.Application, other.Summary.Application, StringComparison.InvariantCulture);
                 }
 
                 //if that is a match, sort by version
@@ -1160,9 +1171,9 @@ namespace Gibraltar.Monitor
             if (ReferenceEquals(left, null))
             {
                 // If right is also null, we're equal; otherwise, we're unequal!
-                return ! ReferenceEquals(right, null);
+                return !ReferenceEquals(right, null);
             }
-            return ! left.Equals(right);
+            return !left.Equals(right);
         }
 
         /// <summary>

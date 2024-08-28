@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using Gibraltar.Data;
 using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Server.Client.Data
@@ -426,6 +427,194 @@ namespace Gibraltar.Server.Client.Data
         }
 
         /// <summary>
+        /// Convert the auto send consent object to a binary format
+        /// </summary>
+        /// <param name="consent"></param>
+        /// <returns></returns>
+        public static byte[] AutoSendConsentToByteArray(AutoSendConsent consent)
+        {
+            using (MemoryStream outputStream = new MemoryStream(2048))
+            {
+                using (TextWriter textWriter = new StreamWriter(outputStream, Encoding.UTF8))
+                {
+                    using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, new XmlWriterSettings()))
+                    {
+                        xmlWriter.WriteStartElement("autoSendConsent");
+
+                        WriteXmlAttribute(xmlWriter, "id", consent.Id.ToString());
+
+                        if (!string.IsNullOrEmpty(consent.ProductName))
+                        {
+                            WriteXmlAttribute(xmlWriter, "product", consent.ProductName);
+                        }
+
+                        if (!string.IsNullOrEmpty(consent.ApplicationName))
+                        {
+                            WriteXmlAttribute(xmlWriter, "application", consent.ApplicationName);
+                        }
+
+                        if (consent.ApplicationVersion != null)
+                        {
+                            WriteXmlAttribute(xmlWriter, "applicationVersion", consent.ApplicationVersion.ToString());
+                        }
+
+                        WriteXmlAttribute(xmlWriter, "userPrompts", consent.UserPrompts);
+                        WriteXmlAttribute(xmlWriter, "selectionMade", consent.SelectionMade);
+                        WriteXmlAttribute(xmlWriter, "optIn", consent.OptIn);
+                        WriteXmlAttribute(xmlWriter, "includeDetails", consent.IncludeDetails);
+                        WriteXmlAttribute(xmlWriter, "updatedUser", consent.UpdatedUser);
+
+                        DateTimeOffsetToXmlWriter(xmlWriter, "updatedDt", consent.UpdatedDt);
+
+                        xmlWriter.WriteEndElement();
+                        xmlWriter.Flush(); // to make sure it writes it all out now.
+
+                        return outputStream.ToArray();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convert auto send consent data from binary to the object
+        /// </summary>
+        /// <param name="rawData"></param>
+        /// <returns></returns>
+        public static AutoSendConsent ByteArrayToAutoSendConsent(byte[] rawData)
+        {
+            using (MemoryStream documentStream = new MemoryStream(rawData))
+            {
+                XmlDocument xml = new XmlDocument();
+                xml.Load(documentStream);
+                XmlNode autoSendConsentNode = xml.DocumentElement;
+
+                if (autoSendConsentNode == null)
+                {
+                    throw new GibraltarException("There is no auto send consent data in the provided raw data");
+                }
+
+                Guid id = Guid.Empty;
+                string product = null, application = null, updateUser = null;
+                Version version = null;
+                int userPrompts = 0;
+                bool selectionMade = false, optIn = false, includeDetails = false;
+                DateTimeOffset updateDt = DateTimeOffset.MinValue;
+
+                //read up our attributes
+                XmlAttribute attribute = autoSendConsentNode.Attributes["id"];
+                if (attribute != null)
+                {
+                    if (string.IsNullOrEmpty(attribute.InnerText) == false)
+                    {
+                        id = new Guid(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["product"];
+                if (attribute != null)
+                {
+                    product = attribute.InnerText;
+                }
+
+                attribute = autoSendConsentNode.Attributes["application"];
+                if (attribute != null)
+                {
+                    application = attribute.InnerText;
+                }
+
+                attribute = autoSendConsentNode.Attributes["applicationVersion"];
+                if (attribute != null)
+                {
+                    if (!string.IsNullOrEmpty(attribute.InnerText))
+                    {
+                        version = new Version(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["userPrompts"];
+                if (attribute != null)
+                {
+                    if (string.IsNullOrEmpty(attribute.InnerText) == false)
+                    {
+                        userPrompts = int.Parse(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["selectionMade"];
+                if (attribute != null)
+                {
+                    if (!string.IsNullOrEmpty(attribute.InnerText))
+                    {
+                        selectionMade = bool.Parse(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["optIn"];
+                if (attribute != null)
+                {
+                    if (!string.IsNullOrEmpty(attribute.InnerText))
+                    {
+                        optIn = bool.Parse(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["includeDetails"];
+                if (attribute != null)
+                {
+                    if (!string.IsNullOrEmpty(attribute.InnerText))
+                    {
+                        includeDetails = bool.Parse(attribute.InnerText);
+                    }
+                }
+
+                attribute = autoSendConsentNode.Attributes["updatedUser"];
+                if (attribute != null)
+                {
+                    updateUser = attribute.InnerText;
+                }
+
+                //now move on to the child elements..  I'm avoiding XPath to avoid failure due to XML schema variations
+                if (autoSendConsentNode.HasChildNodes)
+                {
+                    XmlNode updateDtNode = null;
+                    foreach (XmlNode curChildNode in autoSendConsentNode.ChildNodes)
+                    {
+                        if (curChildNode.NodeType == XmlNodeType.Element)
+                        {
+                            switch (curChildNode.Name)
+                            {
+                                case "updatedDt":
+                                    updateDtNode = curChildNode;
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (updateDtNode != null)
+                                break;
+                        }
+                    }
+
+                    if (updateDtNode != null)
+                    {
+                        attribute = updateDtNode.Attributes["DateTime"];
+                        string dateTimeRaw = attribute.InnerText;
+
+                        attribute = updateDtNode.Attributes["Offset"];
+                        string timeZoneOffset = attribute.InnerText;
+
+                        if ((string.IsNullOrEmpty(dateTimeRaw) == false) && (string.IsNullOrEmpty(timeZoneOffset) == false))
+                        {
+                            updateDt = new DateTimeOffset(DateTime.Parse(dateTimeRaw), new TimeSpan(0, int.Parse(timeZoneOffset), 0));
+                        }
+                    }
+                }
+
+                return new AutoSendConsent(id, product, application, version, userPrompts, selectionMade, optIn, includeDetails, updateDt, updateUser);
+            }
+        }
+
+        /// <summary>
         /// Converts a session XML object to a byte array without relying on XML Serializer
         /// </summary>
         /// <param name="sessionXml"></param>
@@ -618,8 +807,8 @@ namespace Gibraltar.Server.Client.Data
                 string ApplicationTypeName, string ApplicationDescription, string Caption, string StatusName,
                 string TimeZoneCaption, DateTimeOffset StartDt, DateTimeOffset EndDt, int DurationSec,
                 string AgentVersion, string UserName, string UserDomainName, string HostName,
-                string DNSDomainName, int MessageCount, int CriticalMessageCount, int ErrorMessageCount,
-                int WarningMessageCount, int OSPlatformCode, string OSVersion, string OSServicePack,
+                string DNSDomainName, long MessageCount, long CriticalMessageCount, long ErrorMessageCount,
+                long WarningMessageCount, int OSPlatformCode, string OSVersion, string OSServicePack,
                 string OSCultureName, string OSArchitectureName, string OSBootModeName, int OSSuiteMaskCode,
                 int OSProductTypeCode, string RuntimeVersion, string RuntimeArchitectureName, string CurrentCultureName,
                 string CurrentUICultureName, int MemoryMB, int Processors, int ProcessorCores, bool UserInteractive,

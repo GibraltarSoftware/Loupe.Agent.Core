@@ -21,6 +21,11 @@ namespace Gibraltar.Data
         public const string RepositoryFolder = "repository";
 
         /// <summary>
+        /// The subfolder of the selected path used for server repositories
+        /// </summary>
+        public const string ServerRepositoryFolder = "Server Repositories";
+
+        /// <summary>
         /// The subfolder of the selected path used for local session log collection
         /// </summary>
         public const string CollectionFolder = "logs";
@@ -29,6 +34,21 @@ namespace Gibraltar.Data
         /// The subfolder of the selected path used for local session log collection on the .NET Framework original agent
         /// </summary>
         public const string CollectionFolderOld = "Local Logs";
+
+        /// <summary>
+        /// The subfolder of the selected path used for licensing
+        /// </summary>
+        public const string LicensingFolder = "Licensing";
+
+        /// <summary>
+        /// The subfolder of the selected path used for configuration data
+        /// </summary>
+        public const string ConfigurationFolder = "Configuration";
+
+        /// <summary>
+        /// The subfolder of the selected path used for application Extensions
+        /// </summary>
+        public const string ExtensionsFolder = "Extensions";
 
         /// <summary>
         /// The subfolder of the selected path used for discovery information
@@ -75,16 +95,39 @@ namespace Gibraltar.Data
                 string pathFolder = PathTypeToFolderName(pathType);
 
                 //First, we want to try to use the all users data directory if this is not the user-repository.
-                if (pathType != PathType.Repository)
+                if (pathType != PathType.Repository && pathType != PathType.ServerRepository)
                 {
                     bestPath = CreatePath(GetCommonApplicationDataPath(), pathFolder);
                 }
 
-                //Did we get a good path? If not go to the user's folder.
+                //Did we get a good path? If not go to the user's folder. (But not for licensing.)
                 if (string.IsNullOrEmpty(bestPath))
                 {
-                    //nope, we need to switch to the user's LOCAL app data path as our first backup. (not appdata - that may be part of a roaming profile)
-                    bestPath = CreatePath(GetLocalApplicationDataPath(), pathFolder);
+                    if (pathType != PathType.Licensing)
+                    {
+                        //nope, we need to switch to the user's LOCAL app data path as our first backup. (not appdata - that may be part of a roaming profile)
+                        bestPath = CreatePath(GetLocalApplicationDataPath(), pathFolder);
+                    }
+                }
+                else
+                {
+                    if (pathType == PathType.Licensing)
+                    {
+                        // Try to make sure the directory is hidden.
+                        try
+                        {
+                            FileAttributes attr = File.GetAttributes(bestPath);
+                            if ((attr & FileAttributes.Hidden) == 0)
+                            {
+                                attr |= FileAttributes.Hidden;
+                                File.SetAttributes(bestPath, attr);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            GC.KeepAlive(ex); // Just to suppress ReSharper's complaints.
+                        }
+                    }
                 }
             }
 
@@ -94,8 +137,10 @@ namespace Gibraltar.Data
         /// <summary>
         /// Find the full path for the provided subfolder name within a special folder, and make sure it's usable (return null if fails).
         /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="folderName"></param>
         /// <returns>The full path to the requested folder if it is usable, null otherwise.</returns>
-        private static string CreatePath(string basePath, string folderName)
+        public static string CreatePath(string basePath, string folderName)
         {
             string bestPath = ComputePath(basePath, folderName);
 
@@ -108,6 +153,8 @@ namespace Gibraltar.Data
         /// <summary>
         /// Compute the full path for the provided subfolder name within a special folder.
         /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="folderName"></param>
         /// <returns>The full path to the requested folder, which may or may not exist.</returns>
         public static string ComputePath(string basePath, string folderName)
         {
@@ -174,6 +221,7 @@ namespace Gibraltar.Data
             return pathIsWritable;
         }
 
+
         private static string PathTypeToFolderName(PathType pathType)
         {
             string pathFolder;
@@ -186,8 +234,20 @@ namespace Gibraltar.Data
                 case PathType.Repository:
                     pathFolder = RepositoryFolder;
                     break;
+                case PathType.Licensing:
+                    pathFolder = LicensingFolder;
+                    break;
+                case PathType.Configuration:
+                    pathFolder = ConfigurationFolder;
+                    break;
+                case PathType.Extensions:
+                    pathFolder = ExtensionsFolder;
+                    break;
                 case PathType.Discovery:
                     pathFolder = DiscoveryFolder;
+                    break;
+                case PathType.ServerRepository:
+                    pathFolder = ServerRepositoryFolder;
                     break;
                 default:
                     throw new InvalidDataException("The current path type is unknown, indicating a programming error.");
@@ -196,7 +256,11 @@ namespace Gibraltar.Data
             return pathFolder;
         }
 
-        private static string GetLocalApplicationDataPath()
+        /// <summary>
+        /// Calculate a working local application data path
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLocalApplicationDataPath()
         {
             string path = null;
             try
