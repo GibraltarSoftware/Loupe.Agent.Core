@@ -2,10 +2,10 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Version>5.0.0.0</Version>
-		<FileVersion>5.0.0.0</FileVersion>
-		<AssemblyVersion>5.0.0.0</AssemblyVersion>
-		<Copyright>Copyright © 2008-2023 Gibraltar Software, Inc.</Copyright>
+		<Version>6.0.0.0</Version>
+		<FileVersion>6.0.0.0</FileVersion>
+		<AssemblyVersion>6.0.0.0</AssemblyVersion>
+		<Copyright>Copyright © 2008-2024 Gibraltar Software, Inc.</Copyright>
 		<Description>Extends the Loupe Agent to record log message entries into a CSV file.</Description>
 		<Product>Loupe</Product>
 		<Company>Gibraltar Software, Inc.</Company>
