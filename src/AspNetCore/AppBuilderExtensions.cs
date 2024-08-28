@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Loupe.Agent.AspNetCore.Handlers;
+using Loupe.Agent.Core.Services;
+using Loupe.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Loupe.Agent.AspNetCore
 {
@@ -11,6 +15,40 @@ namespace Loupe.Agent.AspNetCore
     /// </summary>
     public static class AppBuilderExtensions
     {
+
+#if NET8_0_OR_GREATER
+
+        /// <summary>
+        /// Adds the main Loupe Agent
+        /// </summary>
+        /// <param name="builder">The <see cref="WebApplicationBuilder"/>.</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="WebApplicationBuilder"/>.</returns>
+        /// <remarks>This is used for non-web applications in .NET 8 and later.</remarks>
+        public static WebApplicationBuilder AddLoupe(this WebApplicationBuilder builder, Action<AgentConfiguration> configure = null)
+        {
+            builder.Host.AddLoupe(configure);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds the main Loupe Agent.
+        /// </summary>
+        /// <param name="builder">The <see cref="WebApplicationBuilder"/>.</param>
+        /// <param name="agentBuilder">A Loupe Agent builder delegate</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="WebApplicationBuilder"/>.</returns>
+        /// <remarks>This is used for non-web applications in .NET 8 and later.</remarks>
+        public static WebApplicationBuilder AddLoupe(this WebApplicationBuilder builder, Action<ILoupeAgentBuilder> agentBuilder, Action<AgentConfiguration> configure = null)
+        {
+            builder.Host.AddLoupe(agentBuilder, configure);
+
+            return builder;
+        }
+
+#endif
+
         /// <summary>
         /// Add a Loupe middleware to time requests and log errors.
         /// </summary>

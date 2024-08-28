@@ -118,6 +118,47 @@ namespace Loupe.Agent.Core.Services
 
 #endif
 
+#if NET8_0_OR_GREATER
+
+        /// <summary>
+        /// Adds the main Loupe Agent
+        /// </summary>
+        /// <param name="builder">The <see cref="HostApplicationBuilder"/>.</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="HostApplicationBuilder"/>.</returns>
+        /// <remarks>This is used for non-web applications in .NET 8 and later.</remarks>
+        public static HostApplicationBuilder AddLoupe(this HostApplicationBuilder builder, Action<AgentConfiguration> configure = null)
+        {
+            AddOptions(builder.Services, configure);
+
+            builder.Services.AddHostedService<LoupeAgentService>();
+            builder.Services.AddSingleton<LoupeAgent>();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds the main Loupe Agent.
+        /// </summary>
+        /// <param name="builder">The <see cref="HostApplicationBuilder"/>.</param>
+        /// <param name="agentBuilder">A Loupe Agent builder delegate</param>
+        /// <param name="configure">Optional.  An Agent configuration delegate</param>
+        /// <returns>The <see cref="HostApplicationBuilder"/>.</returns>
+        /// <remarks>This is used for non-web applications in .NET 8 and later.</remarks>
+        public static HostApplicationBuilder AddLoupe(this HostApplicationBuilder builder, Action<ILoupeAgentBuilder> agentBuilder, Action<AgentConfiguration> configure = null)
+        {
+            AddOptions(builder.Services, configure);
+
+            builder.Services.AddHostedService<LoupeAgentService>();
+            builder.Services.AddSingleton<LoupeAgent>();
+
+            agentBuilder(new LoupeAgentServicesCollectionBuilder(builder.Services));
+
+            return builder;
+        }
+
+#endif
+
         private static void AddOptions(IServiceCollection services, Action<AgentConfiguration> configure = null)
         {
             // Set up a configuration callback
