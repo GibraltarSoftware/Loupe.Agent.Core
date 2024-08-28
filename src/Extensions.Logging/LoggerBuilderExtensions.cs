@@ -42,5 +42,19 @@ namespace Loupe.Extensions.Logging
             return builder.ConfigureLogging(loggingBuilder => loggingBuilder.AddLoupe());
         }
 #endif
+
+#if NET8_0_OR_GREATER
+        /// <summary>
+        /// Adds the Loupe provider for <c>Microsoft.Extensions.Logging</c>.
+        /// </summary>
+        /// <param name="builder">The <see cref="HostApplicationBuilder"/>.</param>
+        /// <returns>The <see cref="HostApplicationBuilder"/>.</returns>
+        public static HostApplicationBuilder AddLoupeLogging(this HostApplicationBuilder builder)
+        {
+            builder.Logging.AddLoupe();
+
+            return builder;
+        }
+#endif
     }
 }
