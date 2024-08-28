@@ -29,6 +29,11 @@ namespace Loupe.Extensibility.Data
         DateTimeOffset Timestamp { get; }
 
         /// <summary>
+        /// The timestamp of this log message in the time zone the user has requested for display.
+        /// </summary>
+        DateTimeOffset DisplayTimestamp { get; }
+
+        /// <summary>
         /// The severity of this log message (from Critical to Verbose).
         /// </summary>
         /// <remarks>Severities have lower numerical values the more severe a message is,
@@ -53,6 +58,11 @@ namespace Loupe.Extensibility.Data
         string CategoryName { get; }
 
         /// <summary>
+        /// An array of the individual category names within the specified category name which is period delimited.
+        /// </summary>
+        string[] CategoryNames { get; }
+
+        /// <summary>
         /// The user name associated with this log message (often just the user who started the process).
         /// </summary>
         /// <remarks>If user anonymization is enabled in configuration this will reflect the anonymous value.</remarks>
@@ -61,7 +71,7 @@ namespace Loupe.Extensibility.Data
         /// <summary>
         /// The simple caption string for this log message.
         /// </summary>
-        string Caption { get; }        
+        string Caption { get; }
 
         /// <summary>
         /// The longer description for this log message.
@@ -82,6 +92,11 @@ namespace Loupe.Extensibility.Data
         /// The full name of the class containing this method which originated the log message, unless unavailable.  (Can be null or empty.)
         /// </summary>
         string ClassName { get; }
+
+        /// <summary>
+        /// An array of the individual elements of the class and namespace hierarchy.
+        /// </summary>
+        string[] ClassNames { get; }
 
         /// <summary>
         /// The full path to the file containing this definition of the method which originated the log message, if available.  (Can be null or empty.)
@@ -139,6 +154,11 @@ namespace Loupe.Extensibility.Data
         /// Indicates if the log message has related thread information.  If false, some calls to thread information may throw exceptions.
         /// </summary>
         bool HasThreadInfo { get; }
+
+        /// <summary>
+        /// Optional.  Details of the thread that recorded the log message
+        /// </summary>
+        IThreadInfo ThreadInfo { get; }
 
         /// <summary>
         /// Indicates if the class name and method name are available.

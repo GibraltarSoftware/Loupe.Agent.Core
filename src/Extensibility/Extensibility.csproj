@@ -42,7 +42,49 @@
 	  <None Remove="Properties\**" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Remove="Extensibility\Data\IApplicationEvent.cs" />
+	  <Compile Remove="Extensibility\Data\IComputer.cs" />
+	  <Compile Remove="Extensibility\Data\IDisplay.cs" />
+	  <Compile Remove="Extensibility\Data\IEnvironment.cs" />
+	  <Compile Remove="Extensibility\Data\IIssue.cs" />
+	  <Compile Remove="Extensibility\Data\IIssueLink.cs" />
+	  <Compile Remove="Extensibility\Data\IIssueLinkType.cs" />
+	  <Compile Remove="Extensibility\Data\IIssueNote.cs" />
+	  <Compile Remove="Extensibility\Data\ILogEvent.cs" />
+	  <Compile Remove="Extensibility\Data\ILogEventCollection.cs" />
+	  <Compile Remove="Extensibility\Data\IPromotionLevel.cs" />
+	  <Compile Remove="Extensibility\Data\IReleaseType.cs" />
+	  <Compile Remove="Extensibility\Data\IRepositoryApplication.cs" />
+	  <Compile Remove="Extensibility\Data\IRepositoryApplicationVersion.cs" />
+	  <Compile Remove="Extensibility\Data\IRepositoryProduct.cs" />
+	  <Compile Remove="Extensibility\Data\ISessionAnalysis.cs" />
+	  <Compile Remove="Extensibility\Data\IssueNoteCategory.cs" />
+	  <Compile Remove="Extensibility\Data\IssueStatus.cs" />
+	  <Compile Remove="Extensibility\Data\IUserProfile.cs" />
+	  <Compile Remove="Extensibility\IRepository.cs" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="..\assets\loupe-192x192.png" Pack="true" PackagePath="" />
+		<None Include="Extensibility\Data\IApplicationEvent.cs" />
+		<None Include="Extensibility\Data\IComputer.cs" />
+		<None Include="Extensibility\Data\IDisplay.cs" />
+		<None Include="Extensibility\Data\IEnvironment.cs" />
+		<None Include="Extensibility\Data\IIssue.cs" />
+		<None Include="Extensibility\Data\IIssueLink.cs" />
+		<None Include="Extensibility\Data\IIssueLinkType.cs" />
+		<None Include="Extensibility\Data\IIssueNote.cs" />
+		<None Include="Extensibility\Data\ILogEvent.cs" />
+		<None Include="Extensibility\Data\ILogEventCollection.cs" />
+		<None Include="Extensibility\Data\IPromotionLevel.cs" />
+		<None Include="Extensibility\Data\IReleaseType.cs" />
+		<None Include="Extensibility\Data\IRepositoryApplication.cs" />
+		<None Include="Extensibility\Data\IRepositoryApplicationVersion.cs" />
+		<None Include="Extensibility\Data\IRepositoryProduct.cs" />
+		<None Include="Extensibility\Data\ISessionAnalysis.cs" />
+		<None Include="Extensibility\Data\IssueNoteCategory.cs" />
+		<None Include="Extensibility\Data\IssueStatus.cs" />
+		<None Include="Extensibility\Data\IUserProfile.cs" />
+		<None Include="Extensibility\IRepository.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

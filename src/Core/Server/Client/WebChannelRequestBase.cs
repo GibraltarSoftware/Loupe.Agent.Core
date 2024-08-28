@@ -97,7 +97,7 @@ namespace Gibraltar.Server.Client
             {
                 using (TextWriter textWriter = new StreamWriter(outputStream, Encoding.UTF8))
                 {
-                    var xmlWriter = XmlWriter.Create(textWriter);
+                    XmlTextWriter xmlWriter = new XmlTextWriter(textWriter);
                     // Write XML using xmlWriter
                     XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
                     XmlSerializerNamespaces xmlNsEmpty = new XmlSerializerNamespaces();

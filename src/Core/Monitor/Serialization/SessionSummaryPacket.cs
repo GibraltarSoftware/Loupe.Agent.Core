@@ -30,6 +30,7 @@ namespace Gibraltar.Monitor.Serialization
         private string m_UserDomainName;
         private string m_HostName;
         private string m_DnsDomainName;
+        private Framework m_Framework;
 
         //Stuff that aligns with SESSION_DETAILS table in index
         private int m_OSPlatformCode;
@@ -115,6 +116,7 @@ namespace Gibraltar.Monitor.Serialization
             m_ScreenHeight = sessionHeader.ScreenHeight;
             m_ColorDepth = sessionHeader.ColorDepth;
             m_CommandLine = sessionHeader.CommandLine;
+            m_Framework = sessionHeader.Framework;
 
             //and app.config properties.
             m_Properties = new Dictionary<string, string>(sessionHeader.Properties);
@@ -361,6 +363,12 @@ namespace Gibraltar.Monitor.Serialization
             set => m_CommandLine = SetSafeStringValue(value, 2048);
         }
 
+        public Framework Framework
+        {
+            get => m_Framework;
+            set => m_Framework = value;
+        }
+
         /// <summary>
         /// The fully qualified user name of the user the application was run as.
         /// </summary>
@@ -375,7 +383,7 @@ namespace Gibraltar.Monitor.Serialization
 
         #region IPacket Members
 
-        private const int SerializationVersion = 3;
+        private const int SerializationVersion = 4;
 
         /// <summary>
         /// The list of packets that this packet depends on.
@@ -409,6 +417,7 @@ namespace Gibraltar.Monitor.Serialization
             definition.Fields.Add("UserDomainName", FieldType.String);
             definition.Fields.Add("HostName", FieldType.String);
             definition.Fields.Add("DNSDomainName", FieldType.String);
+            definition.Fields.Add("Framework", FieldType.Int32);
 
             //Session Details index information
             definition.Fields.Add("OSPlatformCode", FieldType.Int32);
@@ -459,6 +468,7 @@ namespace Gibraltar.Monitor.Serialization
             packet.SetField("UserDomainName", m_UserDomainName);
             packet.SetField("HostName", m_HostName);
             packet.SetField("DNSDomainName", m_DnsDomainName);
+            packet.SetField("Framework", m_Framework);
 
             //write out session details stuff
             packet.SetField("OSPlatformCode", m_OSPlatformCode);
@@ -559,6 +569,13 @@ namespace Gibraltar.Monitor.Serialization
 
             //See the 33 below?  That should be the # of reads - 1 we've done before properties.            
             int baseFields = 33;
+
+            if (definition.Version > 3)
+            {
+                packet.GetField("Framework", out int frameworkRaw);
+                m_Framework = (Framework) frameworkRaw;
+                baseFields++;
+            }
 
             if (definition.Version > 2)
             {

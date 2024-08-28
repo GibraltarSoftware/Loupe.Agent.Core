@@ -61,7 +61,7 @@ namespace Gibraltar
 
             if (baseline.Length == 0)
             {
-                return string.Empty;//this is a stock intered string.
+                return string.Empty;//this is a stock interred string.
             }
 
             string officialString = baseline; // We'll replace this with the official copy if there is one.
@@ -251,10 +251,6 @@ namespace Gibraltar
                 GC.KeepAlive(ex); //just here to avoid a compiler warn in release mode
             }
         }
-
-        #region Private Properties and Methods
-
-        #endregion
 
         #region Private Helper Class WeakStringCollection
 

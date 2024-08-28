@@ -14,7 +14,7 @@ namespace Loupe.Extensibility.Data
     ///     current computing environment (such as Operating System Family and process
     ///     architecture).</para>
     /// </remarks>
-    public interface ISessionSummary: INotifyPropertyChanged
+    public interface ISessionSummary : INotifyPropertyChanged
     {
         /// <summary>
         /// Get a copy of the full session detail this session refers to.  
@@ -66,12 +66,12 @@ namespace Loupe.Extensibility.Data
         DateTimeOffset StartDateTime { get; }
 
         /// <summary>
-        /// The date and time the session started.
+        /// The date and time the session started in the time zone the user has requested for display.
         /// </summary>
         DateTimeOffset DisplayStartDateTime { get; }
 
         /// <summary>
-        /// The date and time the session ended or was last confirmed running in the time zone the user has requested for display.
+        /// The date and time the session ended or was last confirmed running.
         /// </summary>
         DateTimeOffset EndDateTime { get; }
 
@@ -137,6 +137,26 @@ namespace Loupe.Extensibility.Data
         /// If a value is provided it will be carried with the session data to upstream servers and clients.  
         /// If the corresponding entry does not exist it will be automatically created.</remarks>
         string PromotionLevel { get; }
+
+        /// <summary>
+        /// Optional.  The unique Id of the application environment this session is a part of.
+        /// </summary>
+        Guid? ApplicationEnvironmentId { get; }
+
+        /// <summary>
+        /// Optional. The caption of the application environment this session is a part of.
+        /// </summary>
+        string ApplicationEnvironmentCaption { get; }
+
+        /// <summary>
+        /// Optional.  The unique Id of the service within the application environment this session is a part of.
+        /// </summary>
+        Guid? ApplicationEnvironmentServiceId { get; }
+
+        /// <summary>
+        /// Optional.  The caption of the service within the application environment this session is a part of.
+        /// </summary>
+        string ApplicationEnvironmentServiceCaption { get; }
 
         /// <summary>
         /// The type of process the application ran as.
@@ -327,7 +347,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int MessageCount { get; }
+        long MessageCount { get; }
 
         /// <summary>
         /// The number of critical messages in the messages collection.
@@ -336,7 +356,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int CriticalCount { get; }
+        long CriticalCount { get; }
 
         /// <summary>
         /// The number of error messages in the messages collection.
@@ -345,7 +365,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int ErrorCount { get; }
+        long ErrorCount { get; }
 
         /// <summary>
         /// The number of warning messages in the messages collection.
@@ -354,7 +374,7 @@ namespace Loupe.Extensibility.Data
         /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
         /// count of items may exceed the actual number of matching messages in the messages collection if earlier
         /// files are missing.</remarks>
-        int WarningCount { get; }
+        long WarningCount { get; }
 
         /// <summary>
         /// A copy of the collection of application specific properties. (Set via configuration at logging startup.  Do not modify here.)
@@ -362,8 +382,8 @@ namespace Loupe.Extensibility.Data
         IDictionary<string, string> Properties { get; }
 
         /// <summary>
-        /// Optional. Represents the computer that sent the session.
+        /// The primary application framework that recorded the session
         /// </summary>
-        IComputer Computer { get; }
+        Framework Framework { get; }
     }
 }

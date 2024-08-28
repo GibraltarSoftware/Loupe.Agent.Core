@@ -1,8 +1,6 @@
 ﻿using System;
 using Loupe.Extensibility.Data;
 
-
-
 namespace Gibraltar.Monitor
 {
     /// <summary>
@@ -12,7 +10,7 @@ namespace Gibraltar.Monitor
     {
         private LogMessageGroupCollection m_ChildGroups;
 
-        internal LogMessageGroup(string name, LogMessageGroup parent, LogMessage message)
+        internal LogMessageGroup(string name, LogMessageGroup parent, ILogMessage message)
         {
             //screwy but necessary - we need to have it set to the highest numeric value to start.
             MaxSeverity = LogMessageSeverity.Verbose;
@@ -41,7 +39,7 @@ namespace Gibraltar.Monitor
         public LogMessageGroup Parent { get; private set; }
 
         /// <summary>
-        /// The worst-case severity of the log messages in this group or any group underneith it.
+        /// The worst-case severity of the log messages in this group or any group underneath it.
         /// </summary>
         public LogMessageSeverity MaxSeverityWithChildren { get; private set; }
 
@@ -100,20 +98,20 @@ namespace Gibraltar.Monitor
         /// Record the message as part of this group (and its parent groups)
         /// </summary>
         /// <param name="message"></param>
-        internal void AddMessage(LogMessage message)
+        internal void AddMessage(ILogMessage message)
         {
             //we need to count this message and roll up this count to our parents.
             MessageCount++;
-            MaxSeverity = (LogMessageSeverity) Math.Min((int) message.Severity, (int) MaxSeverity);
+            MaxSeverity = (LogMessageSeverity)Math.Min((int)message.Severity, (int)MaxSeverity);
 
-            AddChildMessage(message); //this gets it propogating to parent and handles things we do for our child messages as well.
+            AddChildMessage(message); //this gets it propagating to parent and handles things we do for our child messages as well.
         }
 
         /// <summary>
         /// Record the message as part of a child of this group.
         /// </summary>
         /// <param name="message"></param>
-        internal void AddChildMessage(LogMessage message)
+        internal void AddChildMessage(ILogMessage message)
         {
             //we need to count this message and roll up this count to our parents.
             MessageCountWithChildren++;

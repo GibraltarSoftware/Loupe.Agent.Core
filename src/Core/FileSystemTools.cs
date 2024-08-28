@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 
 namespace Gibraltar
 {
@@ -10,6 +11,25 @@ namespace Gibraltar
     public static class FileSystemTools
     {
         private const int DefaultFileBufferSize = 32768;
+
+        /// <summary>
+        /// Returns a safe format provider for the current user interface culture.
+        /// </summary>
+        /// <remarks>If the current UI culture is not usable it will fall back to the thread main culture which always is.</remarks>
+        public static IFormatProvider UICultureFormat
+        {
+            get
+            {
+                var currentThread = Thread.CurrentThread;
+
+                //start with the current UI Culture...
+                var originalCulture = currentThread.CurrentUICulture;
+
+                IFormatProvider provider = (originalCulture.IsNeutralCulture) ? currentThread.CurrentCulture : originalCulture;
+
+                return provider;
+            }
+        }
 
         /// <summary>
         /// Sanitize the provided directory name by substituting a specified character for illegal values.

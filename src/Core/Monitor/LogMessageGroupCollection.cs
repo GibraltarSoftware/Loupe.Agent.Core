@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Loupe.Extensibility.Data;
 
 #pragma warning disable 1591
 namespace Gibraltar.Monitor
@@ -9,7 +10,7 @@ namespace Gibraltar.Monitor
     /// </summary>
     public class LogMessageGroupCollection : IList<LogMessageGroup>
     {
-        private readonly Dictionary<string, LogMessageGroup> m_Dictionary = new Dictionary<string, LogMessageGroup>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, LogMessageGroup> m_Dictionary = new Dictionary<string, LogMessageGroup>(StringComparer.InvariantCultureIgnoreCase);
         private readonly SortedList<LogMessageGroup, LogMessageGroup> m_List = new SortedList<LogMessageGroup, LogMessageGroup>(); //logMessageGroup itself implements IComparable, so it will determine order
         private readonly object m_Lock = new object();
 
@@ -21,8 +22,8 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Create a new log message group collection for the root log message group.
         /// </summary>
-        internal  LogMessageGroupCollection()
-        {            
+        internal LogMessageGroupCollection()
+        {
         }
 
         /// <summary>
@@ -39,13 +40,11 @@ namespace Gibraltar.Monitor
         /// </summary>
         public LogMessageGroup Parent { get; private set; }
 
-        #region Protected Properties and Methods
-
         /// <summary>
         /// Called whenever the collection changes.
         /// </summary>
         /// <param name="e"></param>
-        /// <remarks>Note to inheritors:  If overriding this method, you must call the base implmenetation to ensure
+        /// <remarks>Note to inheritors:  If overriding this method, you must call the base implementation to ensure
         /// that the appropriate events are raised.</remarks>
         protected virtual void OnCollectionChanged(CollectionChangedEventArgs<LogMessageGroupCollection, LogMessageGroup> e)
         {
@@ -58,15 +57,11 @@ namespace Gibraltar.Monitor
             }
         }
 
-        #endregion
-
-        #region Public Properties and Methods
-
         /// <summary>
-        /// Determines whether the collection contaions an element with the specified key.
+        /// Determines whether the collection contains an element with the specified key.
         /// </summary>
         /// <param name="key">The key to locate in the collection</param>
-        /// <returns>true if the collection contains an element iwth the key; otherwise, false.</returns>
+        /// <returns>true if the collection contains an element with the key; otherwise, false.</returns>
         public bool ContainsKey(string key)
         {
             lock (m_Lock)
@@ -92,29 +87,17 @@ namespace Gibraltar.Monitor
             }
         }
 
-        #endregion
-
-        #region IEnumerable<LogMessageGroup> Members
-
         IEnumerator<LogMessageGroup> IEnumerable<LogMessageGroup>.GetEnumerator()
         {
             //we use the sorted list for enumeration
             return m_List.Values.GetEnumerator();
         }
 
-        #endregion
-
-        #region IEnumerable Members
-
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             //we use the sorted list for enumeration
             return m_List.GetEnumerator();
         }
-
-        #endregion
-
-        #region IList<LogMessageGroup> Members
 
         public int IndexOf(LogMessageGroup item)
         {
@@ -159,10 +142,6 @@ namespace Gibraltar.Monitor
             }
         }
 
-        #endregion
-
-        #region ICollection<LogMessageGroup> Members
-
         /// <summary>
         /// Add the specified LogMessageGroup item to the collection
         /// </summary>
@@ -189,7 +168,7 @@ namespace Gibraltar.Monitor
         /// <param name="groupName">The unique name of the group within this collection</param>
         /// <param name="message">The first message to add to the group</param>
         /// <returns>The new log message group that was added</returns>
-        public LogMessageGroup Add(string groupName, LogMessage message)
+        public LogMessageGroup Add(string groupName, ILogMessage message)
         {
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
@@ -218,7 +197,8 @@ namespace Gibraltar.Monitor
                 }
             }
 
-            if (count > 0) {
+            if (count > 0)
+            {
                 //and raise the event so our caller knows we're cleared
                 OnCollectionChanged(new CollectionChangedEventArgs<LogMessageGroupCollection, LogMessageGroup>(this, null, CollectionAction.Cleared));
             }
@@ -268,28 +248,20 @@ namespace Gibraltar.Monitor
         /// <param name="item">The LogMessageGroup item to remove.</param>
         public bool Remove(LogMessageGroup item)
         {
-            bool result = false;
-
             if (item == null)
             {
                 throw new ArgumentNullException(nameof(item), "A logMessageGroup item must be provided to remove it from the collection.");
             }
 
+            bool result;
+
             lock (m_Lock)
             {
                 //we have to remove it from both collections, and we better not raise an error if not there.
-                if (m_Dictionary.ContainsKey(item.Name))
-                {
-                    m_Dictionary.Remove(item.Name);
-                    result = true; // we did remove something
-                }
+                result = m_Dictionary.Remove(item.Name);
 
                 //here we are relying on the IComparable implementation being a unique key and being fast.
-                if (m_List.ContainsKey(item))
-                {
-                    m_List.Remove(item);
-                    result = true; // we did remove something
-                }
+                result |= m_List.Remove(item);
             }
 
             //and fire our event if there was really something to remove
@@ -300,9 +272,5 @@ namespace Gibraltar.Monitor
 
             return result;
         }
-
-
-        #endregion
     }
-
 }

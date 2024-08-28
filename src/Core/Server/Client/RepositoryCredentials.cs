@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Gibraltar.Server.Client
 {
     /// <summary>
-    /// Authentication credentials for a repository to a shared data service.
+    /// Legacy Authentication for server connections established using shared secret.
     /// </summary>
     public sealed class RepositoryCredentials : IWebAuthenticationProvider
     {
@@ -20,6 +20,11 @@ namespace Gibraltar.Server.Client
         /// The HTTP Request header identifying the client repository
         /// </summary>
         public const string ClientRepositoryHeader = "X-Gibraltar-Repository";
+
+        /// <summary>
+        /// The timestamp that was used to calculate the header hash
+        /// </summary>
+        public const string RequestTimestampHeader = "X-Request-Timestamp";
 
         internal const string AuthorizationHeader = "Authorization";
 
@@ -103,7 +108,7 @@ namespace Gibraltar.Server.Client
 
             var accessToken = await client.GetStringAsync(requestUrl).ConfigureAwait(false);
 
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 //and here we WOULD decrypt the access token if it was encrypted
                 m_AccessToken = accessToken;
@@ -116,9 +121,7 @@ namespace Gibraltar.Server.Client
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="client"></param>
-#pragma warning disable 1998
-        async Task IWebAuthenticationProvider.Logout(WebChannel channel, HttpClient client)
-#pragma warning restore 1998
+        Task IWebAuthenticationProvider.Logout(WebChannel channel, HttpClient client)
         {
             //we have to always use a lock when handling the access token.
             lock (m_Lock)
@@ -126,6 +129,8 @@ namespace Gibraltar.Server.Client
                 m_AccessToken = null;
                 System.Threading.Monitor.PulseAll(m_Lock);
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -182,9 +187,9 @@ namespace Gibraltar.Server.Client
                 System.Threading.Monitor.PulseAll(m_Lock);
             }
 
-            using (var csp = SHA1.Create())
+            using (SHA1CryptoServiceProvider cryptoTransformSHA1 = new SHA1CryptoServiceProvider())
             {
-                return Convert.ToBase64String(csp.ComputeHash(buffer));
+                return Convert.ToBase64String(cryptoTransformSHA1.ComputeHash(buffer));
             }
         }
 

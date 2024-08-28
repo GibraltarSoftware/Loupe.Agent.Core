@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Gibraltar;
 using NUnit.Framework;
 
@@ -23,6 +24,33 @@ namespace Loupe.Core.Test
 #if !DEBUG
         [Ignore("debugging test only")] // Until we can fix the Release optimizations breaking the GC expectations.
 #endif
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void Does_Weak_Reference_Really_Free()
+        {
+            WeakReference reference;
+
+            {
+                var primeZero = GetTestString(0);
+                reference = new WeakReference(primeZero);
+                primeZero = null;
+            }
+
+            var timeout = DateTimeOffset.Now.AddSeconds(10);
+            var iterations = 0;
+            while (reference.IsAlive && DateTimeOffset.Now < timeout)
+            {
+                GarbageCollection();
+                iterations++;
+            }
+
+            Assert.IsFalse(reference.IsAlive, "Weak reference is still alive even after {0:N0} iterations", iterations);
+        }
+
+        [Test]
+#if !DEBUG
+        [Ignore("debugging test only")] // Until we can fix the Release optimizations breaking the GC expectations.
+#endif
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void WeakStringCollectionTest()
         {
             string primeZero = GetTestString(0);

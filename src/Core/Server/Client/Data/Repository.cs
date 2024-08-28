@@ -986,13 +986,13 @@ namespace Gibraltar.Server.Client.Data {
         
         private bool isCompleteField;
         
-        private int messageCountField;
+        private long messageCountField;
         
-        private int criticalMessageCountField;
+        private long criticalMessageCountField;
         
-        private int errorMessageCountField;
+        private long errorMessageCountField;
         
-        private int warningMessageCountField;
+        private long warningMessageCountField;
         
         private string updateUserField;
         
@@ -1342,7 +1342,7 @@ namespace Gibraltar.Server.Client.Data {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int messageCount {
+        public long messageCount {
             get {
                 return this.messageCountField;
             }
@@ -1354,7 +1354,7 @@ namespace Gibraltar.Server.Client.Data {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int criticalMessageCount {
+        public long criticalMessageCount {
             get {
                 return this.criticalMessageCountField;
             }
@@ -1366,7 +1366,7 @@ namespace Gibraltar.Server.Client.Data {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int errorMessageCount {
+        public long errorMessageCount {
             get {
                 return this.errorMessageCountField;
             }
@@ -1378,7 +1378,7 @@ namespace Gibraltar.Server.Client.Data {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int warningMessageCount {
+        public long warningMessageCount {
             get {
                 return this.warningMessageCountField;
             }

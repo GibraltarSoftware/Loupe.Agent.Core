@@ -16,7 +16,7 @@ namespace Gibraltar.Data
     /// in a stream because the SessionHeader is really a cache of the session start info packet that
     /// is easy to access.</remarks>
     [DebuggerDisplay("{Product} {Application} ({Id})")]
-    public sealed class SessionHeader: ISessionSummary, IEquatable<SessionHeader>
+    public sealed class SessionHeader : ISessionSummary, IEquatable<SessionHeader>
     {
         private readonly object m_Lock = new object();
 
@@ -44,7 +44,7 @@ namespace Gibraltar.Data
         private string m_HostName;
         private string m_DnsDomainName;
         private string m_SessionStatusName;
-        private int m_MessageCount;
+        private int m_MessageCount; //change these to long on next breaking change
         private int m_CriticalCount;
         private int m_ErrorCount;
         private int m_WarningCount;
@@ -83,11 +83,11 @@ namespace Gibraltar.Data
         private readonly bool m_Valid;
         private bool m_IsLastFile;
         private int m_FileSequence;
-        private int m_OffsetSessionEndDateTime;
-        private int m_OffsetMessageCount;
-        private int m_OffsetCriticalCount;
-        private int m_OffsetErrorCount;
-        private int m_OffsetWarningCount;
+        private long m_OffsetSessionEndDateTime;
+        private long m_OffsetMessageCount;
+        private long m_OffsetCriticalCount;
+        private long m_OffsetErrorCount;
+        private long m_OffsetWarningCount;
 
         //cached serialized data (for when we're in a fixed representation and want performance)
         private byte[] m_LastRawData; //raw data is JUST the session header stuff, not file or CRC, so you can't return just it.
@@ -106,7 +106,7 @@ namespace Gibraltar.Data
         /// </summary>
         /// <param name="sessionSummary"></param>
         public SessionHeader(SessionSummary sessionSummary)
-            :this(sessionSummary.Properties)
+            : this(sessionSummary.Properties)
         {
             //copy the values from the session start info.  We make a copy because it'd be deadly if any of this changed
             //while we were alive - and while none of it should, lets just not count on that,OK?
@@ -208,7 +208,7 @@ namespace Gibraltar.Data
         /// <returns></returns>
         public byte[] RawData()
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
                 MemoryStream rawData = new MemoryStream(2048);
                 byte[] curValue;
@@ -269,7 +269,7 @@ namespace Gibraltar.Data
                     rawData.Write(curValue, 0, curValue.Length);
 
                     //OK, where we are now is the end date time position which is variable
-                    m_OffsetSessionEndDateTime = (int) rawData.Position;
+                    m_OffsetSessionEndDateTime = rawData.Position;
                     curValue = BinarySerializer.SerializeValue(m_SessionEndDateTime);
                     rawData.Write(curValue, 0, curValue.Length);
 
@@ -289,19 +289,19 @@ namespace Gibraltar.Data
                     rawData.Write(curValue, 0, curValue.Length);
 
                     //For each message count we need to record our position
-                    m_OffsetMessageCount = (int) rawData.Position;
+                    m_OffsetMessageCount = rawData.Position;
                     curValue = BinarySerializer.SerializeValue(m_MessageCount);
                     rawData.Write(curValue, 0, curValue.Length);
 
-                    m_OffsetCriticalCount = (int) rawData.Position;
+                    m_OffsetCriticalCount = rawData.Position;
                     curValue = BinarySerializer.SerializeValue(m_CriticalCount);
                     rawData.Write(curValue, 0, curValue.Length);
 
-                    m_OffsetErrorCount = (int) rawData.Position;
+                    m_OffsetErrorCount = rawData.Position;
                     curValue = BinarySerializer.SerializeValue(m_ErrorCount);
                     rawData.Write(curValue, 0, curValue.Length);
 
-                    m_OffsetWarningCount = (int) rawData.Position;
+                    m_OffsetWarningCount = rawData.Position;
                     curValue = BinarySerializer.SerializeValue(m_WarningCount);
                     rawData.Write(curValue, 0, curValue.Length);
 
@@ -416,7 +416,7 @@ namespace Gibraltar.Data
                 //Now we need to calculate the header CRC
                 curValue = BinarySerializer.CalculateCRC(rawData.ToArray(), (int)rawData.Position);
                 rawData.Write(curValue, 0, curValue.Length);
-                return rawData.ToArray(); 
+                return rawData.ToArray();
             }
         }
 
@@ -452,9 +452,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The unique Id of the session
-        /// </summary>
+        /// <inheritdoc />
         public Guid Id
         {
             get { return m_SessionId; }
@@ -468,22 +466,16 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The link to this item on the server
-        /// </summary>
+        /// <inheritdoc />
         public Uri Uri
         {
             get { throw new NotSupportedException("Links are not supported in this context"); }
         }
 
-        /// <summary>
-        /// Indicates if all of the session data is stored that is expected to be available
-        /// </summary>
+        /// <inheritdoc />
         public bool IsComplete { get { return m_HasFileInfo ? m_IsLastFile : false; } }
 
-        /// <summary>
-        /// The unique Id of the computer
-        /// </summary>
+        /// <inheritdoc />
         public Guid? ComputerId
         {
             get { return m_ComputerId; }
@@ -497,9 +489,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// A display caption for the session
-        /// </summary>
+        /// <inheritdoc />
         public string Caption
         {
             get { return m_Caption; }
@@ -513,9 +503,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The product name of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public string Product
         {
             get { return m_ProductName; }
@@ -529,9 +517,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The title of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public string Application
         {
             get { return m_ApplicationName; }
@@ -545,13 +531,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// Optional.  The environment this session is running in.
-        /// </summary>
-        /// <remarks>Environments are useful for categorizing sessions, for example to 
-        /// indicate the hosting environment. If a value is provided it will be 
-        /// carried with the session data to upstream servers and clients.  If the 
-        /// corresponding entry does not exist it will be automatically created.</remarks>
+        /// <inheritdoc />
         public string Environment
         {
             get { return m_EnvironmentName; }
@@ -565,13 +545,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// Optional.  The promotion level of the session.
-        /// </summary>
-        /// <remarks>Promotion levels are useful for categorizing sessions, for example to 
-        /// indicate whether it was run in development, staging, or production. 
-        /// If a value is provided it will be carried with the session data to upstream servers and clients.  
-        /// If the corresponding entry does not exist it will be automatically created.</remarks>
+        /// <inheritdoc />
         public string PromotionLevel
         {
             get { return m_PromotionLevelName; }
@@ -585,9 +559,19 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The type of process the application ran as.
-        /// </summary>
+        /// <inheritdoc />
+        public Guid? ApplicationEnvironmentId { get; }
+
+        /// <inheritdoc />
+        public string ApplicationEnvironmentCaption { get; }
+
+        /// <inheritdoc />
+        public Guid? ApplicationEnvironmentServiceId { get; }
+
+        /// <inheritdoc />
+        public string ApplicationEnvironmentServiceCaption { get; }
+
+        /// <inheritdoc />
         public ApplicationType ApplicationType
         {
             get { return (ApplicationType)Enum.Parse(typeof(ApplicationType), m_ApplicationTypeName, true); }
@@ -610,9 +594,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The description of the application from its manifest.
-        /// </summary>
+        /// <inheritdoc />
         public string ApplicationDescription
         {
             get { return m_ApplicationDescription; }
@@ -626,9 +608,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The version of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public Version ApplicationVersion
         {
             get { return m_ApplicationVersion; }
@@ -642,9 +622,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The version of the Gibraltar Agent used to monitor the session
-        /// </summary>
+        /// <inheritdoc />
         public Version AgentVersion
         {
             get { return m_AgentVersion; }
@@ -658,10 +636,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The host name / NetBIOS name of the computer that recorded the session
-        /// </summary>
-        /// <remarks>Does not include the domain name portion of the fully qualified DNS name.</remarks>
+        /// <inheritdoc />
         public string HostName
         {
             get { return m_HostName; }
@@ -675,10 +650,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The DNS domain name of the computer that recorded the session.  May be empty.
-        /// </summary>
-        /// <remarks>Does not include the host name portion of the fully qualified DNS name.</remarks>
+        /// <inheritdoc />
         public string DnsDomainName
         {
             get { return m_DnsDomainName; }
@@ -692,9 +664,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The display caption of the time zone where the session was recorded
-        /// </summary>
+        /// <inheritdoc />
         public string TimeZoneCaption
         {
             get { return m_TimeZoneCaption; }
@@ -708,9 +678,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The user Id that was used to run the session
-        /// </summary>
+        /// <inheritdoc />
         public string UserName
         {
             get { return m_UserName; }
@@ -725,9 +693,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The domain of the user id that was used to run the session
-        /// </summary>
+        /// <inheritdoc />
         public string UserDomainName
         {
             get { return m_UserDomainName; }
@@ -742,9 +708,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The fully qualified user name of the user the application was run as.
-        /// </summary>
+        /// <inheritdoc />
         public string FullyQualifiedUserName
         {
             get
@@ -757,9 +721,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The date and time the session started
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset StartDateTime
         {
             get { return m_SessionStartDateTime; }
@@ -773,17 +735,13 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The date and time the session started
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayStartDateTime
         {
             get { return StartDateTime; }
         }
 
-        /// <summary>
-        /// The date and time the session ended or was last confirmed running
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset EndDateTime
         {
             get { return m_SessionEndDateTime; }
@@ -812,17 +770,13 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The date and time the session ended
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayEndDateTime
         {
             get { return EndDateTime; }
         }
 
-        /// <summary>
-        /// The duration of the session.  May be zero indicating unknown
-        /// </summary>
+        /// <inheritdoc />
         public TimeSpan Duration
         {
             get
@@ -836,10 +790,8 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The final status of the session.
-        /// </summary>
-        public SessionStatus Status { get { return m_SessionStatus;  }}
+        /// <inheritdoc />
+        public SessionStatus Status { get { return m_SessionStatus; } }
 
         /// <summary>
         /// The status of the session (based on the SessionStatus enumeration)
@@ -863,16 +815,16 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The total number of log messages recorded in the session
-        /// </summary>
-        public int MessageCount
+        /// <inheritdoc />
+        public long MessageCount
         {
             get { return m_MessageCount; }
             set
             {
                 lock (m_Lock)
                 {
+                    m_MessageCount = value < int.MaxValue ? (int)value : int.MaxValue;
+
                     //this is an updatable field, so if we already have the raw data and can update it, lets do that.
                     if (m_LastRawData != null)
                     {
@@ -884,26 +836,24 @@ namespace Gibraltar.Data
                         else
                         {
                             //update the number at that point.
-                            byte[] binaryValue = BinarySerializer.SerializeValue(value);
+                            byte[] binaryValue = BinarySerializer.SerializeValue(m_MessageCount);
                             binaryValue.CopyTo(m_LastRawData, m_OffsetMessageCount);
                         }
                     }
-
-                    m_MessageCount = value;
                 }
             }
         }
 
-        /// <summary>
-        /// The total number of critical severity log messages recorded in the session
-        /// </summary>
-        public int CriticalCount
+        /// <inheritdoc />
+        public long CriticalCount
         {
             get { return m_CriticalCount; }
             set
             {
                 lock (m_Lock)
                 {
+                    m_CriticalCount = value < int.MaxValue ? (int)value : int.MaxValue;
+
                     //this is an updatable field, so if we already have the raw data and can update it, lets do that.
                     if (m_LastRawData != null)
                     {
@@ -915,26 +865,24 @@ namespace Gibraltar.Data
                         else
                         {
                             //update the number at that point.
-                            byte[] binaryValue = BinarySerializer.SerializeValue(value);
+                            byte[] binaryValue = BinarySerializer.SerializeValue(m_CriticalCount);
                             binaryValue.CopyTo(m_LastRawData, m_OffsetCriticalCount);
                         }
                     }
-
-                    m_CriticalCount = value;
                 }
             }
         }
 
-        /// <summary>
-        /// The total number of error severity log messages recorded in the session
-        /// </summary>
-        public int ErrorCount
+        /// <inheritdoc />
+        public long ErrorCount
         {
             get { return m_ErrorCount; }
             set
             {
                 lock (m_Lock)
                 {
+                    m_ErrorCount = value < int.MaxValue ? (int)value : int.MaxValue;
+
                     //this is an updatable field, so if we already have the raw data and can update it, lets do that.
                     if (m_LastRawData != null)
                     {
@@ -946,26 +894,24 @@ namespace Gibraltar.Data
                         else
                         {
                             //update the number at that point.
-                            byte[] binaryValue = BinarySerializer.SerializeValue(value);
+                            byte[] binaryValue = BinarySerializer.SerializeValue(m_ErrorCount);
                             binaryValue.CopyTo(m_LastRawData, m_OffsetErrorCount);
                         }
                     }
-
-                    m_ErrorCount = value;
                 }
             }
         }
 
-        /// <summary>
-        /// The total number of warning severity log messages recorded in the session
-        /// </summary>
-        public int WarningCount
+        /// <inheritdoc />
+        public long WarningCount
         {
             get { return m_WarningCount; }
             set
             {
                 lock (m_Lock)
                 {
+                    m_WarningCount = value < int.MaxValue ? (int)value : int.MaxValue;
+
                     //this is an updatable field, so if we already have the raw data and can update it, lets do that.
                     if (m_LastRawData != null)
                     {
@@ -977,19 +923,15 @@ namespace Gibraltar.Data
                         else
                         {
                             //update the number at that point.
-                            byte[] binaryValue = BinarySerializer.SerializeValue(value);
+                            byte[] binaryValue = BinarySerializer.SerializeValue(m_WarningCount);
                             binaryValue.CopyTo(m_LastRawData, m_OffsetWarningCount);
                         }
                     }
-
-                    m_WarningCount = value;
                 }
             }
         }
 
-        /// <summary>
-        /// The version information of the installed operating system (without service pack or patches)
-        /// </summary>
+        /// <inheritdoc />
         public Version OSVersion
         {
             get { return m_OSVersion; }
@@ -1003,9 +945,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The operating system service pack, if any.
-        /// </summary>
+        /// <inheritdoc />
         public string OSServicePack
         {
             get { return m_OSServicePack; }
@@ -1019,9 +959,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The culture name of the underlying operating system installation
-        /// </summary>
+        /// <inheritdoc />
         public string OSCultureName
         {
             get { return m_OSCultureName; }
@@ -1035,9 +973,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The OS Platform code, nearly always 1 indicating Windows NT
-        /// </summary>
+        /// <inheritdoc />
         public int OSPlatformCode
         {
             get { return m_OSPlatformCode; }
@@ -1051,9 +987,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The OS product type code, used to differentiate specific editions of various operating systems.
-        /// </summary>
+        /// <inheritdoc />
         public int OSProductType
         {
             get { return m_OSProductTypeCode; }
@@ -1067,9 +1001,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The OS Suite Mask, used to differentiate specific editions of various operating systems.
-        /// </summary>
+        /// <inheritdoc />
         public int OSSuiteMask
         {
             get { return m_OSSuiteMaskCode; }
@@ -1083,53 +1015,43 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The well known operating system family name, like Windows Vista or Windows Server 2003.
-        /// </summary>
+        /// <inheritdoc />
         public string OSFamilyName
         {
             get
             {
-                return string.Empty; // BUG
+                return null; // we don't have a cross-platform way of doing this yet.
             }
         }
 
-        /// <summary>
-        /// The edition of the operating system without the family name, such as Workstation or Standard Server.
-        /// </summary>
+        /// <inheritdoc />
         public string OSEditionName
         {
             get
             {
-                return string.Empty; // BUG
+                return null; // we don't have a cross-platform way of doing this yet.
             }
         }
 
-        /// <summary>
-        /// The well known OS name and edition name
-        /// </summary>
+        /// <inheritdoc />
         public string OSFullName
         {
             get
             {
-                return string.Empty; // BUG
+                return null; // we don't have a cross-platform way of doing this yet.
             }
         }
 
-        /// <summary>
-        /// The well known OS name, edition name, and service pack like Windows XP Professional Service Pack 3
-        /// </summary>
+        /// <inheritdoc />
         public string OSFullNameWithServicePack
         {
             get
             {
-                return string.Empty; // BUG
+                return null; // we don't have a cross-platform way of doing this yet.
             }
         }
 
-        /// <summary>
-        /// The processor architecture of the operating system.
-        /// </summary>
+        /// <inheritdoc />
         public ProcessorArchitecture OSArchitecture
         {
             get { return m_OSArchitecture; }
@@ -1143,9 +1065,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The boot mode of the operating system.
-        /// </summary>
+        /// <inheritdoc />
         public OSBootMode OSBootMode
         {
             get { return m_OSBootMode; }
@@ -1159,10 +1079,7 @@ namespace Gibraltar.Data
             }
         }
 
-
-        /// <summary>
-        /// The version of the .NET runtime that the application domain is running as.
-        /// </summary>
+        /// <inheritdoc />
         public Version RuntimeVersion
         {
             get { return m_RuntimeVersion; }
@@ -1176,9 +1093,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The processor architecture the process is running as.
-        /// </summary>
+        /// <inheritdoc />
         public ProcessorArchitecture RuntimeArchitecture
         {
             get { return m_RuntimeArchitecture; }
@@ -1192,9 +1107,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The current application culture name.
-        /// </summary>
+        /// <inheritdoc />
         public string CurrentCultureName
         {
             get { return m_CurrentCultureName; }
@@ -1208,9 +1121,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The current user interface culture name.
-        /// </summary>
+        /// <inheritdoc />
         public string CurrentUICultureName
         {
             get { return m_CurrentUICultureName; }
@@ -1224,9 +1135,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The number of megabytes of installed memory in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int MemoryMB
         {
             get { return m_MemoryMB; }
@@ -1240,9 +1149,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The number of physical processor sockets in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int Processors
         {
             get { return m_Processors; }
@@ -1256,9 +1163,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The total number of processor cores in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int ProcessorCores
         {
             get { return m_ProcessorCores; }
@@ -1272,9 +1177,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// Indicates if the session was run in a user interactive mode.
-        /// </summary>
+        /// <inheritdoc />
         public bool UserInteractive
         {
             get { return m_UserInteractive; }
@@ -1288,9 +1191,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// Indicates if the session was run through terminal server.  Only applies to User Interactive sessions.
-        /// </summary>
+        /// <inheritdoc />
         public bool TerminalServer
         {
             get { return m_TerminalServer; }
@@ -1304,9 +1205,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The number of pixels wide of the virtual desktop.
-        /// </summary>
+        /// <inheritdoc />
         public int ScreenWidth
         {
             get { return m_ScreenWidth; }
@@ -1320,9 +1219,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The number of pixels tall for the virtual desktop.
-        /// </summary>
+        /// <inheritdoc />
         public int ScreenHeight
         {
             get { return m_ScreenHeight; }
@@ -1336,9 +1233,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The number of bits of color depth.
-        /// </summary>
+        /// <inheritdoc />
         public int ColorDepth
         {
             get { return m_ColorDepth; }
@@ -1352,9 +1247,7 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// The complete command line used to execute the process including arguments.
-        /// </summary>
+        /// <inheritdoc />
         public string CommandLine
         {
             get { return m_CommandLine; }
@@ -1429,41 +1322,22 @@ namespace Gibraltar.Data
             }
         }
 
-        /// <summary>
-        /// A collection of properties used to provided extended information about the session
-        /// </summary>
+        /// <inheritdoc />
         public IDictionary<string, string> Properties { get { return m_Properties; } }
 
-        /// <summary>
-        /// Optional. Represents the computer that sent the session
-        /// </summary>
-        public IComputer Computer { get { return null; } }
-
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset AddedDateTime { get { return m_SessionStartDateTime; } }
 
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayAddedDateTime { get { return m_SessionStartDateTime; } }
 
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset UpdatedDateTime { get { return m_FileEndDateTime; } }
 
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayUpdatedDateTime { get { return m_FileEndDateTime; } }
 
-        /// <summary>
-        /// Get a copy of the full session detail this session refers to.  
-        /// </summary>
-        /// <remarks>Session objects can be large in memory.  This method will return a new object
-        /// each time it is called which should be released by the caller as soon as feasible to control memory usage.</remarks>
+        /// <inheritdoc />
         ISession ISessionSummary.Session()
         {
             throw new NotSupportedException("Loading a full session from a raw session header isn't supported");
@@ -1490,23 +1364,14 @@ namespace Gibraltar.Data
         /// <returns></returns>
         public bool IsValid { get { return m_Valid; } }
 
-        /// <summary>
-        /// Indicates if the session has ever been viewed or exported
-        /// </summary>
-        /// <remarks>Changes to this property are not persisted.</remarks>
+        /// <inheritdoc />
         public bool IsNew { get; set; }
 
-        /// <summary>
-        /// Indicates if the session is currently running and a live stream is available.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsLive { get; set; }
 
-        /// <summary>
-        /// Indicates if session data is available.
-        /// </summary>
-        /// <remarks>The session summary can be transfered separately from the session details
-        /// and isn't subject to pruning so it may be around long before or after the detailed data is.</remarks>
-        public bool HasData { get; set; } 
+        /// <inheritdoc />
+        public bool HasData { get; set; }
 
         /// <summary>
         /// True if the session header contains the extended file information
@@ -1518,14 +1383,10 @@ namespace Gibraltar.Data
         /// </summary>
         public bool SupportsFragments { get { return FileHeader.SupportsFragments(m_MajorVersion, m_MinorVersion); } }
 
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
-        /// </summary>
-        /// <returns>
-        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
-        /// </returns>
-        /// <param name="other">An object to compare with this object.
-        ///                 </param>
+        /// <inheritdoc />
+        public Framework Framework => Framework.DotNet;
+
+        /// <inheritdoc />
         public bool Equals(SessionHeader other)
         {
             // Careful, it could be null; check it without recursion
@@ -1537,27 +1398,13 @@ namespace Gibraltar.Data
             return m_SessionId.Equals(other.Id);
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
-        /// </summary>
-        /// <returns>
-        /// true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>; otherwise, false.
-        /// </returns>
-        /// <param name="obj">The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/>. 
-        ///                 </param><exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.
-        ///                 </exception><filterpriority>2</filterpriority>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return Equals(obj as SessionHeader);
         }
 
-        /// <summary>
-        /// Serves as a hash function for a particular type. 
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/>.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             if (m_HashCode == 0)
@@ -1590,8 +1437,8 @@ namespace Gibraltar.Data
             if (source.Length != target.Length)
                 return false;
 
-            //now we know they have the same nubmer of elements and neither are null.  we can compare individual elements.
-            for(int curItemIndex = 0; curItemIndex < source.Length; curItemIndex++)
+            //now we know they have the same number of elements and neither are null.  we can compare individual elements.
+            for (int curItemIndex = 0; curItemIndex < source.Length; curItemIndex++)
             {
                 if (source[curItemIndex].Equals(target[curItemIndex]) == false)
                     return false; //it only takes one miss
@@ -1657,6 +1504,7 @@ namespace Gibraltar.Data
         {
             bool isValid = false;
             long startingPosition = rawData.Position;
+            length = (length == 0) ? (int)(rawData.Length - rawData.Position) : length;
 
             //The current file version information.
             BinarySerializer.DeserializeValue(rawData, out m_MajorVersion);
@@ -1769,9 +1617,8 @@ namespace Gibraltar.Data
                 m_Properties.Add(name, value);
             }
 
-            //we may have been passed a length or not - if so trust it.
-            long remainingLength = (length == 0) ? rawData.Length : length;
-            if (rawData.Position < remainingLength - 4)
+            //not all headers have file information.  If it doesn't, it'll just have the CRC.
+            if ((rawData.Position - startingPosition) < length - 4) //The -4 is for the size of the CRC.
             {
                 m_HasFileInfo = true;
 
@@ -1785,6 +1632,14 @@ namespace Gibraltar.Data
 
             //now lets get the CRC and check it...
             long dataLength = rawData.Position - startingPosition; //be sure to offset for wherever the stream was when it started
+
+#if DEBUG
+            if ((dataLength > length - 4) && (Debugger.IsAttached))
+            {
+                //we read more bytes than our stream expected.  Something is off!
+                Debugger.Break();
+            }
+#endif
 
             //make a new copy of the header up to the start of the CRC
             byte[] headerBytes = new byte[dataLength];
@@ -1816,7 +1671,6 @@ namespace Gibraltar.Data
 
             m_HashCode = myHash;
         }
-
 
         /// <summary>
         /// Exchange our custom strings for the single instance value from the single instance store.

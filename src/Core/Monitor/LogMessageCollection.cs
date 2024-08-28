@@ -8,7 +8,7 @@ namespace Gibraltar.Monitor
     /// <summary>
     /// The sorted list of all log messages
     /// </summary>
-    public sealed class LogMessageCollection : IList<LogMessage>, IList 
+    public sealed class LogMessageCollection : IList<LogMessage>, IList<ILogMessage>, IList
     {
         private readonly SortedList<long, LogMessage> m_List = new SortedList<long, LogMessage>();
         private readonly Session m_Session;
@@ -22,7 +22,14 @@ namespace Gibraltar.Monitor
         private bool m_HasExceptionInfos;
         private bool m_HasMultipleUsers;
         private bool m_HasMultipleLogSystems;
+        private bool m_HasMultipleThreads;
         private bool m_HasSourceLocation;
+
+        private long m_CriticalMessages;
+        private long m_ErrorMessages;
+        private long m_WarningMessages;
+        private long m_InformationalMessages;
+        private long m_VerboseMessages;
 
         private string m_ReferenceUser;
         private string m_ReferenceLogSystem;
@@ -47,8 +54,10 @@ namespace Gibraltar.Monitor
         private void GenerateTrees()
         {
             //set up the trees
-            m_ClassTree = new LogMessageTree("class", "Classes", "Log Messages by class", ClassTreeFullName, ClassTreeMessageGroup);
-            m_CategoryTree = new LogMessageTree("category", "Categories", "Log Messages by category", CategoryTreeFullName, CategoryTreeMessageGroup);
+            m_ClassTree = new LogMessageTree("class", "Classes", "Log Messages by class",
+                                             m => m.ClassName, m => m.ClassNames);
+            m_CategoryTree = new LogMessageTree("category", "Categories", "Log Messages by category",
+                                                m => m.CategoryName, m => m.CategoryNames);
 
             //we are going to pass through every log message and categorize it.
             foreach (LogMessage logMessage in m_List.Values)
@@ -61,41 +70,21 @@ namespace Gibraltar.Monitor
             }
         }
 
-        private static string[] CategoryTreeMessageGroup(LogMessage message)
-        {
-            return message.CategoryNames;
-        }
-
-        private static string CategoryTreeFullName(LogMessage message)
-        {
-            return message.CategoryName;
-        }
-
-        private static string[] ClassTreeMessageGroup(LogMessage message)
-        {
-            return message.ClassNames;
-        }
-
-        private static string ClassTreeFullName(LogMessage message)
-        {
-            return message.ClassName;
-        }
-
         private void EnsureSorted()
         {
-        /*
-            if (m_SortRequired)
-            {
-                m_SortRequired = false;
-                m_List.Sort();
-            }
-         **/
+            /*
+                if (m_SortRequired)
+                {
+                    m_SortRequired = false;
+                    m_List.Sort();
+                }
+             **/
         }
 
         /// <summary>
         /// This method is called every time a collection change event occurs to allow inheritors to override the change event.
         /// </summary>
-        /// <remarks>If overriden, it is important to call this base implementation to actually fire the event.</remarks>
+        /// <remarks>If overridden, it is important to call this base implementation to actually fire the event.</remarks>
         /// <param name="e"></param>
         private void OnCollectionChanged(CollectionChangedEventArgs<LogMessageCollection, LogMessage> e)
         {
@@ -137,8 +126,8 @@ namespace Gibraltar.Monitor
             {
                 //count how many messages we go through to get to our target.                
                 int curMessageCount = 0;
-                
-                while(curSampleIndex < Count)
+
+                while (curSampleIndex < Count)
                 {
                     if (this[curSampleIndex].Timestamp >= windowEndDateTime)
                     {
@@ -172,7 +161,7 @@ namespace Gibraltar.Monitor
         /// </summary>
         /// <remarks>
         /// To calculate a backwards offset (the date that is the specified interval before the baseline) use a negative
-        /// number of invervals. For example, -1 intervals will give you one interval before the baseline.
+        /// number of intervals. For example, -1 intervals will give you one interval before the baseline.
         /// </remarks>
         /// <param name="baseline">The date and time to calculate an offset date and time from</param>
         /// <param name="interval">The interval to add or subtract from the baseline</param>
@@ -233,7 +222,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The session this collection of log messages is related to
         /// </summary>
-        public Session Session { get { return m_Session; } }
+        public Session Session => m_Session;
 
         /// <summary>
         /// A tree of log message groups for the log messages by category.
@@ -274,7 +263,10 @@ namespace Gibraltar.Monitor
         {
             get
             {
+                if (m_List.Count == 0) return null;
+
                 EnsureSorted();
+
                 return m_List.Values[0];
             }
         }
@@ -286,10 +278,48 @@ namespace Gibraltar.Monitor
         {
             get
             {
+                if (m_List.Count == 0) return null;
+
                 EnsureSorted();
+
                 return m_List.Values[m_List.Count - 1];
             }
         }
+
+        /// <summary>
+        /// Indicates if there is more than one thread associated with the log messages
+        /// </summary>
+        public bool HasMultipleThreads => m_HasMultipleThreads;
+
+        /// <summary>
+        /// The number of messages in the messages collection.
+        /// </summary>
+        public long MessageCount => m_List.Count;
+
+        /// <summary>
+        /// The number of critical messages in the messages collection.
+        /// </summary>
+        public long CriticalCount => m_CriticalMessages;
+
+        /// <summary>
+        /// The number of error messages in the messages collection.
+        /// </summary>
+        public long ErrorCount => m_ErrorMessages;
+
+        /// <summary>
+        /// The number of warning messages in the messages collection.
+        /// </summary>
+        public long WarningCount => m_WarningMessages;
+
+        /// <summary>
+        /// The number of information messages in the messages collection.
+        /// </summary>
+        public long InformationCount => m_InformationalMessages;
+
+        /// <summary>
+        /// The number of verbose messages in the messages collection.
+        /// </summary>
+        public long VerboseCount => m_VerboseMessages;
 
         /// <summary>
         /// Calculate the number of messages per second present in the entire messages collection.
@@ -340,8 +370,7 @@ namespace Gibraltar.Monitor
             return OnCalculateValues(interval, intervals, effectiveStartDateTime, effectiveEndDateTime);
         }
 
-
-
+        /// <inheritdoc />
         IEnumerator<LogMessage> IEnumerable<LogMessage>.GetEnumerator()
         {
             EnsureSorted();
@@ -350,6 +379,16 @@ namespace Gibraltar.Monitor
             return m_List.Values.GetEnumerator();
         }
 
+        /// <inheritdoc />
+        IEnumerator<ILogMessage> IEnumerable<ILogMessage>.GetEnumerator()
+        {
+            EnsureSorted();
+
+            //we use the sorted list for enumeration
+            return m_List.Values.GetEnumerator();
+        }
+
+        /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator()
         {
             EnsureSorted();
@@ -358,16 +397,20 @@ namespace Gibraltar.Monitor
             return m_List.Values.GetEnumerator();
         }
 
-        /// <summary>
-        /// Retrieves the numerical index of the specified item in the collection or -1 if not found.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public int IndexOf(LogMessage item)
         {
             EnsureSorted();
 
             return m_List.Values.IndexOf(item);
+        }
+
+        /// <inheritdoc />
+        public int IndexOf(ILogMessage item)
+        {
+            EnsureSorted();
+
+            return m_List.Values.IndexOf((LogMessage)item);
         }
 
         /// <summary>
@@ -382,10 +425,17 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.IList" />.
+        /// Not supported.
         /// </summary>
-        /// <param name="value">The <see cref="T:System.Object" /> to remove from the <see cref="T:System.Collections.IList" />. </param>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IList" /> is read-only.-or- The <see cref="T:System.Collections.IList" /> has a fixed size. </exception><filterpriority>2</filterpriority>
+        /// <param name="index"></param>
+        /// <param name="item"></param>
+        public void Insert(int index, ILogMessage item)
+        {
+            //we don't support setting an object by index; we are sorted.
+            throw new NotSupportedException();
+        }
+
+        /// <inheritdoc />
         public void Remove(object value)
         {
             Remove((LogMessage)value);
@@ -401,35 +451,20 @@ namespace Gibraltar.Monitor
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Gets or sets the element at the specified index.
-        /// </summary>
-        /// <returns>
-        /// The element at the specified index.
-        /// </returns>
-        /// <param name="index">The zero-based index of the element to get or set. </param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index" /> is not a valid index in the <see cref="T:System.Collections.IList" />. </exception>
-        /// <exception cref="T:System.NotSupportedException">The property is set and the <see cref="T:System.Collections.IList" /> is read-only. </exception><filterpriority>2</filterpriority>
-        object IList.this[int index] 
+        /// <inheritdoc />
+        object IList.this[int index]
         {
             get
             {
                 EnsureSorted();
                 return m_List.Values[index];
             }
-            set
-            {
+            set => throw
                 //we don't want to support setting an object by index, we are sorted.
-                throw new NotSupportedException();
-            }
+                new NotSupportedException();
         }
 
-        /// <summary>
-        /// Gets or sets the element at the specified index.
-        /// </summary>
-        /// <remarks>Setting a metric sample to a particular index is not supported and will result in an exception being thrown.</remarks>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public LogMessage this[int index]
         {
             get
@@ -437,35 +472,33 @@ namespace Gibraltar.Monitor
                 EnsureSorted();
                 return m_List.Values[index];
             }
-            set
-            {
+            set => throw
                 //we don't want to support setting an object by index, we are sorted.
-                throw new NotSupportedException();
-            }
+                new NotSupportedException();
         }
 
-        /// <summary>
-        /// Adds an item to the <see cref="T:System.Collections.IList" />.
-        /// </summary>
-        /// <returns>
-        /// The position into which the new element was inserted.
-        /// </returns>
-        /// <param name="value">The <see cref="T:System.Object" /> to add to the <see cref="T:System.Collections.IList" />. </param>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IList" /> is read-only.-or- The <see cref="T:System.Collections.IList" /> has a fixed size. </exception><filterpriority>2</filterpriority>
+        /// <inheritdoc />
+        ILogMessage IList<ILogMessage>.this[int index]
+        {
+            get
+            {
+                EnsureSorted();
+                return m_List.Values[index];
+            }
+            set => throw
+                //we don't want to support setting an object by index, we are sorted.
+                new NotSupportedException();
+        }
+
+        /// <inheritdoc />
         public int Add(object value)
         {
-            LogMessage logMessage = (LogMessage) value; // throws an exception if it can't cast to the right type
+            LogMessage logMessage = (LogMessage)value; // throws an exception if it can't cast to the right type
             Add(logMessage);
             return m_List.Values.IndexOf(logMessage);
         }
 
-        /// <summary>
-        /// Determines whether the <see cref="T:System.Collections.IList" /> contains a specific value.
-        /// </summary>
-        /// <returns>
-        /// true if the <see cref="T:System.Object" /> is found in the <see cref="T:System.Collections.IList" />; otherwise, false.
-        /// </returns>
-        /// <param name="value">The <see cref="T:System.Object" /> to locate in the <see cref="T:System.Collections.IList" />. </param><filterpriority>2</filterpriority>
+        /// <inheritdoc />
         public bool Contains(object value)
         {
             return m_List.Values.Contains((LogMessage)value);
@@ -489,36 +522,20 @@ namespace Gibraltar.Monitor
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Determines the index of a specific item in the <see cref="T:System.Collections.IList" />.
-        /// </summary>
-        /// <returns>
-        /// The index of <paramref name="value" /> if found in the list; otherwise, -1.
-        /// </returns>
-        /// <param name="value">The <see cref="T:System.Object" /> to locate in the <see cref="T:System.Collections.IList" />. </param><filterpriority>2</filterpriority>
+        /// <inheritdoc />
         public int IndexOf(object value)
         {
             EnsureSorted();
             return m_List.Values.IndexOf((LogMessage)value);
         }
 
-        /// <summary>
-        /// Inserts an item to the <see cref="T:System.Collections.IList" /> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="value" /> should be inserted. </param>
-        /// <param name="value">The <see cref="T:System.Object" /> to insert into the <see cref="T:System.Collections.IList" />. </param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index" /> is not a valid index in the <see cref="T:System.Collections.IList" />. </exception>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IList" /> is read-only.-or- The <see cref="T:System.Collections.IList" /> has a fixed size. </exception>
-        /// <exception cref="T:System.NullReferenceException"><paramref name="value" /> is null reference in the <see cref="T:System.Collections.IList" />.</exception><filterpriority>2</filterpriority>
+        /// <inheritdoc />
         public void Insert(int index, object value)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Add the specified LogMessage item to the collection
-        /// </summary>
-        /// <param name="item">The new LogMessage item to add</param>
+        /// <inheritdoc />
         public void Add(LogMessage item)
         {
             if (item == null)
@@ -528,6 +545,25 @@ namespace Gibraltar.Monitor
 
             //add it to our internal list
             m_List.Add(item.Sequence, item);
+
+            switch (item.Severity)
+            {
+                case LogMessageSeverity.Critical:
+                    m_CriticalMessages++;
+                    break;
+                case LogMessageSeverity.Error:
+                    m_ErrorMessages++;
+                    break;
+                case LogMessageSeverity.Warning:
+                    m_WarningMessages++;
+                    break;
+                case LogMessageSeverity.Information:
+                    m_InformationalMessages++;
+                    break;
+                case LogMessageSeverity.Verbose:
+                    m_VerboseMessages++;
+                    break;
+            }
 
             //see if we need to change one of our tracking flags.
             if (m_HasDetails == false)
@@ -543,6 +579,11 @@ namespace Gibraltar.Monitor
             if (m_HasSourceLocation == false)
             {
                 m_HasSourceLocation = item.HasSourceLocation;
+            }
+
+            if (m_HasMultipleThreads == false)
+            {
+                m_HasMultipleThreads = m_Session.Threads.Count > 1;
             }
 
             if (m_HasMultipleUsers == false)
@@ -569,7 +610,7 @@ namespace Gibraltar.Monitor
                 }
                 else if (string.IsNullOrEmpty(item.LogSystem) == false)
                 {
-                    m_HasMultipleLogSystems = (m_ReferenceLogSystem.Equals(item.UserName, StringComparison.OrdinalIgnoreCase) == false);
+                    m_HasMultipleLogSystems = (m_ReferenceLogSystem.Equals(item.LogSystem, StringComparison.OrdinalIgnoreCase) == false);
                 }
             }
 
@@ -577,136 +618,120 @@ namespace Gibraltar.Monitor
             OnCollectionChanged(new CollectionChangedEventArgs<LogMessageCollection, LogMessage>(this, item, CollectionAction.Added));
         }
 
+        /// <inheritdoc />
+        public void Add(ILogMessage item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item), "A new LogMessage item must be provided to add it to the collection.");
+            }
+
+            Add((LogMessage)item);
+        }
+
         /// <summary>
         /// Indicates if any of the log messages in the collection have detailed xml data
         /// </summary>
-        public bool HasDetail { get { return m_HasDetails; } }
+        public bool HasDetail => m_HasDetails;
 
         /// <summary>
         /// Indicates if any of the log messages in the collection have exception information recorded
         /// </summary>
-        public bool HasExceptionInfo { get { return m_HasExceptionInfos; } }
+        public bool HasExceptionInfo => m_HasExceptionInfos;
 
         /// <summary>
         /// Indicates if there is more than one user associated with the log messages
         /// </summary>
-        public bool HasMultipleUsers { get { return m_HasMultipleUsers; } }
+        public bool HasMultipleUsers => m_HasMultipleUsers;
 
         /// <summary>
         /// Indicates if there is more than one log system associated with the log messages
         /// </summary>
-        public bool HasMultipleLogSystems { get { return m_HasMultipleLogSystems; } }
+        public bool HasMultipleLogSystems => m_HasMultipleLogSystems;
 
         /// <summary>
         /// Indicates if any of the log messages have source code location information
         /// </summary>
-        public bool HasSourceLocation { get { return m_HasSourceLocation; } }
+        public bool HasSourceLocation => m_HasSourceLocation;
 
-        /// <summary>
-        /// Determines whether an element is in the collection.
-        /// </summary>
-        /// <remarks>This method determines equality using the default equality comparer for the type of values in the list.  It performs
-        /// a linear search and therefore is an O(n) operation.</remarks>
-        /// <param name="item">The object to locate in the collection.</param>
-        /// <returns>true if the item is found in the collection; otherwise false.</returns>
+        /// <inheritdoc />
         public bool Contains(LogMessage item)
         {
-            //here we are relying on the fact that the MetricSample object implements IComparable sufficiently to guarantee uniqueness
+            //here we are relying on the fact that the LogMessage object implements IComparable sufficiently to guarantee uniqueness
             return m_List.Values.Contains(item);
         }
 
-        /// <summary>
-        /// Copies the entire collection to a compatible one-dimensional array, starting at the specified index of the target array.
-        /// </summary>
-        /// <remarks>Elements are copied to the array in the same order in which the enumerator iterates them from the collection.  The provided array 
-        /// must be large enough to contain the entire contents of this collection starting at the specified index.  This method is an O(n) operation.</remarks>
-        /// <param name="array">The one-dimensional array that is the destination of the elements copied from the collection.  The Array must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
+        /// <inheritdoc />
+        public bool Contains(ILogMessage item)
+        {
+            //here we are relying on the fact that the LogMessage object implements IComparable sufficiently to guarantee uniqueness
+            return m_List.Values.Contains((LogMessage)item);
+        }
+
+        /// <inheritdoc />
         public void CopyTo(LogMessage[] array, int arrayIndex)
         {
             EnsureSorted();
             m_List.Values.CopyTo(array, arrayIndex);
         }
 
-        /// <summary>
-        /// Copies the elements of the <see cref="T:System.Collections.ICollection" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
-        /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection" />. The <see cref="T:System.Array" /> must have zero-based indexing. </param>
-        /// <param name="index">The zero-based index in <paramref name="array" /> at which copying begins. </param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="array" /> is null. </exception>
-        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index" /> is less than zero. </exception>
-        /// <exception cref="T:System.ArgumentException"><paramref name="array" /> is multidimensional.-or- <paramref name="index" /> is equal to or greater than the length of <paramref name="array" />.-or- The number of elements in the source <see cref="T:System.Collections.ICollection" /> is greater than the available space from <paramref name="index" /> to the end of the destination <paramref name="array" />. </exception>
-        /// <exception cref="T:System.ArgumentException">The type of the source <see cref="T:System.Collections.ICollection" /> cannot be cast automatically to the type of the destination <paramref name="array" />. </exception><filterpriority>2</filterpriority>
+        /// <inheritdoc />
+        public void CopyTo(ILogMessage[] array, int arrayIndex)
+        {
+            EnsureSorted();
+            var messages = new LogMessage[m_List.Count];
+            m_List.Values.CopyTo(messages, 0);
+
+            //now put that in the provided array
+            messages.CopyTo(array, arrayIndex);
+        }
+
+        /// <inheritdoc />
         public void CopyTo(Array array, int index)
         {
             EnsureSorted();
-            LogMessage[] messages = new LogMessage[m_List.Count];
-            m_List.Values.CopyTo(messages, index);
+            var messages = new LogMessage[m_List.Count];
+            m_List.Values.CopyTo(messages, 0);
 
             //now put that in the provided array
             messages.CopyTo(array, index);
         }
 
-        /// <summary>
-        /// The number of items currently in the collection
-        /// </summary>
-        public int Count
-        {
-            get { return m_List.Count; }
-        }
+        /// <inheritdoc />
+        public int Count => m_List.Count;
 
-        /// <summary>
-        /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
-        /// </summary>
-        /// <returns>
-        /// An object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public object SyncRoot
-        {
-            get { return m_Lock; } 
-        }
+        /// <inheritdoc />
+        public object SyncRoot => m_Lock;
 
-        /// <summary>
-        /// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe).
-        /// </summary>
-        /// <returns>
-        /// true if access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe); otherwise, false.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public bool IsSynchronized
-        {
-            get { return true; } 
-        }
+        /// <inheritdoc />
+        public bool IsSynchronized => true;
 
         /// <summary>
         /// Indicates if the collection is read only and therefore can't have items added or removed.
         /// </summary>
         /// <remarks>This collection is always read-only.  
         /// This property is required for ICollection compatibility</remarks>
-        public bool IsReadOnly
-        {
+        public bool IsReadOnly =>
             //we are always read only
-            get { return true; }
-        }
+            true;
 
-        /// <summary>
-        /// Gets a value indicating whether the <see cref="T:System.Collections.IList" /> has a fixed size.
-        /// </summary>
-        /// <returns>
-        /// true if the <see cref="T:System.Collections.IList" /> has a fixed size; otherwise, false.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        public bool IsFixedSize
-        {
-            get { return false; } 
-        }
+        /// <inheritdoc />
+        public bool IsFixedSize => false;
 
         /// <summary>
         /// Not supported, but no exception is returned.
         /// </summary>
         /// <param name="item">The LogMessage item to remove.</param>
         public bool Remove(LogMessage item)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Not supported, but no exception is returned.
+        /// </summary>
+        /// <param name="item">The LogMessage item to remove.</param>
+        public bool Remove(ILogMessage item)
         {
             return false;
         }

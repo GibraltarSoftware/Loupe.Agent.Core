@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -16,21 +17,22 @@ namespace Gibraltar.Monitor
     /// <summary>
     /// The local collection repository, a minimalistic repository
     /// </summary>
-    public class LocalRepository : IRepository
+    [DebuggerDisplay("{Name}")]
+    public class LocalRepository
     {
         /// <summary>
         /// The log category
         /// </summary>
-        protected const string LogCategory = "Loupe.Local Repository";
+        public const string LogCategory = "Loupe.Repository.Local";
 
-        private const string RepositoryTempFolder = "temp";
-        internal const string RepositoryArchiveFolder = "archive";
+        private const string RepositoryTempFolder = "Temp";
+        internal const string RepositoryArchiveFolder = "Archive";
         internal const string RepositoryKeyFile = "repository.gak";
         internal const string ComputerKeyFile = "computer.gak";
 
         private readonly object m_Lock = new object();
         private readonly object m_QueueLock = new object();
-        private readonly Queue<RefreshRequest> m_RefreshRequests = new Queue<RefreshRequest>(); //protected by QUEUELOCK
+        private readonly Queue<RefreshRequest> m_RefreshRequests = new Queue<RefreshRequest>();  //protected by QUEUELOCK
         private readonly string m_Caption;
         private readonly string m_RepositoryPath;
         private readonly Guid m_RepositoryId;
@@ -40,7 +42,7 @@ namespace Gibraltar.Monitor
         private Dictionary<Guid, SessionFileInfo<FileInfo>> m_SessionCache; //protected by LOCK
         private bool m_LoggingEnabled;
         private string m_RepositoryArchivePath;
-        private bool m_AsyncRefreshThreadActive; //protected by QUEUELOCK
+        private bool m_AsyncRefreshThreadActive;  //protected by QUEUELOCK
 
         #region Private Class RefreshRequest
 
@@ -95,29 +97,17 @@ namespace Gibraltar.Monitor
             m_SessionLockFolder = Path.Combine(m_RepositoryPath, FileMessenger.SessionLockFolderName);
             m_RepositoryArchivePath = Path.Combine(m_RepositoryPath, RepositoryArchiveFolder);
 
-            //we want the directories to exist, but we don't worry about permissions because that should have already happened when the repository path was calculated.
-            try
-            {
-                Directory.CreateDirectory(m_RepositoryTempPath);
-            }
-            catch (Exception ex)
-            {
-                GC.KeepAlive(ex);
-            }
+            if (!Log.SilentMode)
+                Log.Write(LogMessageSeverity.Verbose, LogCategory, "Opening local repository " + m_Caption, "Path: {0}", m_RepositoryPath);
 
-            try
-            {
-                Directory.CreateDirectory(m_RepositoryArchivePath);
-            }
-            catch (Exception ex)
-            {
-                GC.KeepAlive(ex);
-            }
+            //we want the directories to exist, but we don't worry about permissions because that should have already happened when the repository path was calculated.
+            Directory.CreateDirectory(m_RepositoryTempPath);
+            Directory.CreateDirectory(m_RepositoryArchivePath);
 
             using (GetMaintenanceLock())
             {
                 //if the repository doesn't have a readme file and our basic information, create that.
-                string readme = Path.Combine(m_RepositoryPath, "_readme.txt");
+                string readme = Path.Combine(m_RepositoryPath, "_ReadMe.txt");
                 if (File.Exists(readme) == false)
                 {
                     try
@@ -226,12 +216,6 @@ namespace Gibraltar.Monitor
         public bool SupportsFragments { get { return true; } }
 
         /// <summary>
-        /// The set of products, applications, and versions loaded into the repository
-        /// </summary>
-        public IList<IRepositoryProduct> Products { get { throw new NotImplementedException("Getting the set of products, applications, and versions from the local repository isn't implemented yet"); } }
-
-
-        /// <summary>
         /// Add a session (full file stream or fragment of a session) to the repository
         /// </summary>
         /// <param name="sessionStream">A stream of the session data (full file or fragment) to add</param>
@@ -268,6 +252,7 @@ namespace Gibraltar.Monitor
                         sessionStream.Position = 0;
                         FileSystemTools.StreamContentCopy(sessionStream, fileStream, false);
                         fileStream.SetLength(fileStream.Position);
+                        fileStream.Close();
                     }
 
                     if (m_SessionCache != null)
@@ -404,7 +389,7 @@ namespace Gibraltar.Monitor
 
             //To avoid using up a lot of memory if the session is large we create a temporary file with the stream and then
             //return a seekable pointer to that.
-            FileStream tempStream = FileSystemTools.GetTempFileStream();
+            var tempStream = new TempFileStream();
             requestedSession.Write(tempStream);
             tempStream.Seek(0, SeekOrigin.Begin);
             return tempStream;
@@ -420,15 +405,13 @@ namespace Gibraltar.Monitor
         {
             lock (m_Lock)
             {
-                Stream existingFile;
-                if (TryLoadSessionFileStream(sessionId, fileId, out existingFile))
+                if (TryLoadSessionFileStream(sessionId, fileId, out var existingFile))
                 {
                     using (existingFile)
                     {
                         //To avoid using up a lot of memory if the session is large we create a temporary file with the stream and then
                         //return a seekable pointer to that.
-                        FileStream tempStream = FileSystemTools.GetTempFileStream();
-                        FileSystemTools.StreamContentCopy(existingFile, tempStream, true);
+                        var tempStream = new TempFileStream(existingFile);
                         return tempStream;
                     }
                 }
@@ -452,8 +435,7 @@ namespace Gibraltar.Monitor
             stream = null;
             lock (m_Lock)
             {
-                SessionFileInfo<FileInfo> sessionFileInfo;
-                if (m_SessionCache.TryGetValue(sessionId, out sessionFileInfo) == false)
+                if (m_SessionCache.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
                     return false;
                 }
@@ -514,13 +496,13 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Update the local repository with the latest information from the file system
         /// </summary>
-        internal void Refresh(bool async, bool force, SessionCriteria sessionCriteria)
+        public void Refresh(bool async, bool force, SessionCriteria sessionCriteria)
         {
             if (async)
             {
                 //because we want minimize any possibility in holding up the caller (which could be the file system monitor)
                 //we queue all requests and even use a dedicated lock to minimize contention
-                lock(m_QueueLock)
+                lock (m_QueueLock)
                 {
                     if (m_RefreshRequests.Count < 10) //circuit breaker for extreme cases
                         m_RefreshRequests.Enqueue(new RefreshRequest(force, sessionCriteria));
@@ -796,6 +778,55 @@ namespace Gibraltar.Monitor
         public string TempPath { get { return m_RepositoryTempPath; } }
 
         /// <summary>
+        /// Get the stored auto consent information for the specified product and application
+        /// </summary>
+        /// <param name="product"></param>
+        /// <param name="application"></param>
+        /// <returns></returns>
+        public AutoSendConsent GetAutoSendConsent(string product, string application)
+        {
+            AutoSendConsent consent = null;
+
+            //we may or may not have the application name, depending on the scope 
+            var consentFileNamePath = Path.Combine(m_RepositoryPath, GenerateConsentFileName(product, application));
+            if (File.Exists(consentFileNamePath))
+            {
+                consent = AutoSendConsent.LoadFile(consentFileNamePath);
+            }
+
+            return consent;
+        }
+
+        /// <summary>
+        /// Create a new one or get any existing auto consent information for the specified product and application
+        /// </summary>
+        /// <param name="product"></param>
+        /// <param name="application"></param>
+        /// <param name="applicationVersion"></param>
+        /// <returns></returns>
+        public AutoSendConsent AddOrGetAutoSendConsent(string product, string application, Version applicationVersion)
+        {
+            var consent = GetAutoSendConsent(product, application);
+
+            if (consent == null)
+            {
+                consent = new AutoSendConsent(product, application, applicationVersion, Log.SessionSummary.FullyQualifiedUserName);
+            }
+
+            return consent;
+        }
+
+        /// <summary>
+        /// Store the provided consent as the latest consent information
+        /// </summary>
+        /// <param name="bestConsent"></param>
+        public void SaveAutoSendConsent(AutoSendConsent bestConsent)
+        {
+            var consentFileNamePath = Path.Combine(m_RepositoryPath, GenerateConsentFileName(bestConsent.ProductName, bestConsent.ApplicationName));
+            bestConsent.Save(consentFileNamePath);
+        }
+
+        /// <summary>
         /// Attempt to load the session header from the specified file, returning null if it can't be loaded
         /// </summary>
         /// <param name="sessionFileNamePath">The full file name &amp; path</param>
@@ -905,7 +936,7 @@ namespace Gibraltar.Monitor
                 do
                 {
                     request = null;
-                    lock(m_QueueLock)
+                    lock (m_QueueLock)
                     {
                         if (m_RefreshRequests.Count == 0)
                         {
@@ -933,7 +964,7 @@ namespace Gibraltar.Monitor
                 if (!exitSet)
                 {
                     //we want to be really, really sure we don't leave the thread active option set when we're no longer running even in ThreadAbort cases.
-                    lock(m_QueueLock)
+                    lock (m_QueueLock)
                     {
                         m_AsyncRefreshThreadActive = false;
                     }
@@ -1146,7 +1177,8 @@ namespace Gibraltar.Monitor
 
                         try
                         {
-                            sourceFile = FileHelper.OpenFileStream(fileFragment.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                            //sourceFile = new FileStream(fileFragment, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                            sourceFile = FileHelper.OpenFileStream(fileFragment.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
                             if (sourceFile == null)
                             {
                                 if (m_LoggingEnabled) Log.Write(LogMessageSeverity.Warning, LogCategory, "Unable to Mark Session as Crashed", "Unable to completely convert session {0} from being marked as running to crashed in repository at '{1}' because the fragment '{2}' could not be opened",
@@ -1224,9 +1256,9 @@ namespace Gibraltar.Monitor
             if (string.IsNullOrEmpty(applicationName))
                 file = string.Format("{0}.gasc", product);
             else
-                file = string.Format("{0}_{1}.gasc", product, applicationName);
+                file = string.Format("{0} {1}.gasc", product, applicationName);
 
-            return FileSystemTools.SanitizeFileName(file, true);
+            return FileSystemTools.SanitizeFileName(file);
         }
 
         /// <summary>
@@ -1244,37 +1276,51 @@ namespace Gibraltar.Monitor
             {
                 foreach (var fragment in sessionFileInfo.Fragments)
                 {
-                    try
+                    if (File.Exists(fragment.FullName)) //Guard against case where the file system was modified underneath us
                     {
-                        if (!destinationDirectory.Equals(fragment.DirectoryName, StringComparison.OrdinalIgnoreCase))
+                        try
                         {
-                            var destinationFileNamePath = Path.Combine(destinationDirectory, fragment.Name);
+                            if (!destinationDirectory.Equals(fragment.DirectoryName,
+                                    StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                var destinationFileNamePath = Path.Combine(destinationDirectory, fragment.Name);
 
-                            //and then move the file to the new location.
-                            Directory.CreateDirectory(destinationDirectory);
+                                //make sure there isn't a file already there (can happen in rare race conditions)
+                                FileHelper.SafeDeleteFile(destinationFileNamePath);
 
-                            //we've seen an odd problem in Azure Service Plans with FileInfo.MoveTo, switching to File.Move.
-#if NET5_0_OR_GREATER
-                            File.Move(fragment.FullName, destinationFileNamePath, true);
-#else
-                            //make sure there isn't a file already there (can happen in rare race conditions)
-                            FileHelper.SafeDeleteFile(destinationFileNamePath);
-                            File.Move(fragment.FullName, destinationFileNamePath);
-#endif
-                            modifiedAnyFile = true;
+                                //and then move the file to the new location.
+                                Directory.CreateDirectory(destinationDirectory);
+                                File.Move(fragment.FullName, destinationFileNamePath);
+                                modifiedAnyFile = true;
+                            }
                         }
-                    }
-                    catch (FileNotFoundException ex)
-                    {
-                        if (!Log.SilentMode)
-                            Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, true, LogCategory, "While changing a session fragment file new state to " + isNew + " the file was not found", 
-                                "It's most likely already been moved to the appropriate status or was deleted.\r\nSession Id: {0}\r\nFragment: {1}\r\nException:\r\n{2}: {3}", sessionId, fragment.Name, ex.GetType(), ex.Message);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (!Log.SilentMode)
-                            Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, ex, true, LogCategory, "Unable to update session fragment new state to " + isNew + " due to " + ex.GetType(), 
-                                "It's most likely in use by another process, so we'll have another opportunity to get it later.\r\nSession Id: {0}\r\nFragment: {1}\r\nException:\r\n{2}: {3}", sessionId, fragment.Name, ex.GetType(), ex.Message);
+                        catch (DirectoryNotFoundException ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, ex, true, LogCategory,
+                                    "Unable to update session fragment new state to " + isNew + " due to " + ex.GetType(),
+                                    "It's most likely already been moved to the appropriate status or was deleted.\r\n" +
+                                    "Session Id: {0}\r\nFragment File: {1}\r\nDestination Directory: {2} (Exists: {3})\r\nException:\r\n{4}: {5}",
+                                    sessionId, fragment.FullName, destinationDirectory, Directory.Exists(destinationDirectory), ex.GetType(), ex.Message);
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, true, LogCategory,
+                                    "While changing a session fragment file new state to " + isNew +
+                                    " the file was not found",
+                                    "It's most likely already been moved to the appropriate status or was deleted.\r\nSession Id: {0}\r\nFragment: {1}\r\nException:\r\n{2}: {3}",
+                                    sessionId, fragment.Name, ex.GetType(), ex.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!Log.SilentMode)
+                                Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, ex, true, LogCategory,
+                                    "Unable to update session fragment new state to " + isNew + " due to " +
+                                    ex.GetType(),
+                                    "It's most likely in use by another process, so we'll have another opportunity to get it later.\r\nSession Id: {0}\r\nFragment: {1}\r\nException:\r\n{2}: {3}",
+                                    sessionId, fragment.Name, ex.GetType(), ex.Message);
+                        }
                     }
                 }
 
@@ -1285,6 +1331,6 @@ namespace Gibraltar.Monitor
             return modifiedAnyFile;
         }
 
-#endregion
+        #endregion
     }
 }

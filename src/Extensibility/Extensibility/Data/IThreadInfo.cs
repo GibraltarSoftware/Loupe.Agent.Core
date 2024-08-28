@@ -1,4 +1,6 @@
-﻿namespace Loupe.Extensibility.Data
+﻿using System;
+
+namespace Loupe.Extensibility.Data
 {
     /// <summary>
     /// An interface for accessing information about a thread.
@@ -9,6 +11,11 @@
         /// The session this thread was recorded with
         /// </summary>
         ISession Session { get; }
+
+        /// <summary>
+        /// The unique key for this thread
+        /// </summary>
+        Guid Id { get; }
 
         /// <summary>
         /// The managed thread ID of the thread which originated this log message.

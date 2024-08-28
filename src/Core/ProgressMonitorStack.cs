@@ -1,9 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
-
-
 
 namespace Gibraltar
 {
@@ -124,7 +122,7 @@ namespace Gibraltar
                         if (m_ReadOnly)
                         {
                             //we are no longer updatable
-                            throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                            throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                         }
 
                         //and we're read only and complete.
@@ -182,7 +180,7 @@ namespace Gibraltar
         /// <remarks>While it is possible to specify zero for the number of steps, it is recommended
         /// that a guess be made for the maximum number of steps to provide the best UI experience.  When in
         /// doubt, guess high and reduce later which will make the progress appear to accelerate.</remarks>
-        /// <param name="owner">The object that is responsible for the proces being tracked (for development purposes, never displayed)</param>
+        /// <param name="owner">The object that is responsible for the process being tracked (for development purposes, never displayed)</param>
         /// <param name="status">A short status message for the user</param>
         /// <param name="maxSteps">The maximum number of steps in the process being monitored</param>
         /// <returns>A new monitor object which will be at the top of the stack</returns>
@@ -194,7 +192,7 @@ namespace Gibraltar
                 if (m_ReadOnly)
                 {
                     //we are no longer updatable
-                    throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                    throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                 }
 
                 //create a new monitor object

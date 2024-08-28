@@ -474,7 +474,16 @@ namespace Gibraltar.Data
             DeserializeValue(networkBytes, out serializedValue);
             if (s_MonoRuntime == false)
             {
-                hostValue = DateTimeOffset.ParseExact(serializedValue, "o", null);
+                try
+                {
+                    hostValue = DateTimeOffset.ParseExact(serializedValue, "o", null);
+                }
+                catch (FormatException ex)
+                {
+                    //improve the response so we include the raw value to help in diagnosing problems.
+                    throw new FormatException(string.Format("Unrecognized format for DateTimeOffset deserialization: \"{0}\"",
+                        serializedValue), ex);
+                }
             }
             else
             {

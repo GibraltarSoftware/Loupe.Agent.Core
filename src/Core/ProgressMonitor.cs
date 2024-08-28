@@ -1,8 +1,6 @@
-﻿
-using System;
+﻿using System;
+using System.Data;
 using System.Diagnostics;
-
-
 
 namespace Gibraltar
 {
@@ -24,7 +22,7 @@ namespace Gibraltar
         private bool m_PercentCompleteValid;
         private bool m_Complete;
         private bool m_ReadOnly;
-
+        private volatile bool m_CancellationRequested;
 
         /// <summary>
         /// Raised when the monitor stack is in the process of cancelling.
@@ -73,7 +71,7 @@ namespace Gibraltar
                         if (m_ReadOnly)
                         {
                             //we are no longer updatable
-                            throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                            throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                         }
 
                         //Now we are going to force the percentage to 100% and mark it valid
@@ -109,9 +107,7 @@ namespace Gibraltar
                 {
                     m_CompletedSteps = value;
 
-#if DEBUG
                     Debug.Assert(m_CompletedSteps <= m_MaxSteps);
-#endif
 
                     //and invalidate the cached percentage
                     m_PercentCompleteValid = false;
@@ -240,7 +236,7 @@ namespace Gibraltar
                 if (m_ReadOnly)
                 {
                     //we are no longer updatable
-                    throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                    throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                 }
 
                 StatusMessage = status;
@@ -261,7 +257,7 @@ namespace Gibraltar
                 if (m_ReadOnly)
                 {
                     //we are no longer updatable
-                    throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                    throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                 }
 
                 StatusMessage = status;
@@ -287,7 +283,7 @@ namespace Gibraltar
                 if (m_ReadOnly)
                 {
                     //we are no longer updatable
-                    throw new InvalidOperationException("The monitor has been marked complete and is now read only.");
+                    throw new ReadOnlyException("The monitor has been marked complete and is now read only.");
                 }
 
                 StatusMessage = status;
@@ -295,6 +291,14 @@ namespace Gibraltar
                 CompletedSteps = completedSteps;
                 OnMonitorUpdated();
             }
+        }
+
+        /// <summary>
+        /// Indicates if the user is requesting the monitored task be canceled.
+        /// </summary>
+        public bool CancellationRequested
+        {
+            get => m_CancellationRequested;
         }
 
         #endregion
@@ -307,6 +311,8 @@ namespace Gibraltar
         /// <remarks>Any inheritors that override this event must add a call to Base.OnMonitorCanceled at the end of their routine to ensure the event is raised.</remarks>
         protected virtual void OnMonitorCanceled()
         {
+            m_CancellationRequested = true;
+
             ProgressMonitorEventArgs e = new ProgressMonitorEventArgs(m_ProgressMonitors, this);
 
             //save the delegate field in a temporary field for thread safety

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Gibraltar.Server.Client.Data;
 using Loupe.Configuration;
 

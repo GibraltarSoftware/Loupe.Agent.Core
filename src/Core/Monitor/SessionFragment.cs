@@ -76,22 +76,22 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The number of messages recorded in the entire session up through this fragment.
         /// </summary>
-        public int MessageCount { get { return m_SessionFile.SessionHeader.MessageCount; } }
+        public long MessageCount { get { return m_SessionFile.SessionHeader.MessageCount; } }
 
         /// <summary>
         /// The number of critical messages recorded in the entire session up through this fragment.
         /// </summary>
-        public int CriticalCount { get { return m_SessionFile.SessionHeader.CriticalCount; } }
+        public long CriticalCount { get { return m_SessionFile.SessionHeader.CriticalCount; } }
 
         /// <summary>
         /// The number of error messages recorded in the entire session up through this fragment.
         /// </summary>
-        public int ErrorCount { get { return m_SessionFile.SessionHeader.ErrorCount; } }
+        public long ErrorCount { get { return m_SessionFile.SessionHeader.ErrorCount; } }
 
         /// <summary>
         /// The number of warning messages recorded in the entire session up through this fragment.
         /// </summary>
-        public int WarningCount { get { return m_SessionFile.SessionHeader.WarningCount; } }
+        public long WarningCount { get { return m_SessionFile.SessionHeader.WarningCount; } }
 
         /// <summary>
         /// The compressed stream size

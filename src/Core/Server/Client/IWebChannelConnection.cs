@@ -35,6 +35,26 @@ namespace Gibraltar.Server.Client
         Task DownloadFile(string relativeUrl, string destinationFileName, int? timeout = -1);
 
         /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="T">The result object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        Task<T> DownloadJsonData<T>(string relativeUrl, int? timeout = -1);
+
+        /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="TQ">The query object type</typeparam>
+        /// <typeparam name="TR">The result object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="query">The input to the remote method</param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        Task<TR> DownloadJsonData<TQ, TR>(string relativeUrl, TQ query, int? timeout = -1);
+
+        /// <summary>
         /// Downloads the resource with the specified URI to a string
         /// </summary>
         /// <param name="relativeUrl"></param>
@@ -84,5 +104,15 @@ namespace Gibraltar.Server.Client
         /// <param name="timeout">The number of seconds to wait for a response to the request</param>
         /// <returns>A string containing the body of the response from the resource</returns>
         Task<string> UploadString(string relativeUrl, HttpMethod method, string contentType, string data, int? timeout = -1);
+
+        /// <summary>
+        /// Downloads the JSON resource as an object from the specified URI
+        /// </summary>
+        /// <typeparam name="T">The uploaded object type</typeparam>
+        /// <param name="relativeUrl"></param>
+        /// <param name="data">The input to the remote method</param>
+        /// <param name="timeout">Optional.  The number of seconds to wait for a response to the request.</param>
+        /// <returns></returns>
+        Task UploadJsonData<T>(string relativeUrl, T data, int? timeout = -1);
     }
 }

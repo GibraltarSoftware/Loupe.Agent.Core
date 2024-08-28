@@ -36,7 +36,9 @@ namespace Gibraltar.Monitor.Serialization
 
         public bool IsThreadPoolThread { get { return m_IsThreadPoolThread; } set { m_IsThreadPoolThread = value; } }
 
-        ISession IThreadInfo.Session { get { return null; } } 
+        Guid IThreadInfo.Id => Guid.Empty;
+
+        ISession IThreadInfo.Session => null;
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.

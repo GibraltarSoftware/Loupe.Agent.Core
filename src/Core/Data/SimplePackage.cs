@@ -1,5 +1,7 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,31 +14,73 @@ namespace Gibraltar.Data
     /// A very simple implementation of the Package type for use within the agent
     /// </summary>
     /// <remarks>Unlike the full package implementation this form has no index and does not merge session fragments.</remarks>
-    public class SimplePackage: IDisposable
+    public class SimplePackage : IDisposable
     {
-        private const string LogCategory = "Loupe.Repository.Package";
-        private const string FragmentsFolder = "SessionFragments";
+        protected const string LogCategory = "Loupe.Repository.Package";
+        protected const string FragmentsFolder = "SessionFragments";
 
         private readonly object m_Lock = new object();
-        private readonly Dictionary<Guid, SessionFileInfo<ZipArchiveEntry>> m_Sessions = new Dictionary<Guid, SessionFileInfo<ZipArchiveEntry>>();
+        private readonly Dictionary<Guid, SessionFileInfo<SessionFragmentZipEntry>> m_Sessions = new();
 
         private ZipArchive m_Archive;
-        private string m_FileNamePath;
+        private string m_TempFileName; // Used when we are creating a transient package to track the file for cleanup.
         private volatile bool m_Disposed;
 
-        private string m_Caption;
-        private string m_Description;
+        public event CollectionChangeEventHandler CollectionChanged;
 
+        #region protected class SessionFragmentZipEntry
 
         /// <summary>
-        /// Create a new, empty package.
+        /// Tracks session fragment header information for a fragment in the package
+        /// </summary>
+        protected class SessionFragmentZipEntry
+        {
+            /// <summary>
+            /// The session header from the fragment
+            /// </summary>
+            public SessionHeader Header { get; set; }
+
+            /// <summary>
+            /// The length of the fragment file in bytes (uncompressed)
+            /// </summary>
+            public long FileSize { get; set; }
+
+            /// <summary>
+            /// The <seealso cref="ZipArchiveEntry"/>
+            /// </summary>
+            public ZipArchiveEntry ZipEntry { get; set; }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Create a new, empty package, writing to the provided stream.
         /// </summary>
         public SimplePackage()
         {
             //we are a new package, don't know what we are yet
             Caption = "New Package";
 
-            OnInitialize();
+            //We are dirty - we're unsaved.
+            IsDirty = true;
+
+            if (!Log.SilentMode)
+                Log.Write(LogMessageSeverity.Information, LogCategory, "Creating new package.", null);
+
+            //assigning a temporary directory we'll extract everything into
+            var tempPath = Path.GetTempPath();
+
+            Directory.CreateDirectory(tempPath);
+            var tempFileName = Path.Combine(tempPath, Path.GetRandomFileName());
+
+            //and create it now so the zip file can be opened.
+            m_Archive = ZipFile.Open(tempFileName, ZipArchiveMode.Create);
+
+            //Note we didn't set the FileNamePath property - this is to signal to our code that
+            //we're running in a temp space.
+            m_TempFileName = tempFileName;
+
+            SupportsFragments = true;
         }
 
         /// <summary>
@@ -57,16 +101,22 @@ namespace Gibraltar.Data
             }
 
             //open the zip archive - if the file doesn't exist we want to fail now.
-            m_Archive = ZipFile.Open(fileNamePath, ZipArchiveMode.Update);
+            m_Archive = ZipFile.Open(fileNamePath, ZipArchiveMode.Read);
 
-            m_FileNamePath = fileNamePath;
+            Description = FileNamePath = fileNamePath;
 
-            Caption = Path.GetFileNameWithoutExtension(m_FileNamePath);
+            Caption = Path.GetFileNameWithoutExtension(FileNamePath);
 
             //and we start out not dirty (setting properties can make us dirty).
             IsDirty = false;
 
-            OnInitialize();
+            //See if we are a legacy package or not by checking for the database file.
+            if (m_Archive.GetEntry("index.vdb3") != null) // no index means we support fragments.
+            {
+                SupportsFragments = false;
+
+                IsReadOnly = true; // we can't update legacy packages
+            }
         }
 
         /// <summary>
@@ -85,8 +135,11 @@ namespace Gibraltar.Data
         /// </summary>
         /// <param name="sessionStream"></param>
         public void AddSession(Stream sessionStream)
-        {           
-            using (GLFReader glfReader = new GLFReader(sessionStream)) // This will dispose the stream when it is disposed.
+        {
+            if (IsReadOnly)
+                throw new InvalidOperationException("Package is read only and can't be modified");
+
+            using (var glfReader = new GLFReader(sessionStream)) // This will dispose the stream when it is disposed.
             {
                 if (!glfReader.IsSessionStream)
                     throw new GibraltarException("The data stream provided is not a valid session data stream.");
@@ -96,32 +149,94 @@ namespace Gibraltar.Data
 
                 lock (m_Lock)
                 {
-                    //Add this stream to our zip archive
-                    string fileName = glfReader.SessionHeader.HasFileInfo ? string.Format("{0}~{1}.{2}", glfReader.SessionHeader.Id, glfReader.SessionHeader.FileId, Log.LogExtension)
-                                          : string.Format("{0}.{1}", glfReader.SessionHeader.Id, Log.LogExtension);
+                    ClearSessionCache();
 
-                    string zipFilePath = GenerateFragmentPath(glfReader.SessionHeader.FileId);
+                    //If the archive is in read mode we need to re-open it in an editable mode.
+                    if (m_Archive.Mode == ZipArchiveMode.Read)
+                    {
+                        m_Archive.Dispose();
+                        m_Archive = ZipFile.Open(GetWorkingFileNamePath(), ZipArchiveMode.Update);
+                    }
+
+                    //Add this stream to our zip archive
+                    var fileName = glfReader.SessionHeader.HasFileInfo ? GenerateFragmentPath(glfReader.SessionHeader.Id, glfReader.SessionHeader.FileId)
+                        : GenerateSessionPath(glfReader.SessionHeader.Id);
 
                     ZipArchiveEntry fragmentEntry;
-                    if (m_Archive.Mode == ZipArchiveMode.Update)
+                    if (m_Archive.Mode == ZipArchiveMode.Update) //as opposed to create, which it would be if it was brand new.
                     {
-                        fragmentEntry = m_Archive.GetEntry(zipFilePath);
+                        fragmentEntry = m_Archive.GetEntry(fileName);
                         if (fragmentEntry != null)
                         {
-                            fragmentEntry.Delete(); //wipe out any existing entry
+                            if (glfReader.SessionHeader.HasFileInfo) return; //it's already here, and fragments are immutable.
+
+                            //Otherwise we have to delete it so we can add it.
+                            fragmentEntry.Delete();
                         }
                     }
 
-                    fragmentEntry = m_Archive.CreateEntry(FragmentsFolder + "\\" + fileName, CompressionLevel.NoCompression); //session files are already highly compressed, no reason to waste effort.
+                    fragmentEntry = m_Archive.CreateEntry(fileName, CompressionLevel.NoCompression); //session files are already highly compressed, no reason to waste effort.
 
                     using (var zipStream = fragmentEntry.Open())
                     {
-                        FileSystemTools.StreamContentCopy(sessionStream, zipStream, false); // Copy the stream into our package's temp directory.
+                        sessionStream.CopyTo(zipStream);
                     }
 
                     IsDirty = true;
                 }
+
+                OnCollectionChanged(new CollectionChangeEventArgs(CollectionChangeAction.Add, glfReader.SessionHeader.Id));
             }
+        }
+
+        /// <summary>
+        /// Remove a session from the package
+        /// </summary>
+        /// <param name="sessionId"></param>
+        /// <returns>True if any sessions were removed.</returns>
+        public bool Remove(Guid sessionId)
+        {
+            if (IsReadOnly)
+                throw new InvalidOperationException("Package is read only and can't be modified");
+
+            var itemRemoved = false;
+
+            lock (m_Lock)
+            {
+                var fileTemplate = $"{FragmentsFolder}/{sessionId}";
+                var sessionEntries = m_Archive.Entries.Where(e => e.FullName.StartsWith(fileTemplate)).ToList();
+
+                foreach (var sessionEntry in sessionEntries)
+                {
+                    sessionEntry.Delete();
+
+                    itemRemoved = true;
+
+                    IsDirty = true;
+                }
+            }
+
+            OnCollectionChanged(new CollectionChangeEventArgs(CollectionChangeAction.Remove, sessionId));
+
+            return itemRemoved;
+        }
+
+        /// <summary>
+        /// Remove a list of sessions from the package
+        /// </summary>
+        /// <returns>True if any sessions were removed.</returns>
+        public bool Remove(IList<Guid> sessionIds)
+        {
+            bool itemRemoved = false;
+
+            foreach (var sessionId in sessionIds)
+            {
+                var removed = Remove(sessionId);
+
+                itemRemoved = itemRemoved || removed;
+            }
+
+            return itemRemoved;
         }
 
         /// <summary>
@@ -130,12 +245,15 @@ namespace Gibraltar.Data
         /// <param name="progressMonitors"></param>
         public void Save(ProgressMonitorStack progressMonitors)
         {
-            if (string.IsNullOrEmpty(m_FileNamePath))
+            if (IsReadOnly)
+                throw new InvalidOperationException("Package is read only and can't be modified");
+
+            if (string.IsNullOrEmpty(FileNamePath))
             {
                 throw new FileNotFoundException("Unable to save the current package because no path has been set to save to.");
             }
 
-            Save(progressMonitors, m_FileNamePath);            
+            Save(progressMonitors, FileNamePath);
         }
 
         /// <summary>
@@ -156,65 +274,95 @@ namespace Gibraltar.Data
             //make sure the path exists so we can save into it.
             FileSystemTools.EnsurePathExists(fileNamePath);
 
-            lock(m_Lock)
+            lock (m_Lock)
             {
-                int steps = 2;
-                int completedSteps = 0;
-                using (ProgressMonitor ourMonitor = progressMonitors.NewMonitor(this, "Saving Package", steps))
+                var steps = 2;
+                var completedSteps = 0;
+                using (var ourMonitor = progressMonitors.NewMonitor(this, "Saving Package", steps))
                 {
                     //Do the save (if this fails, we failed)
                     ourMonitor.Update("Saving Package File to Disk", completedSteps++);
 
-                    m_Archive.Dispose(); // ...So we need to dispose and reopen the archive.
+#if NET8_0_OR_GREATER
+                    m_Archive.Comment = Description;
+#endif
+                    m_Archive.Dispose(); // ZipArchive saves as it goes, so we just have to dispose it to get it to finalize.
+                    m_Archive = null;
 
-                    //check to see if we're saving to the same file we *are*...
-                    if (fileNamePath.Equals(m_FileNamePath, StringComparison.OrdinalIgnoreCase) == false)
+                    //If this is our first save then we are establishing the filename.
+                    if (string.IsNullOrEmpty(m_TempFileName) == false)
                     {
-                        File.Copy(m_FileNamePath, fileNamePath, true);
+                        File.Copy(m_TempFileName, fileNamePath, true);
                         try
                         {
-                            File.Delete(m_FileNamePath);
+                            File.Delete(m_TempFileName);
                         }
                         catch (Exception ex)
                         {
                             if (!Log.SilentMode) Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, LogCategory,
                                 "Unable to Delete Package Temporary File due to " + ex.GetType(),
                                 "Unable to delete the temporary working file '{0}'. This means we'll use more disk space than we should but otherwise should not impact the application.",
-                                m_FileNamePath);
+                                m_TempFileName);
 
                         }
 
-                        m_FileNamePath = fileNamePath;
+                        // And clear the temp path - we're no longer at that path.
+                        m_TempFileName = null;
+                    }
+                    else if (fileNamePath.Equals(FileNamePath, StringComparison.OrdinalIgnoreCase) == false)
+                    {
+                        File.Copy(FileNamePath, fileNamePath, true);
                     }
 
                     ourMonitor.Update("Confirming package contents", completedSteps++);
 
                     //Since we were successful at saving, this is our new path and we are no longer dirty.
-                    m_FileNamePath = fileNamePath;
-                    m_Archive = ZipFile.Open(m_FileNamePath, ZipArchiveMode.Update); // Now we should again be able to read any entry.
-                    LoadIndex();
+                    FileNamePath = fileNamePath;
+                    Caption = Path.GetFileNameWithoutExtension(FileNamePath);
+                    m_Archive = ZipFile.Open(FileNamePath, ZipArchiveMode.Read); // We can open in read/write mode because we know it exists.
+                    ClearSessionCache();
                     IsDirty = false;
                 }
             }
         }
 
         /// <summary>
+        /// Write the entire package to the provided stream (which must be seekable)
+        /// </summary>
+        /// <param name="stream"></param>
+        public void Write(Stream stream)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            if (!stream.CanWrite)
+                throw new ArgumentException("The provided stream must be writable.", nameof(stream));
+
+            lock (m_Lock)
+            {
+                // Ensure the archive is properly disposed before trying to access the file directly.
+                m_Archive.Dispose();
+
+                // Open the temporary file for reading.
+                using (var fileStream = new FileStream(GetWorkingFileNamePath(), FileMode.Open, FileAccess.Read))
+                {
+                    fileStream.CopyTo(stream);
+                }
+
+                // Since we've closed the archive, we need to reopen it if the class continues to be used.
+                m_Archive = ZipFile.Open(GetWorkingFileNamePath(), ZipArchiveMode.Read);
+            }
+        }
+
+        /// <summary>
         /// The display caption for the package
         /// </summary>
-        public string Caption
-        {
-            get { return m_Caption; }
-            set { m_Caption = value; }
-        }
+        public string Caption { get; set; }
 
         /// <summary>
         /// The end user display description for the package
         /// </summary>
-        public string Description
-        {
-            get { return m_Description; }
-            set { m_Description = value; }
-        }
+        public string Description { get; set; }
 
         /// <summary>
         /// Indicates if there is unsaved data in the repository.
@@ -222,18 +370,66 @@ namespace Gibraltar.Data
         public bool IsDirty { get; private set; }
 
         /// <summary>
-        /// The current full path to the package.  It may be null or empty if this package has never been saved.
+        /// Indicates if the repository is read only (sessions can't be added or removed).
         /// </summary>
-        public string FileNamePath => m_FileNamePath;
+        /// <remarks>Legacy packages are read only since we can't update them in a compatible fashion</remarks>
+        public bool IsReadOnly { get; private set; }
 
         /// <summary>
-        /// Clear all of the sessions from the package
+        /// Determines if the provided file is likely to be a Loupe Package
+        /// </summary>
+        /// <param name="fileNamePath">The file to check if it's a Loupe package</param>
+        /// <returns></returns>
+        public static bool IsPackage(string fileNamePath)
+        {
+            var zipFileHeader = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
+
+            if (File.Exists(fileNamePath))
+            {
+                using (var fileStream = File.OpenRead(fileNamePath))
+                {
+                    var fileHeader = new byte[4];
+                    var readLength = fileStream.Read(fileHeader, 0, fileHeader.Length);
+                    if (readLength >= 4)
+                    {
+                        // make sure the header is a zip file.
+                        for (var i = 0; i < fileHeader.Length; i++)
+                        {
+                            if (fileHeader[i] != zipFileHeader[i])
+                            {
+                                return false; // The headers do not match
+                            }
+                        }
+                        return true; // The headers match
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Indicates if the repository supports fragment files or not.  Most do.
+        /// </summary>
+        /// <remarks>Legacy packages do not support fragments, newer packages do.</remarks>
+        public bool SupportsFragments { get; private set; }
+
+        /// <summary>
+        /// The current full path to the package.  It may be null or empty if this package has never been saved.
+        /// </summary>
+        public string FileNamePath { get; private set; }
+
+        /// <summary>
+        /// Clear all the sessions from the package
         /// </summary>
         public void Clear()
         {
+            if (IsReadOnly)
+                throw new InvalidOperationException("Package is read only and can't be modified");
+
             lock (m_Lock)
             {
-                m_Sessions.Clear();
+                ClearSessionCache();
 
                 //now wipe them out the fragments
                 var deadEntries = m_Archive.Entries.Where(e => e.FullName.StartsWith(FragmentsFolder, StringComparison.OrdinalIgnoreCase));
@@ -248,28 +444,26 @@ namespace Gibraltar.Data
         /// Get summary statistics about the sessions in the repository
         /// </summary>
         /// <param name="sessions">The number of sessions in the entire repository</param>
-        /// <param name="files">The number of files for all of the sessions in the repository</param>
+        /// <param name="files">The number of files for all the sessions in the repository</param>
         /// <param name="fileBytes">The total number of bytes used by files in the repository</param>
         /// <param name="problemSessions">The number of sessions with problems in the folder and all folders it contains</param>
         /// <remarks>Problems are crashed sessions or sessions with critical or error messages.</remarks>
         public void GetStats(out int sessions, out int problemSessions, out int files, out long fileBytes)
         {
-            sessions = m_Sessions.Count;
             problemSessions = 0;
             fileBytes = 0;
             files = 0;
 
             lock (m_Lock)
             {
-                if (IsDirty)
-                {
-                    LoadIndex(); //we can't trust our in-memory copy because we can't update it while writing to it.
-                }
+                EnsureIndexLoaded(false);
+
+                sessions = m_Sessions.Count;
 
                 foreach (var session in m_Sessions.Values)
                 {
-                    if ((session.Header.ErrorCount > 0) 
-                        || (session.Header.CriticalCount > 0) 
+                    if ((session.Header.ErrorCount > 0)
+                        || (session.Header.CriticalCount > 0)
                         || (session.Header.StatusName.Equals(SessionStatus.Crashed.ToString(), StringComparison.OrdinalIgnoreCase)))
                     {
                         problemSessions++;
@@ -278,28 +472,25 @@ namespace Gibraltar.Data
                     files += session.Fragments.Count;
                     foreach (var fragment in session.Fragments)
                     {
-                        fileBytes += fragment.Length;
+                        fileBytes += fragment.ZipEntry.Length;
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Get the set of all of the session headers in the package
+        /// Get the list of session headers currently in the package
         /// </summary>
-        /// <returns></returns>
-        public IList<SessionHeader> GetSessions()
+        public IList<SessionHeader> GetSessionHeaders()
         {
             lock (m_Lock)
-            {                
-                var sessionList = new List<SessionHeader>(m_Sessions.Count);
+            {
+                EnsureIndexLoaded(false);
 
-                foreach (var session in m_Sessions.Values)
-                {
-                    sessionList.Add(session.Header);
-                }
+                // Snapshot the session headers only from our cache.  The zip entries aren't safe outside our lock.
+                var headers = m_Sessions.Select(s => s.Value.Header).ToList();
 
-                return sessionList;
+                return headers;
             }
         }
 
@@ -312,29 +503,32 @@ namespace Gibraltar.Data
             Session requestedSession = null;
             lock (m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionId, out sessionFileInfo) == false)
+                //make sure our index is clean and usable
+                EnsureIndexLoaded(false);
+
+                if (m_Sessions.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
                     throw new ArgumentOutOfRangeException(nameof(sessionId), "There is no session in the package with the provided id");
                 }
 
-                //now load up all of the session fragments.
+                //now load up all the session fragments.
                 var loadingCollection = new SessionCollection();
 
                 foreach (var fragment in sessionFileInfo.Fragments)
                 {
-                    //we need a seek-able stream - so we'll extract the fragment into a temp file and go with that.
                     if (fileId != null)
                     {
                         //we need to check the file Id to see if it's what they requested
-                        using (var reader = new GLFReader(FileSystemTools.GetTempFileStreamCopy(fragment.Open())))
+                        var header = LoadSessionHeader(fragment.ZipEntry); //this carefully just reads the header bytes to save perf.
+                        if (header.FileId != fileId.Value)
                         {
-                            if (reader.SessionHeader.FileId != fileId.Value)
-                                continue;
+                            continue;
                         }
                     }
 
-                    requestedSession = loadingCollection.Add(FileSystemTools.GetTempFileStreamCopy(fragment.Open()), true);
+                    //we need a seek-able stream - so we'll extract the fragment into a temp file and go with that.
+                    var tempCopy = new TempFileStream(fragment.ZipEntry.Open());
+                    requestedSession = loadingCollection.Add(tempCopy, true);
                 }
             }
 
@@ -348,22 +542,25 @@ namespace Gibraltar.Data
         /// Retrieve the ids of the sessions files known locally for the specified session
         /// </summary>
         /// <param name="sessionId"></param>
-        /// <returns></returns>
+        /// <returns>A list of the file Ids for the specified session found in the local repository.  If the session doesn't exist an empty list is returned.</returns>
         public IList<Guid> GetSessionFileIds(Guid sessionId)
         {
-            lock(m_Lock)
+            lock (m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionId, out sessionFileInfo) == false)
+                EnsureIndexLoaded(false);
+
+                if (m_Sessions.TryGetValue(sessionId, out var sessionFileInfo) == false)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(sessionId), "There is no session in the package with the provided id");
+                    //This is a change from previous to match IRepository behavior.
+                    return new List<Guid>();
                 }
 
                 var fileIds = new List<Guid>();
                 foreach (var fragment in sessionFileInfo.Fragments)
                 {
                     //this is kinda crappy - we have to make a copy of the whole fragment to get a seekable stream to read the id.
-                    using (var reader = new GLFReader(FileSystemTools.GetTempFileStreamCopy(fragment.Open())))
+                    using (var tempCopy = new TempFileStream(fragment.ZipEntry.Open()))
+                    using (var reader = new GLFReader(tempCopy))
                     {
                         fileIds.Add(reader.SessionHeader.FileId);
                     }
@@ -373,12 +570,10 @@ namespace Gibraltar.Data
             }
         }
 
-        #region Protected Properties and Methods
-
         /// <summary>
         /// Dispose managed and unmanaged resources
         /// </summary>
-        /// <param name="releaseManaged">Indicates if its safe to release all of the managed resources</param>
+        /// <param name="releaseManaged">Indicates if it's safe to release the managed resources</param>
         protected virtual void Dispose(bool releaseManaged)
         {
             if (m_Disposed == false)
@@ -393,78 +588,98 @@ namespace Gibraltar.Data
                         m_Archive.Dispose();
                         m_Archive = null;
                     }
+
+                    // Plus, we don't want to leave a temp file around if they were just using us for transient generation.
+                    if (m_TempFileName != null)
+                    {
+                        try
+                        {
+                            File.Delete(m_TempFileName);
+                        }
+                        catch
+                        {
+                        }
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Called to initialize the package on creation
+        /// Called whenever the collection changes.
         /// </summary>
-        protected virtual void OnInitialize()
+        /// <param name="e"></param>
+        /// <remarks>Note to inheritors:  If overriding this method, you must call the base implementation to ensure
+        /// that the appropriate events are raised.</remarks>
+        protected virtual void OnCollectionChanged(CollectionChangeEventArgs e)
+        {
+            CollectionChanged?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Get the session headers for all session fragments in the package
+        /// </summary>
+        /// <returns></returns>
+        protected IList<SessionFragmentZipEntry> GetSessionFileHeaders()
         {
             lock (m_Lock)
             {
-                //is this a NEW package or an EXISTING package?
-                if (m_Archive == null)
-                {
-                    if (!Log.SilentMode)
-                        Log.Write(LogMessageSeverity.Information, LogCategory, "Creating new package.", null);
+                EnsureIndexLoaded(false);
 
-                    //assigning a temporary directory we'll extract everything into
-                    var tempPath = Path.GetTempPath();
+                // Snapshot the session headers only from our cache.  The zip entries aren't safe outside our lock.
+                var headers = m_Sessions.SelectMany(s => s.Value.Fragments)
+                    .ToList();
 
-                    Directory.CreateDirectory(tempPath);
-                    m_FileNamePath = Path.Combine(tempPath, Path.GetRandomFileName());
-
-                    //and create it now so the zip file can be opened.
-                    m_Archive = ZipFile.Open(m_FileNamePath, ZipArchiveMode.Create);
-                }
-                else
-                {
-                    m_Description = m_FileNamePath;
-
-                    LoadIndex();
-                }
+                return headers;
             }
         }
 
-        private void AddSessionHeaderToIndex(SessionHeader sessionHeader, ZipArchiveEntry sessionFragment)
+        private void AddSessionHeaderToIndex(SessionHeader sessionFragmentHeader, ZipArchiveEntry sessionFragment)
         {
+            var fragmentEntry = new SessionFragmentZipEntry
+            {
+                Header = sessionFragmentHeader,
+                ZipEntry = sessionFragment
+            };
+
             lock (m_Lock)
             {
-                SessionFileInfo<ZipArchiveEntry> sessionFileInfo;
-                if (m_Sessions.TryGetValue(sessionHeader.Id, out sessionFileInfo))
+                if (m_Sessions.TryGetValue(sessionFragmentHeader.Id, out var sessionFileInfo))
                 {
                     //add this file fragment to the existing session info
-                    sessionFileInfo.AddFragment(sessionHeader, sessionFragment, true);
+                    sessionFileInfo.AddFragment(sessionFragmentHeader, fragmentEntry, true);
                 }
                 else
                 {
                     //create a new session file info - this is the first we've seen this session.
-                    sessionFileInfo = new SessionFileInfo<ZipArchiveEntry>(sessionHeader, sessionFragment, true);
+                    sessionFileInfo = new SessionFileInfo<SessionFragmentZipEntry>(sessionFragmentHeader, fragmentEntry, true);
                     m_Sessions.Add(sessionFileInfo.Id, sessionFileInfo);
                 }
             }
         }
 
         /// <summary>
-        /// Load the index from the current archive by reading all of the file fragments.
+        /// Load the index from the current archive by reading all the file fragments.
         /// </summary>
-        private void LoadIndex()
+        private void EnsureIndexLoaded(bool forceLoad)
         {
             lock (m_Lock)
             {
-                if (!Log.SilentMode)
-                    Log.Write(LogMessageSeverity.Information, LogCategory, "Loading package file", "File name: {0}", m_FileNamePath);
-
-                m_Sessions.Clear();
-
-                var originalMode = m_Archive.Mode;
-                if (originalMode != ZipArchiveMode.Read)
+                if ((forceLoad == false) && (IsDirty == false) && (m_Sessions.Count > 0))
                 {
-                    m_Archive.Dispose();
-                    m_Archive = ZipFile.Open(m_FileNamePath, ZipArchiveMode.Read);
+                    return; //we previously loaded and there's been no change to make us need to reload.
                 }
+
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Information, LogCategory, "Loading package file", "File name: {0}", FileNamePath);
+
+                ClearSessionCache();
+
+                //To reliably read the index data we have to flush it.
+                m_Archive.Dispose();
+                IsDirty = false;
+
+                // And for our data to be usable we have to open the archive in read mode (otherwise properties like Length aren't available)
+                m_Archive = ZipFile.Open(GetWorkingFileNamePath(), ZipArchiveMode.Read);
 
                 //we need to load up an index of these items
                 foreach (var zipEntry in m_Archive.Entries)
@@ -485,28 +700,60 @@ namespace Gibraltar.Data
                         catch (Exception ex)
                         {
                             if (!Log.SilentMode)
-                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, LogCategory, 
+                                Log.Write(LogMessageSeverity.Error, LogWriteMode.Queued, ex, true, LogCategory,
                                     "Unable to parse file fragment name in simple package due to " + ex.GetType(), "File Name: {0}\r\nException: {1}", zipEntry.Name, ex.Message);
                         }
                     }
                 }
-
-                if (originalMode != ZipArchiveMode.Read)
-                {
-                    m_Archive.Dispose();
-                    m_Archive = ZipFile.Open(m_FileNamePath, ZipArchiveMode.Update);
-                }
             }
         }
 
-        #endregion
-
-        #region Private Properties and Methods
-
-        private static string GenerateFragmentPath(Guid fileId)
+        /// <summary>
+        /// the path within the archive for a session with no file fragment information
+        /// </summary>
+        protected static string GenerateSessionPath(Guid sessionId)
         {
-            return string.Format("{0}/{1}.{2}", FragmentsFolder, fileId, Log.LogExtension);
+            return $"{FragmentsFolder}/{sessionId}.{Log.LogExtension}";
         }
+
+        /// <summary>
+        /// The path within the archive for a session fragment file
+        /// </summary>
+        protected static string GenerateFragmentPath(Guid sessionId, Guid fileId)
+        {
+            return $"{FragmentsFolder}/{sessionId}~{fileId}.{Log.LogExtension}";
+        }
+
+        /// <summary>
+        /// A lock to control access to the zip archive
+        /// </summary>
+        protected object Lock => m_Lock;
+
+        /// <summary>
+        /// The zip archive.
+        /// </summary>
+        protected ZipArchive Archive => m_Archive;
+
+        /// <summary>
+        /// The file name and path to the working archive file
+        /// </summary>
+        /// <returns></returns>
+        private string GetWorkingFileNamePath()
+        {
+            return m_TempFileName ?? FileNamePath;
+        }
+
+        /// <summary>
+        /// Invalidate our session cache
+        /// </summary>
+        private void ClearSessionCache()
+        {
+            lock (m_Lock)
+            {
+                m_Sessions.Clear();
+            }
+        }
+
 
         /// <summary>
         /// Attempt to load the session header from the specified entry, returning null if it can't be loaded
@@ -565,7 +812,5 @@ namespace Gibraltar.Data
 
             return header;
         }
-
-        #endregion
     }
 }

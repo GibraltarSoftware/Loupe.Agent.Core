@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Security.Principal;
 using Gibraltar.Messaging;
 using Gibraltar.Serialization;
@@ -35,9 +36,12 @@ namespace Gibraltar.Monitor.Serialization
         //the following are generated fields and are not persisted
         private string m_Message; //a concatenated caption & description for GLV.
         private IPrincipal m_Principal;
+        private string[] m_ClassNames;
+        private string[] m_CategoryNames;
 
         public LogMessagePacket()
         {
+            //we aren't a cachable packet so we have our own GUID
             Id = Guid.NewGuid();
             m_SuppressNotification = Gibraltar.Messaging.Publisher.QueryThreadMustNotNotify();
         }
@@ -53,13 +57,13 @@ namespace Gibraltar.Monitor.Serialization
         {
             if (sourceProvider != null)
             {
+                // Note: Should we map null strings to empty strings here?
                 MethodName = sourceProvider.MethodName;
                 ClassName = sourceProvider.ClassName;
                 FileName = sourceProvider.FileName;
                 LineNumber = sourceProvider.LineNumber;
             }
         }
-
 
         public Guid Id { get { return m_ID; } private set { m_ID = value; } }
 
@@ -68,6 +72,21 @@ namespace Gibraltar.Monitor.Serialization
         public string LogSystem { get { return m_LogSystem; } set { m_LogSystem = value; } }
 
         public string CategoryName { get { return m_CategoryName; } set { m_CategoryName = value; } }
+
+        public string[] CategoryNames
+        {
+            get
+            {
+                //have we parsed it yet?  We don't want to do this every time, it ain't cheap.
+                if (m_CategoryNames == null)
+                {
+                    //no.
+                    m_CategoryNames = TextParse.CategoryName(CategoryName);
+                }
+
+                return m_CategoryNames;
+            }
+        }
 
         public string UserName { get { return m_UserName; } set { m_UserName = value; } }
 
@@ -79,19 +98,26 @@ namespace Gibraltar.Monitor.Serialization
         /// <summary>
         /// Optional.  The raw user principal, used for deferred user lookup
         /// </summary>
-        public IPrincipal Principal
-        {
-            get => m_Principal;
-            set
-            {
-                m_Principal = value;
-                m_UserName = m_Principal?.Identity?.Name ?? m_UserName; 
-            }
-        }
+        public IPrincipal Principal { get; set; }
 
         public string MethodName { get { return m_MethodName; } set { m_MethodName = value; } }
 
         public string ClassName { get { return m_ClassName; } set { m_ClassName = value; } }
+
+        public string[] ClassNames
+        {
+            get
+            {
+                //have we parsed it yet?  We don't want to do this every time, it ain't cheap.
+                if (m_ClassNames == null)
+                {
+                    //no.
+                    m_ClassNames = TextParse.ClassName(ClassName);
+                }
+
+                return m_ClassNames;
+            }
+        }
 
         public string FileName { get { return m_FileName; } set { m_FileName = value; } }
 
@@ -132,6 +158,9 @@ namespace Gibraltar.Monitor.Serialization
         /// <remarks>Added for GLV support</remarks>
         public DateTime TimestampDateTime { get { return Timestamp.DateTime; } }
 
+        /// <inheritdoc />
+        public DateTimeOffset DisplayTimestamp { get { return Timestamp; } }
+
         /// <summary>A combined caption &amp; description</summary>
         /// <remarks>Added for GLV support</remarks>
         public string Message
@@ -141,7 +170,7 @@ namespace Gibraltar.Monitor.Serialization
                 if (m_Message == null) //that's deliberate - null means not calculated, empty string means calculated as empty.
                 {
                     bool haveCaption = (string.IsNullOrEmpty(m_Caption) == false);
-                    bool haveDescription = (string.IsNullOrEmpty(m_Caption) == false);
+                    bool haveDescription = (string.IsNullOrEmpty(m_Description) == false);
 
                     if (haveCaption && haveDescription)
                     {
@@ -201,7 +230,7 @@ namespace Gibraltar.Monitor.Serialization
             get
             {
                 return (string.IsNullOrEmpty(FileName) == false) ?
-                    StringReference.GetReference(string.Format("{0} ({1:N0})", FileName, LineNumber))
+                    StringReference.GetReference(string.Format(FileSystemTools.UICultureFormat, "{0} ({1:N0})", FileName, LineNumber))
                     : string.Empty;
             }
         }
@@ -255,25 +284,6 @@ namespace Gibraltar.Monitor.Serialization
 
                 return exceptionInfo[0];
             }
-        }
-
-        /// <summary>
-        /// Normalize the exception pointers to a single list.
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
-        public static IList<IExceptionInfo> ExceptionsList(IExceptionInfo exception)
-        {
-            List<IExceptionInfo> exceptions = new List<IExceptionInfo>();
-
-            IExceptionInfo innerException = exception;
-            while (innerException != null)
-            {
-                exceptions.Add(innerException);
-                innerException = innerException.InnerException;
-            }
-
-            return exceptions;
         }
 
         /// <summary>
@@ -334,7 +344,8 @@ namespace Gibraltar.Monitor.Serialization
 
         public override string ToString()
         {
-            string text = string.Format(CultureInfo.CurrentCulture, "{0:d} {0:t}: {1}", Timestamp, Caption);
+            string text = string.Format(CultureInfo.CurrentCulture, "{0} {1}: {2}", Timestamp.DateTime.ToShortDateString(),
+                                        Timestamp.DateTime.ToShortTimeString(), Caption);
             return text;
         }
 
@@ -352,9 +363,7 @@ namespace Gibraltar.Monitor.Serialization
             //now we want to sort by our nice increasing sequence #
             int compareResult = Sequence.CompareTo(other.Sequence);
 
-#if DEBUG
             Debug.Assert(compareResult != 0); //no way we should ever get an equal at this point.
-#endif
 
             return compareResult;
         }
@@ -471,7 +480,7 @@ namespace Gibraltar.Monitor.Serialization
         /// <returns>An array of IPackets, or null if there are no dependencies.</returns>
         IPacket[] IPacket.GetRequiredPackets()
         {
-            // We now hold the ThreadId ourselves, so we depend on the ThreadInfoPacket
+
 #if DEBUG
             if (ReferenceEquals(ThreadInfoPacket, null))
             {
@@ -517,18 +526,17 @@ namespace Gibraltar.Monitor.Serialization
             definition.Fields.Add("StackTraces", FieldType.StringArray);
 
             // Added in version 3
-            definition.Fields.Add("ApplicationUserId", FieldType.Guid); 
+            definition.Fields.Add("ApplicationUserId", FieldType.Guid);
 
             return definition;
         }
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
+
             // We depend on the ThreadInfoPacket!
-#if DEBUG
             Debug.Assert(ThreadInfoPacket != null);
             Debug.Assert(ThreadInfoPacket.ThreadId == ThreadId);
-#endif
 
             packet.SetField("ID", m_ID);
             packet.SetField("Caption", m_Caption);
@@ -574,7 +582,7 @@ namespace Gibraltar.Monitor.Serialization
             packet.SetField("Messages", messages);
             packet.SetField("Sources", sources);
             packet.SetField("StackTraces", stackTraces);
-            
+
             packet.SetField("ApplicationUserId", (UserPacket == null) ? Guid.Empty : UserPacket.ID);
         }
 
@@ -648,12 +656,12 @@ namespace Gibraltar.Monitor.Serialization
                     for (int i = 0; i < arrayLength; i++)
                     {
                         IExceptionInfo exception = new ExceptionInfoPacket()
-                                                       {
-                                                           TypeName = typeNames[i],
-                                                           Message = messages[i],
-                                                           Source = sources[i],
-                                                           StackTrace = stackTraces[i]
-                                                       };
+                        {
+                            TypeName = typeNames[i],
+                            Message = messages[i],
+                            Source = sources[i],
+                            StackTrace = stackTraces[i]
+                        };
                         exceptions[i] = exception;
                         if (lastException != null)
                             ((ExceptionInfoPacket)lastException).InnerException = exception; //we are the inner exception to our parent.
@@ -720,8 +728,10 @@ namespace Gibraltar.Monitor.Serialization
             if (applicationUserId != Guid.Empty)
             {
                 ApplicationUser applicationUser;
-                m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser);
-                UserPacket = applicationUser.Packet;
+                if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser))
+                {
+                    UserPacket = applicationUser.Packet;
+                }
             }
 
             //these are supposed to be parallel arrays - assume they're all the same size.

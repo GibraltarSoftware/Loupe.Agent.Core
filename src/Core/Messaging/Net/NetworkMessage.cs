@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Gibraltar.Data;
-
+using Gibraltar.Monitor;
+using Loupe.Extensibility.Data;
 
 
 namespace Gibraltar.Messaging.Net
@@ -12,6 +14,14 @@ namespace Gibraltar.Messaging.Net
     public abstract class NetworkMessage
     {
         private const int BasePacketLength = 16; //our fixed size when serialized
+
+        /// <summary>
+        /// The maximum length of any network message, anything longer is invalid.
+        /// </summary>
+        /// <remarks>The only packet of any real size is a SessionHeader message.
+        /// They're generally around 3KB plus name/value pairs but lets assume no one goes
+        /// crazy so the biggest is 1MB.</remarks>
+        public const int MaxMessageLength = 1024 * 1024;
 
         private readonly object m_Lock = new object();
 
@@ -26,14 +36,14 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_Version;
                 }
             }
             set
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     m_Version = value;
                 }
@@ -47,14 +57,14 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_TypeCode;
                 }
             }
             set
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     m_TypeCode = value;
                 }
@@ -68,7 +78,7 @@ namespace Gibraltar.Messaging.Net
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     if (m_Length == 0)
                     {
@@ -117,13 +127,10 @@ namespace Gibraltar.Messaging.Net
         {
             NetworkMessage newPacket;
 
+            var initialStreamPosition = stream.Position;
+
             //read out the header, this gives us what we need to know what type of packet to make.
-            Version version;
-            NetworkMessageTypeCode typeCode;
-            int packetLength;
-
-            ReadPacket(stream, out typeCode, out version, out packetLength);
-
+            ReadPacket(stream, out var typeCode, out var version, out var packetLength);
             switch (typeCode)
             {
                 case NetworkMessageTypeCode.LiveViewStartCommand:
@@ -153,6 +160,15 @@ namespace Gibraltar.Messaging.Net
                 case NetworkMessageTypeCode.PacketStreamStartCommand:
                     newPacket = new PacketStreamStartCommandMessage();
                     break;
+                case NetworkMessageTypeCode.ClockDrift:
+                    newPacket = new ClockDriftMessage();
+                    break;
+                case NetworkMessageTypeCode.PauseSessionHeaders:
+                    newPacket = new PauseSessionHeadersCommandMessage();
+                    break;
+                case NetworkMessageTypeCode.ResumeSessionHeaders:
+                    newPacket = new ResumeSessionHeadersCommandMessage();
+                    break;
                 default:
                     throw new InvalidOperationException("Unable to create network packet because it uses a type code that is unknown: " + typeCode);
             }
@@ -163,6 +179,21 @@ namespace Gibraltar.Messaging.Net
 
             newPacket.OnRead(stream);
 
+            //force the stream to be at the end of our length in case a derived class messed up.
+            if (stream.Position - initialStreamPosition != packetLength)
+            {
+                Log.Write(LogMessageSeverity.Warning, LogWriteMode.Queued, null, 0, NetworkClient.LogCategory,
+                    "Network stream is not in correct position after packet read",
+                    "After reading a packet {0:N0} long from a stream starting at position {1:N0} the stream is at position {2:N0}.  This stream will likely fail on a subsequent read.",
+                    packetLength, initialStreamPosition, stream.Position);
+
+#if DEBUG && DEBUG_LIVE
+                if (Debugger.IsAttached)
+                    Debugger.Break();
+#endif
+                stream.Position = initialStreamPosition + packetLength;
+            }
+
             return newPacket;
         }
 
@@ -172,18 +203,21 @@ namespace Gibraltar.Messaging.Net
         /// <param name="stream">The stream to write to</param>
         public void Write(Stream stream)
         {
-            lock(m_Lock)
+            //we can't depend on the stream being seekable so we have to stage our serialization.
+            lock (m_Lock)
             {
                 //serialize our derived packet so we can know our length below
-                MemoryStream ourPacketStream = new MemoryStream();
-                OnWrite(ourPacketStream);
-                ourPacketStream.Position = 0;
+                using (var ourPacketStream = new MemoryStream())
+                {
+                    OnWrite(ourPacketStream);
+                    ourPacketStream.Position = 0;
 
-                BinarySerializer.SerializeValue(stream, (int)m_TypeCode);
-                BinarySerializer.SerializeValue(stream, m_Version.Major);
-                BinarySerializer.SerializeValue(stream, m_Version.Minor);
-                BinarySerializer.SerializeValue(stream, (int)(ourPacketStream.Length + BasePacketLength));
-                ourPacketStream.WriteTo(stream);
+                    BinarySerializer.SerializeValue(stream, (int)m_TypeCode);
+                    BinarySerializer.SerializeValue(stream, m_Version.Major);
+                    BinarySerializer.SerializeValue(stream, m_Version.Minor);
+                    BinarySerializer.SerializeValue(stream, (int)(ourPacketStream.Length + BasePacketLength));
+                    ourPacketStream.WriteTo(stream);
+                }
             }
         }
 
@@ -230,7 +264,11 @@ namespace Gibraltar.Messaging.Net
             BinarySerializer.DeserializeValue(stream, out minorVer);
             version = new Version(majorVer, minorVer);
 
-            BinarySerializer.DeserializeValue(stream, out length);            
+            BinarySerializer.DeserializeValue(stream, out length);
+#if DEBUG
+            if (length > MaxMessageLength && Debugger.IsAttached)
+                Debugger.Break();
+#endif
         }
 
         #endregion

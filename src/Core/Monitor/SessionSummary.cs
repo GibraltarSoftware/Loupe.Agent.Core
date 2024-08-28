@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Gibraltar.Data;
+using Gibraltar.Monitor.Platform;
 using Gibraltar.Monitor.Serialization;
 using Loupe.Configuration;
 using Loupe.Extensibility.Data;
@@ -34,12 +35,12 @@ namespace Gibraltar.Monitor
 
         private readonly bool m_IsLive;
         private readonly SessionSummaryPacket m_Packet;
-        private int m_CriticalCount;
-        private int m_ErrorCount;
-        private int m_WarningCount;
-        private int m_MessageCount;
-        volatile private SessionStatus m_SessionStatus;
-        private ApplicationType m_AgentAppType;
+        private readonly ApplicationType m_AgentAppType;
+        private long m_CriticalCount;
+        private long m_ErrorCount;
+        private long m_WarningCount;
+        private long m_MessageCount;
+        private volatile SessionStatus m_SessionStatus;
 
         private readonly bool m_PrivacyEnabled;
 
@@ -85,24 +86,67 @@ namespace Gibraltar.Monitor
                 m_Packet.TimeZoneCaption = TimeZoneInfo.Local.StandardName;
                 m_Packet.EndDateTime = StartDateTime; //we want to ALWAYS have an end time, and since we just created our start time we need to move that over to end time
 
-                //this stuff, on the other hand, doesn't always succeed
-
-                //Lets see if the user has already picked some things for us...
-                PublisherConfiguration publisherConfig = configuration.Publisher;
-                string productName = null, applicationName = null, applicationDescription = null;
-                Version applicationVersion = null;
+                //Let's see if the user has already picked some things for us...
+                var publisherConfig = configuration.Publisher;
 
                 //what kind of process are we?
                 if (publisherConfig.ApplicationType != ApplicationType.Unknown)
                 {
                     // They specified an application type, so just use that.
-                    m_AgentAppType = publisherConfig.ApplicationType; // Start with the type they specified.
+                    m_AgentAppType = publisherConfig.ApplicationType;
+                }
+                else
+                {
+                    var entryAssembly = Assembly.GetEntryAssembly();
+                    if (entryAssembly != null)
+                    {
+                        // See if we're running in the root OS session or not
+                        int sessionId;
+                        try
+                        {
+                            sessionId = Process.GetCurrentProcess().SessionId; // May not work outside of Windows.
+                        }
+                        catch
+                        {
+                            sessionId = 0; // 
+                        }
+
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && sessionId == 0 && System.Environment.UserInteractive == false)
+                        {
+                            // If we're in SessionId 0 then we're started by the kernel.  If also non-interactive, call it a service.
+                            m_AgentAppType = ApplicationType.Service;
+                        }
+                        else
+                        {
+                            m_AgentAppType = ApplicationType.Console;
+                            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || System.Environment.UserInteractive) // Linux always thinks it's not interactive.
+                            {
+                                var referencedAssemblies = entryAssembly.GetReferencedAssemblies();
+                                foreach (var assemblyName in referencedAssemblies)
+                                {
+                                    if (assemblyName.Name == "System.Windows.Forms")
+                                    {
+                                        m_AgentAppType = ApplicationType.Windows;
+                                        break;
+                                    }
+
+                                    if (assemblyName.Name == "System.Windows.Presentation")
+                                    {
+                                        m_AgentAppType = ApplicationType.Windows;
+                                        break;
+                                    }
+                                }
+                                // If it doesn't reference System.Windows.Forms, it can't be a winforms app.
+                            }
+                            // Otherwise, non-interactive can't be a winforms app, so leave it as Console.
+                        }
+                    }
                 }
 
                 m_Packet.ApplicationType = m_AgentAppType; // Finally, set the application type from our determined type.
 
                 //we want to find our entry assembly and get default product/app info from it.
-                GetApplicationNameSafe(out productName, out applicationName, out applicationVersion, out applicationDescription);                    
+                GetApplicationNameSafe(out var productName, out var applicationName, out var applicationVersion, out var applicationDescription);                    
 
                 //OK, now apply configuration overrides or what we discovered...
                 m_Packet.ProductName = string.IsNullOrEmpty(publisherConfig.ProductName) ? productName : publisherConfig.ProductName;
@@ -115,10 +159,10 @@ namespace Gibraltar.Monitor
                 //Finally, no nulls allowed! Fix any...
                 m_Packet.ProductName = string.IsNullOrEmpty(m_Packet.ProductName) ? "Unknown" : m_Packet.ProductName;
                 m_Packet.ApplicationName = string.IsNullOrEmpty(m_Packet.ApplicationName) ? "Unknown" : m_Packet.ApplicationName;
-                m_Packet.ApplicationVersion = m_Packet.ApplicationVersion ?? new Version(0, 0);
-                m_Packet.ApplicationDescription = m_Packet.ApplicationDescription ?? string.Empty;
-                m_Packet.EnvironmentName = m_Packet.EnvironmentName ?? string.Empty;
-                m_Packet.PromotionLevelName = m_Packet.PromotionLevelName ?? string.Empty;
+                m_Packet.ApplicationVersion ??= new Version(0, 0);
+                m_Packet.ApplicationDescription ??= string.Empty;
+                m_Packet.EnvironmentName ??= string.Empty;
+                m_Packet.PromotionLevelName ??= string.Empty;
 
                 m_Packet.ComputerId = GetComputerIdSafe(m_Packet.ProductName, configuration);
                 m_Packet.AgentVersion = GetAgentVersionSafe();
@@ -129,7 +173,7 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
             }
 
-            bool isContainer = IsRunningInContainer();
+            var isContainer = IsRunningInContainer();
 
             if (isContainer)
             {
@@ -140,7 +184,7 @@ namespace Gibraltar.Monitor
             {
                 try
                 {
-                    IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                    var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
                     m_Packet.HostName = ipGlobalProperties.HostName;
                     m_Packet.DnsDomainName = ipGlobalProperties.DomainName ?? string.Empty;
                 }
@@ -211,6 +255,15 @@ namespace Gibraltar.Monitor
                             m_Packet.RuntimeVersion = new Version(0, 0);
                         }
                     }
+
+                    if (frameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase))
+                    {
+                        m_Packet.Framework = Framework.DotNet;
+                    }
+                    else
+                    {
+                        m_Packet.Framework = Framework.DotNetCore;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -218,13 +271,23 @@ namespace Gibraltar.Monitor
                     m_Packet.RuntimeVersion = new Version(0, 0);
                 }
 
-                m_Packet.MemoryMB = 0; // BUG
+                var hostMemoryMB = 0;
+                try
+                {
+                    var totalMemoryBytes = HostCapabilities.GetTotalMemory();
+                    hostMemoryMB = (int)(totalMemoryBytes / (1024 * 1024)); //to MB
+                }
+                catch (PlatformNotSupportedException)
+                {
+                }
+
+                m_Packet.MemoryMB = hostMemoryMB;
                 m_Packet.UserInteractive = System.Environment.UserInteractive;
 
                 //find the active screen resolution
                 if (m_AgentAppType == ApplicationType.Windows)
                 {
-                    //We don't know if we can reliably get these on .NET Core.
+                    //We don't want to pull in WinForms to grab this...
                     m_Packet.TerminalServer = false;
                     m_Packet.ColorDepth = 0;
                     m_Packet.ScreenHeight = 0;
@@ -251,7 +314,7 @@ namespace Gibraltar.Monitor
             //now do user defined properties
             try
             {
-                foreach (KeyValuePair<string, string> keyValuePair in configuration.Properties)
+                foreach (var keyValuePair in configuration.Properties)
                 {
                     m_Packet.Properties.Add(keyValuePair.Key, keyValuePair.Value);
                 }
@@ -292,72 +355,44 @@ namespace Gibraltar.Monitor
             m_Packet.Caption = applicationName; // this is what the packet constructor does.
         }
 
-        /// <summary>
-        /// Get a copy of the full session detail this session refers to.  
-        /// </summary>
-        /// <remarks>Session objects can be large in memory.  This method will return a new object
-        /// each time it is called which should be released by the caller as soon as feasible to control memory usage.</remarks>
+        /// <inheritdoc />
         ISession ISessionSummary.Session()
         {
             throw new NotSupportedException("Retrieving the full session from a SessionSummary is not supported");
         }
 
-        /// <summary>
-        /// The unique Id of the session
-        /// </summary>
+        /// <inheritdoc />
         public Guid Id => m_Packet.ID;
 
-        /// <summary>
-        /// The link to this item on the server
-        /// </summary>
+        /// <inheritdoc />
         public Uri Uri => throw new NotSupportedException("Links are not supported in this context");
 
-        /// <summary>
-        /// Indicates if the session has ever been viewed or exported
-        /// </summary>
+        /// <inheritdoc />
         bool ISessionSummary.IsNew => true;
 
-        /// <summary>
-        /// Indicates if all of the session data is stored that is expected to be available
-        /// </summary>
+        /// <inheritdoc />
         bool ISessionSummary.IsComplete => true;
 
-        /// <summary>
-        /// Indicates if the session is currently running and a live stream is available.
-        /// </summary>
+        /// <inheritdoc />
         bool ISessionSummary.IsLive => false;
 
-        /// <summary>
-        /// Indicates if session data is available.
-        /// </summary>
-        /// <remarks>The session summary can be transfered separately from the session details
-        /// and isn't subject to pruning so it may be around long before or after the detailed data is.</remarks>
+        /// <inheritdoc />
         bool ISessionSummary.HasData //we are just a header, we presume we stand alone.
             => false;
 
-        /// <summary>
-        /// The unique Id of the local computer.
-        /// </summary>
+        /// <inheritdoc />
         public Guid? ComputerId => m_Packet.ComputerId;
 
-        /// <summary>
-        /// The display caption of the time zone where the session was recorded
-        /// </summary>
+        /// <inheritdoc />
         public string TimeZoneCaption => m_Packet.TimeZoneCaption;
 
-        /// <summary>
-        /// The date and time the session started
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset StartDateTime => m_Packet.Timestamp;
 
-        /// <summary>
-        /// The date and time the session started
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayStartDateTime => StartDateTime;
 
-        /// <summary>
-        /// The date and time the session ended or was last confirmed running
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset EndDateTime
         {
             get
@@ -374,34 +409,22 @@ namespace Gibraltar.Monitor
             internal set => m_Packet.EndDateTime = value;
         }
 
-        /// <summary>
-        /// The date and time the session ended or was last confirmed running in the time zone the user has requested for display
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset DisplayEndDateTime => EndDateTime;
 
-        /// <summary>
-        /// The time range between the start and end of this session, or the last message logged if the session ended unexpectedly.
-        /// </summary>
+        /// <inheritdoc />
         public TimeSpan Duration => EndDateTime - StartDateTime;
 
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         DateTimeOffset ISessionSummary.AddedDateTime => StartDateTime;
 
-        /// <summary>
-        /// The date and time the session was added to the repository in the time zone the user has requested for display
-        /// </summary>
+        /// <inheritdoc />
         DateTimeOffset ISessionSummary.DisplayAddedDateTime => StartDateTime;
 
-        /// <summary>
-        /// The date and time the session was added to the repository
-        /// </summary>
+        /// <inheritdoc />
         DateTimeOffset ISessionSummary.UpdatedDateTime => EndDateTime;
 
-        /// <summary>
-        /// The date and time the session header was last updated locally in the time zone the user has requested for display
-        /// </summary>
+        /// <inheritdoc />
         DateTimeOffset ISessionSummary.DisplayUpdatedDateTime => EndDateTime;
 
         /// <summary>
@@ -434,10 +457,7 @@ namespace Gibraltar.Monitor
             }
         }
 
-
-        /// <summary>
-        /// A display caption for the session
-        /// </summary>
+        /// <inheritdoc />
         public string Caption
         {
             get => m_Packet.Caption;
@@ -453,37 +473,31 @@ namespace Gibraltar.Monitor
             }
         }
 
-        /// <summary>
-        /// The product name of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public string Product => m_Packet.ProductName;
 
-        /// <summary>
-        /// The title of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public string Application => m_Packet.ApplicationName;
 
-        /// <summary>
-        /// Optional.  The environment this session is running in.
-        /// </summary>
-        /// <remarks>Environments are useful for categorizing sessions, for example to 
-        /// indicate the hosting environment. If a value is provided it will be 
-        /// carried with the session data to upstream servers and clients.  If the 
-        /// corresponding entry does not exist it will be automatically created.</remarks>
+        /// <inheritdoc />
         public string Environment => m_Packet.EnvironmentName;
 
-        /// <summary>
-        /// Optional.  The promotion level of the session.
-        /// </summary>
-        /// <remarks>Promotion levels are useful for categorizing sessions, for example to 
-        /// indicate whether it was run in development, staging, or production. 
-        /// If a value is provided it will be carried with the session data to upstream servers and clients.  
-        /// If the corresponding entry does not exist it will be automatically created.</remarks>
+        /// <inheritdoc />
         public string PromotionLevel => m_Packet.PromotionLevelName;
 
-        /// <summary>
-        /// The type of process the application ran as (as declared or detected for recording).  (See AgentAppType for internal Agent use.)
-        /// </summary>
+        /// <inheritdoc />
+        public Guid? ApplicationEnvironmentId => null;
+
+        /// <inheritdoc />
+        public string ApplicationEnvironmentCaption => null;
+
+        /// <inheritdoc />
+        public Guid? ApplicationEnvironmentServiceId => null;
+
+        /// <inheritdoc />
+        public string ApplicationEnvironmentServiceCaption => null;
+
+        /// <inheritdoc />
         public ApplicationType ApplicationType => m_Packet.ApplicationType;
 
         /// <summary>
@@ -491,258 +505,143 @@ namespace Gibraltar.Monitor
         /// </summary>
         public ApplicationType AgentAppType => m_AgentAppType;
 
-        /// <summary>
-        /// The description of the application from its manifest.
-        /// </summary>
+        /// <inheritdoc />
         public string ApplicationDescription => m_Packet.ApplicationDescription;
 
-        /// <summary>
-        /// The version of the application that recorded the session
-        /// </summary>
+        /// <inheritdoc />
         public Version ApplicationVersion => m_Packet.ApplicationVersion;
 
-        /// <summary>
-        /// The version of the Gibraltar Agent used to monitor the session
-        /// </summary>
+        /// <inheritdoc />
         public Version AgentVersion => m_Packet.AgentVersion;
 
-        /// <summary>
-        /// The host name / NetBIOS name of the computer that recorded the session
-        /// </summary>
-        /// <remarks>Does not include the domain name portion of the fully qualified DNS name.</remarks>
+        /// <inheritdoc />
         public string HostName => m_Packet.HostName;
 
-        /// <summary>
-        /// The DNS domain name of the computer that recorded the session.  May be empty.
-        /// </summary>
-        /// <remarks>Does not include the host name portion of the fully qualified DNS name.</remarks>
+        /// <inheritdoc />
         public string DnsDomainName => m_Packet.DnsDomainName;
 
-        /// <summary>
-        /// The fully qualified user name of the user the application was run as.
-        /// </summary>
+        /// <inheritdoc />
         public string FullyQualifiedUserName => m_Packet.FullyQualifiedUserName;
 
-        /// <summary>
-        /// The user Id that was used to run the session
-        /// </summary>
+        /// <inheritdoc />
         public string UserName => m_Packet.UserName;
 
-        /// <summary>
-        /// The domain of the user id that was used to run the session
-        /// </summary>
+        /// <inheritdoc />
         public string UserDomainName => m_Packet.UserDomainName;
 
-        /// <summary>
-        /// The version information of the installed operating system (without service pack or patches)
-        /// </summary>
+        /// <inheritdoc />
         public Version OSVersion => m_Packet.OSVersion;
 
-        /// <summary>
-        /// The operating system service pack, if any.
-        /// </summary>
+        /// <inheritdoc />
         public string OSServicePack => m_Packet.OSServicePack;
 
-        /// <summary>
-        /// The culture name of the underlying operating system installation
-        /// </summary>
+        /// <inheritdoc />
         public string OSCultureName => m_Packet.OSCultureName;
 
-        /// <summary>
-        /// The processor architecture of the operating system.
-        /// </summary>
+        /// <inheritdoc />
         public ProcessorArchitecture OSArchitecture => m_Packet.OSArchitecture;
 
-        /// <summary>
-        /// The boot mode of the operating system.
-        /// </summary>
+        /// <inheritdoc />
         public OSBootMode OSBootMode => m_Packet.OSBootMode;
 
-        /// <summary>
-        /// The OS Platform code, nearly always 1 indicating Windows NT
-        /// </summary>
+        /// <inheritdoc />
         public int OSPlatformCode => m_Packet.OSPlatformCode;
 
-        /// <summary>
-        /// The OS product type code, used to differentiate specific editions of various operating systems.
-        /// </summary>
+        /// <inheritdoc />
         public int OSProductType => m_Packet.OSProductType;
 
-        /// <summary>
-        /// The OS Suite Mask, used to differentiate specific editions of various operating systems.
-        /// </summary>
+        /// <inheritdoc />
         public int OSSuiteMask => m_Packet.OSSuiteMask;
 
-        /// <summary>
-        /// The well known operating system family name, like Windows Vista or Windows Server 2003.
-        /// </summary>
-        public string OSFamilyName
-        {
-            get
-            {
-                return string.Empty; // BUG 
-            }
-        }
+        /// <inheritdoc />
+        public string OSFamilyName => string.Empty; // BUG 
 
-        /// <summary>
-        /// The edition of the operating system without the family name, such as Workstation or Standard Server.
-        /// </summary>
-        public string OSEditionName
-        {
-            get
-            {
-                return string.Empty; // BUG 
-            }
-        }
+        /// <inheritdoc />
+        public string OSEditionName => string.Empty; // BUG 
 
-        /// <summary>
-        /// The well known OS name and edition name
-        /// </summary>
-        public string OSFullName
-        {
-            get
-            {
-                return string.Empty; // BUG 
-            }
-        }
+        /// <inheritdoc />
+        public string OSFullName => string.Empty; // BUG 
 
-        /// <summary>
-        /// The well known OS name, edition name, and service pack like Windows XP Professional Service Pack 3
-        /// </summary>
-        public string OSFullNameWithServicePack
-        {
-            get
-            {
-                return string.Empty; // BUG 
-            }
-        }
+        /// <inheritdoc />
+        public string OSFullNameWithServicePack => string.Empty; // BUG 
 
-        /// <summary>
-        /// The version of the .NET runtime that the application domain is running as.
-        /// </summary>
+        /// <inheritdoc />
         public Version RuntimeVersion => m_Packet.RuntimeVersion;
 
-        /// <summary>
-        /// The processor architecture the process is running as.
-        /// </summary>
+        /// <inheritdoc />
         public ProcessorArchitecture RuntimeArchitecture => m_Packet.RuntimeArchitecture;
 
-        /// <summary>
-        /// The current application culture name.
-        /// </summary>
+        /// <inheritdoc />
         public string CurrentCultureName => m_Packet.CurrentCultureName;
 
-        /// <summary>
-        /// The current user interface culture name.
-        /// </summary>
+        /// <inheritdoc />
         public string CurrentUICultureName => m_Packet.CurrentUICultureName;
 
-        /// <summary>
-        /// The number of megabytes of installed memory in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int MemoryMB => m_Packet.MemoryMB;
 
-        /// <summary>
-        /// The number of physical processor sockets in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int Processors => m_Packet.Processors;
 
-        /// <summary>
-        /// The total number of processor cores in the host computer.
-        /// </summary>
+        /// <inheritdoc />
         public int ProcessorCores => m_Packet.ProcessorCores;
 
-        /// <summary>
-        /// Indicates if the session was run in a user interactive mode.
-        /// </summary>
+        /// <inheritdoc />
         public bool UserInteractive => m_Packet.UserInteractive;
 
-        /// <summary>
-        /// Indicates if the session was run through terminal server.  Only applies to User Interactive sessions.
-        /// </summary>
+        /// <inheritdoc />
         public bool TerminalServer => m_Packet.TerminalServer;
 
-        /// <summary>
-        /// The number of pixels wide of the virtual desktop.
-        /// </summary>
+        /// <inheritdoc />
         public int ScreenWidth => m_Packet.ScreenWidth;
 
-        /// <summary>
-        /// The number of pixels tall for the virtual desktop.
-        /// </summary>
+        /// <inheritdoc />
         public int ScreenHeight => m_Packet.ScreenHeight;
 
-        /// <summary>
-        /// The number of bits of color depth.
-        /// </summary>
+        /// <inheritdoc />
         public int ColorDepth => m_Packet.ColorDepth;
 
-        /// <summary>
-        /// The complete command line used to execute the process including arguments.
-        /// </summary>
+        /// <inheritdoc />
         public string CommandLine => m_Packet.CommandLine;
 
-
-        /// <summary>
-        /// The final status of the session.
-        /// </summary>
+        /// <inheritdoc />
         public SessionStatus Status { get => m_SessionStatus;
             internal set => m_SessionStatus = value;
         }
 
-            /// <summary>
-        /// The number of messages in the messages collection.
-        /// </summary>
-        /// <remarks>This value is cached for high performance and reflects all of the known messages.  If only part
-        /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
-        /// count of items may exceed the actual number of matching messages in the messages collection if earlier
-        /// files are missing.</remarks>
-        public int MessageCount { get => m_MessageCount;
-                internal set => m_MessageCount = value;
-            }
+        /// <inheritdoc />
+        public long MessageCount 
+        { 
+            get => m_MessageCount;
+            internal set => m_MessageCount = value;
+        }
 
-        /// <summary>
-        /// The number of critical messages in the messages collection.
-        /// </summary>
-        /// <remarks>This value is cached for high performance and reflects all of the known messages.  If only part
-        /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
-        /// count of items may exceed the actual number of matching messages in the messages collection if earlier
-        /// files are missing.</remarks>
-        public int CriticalCount { get => m_CriticalCount;
+            /// <inheritdoc />
+        public long CriticalCount 
+        {
+            get => m_CriticalCount;
             internal set => m_CriticalCount = value;
         }
 
-        /// <summary>
-        /// The number of error messages in the messages collection.
-        /// </summary>
-        /// <remarks>This value is cached for high performance and reflects all of the known messages.  If only part
-        /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
-        /// count of items may exceed the actual number of matching messages in the messages collection if earlier
-        /// files are missing.</remarks>
-        public int ErrorCount { get => m_ErrorCount;
+        /// <inheritdoc />
+        public long ErrorCount 
+        { 
+            get => m_ErrorCount;
             internal set => m_ErrorCount = value;
         }
 
-        /// <summary>
-        /// The number of error messages in the messages collection.
-        /// </summary>
-        /// <remarks>This value is cached for high performance and reflects all of the known messages.  If only part
-        /// of the files for a session are loaded, the totals as of the latest file loaded are used.  This means the
-        /// count of items may exceed the actual number of matching messages in the messages collection if earlier
-        /// files are missing.</remarks>
-        public int WarningCount { get => m_WarningCount;
+        /// <inheritdoc />
+        public long WarningCount 
+        { 
+            get => m_WarningCount;
             internal set => m_WarningCount = value;
         }
 
-        /// <summary>
-        /// A collection of application specific properties.
-        /// </summary>
+        /// <inheritdoc />
         public IDictionary<string, string> Properties => m_Packet.Properties;
 
-        /// <summary>
-        /// Optional. Represents the computer that sent the session
-        /// </summary>
-        public IComputer Computer => null;
+        /// <inheritdoc />
+        public Framework Framework => m_Packet.Framework;
 
         /// <summary>
         /// Generates a reasonable default caption for the provided session that has no caption

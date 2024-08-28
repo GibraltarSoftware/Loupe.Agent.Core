@@ -23,7 +23,7 @@ namespace Gibraltar.Data
         /// <summary>
         /// Details about the storage required for this session fragment
         /// </summary>
-        public FragmentStorageSummary FragmentStorageSummary { get; private set; } 
+        public FragmentStorageSummary FragmentStorageSummary { get; private set; }
 
         /// <summary>
         /// Create a new GLF reader to operate on the provided stream.  The GLFReader then owns the stream and will dispose it
@@ -110,7 +110,7 @@ namespace Gibraltar.Data
             {
                 throw new ArgumentException("The provided data stream doesn't support seeking so it can't be used to read sessions.");
             }
-            
+
             if (fileStream.Length >= FileHeader.HeaderSize) //any real file will be longer than the header, but we might be just getting a taste...
             {
                 //lets see if it has the right type code
@@ -155,7 +155,7 @@ namespace Gibraltar.Data
                 throw new InvalidOperationException("The provided file is not a valid Loupe data stream and can't be read.");
             }
 
-            if (m_RawStream == null)
+            if ((m_RawStream == null) && (m_File != null))
             {
                 m_RawStream = m_File; // Outdated, but this distinguishes that it has been "loaded" and positioned in the packet data.
 
@@ -188,7 +188,7 @@ namespace Gibraltar.Data
                 catch (Exception ex)
                 {
 #if DEBUG
-                    Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, Session.LogCategory, "First pass close attempt on packet stream failed", 
+                    Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, ex, Session.LogCategory, "First pass close attempt on packet stream failed",
                         "Exception: {0}", ex.Message);
 #endif
                     GC.KeepAlive(ex);

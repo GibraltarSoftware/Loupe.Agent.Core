@@ -9,17 +9,15 @@ namespace Gibraltar.Monitor
     /// </summary>
     /// <remarks>This class pulls together references to a Session, ThreadInfo, and DataExtension associated
     /// with a specific LogMessagePacket.</remarks>
-    public class LogMessage : IDisplayable, IDataObject, IComparable<LogMessage>, IEquatable<LogMessage>
+    public class LogMessage : IDisplayable, IDataObject, IComparable<LogMessage>, IEquatable<LogMessage>, ILogMessage
     {
         private readonly Session m_Session;
         private readonly ThreadInfo m_ThreadInfo;
         private readonly ApplicationUser m_ApplicationUser;
         private readonly LogMessagePacket m_MessagePacket;
-        private string[] m_CategoryNames;
-        private string[] m_ClassNames;
         private int m_IndexOf = -1; //we rely on this so we know if it has been calculated
 
-        internal LogMessage( Session session, ThreadInfo threadInfo, ApplicationUser applicationUser, LogMessagePacket messagePacket )
+        internal LogMessage(Session session, ThreadInfo threadInfo, ApplicationUser applicationUser, LogMessagePacket messagePacket)
         {
             m_Session = session;
             m_ThreadInfo = threadInfo;
@@ -29,11 +27,14 @@ namespace Gibraltar.Monitor
 
         #region Public Properties and Methods
 
+        /// <inheritdoc />
+        ISession ILogMessage.Session => ((ILogMessage)m_MessagePacket).Session;
+
         /// <summary>
         /// A globally unique ID for this message.
         /// </summary>
-        public Guid Id { get { return m_MessagePacket.Id; } }
-        
+        public Guid Id => m_MessagePacket.Id;
+
         /// <summary>
         /// The index of this log message in the messages collection.
         /// </summary>
@@ -53,194 +54,178 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The underlying packet sequence number that ensures absolute, but non-monotonic, ordering of messages.
         /// </summary>
-        public long Sequence { get { return m_MessagePacket.Sequence; } }
+        public long Sequence => m_MessagePacket.Sequence;
 
         /// <summary>
         /// The exact timestamp of this message.
         /// </summary>
-        public DateTimeOffset Timestamp { get { return m_MessagePacket.Timestamp; } }
+        public DateTimeOffset Timestamp => m_MessagePacket.Timestamp;
+
+        /// <inheritdoc />
+        public DateTimeOffset DisplayTimestamp
+        {
+            get => m_MessagePacket.DisplayTimestamp;
+        }
 
         /// <summary>
         /// The system that logged the message
         /// </summary>
         /// <remarks>Commonly Trace, Gibraltar, or Log4Net but can also be a user-specified system.</remarks>
-        public string LogSystem { get { return m_MessagePacket.LogSystem; } }
+        public string LogSystem => m_MessagePacket.LogSystem;
 
         /// <summary>
         /// Our ThreadInfo for the thread which issued this log message.
         /// </summary>
-        public ThreadInfo ThreadInfo { get { return m_ThreadInfo; } }
+        public IThreadInfo ThreadInfo => m_ThreadInfo;
 
         /// <summary>
         /// Optional.  The application user associated with this message
         /// </summary>
-        public ApplicationUser User { get { return m_ApplicationUser; } }
+        public ApplicationUser User => m_ApplicationUser;
 
         /// <summary>
         /// The short name of the user that generated this message
         /// </summary>
-        public string UserName { get { return m_MessagePacket.UserName; } }
+        public string UserName => m_MessagePacket.UserName;
 
         /// <summary>
         /// The numeric ID of the thread this message was logged on.
         /// </summary>
-        public int ThreadId { get { return m_ThreadInfo.ThreadId; } }
+        public int ThreadId => m_ThreadInfo.ThreadId;
 
         /// <summary>
         /// The display caption of the thread this message was logged on.
         /// </summary>
-        public string ThreadName { get { return m_ThreadInfo.Caption; } }
+        public string ThreadName => m_ThreadInfo.Caption;
+
+        /// <inheritdoc />
+        public int DomainId => ((ILogMessage)m_MessagePacket).DomainId;
+
+        /// <inheritdoc />
+        public string DomainName => ((ILogMessage)m_MessagePacket).DomainName;
+
+        /// <inheritdoc />
+        public bool IsBackground => ((ILogMessage)m_MessagePacket).IsBackground;
+
+        /// <inheritdoc />
+        public bool IsThreadPoolThread => ((ILogMessage)m_MessagePacket).IsThreadPoolThread;
 
         /// <summary>
         /// Indicates if the class name and method name are available.
         /// </summary>
-        public bool HasMethodInfo { get { return !string.IsNullOrEmpty(m_MessagePacket.ClassName); } }
+        public bool HasMethodInfo => !string.IsNullOrEmpty(m_MessagePacket.ClassName);
 
         /// <summary>
         /// If available, the full class name with namespace.  May be null.
         /// </summary>
-        public string ClassName { get { return m_MessagePacket.ClassName; } }
+        public string ClassName => m_MessagePacket.ClassName;
 
         /// <summary>
         /// An array of the individual elements of the class and namespace hierarchy.
         /// </summary>
-        public string[] ClassNames
-        {
-            get
-            {
-                //have we parsed it yet?  We don't want to do this every time, it ain't cheap.
-                if (m_ClassNames == null)
-                {
-                    //no.
-                    m_ClassNames = TextParse.ClassName(ClassName);
-                }
-
-                return m_ClassNames;
-            }
-        }
+        public string[] ClassNames => m_MessagePacket.ClassNames;
 
         /// <summary>
         /// If available, the method where this message was logged.  May be null.
         /// </summary>
-        public string MethodName { get { return m_MessagePacket.MethodName; } }
+        public string MethodName => m_MessagePacket.MethodName;
 
         /// <summary>
         /// Indicates if the file name and line number are available.
         /// </summary>
-        public bool HasSourceLocation { get { return !string.IsNullOrEmpty(m_MessagePacket.FileName); } }
+        public bool HasSourceLocation => !string.IsNullOrEmpty(m_MessagePacket.FileName);
 
         /// <summary>
         /// Indicates if the log message has related thread information.  If false, some calls to thread information may throw exceptions.
         /// </summary>
-        public bool HasThreadInfo { get { return m_MessagePacket.HasThreadInfo; } }
+        public bool HasThreadInfo => m_MessagePacket.HasThreadInfo;
 
         /// <summary>
         /// If available, the source file for the class and method of this message.  May be null.
         /// </summary>
-        public string FileName { get { return m_MessagePacket.FileName; } }
+        public string FileName => m_MessagePacket.FileName;
 
         /// <summary>
         /// If available, the line number for the class and method of this message.  May be zero.
         /// </summary>
-        public int LineNumber { get { return m_MessagePacket.LineNumber; } }
+        public int LineNumber => m_MessagePacket.LineNumber;
 
         /// <summary>
         /// A display caption for this message.
         /// </summary>
-        public string Caption { get { return m_MessagePacket.Caption; } }
+        public string Caption => m_MessagePacket.Caption;
 
         /// <summary>
         /// A multi-line description included with the log message.
         /// </summary>
-        public string Description { get { return m_MessagePacket.Description; } }
+        public string Description => m_MessagePacket.Description;
 
         /// <summary>
         /// An XML description document that goes along with the log message.
         /// </summary>
-        public string Details { get { return m_MessagePacket.Details; } }
+        public string Details => m_MessagePacket.Details;
 
         /// <summary>
         /// The severity level of this message.
         /// </summary>
-        public LogMessageSeverity Severity { get { return m_MessagePacket.Severity; } set { m_MessagePacket.Severity = value; } }
+        public LogMessageSeverity Severity
+        {
+            get => m_MessagePacket.Severity;
+            set => m_MessagePacket.Severity = value;
+        }
 
         /// <summary>
         /// The subsystem category under which this log message was issued.
         /// </summary>
         /// <remarks>For example, the logger name in log4net.</remarks>
-        public string CategoryName { get { return m_MessagePacket.CategoryName; } }
+        public string CategoryName => m_MessagePacket.CategoryName;
 
         /// <summary>
         /// An array of the individual category names within the specified category name which is period delimited.
         /// </summary>
-        public string[] CategoryNames
-        {
-            get
-            {
-                //have we parsed it yet?  We don't want to do this every time, it ain't cheap.
-                if (m_CategoryNames == null)
-                {
-                    //no.
-                    m_CategoryNames = TextParse.CategoryName(CategoryName);
-                }
-
-                return m_CategoryNames;
-            }
-        }
+        public string[] CategoryNames => m_MessagePacket.CategoryNames;
 
         /// <summary>
         ///  Provide TimeStamp as DateTime for GLV (SourceGrid doesn't do DateTimeOffset)
         /// </summary>
         /// <remarks>Added for GLV support</remarks>
-        public DateTime TimestampDateTime { get { return Timestamp.DateTime; } }
+        public DateTime TimestampDateTime => Timestamp.DateTime;
 
         /// <summary>A combined caption &amp; description</summary>
         /// <remarks>Added for GLV support</remarks>
-        public string Message { get { return m_MessagePacket.Message; } }
+        public string Message => m_MessagePacket.Message;
 
         /// <summary>
         /// A display string for the full class and method if available, otherwise an empty string.
         /// </summary>
         /// <remarks>Added for GLV support</remarks>
-        public string MethodFullName { get { return m_MessagePacket.MethodFullName; } }
+        public string MethodFullName => m_MessagePacket.MethodFullName;
 
         /// <summary>
         /// A display string for the full file name and line number if available, otherwise an empty string.
         /// </summary>
         /// <remarks>Added for GLV support</remarks>
-        public string SourceCodeLocation { get { return m_MessagePacket.SourceCodeLocation; } }
+        public string SourceCodeLocation => m_MessagePacket.SourceCodeLocation;
 
         /// <summary>
         /// The session this message is related to.
         /// </summary>
-        public Session Session { get { return m_Session; } }
+        public Session Session => m_Session;
 
         /// <summary>
         /// True if there is an exception array associated with this message.
         /// </summary>
-        public bool HasException { get { return m_MessagePacket.HasException; } }
+        public bool HasException => m_MessagePacket.HasException;
 
         /// <summary>
         /// The outermost exception
         /// </summary>
-        public IExceptionInfo Exception
-        {
-            get
-            {
-                return m_MessagePacket.Exception;
-            }
-        }
+        public IExceptionInfo Exception => m_MessagePacket.Exception;
 
         /// <summary>
         /// The array of exceptions associated with this log message.
         /// </summary>
-        public IExceptionInfo[] Exceptions
-        {
-            get
-            {
-                return m_MessagePacket.Exceptions;
-            }
-        }
+        public IExceptionInfo[] Exceptions => m_MessagePacket.Exceptions;
 
         /// <summary>
         /// Compare this log message with another to determine if they are the same or how they should be sorted relative to each other.
@@ -297,19 +282,19 @@ namespace Gibraltar.Monitor
         public override int GetHashCode()
         {
             int myHash = 0;
-            
+
             if (m_MessagePacket != null) myHash ^= m_MessagePacket.Id.GetHashCode(); // Packet ID is all that Equals checks!
 
             return myHash;
         }
-        
+
         /// <summary>
         /// Compares two LogMessage instances for equality.
         /// </summary>
         /// <param name="left">The LogMessage to the left of the operator</param>
         /// <param name="right">The LogMessage to the right of the operator</param>
         /// <returns>True if the two LogMessages are equal.</returns>
-        public static bool operator==(LogMessage left, LogMessage right)
+        public static bool operator ==(LogMessage left, LogMessage right)
         {
             // We have to check if left is null (right can be checked by Equals itself)
             if (ReferenceEquals(left, null))
@@ -319,22 +304,22 @@ namespace Gibraltar.Monitor
             }
             return left.Equals(right);
         }
-        
+
         /// <summary>
         /// Compares two LogMessage instances for inequality.
         /// </summary>
         /// <param name="left">The LogMessage to the left of the operator</param>
         /// <param name="right">The LogMessage to the right of the operator</param>
         /// <returns>True if the two LogMessages are not equal.</returns>
-        public static bool operator!=(LogMessage left, LogMessage right)
+        public static bool operator !=(LogMessage left, LogMessage right)
         {
             // We have to check if left is null (right can be checked by Equals itself)
             if (ReferenceEquals(left, null))
             {
                 // If right is also null, we're equal; otherwise, we're unequal!
-                return ! ReferenceEquals(right, null);
+                return !ReferenceEquals(right, null);
             }
-            return ! left.Equals(right);
+            return !left.Equals(right);
         }
 
         /// <summary>
@@ -343,7 +328,7 @@ namespace Gibraltar.Monitor
         /// <param name="left">The LogMessage to the left of the operator</param>
         /// <param name="right">The LogMessage to the right of the operator</param>
         /// <returns>True if the LogMessage to the left should sort less than the LogMessage to the right.</returns>
-        public static bool operator<(LogMessage left, LogMessage right)
+        public static bool operator <(LogMessage left, LogMessage right)
         {
             return (left.CompareTo(right) < 0);
         }
@@ -354,9 +339,21 @@ namespace Gibraltar.Monitor
         /// <param name="left">The LogMessage to the left of the operator</param>
         /// <param name="right">The LogMessage to the right of the operator</param>
         /// <returns>True if the LogMessage to the left should sort greater than the LogMessage to the right.</returns>
-        public static bool operator>(LogMessage left, LogMessage right)
+        public static bool operator >(LogMessage left, LogMessage right)
         {
             return (left.CompareTo(right) > 0);
+        }
+
+        /// <inheritdoc />
+        public int CompareTo(ILogMessage other)
+        {
+            return m_MessagePacket.CompareTo((LogMessagePacket)other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(ILogMessage other)
+        {
+            return m_MessagePacket.Equals((LogMessagePacket)other);
         }
 
         /// <summary>
@@ -375,7 +372,7 @@ namespace Gibraltar.Monitor
 
         #region Internal Properties and Methods
 
-        internal LogMessagePacket MessagePacket { get { return m_MessagePacket; } }
+        internal LogMessagePacket MessagePacket => m_MessagePacket;
 
         #endregion
     }
