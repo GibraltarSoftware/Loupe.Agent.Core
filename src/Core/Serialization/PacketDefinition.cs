@@ -178,7 +178,7 @@ namespace Gibraltar.Serialization
                 m_Fields.Add(new FieldDefinition(fieldName, fieldType));
             }
 
-            // Handle the possiblity that a Packet aggregates lower level packets
+            // Handle the possibility that a Packet aggregates lower level packets
             int subPacketCount = reader.ReadInt32();
             m_SubPackets = new List<PacketDefinition>();
             for ( int i = 0; i < subPacketCount; i++)
@@ -234,8 +234,8 @@ namespace Gibraltar.Serialization
 
         public FieldDefinitionCollection Fields { get { return m_Fields; } }
 
-            /// <summary>
-        /// This list allows for the possiblity of a Packet that aggregates other sub-packets
+        /// <summary>
+        /// This list allows for the possibility of a Packet that aggregates other sub-packets
         /// </summary>
         public List<PacketDefinition> SubPackets { get { return m_SubPackets; } }
 

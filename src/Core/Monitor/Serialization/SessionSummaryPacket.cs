@@ -400,7 +400,6 @@ namespace Gibraltar.Monitor.Serialization
             const string typeName = nameof(SessionSummaryPacket);
             var definition = new PacketDefinition(typeName, SerializationVersion, false);
 
-            //Session index information
             definition.Fields.Add("ComputerId", FieldType.Guid);
             definition.Fields.Add("ProductName", FieldType.String);
             definition.Fields.Add("ApplicationName", FieldType.String);
@@ -418,8 +417,6 @@ namespace Gibraltar.Monitor.Serialization
             definition.Fields.Add("HostName", FieldType.String);
             definition.Fields.Add("DNSDomainName", FieldType.String);
             definition.Fields.Add("Framework", FieldType.Int32);
-
-            //Session Details index information
             definition.Fields.Add("OSPlatformCode", FieldType.Int32);
             definition.Fields.Add("OSVersion", FieldType.String);
             definition.Fields.Add("OSServicePack", FieldType.String);
@@ -430,8 +427,6 @@ namespace Gibraltar.Monitor.Serialization
             definition.Fields.Add("OSProductTypeCode", FieldType.Int32);
             definition.Fields.Add("RuntimeVersion", FieldType.String);
             definition.Fields.Add("RuntimeArchitecture", FieldType.Int32);
-            definition.Fields.Add("CurrentCultureName", FieldType.String);
-            definition.Fields.Add("CurrentUICultureName", FieldType.String);
             definition.Fields.Add("MemoryMB", FieldType.Int32);
             definition.Fields.Add("Processors", FieldType.Int32);
             definition.Fields.Add("ProcessorCores", FieldType.Int32);
@@ -440,10 +435,15 @@ namespace Gibraltar.Monitor.Serialization
             definition.Fields.Add("ScreenWidth", FieldType.Int32);
             definition.Fields.Add("ScreenHeight", FieldType.Int32);
             definition.Fields.Add("ColorDepth", FieldType.Int32);
+
+            // non-obvious workaround: For backwards compatibility with 5.x readers, 
+            // we need to be sure the fields starting with the 34th are strings so worst case
+            // they get read as name/value pair properties when the older code thinks it's read
+            // everything there is to read.  This only affects this path where we set the definition order.
             definition.Fields.Add("CommandLine", FieldType.String);
+            definition.Fields.Add("CurrentCultureName", FieldType.String);
+            definition.Fields.Add("CurrentUICultureName", FieldType.String);
 
-
-            //App.Config options
             foreach (KeyValuePair<string, string> property in m_Properties)
                 definition.Fields.Add(property.Key, FieldType.String);
             return definition;
@@ -451,7 +451,6 @@ namespace Gibraltar.Monitor.Serialization
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
-            //Write out session stuff
             packet.SetField("ComputerId", m_ComputerId);
             packet.SetField("ProductName", m_ProductName);
             packet.SetField("ApplicationName", m_ApplicationName);
@@ -469,8 +468,6 @@ namespace Gibraltar.Monitor.Serialization
             packet.SetField("HostName", m_HostName);
             packet.SetField("DNSDomainName", m_DnsDomainName);
             packet.SetField("Framework", m_Framework);
-
-            //write out session details stuff
             packet.SetField("OSPlatformCode", m_OSPlatformCode);
             packet.SetField("OSVersion", m_OSVersion.ToString());
             packet.SetField("OSServicePack", m_OSServicePack);
@@ -493,7 +490,6 @@ namespace Gibraltar.Monitor.Serialization
             packet.SetField("ColorDepth", m_ColorDepth);
             packet.SetField("CommandLine", m_CommandLine);
 
-
             //write out application config provided stuff
             foreach (KeyValuePair<string, string> property in m_Properties)
                 packet.SetField(property.Key, property.Value);
@@ -501,103 +497,144 @@ namespace Gibraltar.Monitor.Serialization
 
         void IPacket.ReadFields(PacketDefinition definition, SerializedPacket packet)
         {
-            //read back session stuff.  Order really doesn't matter a damn, but hey.
-            packet.GetField("ProductName", out m_ProductName);
-            packet.GetField("ApplicationName", out m_ApplicationName);
-
-            string applicationVersionRaw;
-            packet.GetField("ApplicationVersion", out applicationVersionRaw);
-            m_ApplicationVersion = new Version(applicationVersionRaw);
-
-            int applicationTypeRaw;
-            packet.GetField("ApplicationType", out applicationTypeRaw);
-            m_ApplicationType = (ApplicationType) applicationTypeRaw;
-
-            packet.GetField("ApplicationDescription", out m_ApplicationDescription);
-            packet.GetField("Caption", out m_Caption);
-            packet.GetField("TimeZoneCaption", out m_TimeZoneCaption);
-            packet.GetField("EndDateTime", out m_EndDateTime);
-
-            string agentVersionRaw;
-            packet.GetField("AgentVersion", out agentVersionRaw);
-            m_AgentVersion = new Version(agentVersionRaw);
-
-            packet.GetField("UserName", out m_UserName);
-            packet.GetField("UserDomainName", out m_UserDomainName);
-            packet.GetField("HostName", out m_HostName);
-            packet.GetField("DNSDomainName", out m_DnsDomainName);
-
-            //Read back session details stuff
-            packet.GetField("OSPlatformCode", out m_OSPlatformCode);
-            string osVersionRaw;
-            packet.GetField("OSVersion", out osVersionRaw);
-            m_OSVersion = new Version(osVersionRaw);
-
-            packet.GetField("OSServicePack", out m_OSServicePack);
-            packet.GetField("OSCultureName", out m_OSCultureName);
-
-            int osArchitectureRaw;
-            packet.GetField("OSArchitecture", out osArchitectureRaw);
-            m_OSArchitecture = ((ProcessorArchitecture) osArchitectureRaw);
-
-            int osBootModeRaw;
-            packet.GetField("OSBootMode", out osBootModeRaw);
-            m_OSBootMode = (OSBootMode) osBootModeRaw;
-
-            packet.GetField("OSSuiteMaskCode", out m_OSSuiteMaskCode);
-            packet.GetField("OSProductTypeCode", out m_OSProductTypeCode);
-
-            string runtimeVersionRaw;
-            packet.GetField("RuntimeVersion", out runtimeVersionRaw);
-            m_RuntimeVersion = new Version(runtimeVersionRaw);
-
-            int runtimeArchitectureRaw;
-            packet.GetField("RuntimeArchitecture", out runtimeArchitectureRaw);
-            m_RuntimeArchitecture = ((ProcessorArchitecture) runtimeArchitectureRaw);
-
-            packet.GetField("CurrentCultureName", out m_CurrentCultureName);
-            packet.GetField("CurrentUICultureName", out m_CurrentUICultureName);
-            packet.GetField("MemoryMB", out m_MemoryMB);
-            packet.GetField("Processors", out m_Processors);
-            packet.GetField("ProcessorCores", out m_ProcessorCores);
-            packet.GetField("UserInteractive", out m_UserInteractive);
-            packet.GetField("TerminalServer", out m_TerminalServer);
-            packet.GetField("ScreenWidth", out m_ScreenWidth);
-            packet.GetField("ScreenHeight", out m_ScreenHeight);
-            packet.GetField("ColorDepth", out m_ColorDepth);
-            packet.GetField("CommandLine", out m_CommandLine);
-
-            //See the 33 below?  That should be the # of reads - 1 we've done before properties.            
-            int baseFields = 33;
-
-            if (definition.Version > 3)
+            foreach (var field in definition.Fields)
             {
-                packet.GetField("Framework", out int frameworkRaw);
-                m_Framework = (Framework) frameworkRaw;
-                baseFields++;
-            }
-
-            if (definition.Version > 2)
-            {
-                packet.GetField("ComputerId", out m_ComputerId);
-                baseFields++;
-            }
-
-            if (definition.Version > 1)
-            {
-                packet.GetField("EnvironmentName", out m_EnvironmentName);
-                packet.GetField("PromotionLevelName", out m_PromotionLevelName);
-                baseFields += 2; //we have to account for the additional fields beyond the default
-            }
-
-            //Application provided properties
-            //if this starts blowing up, count the number of fields above first.
-            for (int i = baseFields; i < definition.Fields.Count; i++)
-            {
-                FieldDefinition fieldDefinition = definition.Fields[i];
-                string fieldValue;
-                packet.GetField(fieldDefinition.Name, out fieldValue);
-                m_Properties.Add(fieldDefinition.Name, fieldValue);
+                switch (field.Name)
+                {
+                    case "AgentVersion":
+                        packet.GetField(field.Name, out string agentVersionStr);
+                        m_AgentVersion = Version.Parse(agentVersionStr);
+                        break;
+                    case "ApplicationDescription":
+                        packet.GetField(field.Name, out m_ApplicationDescription);
+                        break;
+                    case "ApplicationName":
+                        packet.GetField(field.Name, out m_ApplicationName);
+                        break;
+                    case "ApplicationType":
+                        packet.GetField(field.Name, out int applicationType);
+                        m_ApplicationType = (ApplicationType)applicationType;
+                        break;
+                    case "ApplicationVersion":
+                        packet.GetField(field.Name, out string applicationVersionStr);
+                        m_ApplicationVersion = Version.Parse(applicationVersionStr);
+                        break;
+                    case "Caption":
+                        packet.GetField(field.Name, out m_Caption);
+                        break;
+                    case "ColorDepth":
+                        packet.GetField(field.Name, out m_ColorDepth);
+                        break;
+                    case "CommandLine":
+                        packet.GetField(field.Name, out m_CommandLine);
+                        break;
+                    case "ComputerId":
+                        packet.GetField(field.Name, out m_ComputerId);
+                        break;
+                    case "CurrentCultureName":
+                        packet.GetField(field.Name, out m_CurrentCultureName);
+                        break;
+                    case "CurrentUICultureName":
+                        packet.GetField(field.Name, out m_CurrentUICultureName);
+                        break;
+                    case "DnsDomainName":
+                        packet.GetField(field.Name, out m_DnsDomainName);
+                        break;
+                    case "EndDateTime":
+                        packet.GetField(field.Name, out m_EndDateTime);
+                        break;
+                    case "EnvironmentName":
+                        packet.GetField(field.Name, out m_EnvironmentName);
+                        break;
+                    case "Framework":
+                        packet.GetField(field.Name, out int framework);
+                        m_Framework = (Framework)framework;
+                        break;
+                    case "HostName":
+                        packet.GetField(field.Name, out m_HostName);
+                        break;
+                    case "MemoryMB":
+                        packet.GetField(field.Name, out m_MemoryMB);
+                        break;
+                    case "OSArchitecture":
+                        packet.GetField(field.Name, out int osArchitecture);
+                        m_OSArchitecture = (ProcessorArchitecture)osArchitecture;
+                        break;
+                    case "OSBootMode":
+                        packet.GetField(field.Name, out int osBootMode);
+                        m_OSBootMode = (OSBootMode)osBootMode;
+                        break;
+                    case "OSCultureName":
+                        packet.GetField(field.Name, out m_OSCultureName);
+                        break;
+                    case "OSPlatformCode":
+                        packet.GetField(field.Name, out m_OSPlatformCode);
+                        break;
+                    case "OSProductTypeCode":
+                        packet.GetField(field.Name, out m_OSProductTypeCode);
+                        break;
+                    case "OSServicePack":
+                        packet.GetField(field.Name, out m_OSServicePack);
+                        break;
+                    case "OSSuiteMaskCode":
+                        packet.GetField(field.Name, out m_OSSuiteMaskCode);
+                        break;
+                    case "OSVersion":
+                        packet.GetField(field.Name, out string osVersionStr);
+                        m_OSVersion = Version.Parse(osVersionStr);
+                        break;
+                    case "ProcessorCores":
+                        packet.GetField(field.Name, out m_ProcessorCores);
+                        break;
+                    case "Processors":
+                        packet.GetField(field.Name, out m_Processors);
+                        break;
+                    case "ProductName":
+                        packet.GetField(field.Name, out m_ProductName);
+                        break;
+                    case "PromotionLevelName":
+                        packet.GetField(field.Name, out m_PromotionLevelName);
+                        break;
+                    case "RuntimeArchitecture":
+                        packet.GetField(field.Name, out int runtimeArchitecture);
+                        m_RuntimeArchitecture = (ProcessorArchitecture)runtimeArchitecture;
+                        break;
+                    case "RuntimeVersion":
+                        packet.GetField(field.Name, out string runtimeVersionStr);
+                        m_RuntimeVersion = Version.Parse(runtimeVersionStr);
+                        break;
+                    case "ScreenHeight":
+                        packet.GetField(field.Name, out m_ScreenHeight);
+                        break;
+                    case "ScreenWidth":
+                        packet.GetField(field.Name, out m_ScreenWidth);
+                        break;
+                    case "TerminalServer":
+                        packet.GetField(field.Name, out m_TerminalServer);
+                        break;
+                    case "TimeZoneCaption":
+                        packet.GetField(field.Name, out m_TimeZoneCaption);
+                        break;
+                    case "UserDomainName":
+                        packet.GetField(field.Name, out m_UserDomainName);
+                        break;
+                    case "UserInteractive":
+                        packet.GetField(field.Name, out m_UserInteractive);
+                        break;
+                    case "UserName":
+                        packet.GetField(field.Name, out m_UserName);
+                        break;
+                    default:
+                        // If it's a string field it's a custom property.  It also
+                        // could be a newer summary field we don't know about - in which case
+                        // we will ignore it if it's not a string.
+                        if (field.FieldType == FieldType.String)
+                        {
+                            packet.GetField(field.Name, out string propertyValue);
+                            m_Properties[field.Name] = propertyValue;
+                        }
+                        break;
+                }
             }
         }
 
