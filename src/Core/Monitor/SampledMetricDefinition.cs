@@ -1,4 +1,5 @@
 ﻿using Gibraltar.Monitor.Serialization;
+using Loupe.Extensibility.Data;
 
 namespace Gibraltar.Monitor
 {
@@ -12,7 +13,7 @@ namespace Gibraltar.Monitor
     /// the range of start and end.  Event metrics are only defined at the instant they are timestamped, 
     /// and imply nothing for other timestamps.  
     /// For event based metrics, use the EventMetricDefinition base class.</remarks>
-    public abstract class SampledMetricDefinition : MetricDefinition
+    public abstract class SampledMetricDefinition : MetricDefinition, ISampledMetricDefinition
     {
         /// <summary>
         /// Create a new sampled metric object from the provided raw data packet.
@@ -44,6 +45,20 @@ namespace Gibraltar.Monitor
                 //the inner property is trimming, no need to do so here.
                 ((SampledMetricDefinitionPacket)base.Packet).UnitCaption = value;
             }
+        }
+
+        /// <inheritdoc />
+        public int CompareTo(ISampledMetricDefinition other)
+        {
+            //we let our base object do the compare, we're really just casting things
+            return base.CompareTo(other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(ISampledMetricDefinition other)
+        {
+            //We're really just a type cast, refer to our base object
+            return base.Equals(other);
         }
 
         #endregion
