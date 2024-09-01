@@ -88,7 +88,7 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)/packages'
       artifactName: packages
 
-  - task: NuGetAuthenticate@0
+  - task: NuGetAuthenticate@1
     displayName: 'Authenticate with NuGet feed'
 
   - task: NuGetCommand@2
