@@ -8,6 +8,8 @@ using Gibraltar.Data;
 using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
+using System.Reflection;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Gibraltar.Monitor
 {
@@ -119,6 +121,50 @@ namespace Gibraltar.Monitor
             SendPropertyChanged(null);
         }
 
+        /// <summary>
+        /// See if our PerformanceCounter library is around and if so register it for deserialization.
+        /// </summary>
+        /// <returns></returns>
+        private void RegisterPerfCounterFactory(PacketReader packetReader)
+        {
+            var assemblyName = "Loupe.Agent.PerformanceCounters.dll";
+            var factoryTypeName = "Loupe.Agent.PerformanceCounters.Serialization.PerfCounterMetricPacketFactory";
+
+            var binFolder = AppDomain.CurrentDomain.BaseDirectory;
+            var assemblyPath = Path.Combine(binFolder, assemblyName);
+
+            if (!File.Exists(assemblyPath))
+            {
+                return;
+            }
+
+            var assembly = Assembly.LoadFrom(assemblyPath);
+            var factoryType = assembly.GetType(factoryTypeName);
+
+            if (factoryType == null)
+            {
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Error, "", "Unable to load performance counter data because library doesn't have the expected factory type", "We looked for a type called {0} but it wasn't found, so we'll skip Perf Counter data.", factoryTypeName);
+                return;
+            }
+
+            // Create an instance of PerfCounterMetricPacketFactory
+            var factoryInstance = Activator.CreateInstance(factoryType, this);
+
+            // Get the Register method
+            var registerMethod = factoryType.GetMethod("Register");
+
+            if (registerMethod == null)
+            {
+                if (!Log.SilentMode)
+                    Log.Write(LogMessageSeverity.Error, "", "Unable to load performance counter data because library doesn't support registration", "We attempted to invoke the register method of the performance counter assembly but it was not found, so we'll skip it.");
+                return;
+            }
+
+            // Invoke the Register method
+            registerMethod.Invoke(factoryInstance, new [] { packetReader });
+        }
+
         #endregion
 
         #region Internal Properties and Methods
@@ -129,7 +175,7 @@ namespace Gibraltar.Monitor
         /// <param name="newHeader"></param>
         internal void IntegrateHeader(SessionHeader newHeader)
         {
-            SessionStatus newStatus = (SessionStatus)Enum.Parse(typeof(SessionStatus), newHeader.StatusName, true);
+            var newStatus = (SessionStatus)Enum.Parse(typeof(SessionStatus), newHeader.StatusName, true);
             if (newStatus > Summary.Status)
             {
                 Summary.Status = newStatus; // It's a new status, so update our record.
@@ -171,13 +217,13 @@ namespace Gibraltar.Monitor
             //we have streams that haven't been loaded yet. Lets load them.           
             m_LoadingStreams = true; //so we don't get into an infinite loop trying to load.
 
-            List<GLFReader> loadedStreams = new List<GLFReader>(m_UnloadedPacketStreams.Count);
+            var loadedStreams = new List<GLFReader>(m_UnloadedPacketStreams.Count);
 
             try
             {
                 while (m_UnloadedPacketStreams.Count > 0)
                 {
-                    using (GLFReader glfReader = m_UnloadedPacketStreams[0]) //we want to dispose of these as we go to save RAM.
+                    using (var glfReader = m_UnloadedPacketStreams[0]) //we want to dispose of these as we go to save RAM.
                     {
                         try
                         {
@@ -221,7 +267,7 @@ namespace Gibraltar.Monitor
             if (glfReader == null)
                 throw new ArgumentNullException(nameof(glfReader));
 
-            Stream packetStream = glfReader.GetPacketStreamStart(); // Resets stream to start of packet data.
+            var packetStream = glfReader.GetPacketStreamStart(); // Resets stream to start of packet data.
 
             if (packetStream == null)
             {
@@ -249,8 +295,11 @@ namespace Gibraltar.Monitor
             var metricSamplePacketFactory = new MetricSamplePacketFactory(this);
             metricSamplePacketFactory.Register(packetReader);
 
+            //HACK: our PerfCounter factory.
+            RegisterPerfCounterFactory(packetReader);
+
             Stream stream;
-            int packetCount = 0;
+            var packetCount = 0;
             IPacket previousPacket = null; //this is just used for debugging and can't be moved to inner scope.
 
             while ((stream = packetManager.GetNextPacket()) != null)
@@ -265,8 +314,8 @@ namespace Gibraltar.Monitor
                     var b = new byte[stream.Length];
                     stream.Read(b, 0, (int)stream.Length);
                     stream.Position = 0;
-                    string s = "";
-                    for (int i = 0; i < stream.Length; i++)
+                    var s = "";
+                    for (var i = 0; i < stream.Length; i++)
                     {
                         var ch = (char)b[i];
                         s += (b[i] > 20 && b[i] < 127) ? ch.ToString() : ".";
@@ -327,8 +376,7 @@ namespace Gibraltar.Monitor
                             {
                                 // The new serialized version of LMP adds a ThreadIndex field.  Older versions will set this
                                 // field from the ThreadId field, so we can rely on ThreadIndex in any case.
-                                ThreadInfo threadInfo;
-                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out threadInfo) == false)
+                                if (m_Threads.TryGetValue(logMessagePacket.ThreadIndex, out var threadInfo) == false)
                                 {
                                     // Uh-oh.  This should never happen.
                                     threadInfo = null; // We couldn't find the ThreadInfo for this log message!
@@ -349,8 +397,7 @@ namespace Gibraltar.Monitor
                             if (m_MetricDefinitions.ContainsMetricKey(metricPacket.ID) == false)
                             {
                                 //We need to find the definition object for this metric so we can create the metric object
-                                IMetricDefinition definition;
-                                if (m_MetricDefinitions.TryGetValue(metricPacket.DefinitionId, out definition) == false)
+                                if (m_MetricDefinitions.TryGetValue(metricPacket.DefinitionId, out var definition) == false)
                                 {
                                     //Trace out that we are going to have to drop this metric value because we don't have 
                                     //the metric it applies to
@@ -374,8 +421,7 @@ namespace Gibraltar.Monitor
                             //these are the individual metric samples that are associated with a metric
 
                             //we need to find the metric for this packet before we can add it
-                            IMetric metric;
-                            if (m_MetricDefinitions.TryGetMetricValue(metricSamplePacket.MetricId, out metric) == false)
+                            if (m_MetricDefinitions.TryGetMetricValue(metricSamplePacket.MetricId, out var metric) == false)
                             {
                                 //Trace out that we are going to have to drop this metric value because we don't have 
                                 //the metric it applies to
@@ -521,7 +567,7 @@ namespace Gibraltar.Monitor
         /// <returns>The default caption</returns>
         internal static string DefaultCaption(SessionSummary sessionSummary)
         {
-            string defaultCaption = string.Empty;
+            var defaultCaption = string.Empty;
 
             //We are currently shooting for <appname> <Short Date> <Short time>
             if (string.IsNullOrEmpty(sessionSummary.Application))
@@ -582,9 +628,9 @@ namespace Gibraltar.Monitor
                     return 0;
 
                 long length = 0;
-                foreach (GLFReader glfReader in m_UnloadedPacketStreams)
+                foreach (var glfReader in m_UnloadedPacketStreams)
                 {
-                    Stream rawStream = glfReader.RawStream;
+                    var rawStream = glfReader.RawStream;
                     if (rawStream.CanSeek)
                         length += rawStream.Length;
                 }
@@ -639,8 +685,8 @@ namespace Gibraltar.Monitor
                 if (!Log.SilentMode) Log.Write(LogMessageSeverity.Verbose, LogCategory, "Copying session stream directly from unloaded original packet stream", "This is the fastest path");
 
                 //we still have to make a valid file - so we have to use GLF writer.  This ensures the summary data is current.
-                GLFReader sessionReader = m_UnloadedPacketStreams[0];
-                Stream sessionStream = sessionReader.RawStream; // Get the raw GLF stream (including header)
+                var sessionReader = m_UnloadedPacketStreams[0];
+                var sessionStream = sessionReader.RawStream; // Get the raw GLF stream (including header)
                 FileSystemTools.StreamContentCopy(sessionStream, stream); // Copy the entire GLF stream, then restore its Position.
             }
             else
@@ -650,7 +696,7 @@ namespace Gibraltar.Monitor
                 //make sure all files are loaded
                 EnsureDataLoaded(); //this is very fast if all are already loaded
 
-                using (GLFWriter writer = new GLFWriter(stream, m_SessionSummary, majorVersion, minorVersion))
+                using (var writer = new GLFWriter(stream, m_SessionSummary, majorVersion, minorVersion))
                 {
                     //order really should be unnecessary due to packet dependency tracking, but we tend to order them anyway.
 
@@ -658,19 +704,19 @@ namespace Gibraltar.Monitor
                     writer.Write(m_SessionSummary.Packet);
 
                     //information on the fragments it was recorded into
-                    foreach (SessionFragment sessionFile in m_Fragments)
+                    foreach (var sessionFile in m_Fragments)
                         writer.Write(sessionFile.Packet);
 
                     //Threads
-                    foreach (ThreadInfo threadInfo in m_Threads)
+                    foreach (var threadInfo in m_Threads)
                         writer.Write(threadInfo.Packet);
 
                     //Assemblies
-                    foreach (KeyValuePair<string, SessionAssemblyInfo> pair in m_Assemblies)
+                    foreach (var pair in m_Assemblies)
                         writer.Write(pair.Value.Packet);
 
                     //Log Message data (we should really serialize data last after metric definitions...
-                    foreach (LogMessage message in (IList<LogMessage>)m_Messages)
+                    foreach (var message in (IList<LogMessage>)m_Messages)
                         writer.Write(message.MessagePacket);
 
                     //metric definitions and, internally, metric samples.
@@ -679,7 +725,7 @@ namespace Gibraltar.Monitor
                         writer.Write(curMetricDefinition.Packet);
 
                         //Is this an event metric?  We have to serialize out more information for them. (yeah, very bogus)
-                        EventMetricDefinition eventMetricDefinition = curMetricDefinition as EventMetricDefinition;
+                        var eventMetricDefinition = curMetricDefinition as EventMetricDefinition;
                         if (eventMetricDefinition != null)
                         {
                             foreach (EventMetricValueDefinition curValueDefinition in eventMetricDefinition.Values)
@@ -881,8 +927,7 @@ namespace Gibraltar.Monitor
 
             foreach (var fragmentId in fragmentIds)
             {
-                SessionFragment fragment;
-                if (Fragments.TryGetValue(fragmentId, out fragment))
+                if (Fragments.TryGetValue(fragmentId, out var fragment))
                 {
                     m_UnloadedPacketStreams.Add(fragment.Reader);
                 }
@@ -1119,7 +1164,7 @@ namespace Gibraltar.Monitor
         /// <returns>True if the other object is also a Session and represents the same data.</returns>
         public override bool Equals(object obj)
         {
-            Session otherSession = obj as Session;
+            var otherSession = obj as Session;
 
             return Equals(otherSession); // Just have type-specific Equals do the check (it even handles null)
         }
@@ -1137,7 +1182,7 @@ namespace Gibraltar.Monitor
         /// </returns>
         public override int GetHashCode()
         {
-            int myHash = Id.GetHashCode(); // The ID is all that Equals checks!
+            var myHash = Id.GetHashCode(); // The ID is all that Equals checks!
 
             return myHash;
         }
