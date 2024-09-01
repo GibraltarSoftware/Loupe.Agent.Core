@@ -18,10 +18,10 @@ namespace Gibraltar.Monitor.Serialization
 
             //resolve the names of all the types we want to be able to get packets for
             //this lets us do a faster switch in CreatePacket
-            m_MetricSamplePacketType = typeof(MetricSamplePacket).Name;
-            m_SampledMetricSamplePacketType = typeof(SampledMetricSamplePacket).Name;
-            m_EventMetricSamplePacketType = typeof(EventMetricSamplePacket).Name;
-            m_CustomSampledMetricSamplePacketType = typeof(CustomSampledMetricSamplePacket).Name;
+            m_MetricSamplePacketType = nameof(MetricSamplePacket);
+            m_SampledMetricSamplePacketType = nameof(SampledMetricSamplePacket);
+            m_EventMetricSamplePacketType = nameof(EventMetricSamplePacket);
+            m_CustomSampledMetricSamplePacketType = nameof(CustomSampledMetricSamplePacket);
         }
 
         /// <summary>

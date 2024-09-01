@@ -21,4 +21,14 @@
     <ProjectReference Include="..\PerformanceCounters\PerformanceCounters.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Core.Test\Content\NoisySession.glf" Link="Content\NoisySession.glf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

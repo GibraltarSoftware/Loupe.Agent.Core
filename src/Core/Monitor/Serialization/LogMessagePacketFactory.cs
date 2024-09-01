@@ -19,9 +19,9 @@ namespace Gibraltar.Monitor.Serialization
 
             //resolve the names of all the types we want to be able to get packets for
             //this lets us do a faster switch in CreatePacket
-            m_LogMessagePacketType = typeof(LogMessagePacket).Name;
-            m_ExceptionInfoPacketType = typeof(ExceptionInfoPacket).Name;
-            m_ApplicationUserPacketType = typeof(ApplicationUserPacket).Name;
+            m_LogMessagePacketType = nameof(LogMessagePacket);
+            m_ExceptionInfoPacketType = nameof(ExceptionInfoPacket);
+            m_ApplicationUserPacketType = nameof(ApplicationUserPacket);
         }
 
         /// <summary>

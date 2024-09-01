@@ -16,11 +16,11 @@ namespace Gibraltar.Monitor.Serialization
         {
             //resolve the names of all the types we want to be able to get packets for
             //this lets us do a faster switch in CreatePacket
-            m_AssemblyInfoPacketType = typeof(AssemblyInfoPacket).Name;
-            m_SessionStartInfoPacketType = typeof(SessionSummaryPacket).Name;
-            m_SessionEndInfoPacketType = typeof(SessionClosePacket).Name;
-            m_SessionFilePacketType = typeof(SessionFragmentPacket).Name;
-            m_ThreadInfoPacketType = typeof(ThreadInfoPacket).Name;
+            m_AssemblyInfoPacketType = nameof(AssemblyInfoPacket);
+            m_SessionStartInfoPacketType = nameof(SessionSummaryPacket);
+            m_SessionEndInfoPacketType = nameof(SessionClosePacket);
+            m_SessionFilePacketType = nameof(SessionFragmentPacket);
+            m_ThreadInfoPacketType = nameof(ThreadInfoPacket);
         }
 
         /// <summary>

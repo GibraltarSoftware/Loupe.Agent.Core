@@ -14,7 +14,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
     internal class PerfCounterMetricDefinitionPacket : SampledMetricDefinitionPacket, IPacket, IPacketObjectFactory<MetricDefinition, MetricDefinitionCollection>, IComparable<PerfCounterMetricDefinitionPacket>, IEquatable<PerfCounterMetricDefinitionPacket>
     {
         /// <summary>
-        /// Create a new metric definition for the provided perfomance counter object
+        /// Create a new metric definition for the provided performance counter object
         /// </summary>
         /// <param name="counter">The windows performance counter object to create a metric definition for</param>
         public PerfCounterMetricDefinitionPacket(PerformanceCounter counter)
