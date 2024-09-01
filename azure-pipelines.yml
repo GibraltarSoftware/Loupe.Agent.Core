@@ -88,6 +88,17 @@ jobs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)/packages'
       artifactName: packages
 
+  - task: NuGetAuthenticate@0
+    displayName: 'Authenticate with NuGet feed'
+
+  - task: NuGetCommand@2
+    displayName: 'Push NuGet Packages to Feed'
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/*.nupkg'
+      publishVstsFeed: 'private-nuget'
+      allowPackageConflicts: true
+
   - task: VSTest@2
     inputs:
       platform: '$(buildPlatform)'
