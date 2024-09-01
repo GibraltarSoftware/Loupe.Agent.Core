@@ -93,6 +93,7 @@ jobs:
 
   - task: NuGetCommand@2
     displayName: 'Push NuGet Packages to Feed'
+    condition: eq(variables['Build.Reason'], 'IndividualCI')
     inputs:
       command: 'push'
       packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/*.nupkg'
