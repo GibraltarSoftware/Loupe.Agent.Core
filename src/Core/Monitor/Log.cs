@@ -1972,7 +1972,16 @@ namespace Gibraltar.Monitor
             s_SessionStartInfo = new SessionSummary(s_RunningConfiguration);
 
             if (s_RunningConfiguration.SessionFile.Enabled)
-                s_Repository = new LocalRepository(s_SessionStartInfo.Product, s_RunningConfiguration.SessionFile.Folder);
+            {
+                try
+                {
+                    s_Repository = new LocalRepository(s_SessionStartInfo.Product, s_RunningConfiguration.SessionFile.Folder);
+                }
+                catch (InvalidOperationException)
+                {
+                    // we couldn't find a valid path, so we'll move on.
+                }
+            }
 
             //initialize our publisher
             string sessionName = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}", s_SessionStartInfo.Product,
