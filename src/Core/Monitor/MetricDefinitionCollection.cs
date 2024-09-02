@@ -73,6 +73,21 @@ namespace Gibraltar.Monitor
             }
         }
 
+        /// <summary>
+        /// Ensure any loaded definition is set to read only (used during deserialization)
+        /// </summary>
+        internal void SetReadOnly()
+        {
+            foreach (var metricDefinition in m_List)
+            {
+                if (metricDefinition is EventMetricDefinition eventMetricDef)
+                {
+                    // We don't have a way of distinguishing that this metric hasn't already been locked so we just call it to lock it in.
+                    eventMetricDef.SetReadOnly();
+                }
+            }
+        }
+
         #endregion
 
         #region Public Properties and Methods

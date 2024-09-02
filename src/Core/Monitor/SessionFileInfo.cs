@@ -37,7 +37,7 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The session id
         /// </summary>
-        public Guid Id { get { return m_SessionId; } }
+        public Guid Id => m_SessionId;
 
         /// <summary>
         /// Indicates if the session is actually running (regardless of its session state)
@@ -47,12 +47,12 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// The best session header from all the loaded fragments
         /// </summary>
-        public SessionHeader Header { get { return m_SessionHeader; } }
+        public SessionHeader Header => m_SessionHeader;
 
         /// <summary>
         /// The list of fragments that have been found
         /// </summary>
-        public IList<T> Fragments { get { return m_SessionFragments.Values; } }
+        public IList<T> Fragments => m_SessionFragments.Values;
 
         /// <summary>
         /// Add another fragment to this session's information

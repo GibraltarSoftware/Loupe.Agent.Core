@@ -1,16 +1,12 @@
 ﻿using Gibraltar.Data;
 using Gibraltar.Monitor;
 using Loupe.Agent.PerformanceCounters;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Loupe.Core.Test.Data
+namespace Loupe.PerformanceCounters.Test
 {
     [TestFixture]
     public class When_Loading_Session_Data
@@ -18,16 +14,38 @@ namespace Loupe.Core.Test.Data
         [Test]
         public void Can_Load_Perf_Counter_Data()
         {
-            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Content", "NoisySession.glf");
-
-            using (var stream = File.OpenRead(file))
-            using (var glfReader = new GLFReader(stream))
-            using (var session = new Session(glfReader))
+            using (var session = LoadSampleSession())
             {
                 var perfCounterMetrics = session.MetricDefinitions.Where(d => d is PerfCounterMetricDefinition).ToList();
 
                 Assert.NotZero(perfCounterMetrics.Count);
             }
+        }
+
+        [Test]
+        public void Can_Calculate_Perf_Counter_Samples()
+        {
+            using (var session = LoadSampleSession())
+            {
+                var procTimeCounterDefinition = session.MetricDefinitions.FirstOrDefault(d => d.Name == "PerfCounter~Processor~% Processor Time") as PerfCounterMetricDefinition;
+                Assert.IsNotNull(procTimeCounterDefinition);
+
+                var procTimeCounter = procTimeCounterDefinition.Metrics.FirstOrDefault() as PerfCounterMetric;
+                Assert.IsNotNull(procTimeCounter);
+
+                var samples = procTimeCounter.CalculateValues(Extensibility.Data.MetricSampleInterval.Second, 5);
+                Assert.IsNotNull(samples);
+                Assert.AreEqual(13, samples.Count);
+            }
+        }
+
+        private Session LoadSampleSession()
+        {
+            var file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Content", "NoisySession.glf");
+
+            var session = new Session(new GLFReader(File.OpenRead(file)));
+
+            return session;
         }
     }
 }

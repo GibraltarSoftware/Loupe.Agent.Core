@@ -5,9 +5,6 @@ using System.IO;
 using Gibraltar.Data;
 using IEnumerator=System.Collections.IEnumerator;
 
-
-
-
 namespace Gibraltar.Monitor
 {
     /// <summary>
@@ -72,10 +69,8 @@ namespace Gibraltar.Monitor
             {
                 // Uh-oh, the caller wants to keep the stream themselves.  We need to punt a copy from the original stream.
                 fileStream.Position = 0; // Reset its position to the start of the file to copy from the start.
-                newStream = FileSystemTools.GetTempFileStreamCopy(fileStream); // Get a delete-on-close temp file copied from it.
-                newStream.Position = originalPosition; // Should it do this?
-
-                fileStream.Position = originalPosition; // And set it back where it had been.
+                newStream = new TempFileStream(fileStream); // Get a delete-on-close temp file copied from it.
+                fileStream.Position = originalPosition; // And set it our actual file stream back where it had been before we copied it.
             }
             else
             {
@@ -83,10 +78,10 @@ namespace Gibraltar.Monitor
                 newStream = fileStream;
             }
 
-            GLFReader glfReader = new GLFReader(newStream);
+            var glfReader = new GLFReader(newStream);
 
             //now forward to our GLF Reader add which is shared with other things
-            Session newSession = Add(glfReader);
+            var newSession = Add(glfReader);
 
             return newSession;
         }
