@@ -93,6 +93,10 @@ namespace Gibraltar.Monitor
 
             //now, before we can use the product name we need to make sure it doesn't have any illegal characters.
             m_RepositoryPath = CalculateRepositoryPath(productName, overridePath);
+
+            if (m_RepositoryPath == null)
+                throw new InvalidOperationException("Unable to initialize local repository - path is not accessible");
+
             m_RepositoryTempPath = Path.Combine(m_RepositoryPath, RepositoryTempFolder);
             m_SessionLockFolder = Path.Combine(m_RepositoryPath, FileMessenger.SessionLockFolderName);
             m_RepositoryArchivePath = Path.Combine(m_RepositoryPath, RepositoryArchiveFolder);
@@ -160,9 +164,16 @@ namespace Gibraltar.Monitor
         /// <summary>
         /// Calculate the best path for the log folder and the repository
         /// </summary>
+        /// <returns>The full path to use, or null if no valid path could be determined</returns>
         public static string CalculateRepositoryPath(string productName, string overridePath = null)
         {
             var repositoryFolder = PathManager.FindBestPath(PathType.Collection, overridePath);
+
+            //if we didn't get a repository folder at all that's bad - it means there's no usable path.
+            if (string.IsNullOrEmpty(repositoryFolder))
+            {
+                return null;
+            }
 
             //now, we either just calculated a DEFAULT folder (which is just the base directory) or a final one.
             if (string.IsNullOrEmpty(overridePath))

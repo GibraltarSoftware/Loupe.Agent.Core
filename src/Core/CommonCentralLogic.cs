@@ -42,6 +42,17 @@ namespace Gibraltar
             set => g_BreakPointEnable = value;
         }
 
+
+        /// <summary>
+        /// Indicates if the current process is running in a container.
+        /// </summary>
+        public static bool IsRunningInContainer()
+        {
+            var runningInContainer = System.Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER");
+
+            return !string.IsNullOrEmpty(runningInContainer) && runningInContainer.ToLowerInvariant() == "true";
+        }
+
         /// <summary>
         /// Reports whether EndSession() has been called to formally end the session.
         /// </summary>

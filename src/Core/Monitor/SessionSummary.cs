@@ -173,7 +173,7 @@ namespace Gibraltar.Monitor
                 GC.KeepAlive(ex);
             }
 
-            var isContainer = IsRunningInContainer();
+            var isContainer = CommonCentralLogic.IsRunningInContainer();
 
             if (isContainer)
             {
@@ -740,16 +740,6 @@ namespace Gibraltar.Monitor
             return version;
         }
 
-        /// <summary>
-        /// Indicates if the current process is running in a container.
-        /// </summary>
-        private static bool IsRunningInContainer()
-        {
-            var runningInContainer = System.Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER");
-
-            return !string.IsNullOrEmpty(runningInContainer) && runningInContainer.ToLowerInvariant() == "true";
-        }
-
         private static Guid GetComputerIdSafe(string product, AgentConfiguration configuration)
         {
             var computerId = Guid.Empty;  //we can't fail, this is a good default value since upstream items will treat it as a "don't know"
@@ -758,7 +748,7 @@ namespace Gibraltar.Monitor
                 //If we're in a container we want to use the log storage folder - the computer Id will be transient
                 //which can cause problems with our upload process (registering the same session to many computers).
                 //So on a container we want to use the local repository.
-                var preferredPath = IsRunningInContainer() ? LocalRepository.CalculateRepositoryPath(product, configuration.SessionFile.Folder) 
+                var preferredPath = CommonCentralLogic.IsRunningInContainer() ? LocalRepository.CalculateRepositoryPath(product, configuration.SessionFile.Folder) 
                     : PathManager.FindBestPath(PathType.Collection);
 
                 //first see if we have a GUID file in the system-wide location.

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gibraltar.Monitor;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -290,6 +291,7 @@ namespace Gibraltar.Data
                 //Our primary expectation for an exception is the path didn't exist and we couldn't create it.
             }
 
+            // Fall back to this environment variable which is commonly available on multiple OS.
             if (string.IsNullOrWhiteSpace(path))
                 path = Environment.GetEnvironmentVariable("HOME");
 
