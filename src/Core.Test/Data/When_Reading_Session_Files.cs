@@ -10,6 +10,10 @@ namespace Loupe.Core.Test.Data
     [TestFixture]
     public class When_Reading_Session_Files
     {
+        /// <summary>
+        /// Ensure our event metric value definitions have their index set after deserialization
+        /// </summary>
+        /// <remarks>This test ensure we don't regress a defect where the value definition index was unset (-1) after rehydration</remarks>
         [Test]
         public void Can_Get_Index_Of_Event_Metric_Values()
         {
