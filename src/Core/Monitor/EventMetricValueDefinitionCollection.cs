@@ -504,7 +504,7 @@ namespace Gibraltar.Monitor
         internal EventMetricValueDefinition Add(EventMetricValueDefinitionPacket packet)
         {
             //Even though this is an internal method used just during rehydration of data, we are going to 
-            //enforce all of the integrity checks to be sure we have good data
+            //enforce all the integrity checks to be sure we have good data
 
             //The one thing we CAN'T check is read only, because we're used when the collection IS read only.
 
@@ -528,10 +528,13 @@ namespace Gibraltar.Monitor
                 }
 
                 //create a new value definition
-                EventMetricValueDefinition newDefinition = new EventMetricValueDefinition(m_Definition, packet);
+                var newDefinition = new EventMetricValueDefinition(m_Definition, packet);
 
                 //forward the call to our one true add method
                 Add(newDefinition);
+
+                // set our index for the read-time position of the value.
+                newDefinition.MyIndex = m_List.IndexOf(newDefinition);
 
                 //and return the new object to our caller so they have the object we created from their input.
                 return newDefinition;
