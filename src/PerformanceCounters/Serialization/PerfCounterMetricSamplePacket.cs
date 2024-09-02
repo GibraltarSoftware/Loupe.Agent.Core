@@ -14,7 +14,10 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
     /// </summary>
     internal class PerfCounterMetricSamplePacket : SampledMetricSamplePacket, IPacket, IPacketObjectFactory<MetricSample, Metric>, IComparable<PerfCounterMetricSamplePacket>, IEquatable<PerfCounterMetricSamplePacket>
     {
-        private CounterSample m_Sample;
+#if NET40_OR_GREATER || WINDOWS
+        private CounterSample? m_Sample;
+#endif
+        private SerializedCounterSample? m_RestoredSample;
 
         /// <summary>
         /// Create a new performance counter metric by sampling the provided performance counter object.
@@ -29,11 +32,15 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         public PerfCounterMetricSamplePacket(PerformanceCounter counter, PerfCounterMetric metric)
             : base(metric)
         {
+#if NET40_OR_GREATER || WINDOWS
             //we ask the perf counter for a value right now
             m_Sample = counter.NextSample();
             
             //and we have to stuff a few things into our base object so it knows what we're talking about
-            RawValue = m_Sample.RawValue;
+            RawValue = m_Sample.Value.RawValue;
+#else
+            throw new PlatformNotSupportedException("Performance counters are not supported outside of Windows");
+#endif
         }
 
 
@@ -41,14 +48,14 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         /// Create a new performance counter metric sampled packet for rehydration
         /// </summary>
         /// <param name="session"></param>
-        public PerfCounterMetricSamplePacket(Session session) 
+        public PerfCounterMetricSamplePacket(Session session)
             : base(session)
-        {            
+        {
         }
 
         #region Public Properties and Methods
 
-        public static implicit operator CounterSample(PerfCounterMetricSamplePacket r)
+        public static implicit operator SerializedCounterSample(PerfCounterMetricSamplePacket r)
         {
             return r.CounterSample;
         }
@@ -90,8 +97,8 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
                 return false; // since we're a live object we can't be equal.
             }
 
-            //we let our base object do the compare, we're realy just casting things
-            return ((m_Sample == other.m_Sample) 
+            //we let our base object do the compare, we're really just casting things
+            return ((m_RestoredSample == other.m_RestoredSample)
                     && base.Equals(other));
         }
 
@@ -110,7 +117,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         {
             int myHash = base.GetHashCode(); // Fold in hash code for inherited base type
 
-            myHash ^= m_Sample.GetHashCode(); // Fold in hash code for CounterSample member Sample
+            myHash ^= m_RestoredSample.GetHashCode(); // Fold in hash code for CounterSample member Sample
 
             return myHash;
         }
@@ -120,14 +127,14 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         /// The Windows Counter Sample.
         /// </summary>
         /// <returns></returns>
-        public CounterSample CounterSample => m_Sample;
+        public SerializedCounterSample CounterSample => m_RestoredSample.Value;
 
         #endregion
 
 
         #region Explicit IPacket Implementation
         //We need to explicitly implement this interface because we don't want to override the IPacket implementation,
-        //we want to have our own distinct implementatino because the packet serialization methods know to recurse object
+        //we want to have our own distinct implementation because the packet serialization methods know to recurse object
         //structures looking for the interface.
 
         private const int SerializationVersion = 1;
@@ -144,7 +151,6 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
 
         PacketDefinition IPacket.GetPacketDefinition()
         {
-
             string typeName = MethodBase.GetCurrentMethod().DeclaringType.Name;
             PacketDefinition definition = new PacketDefinition(typeName, SerializationVersion, false);
             definition.Fields.Add("baseValue", FieldType.Int64);
@@ -159,17 +165,32 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
-            packet.SetField("baseValue", m_Sample.BaseValue);
-            packet.SetField("counterTimeStamp", m_Sample.CounterTimeStamp);
-            packet.SetField("counterFrequency", m_Sample.CounterFrequency);
-            packet.SetField("systemFrequency", m_Sample.SystemFrequency);
-            packet.SetField("timeStamp", m_Sample.TimeStamp);
-            packet.SetField("timeStamp100nSec", m_Sample.TimeStamp100nSec);
+#if NET40_OR_GREATER || WINDOWS
+            if (m_Sample.HasValue) 
+            {
+                var sample = m_Sample.Value;
+                packet.SetField("baseValue", sample.BaseValue);
+                packet.SetField("counterTimeStamp", sample.CounterTimeStamp);
+                packet.SetField("counterFrequency", sample.CounterFrequency);
+                packet.SetField("systemFrequency", sample.SystemFrequency);
+                packet.SetField("timeStamp", sample.TimeStamp);
+                packet.SetField("timeStamp100nSec", sample.TimeStamp100nSec);
 
-            //conceptually we shouldn't persist this - it's always the same and it's always on our metric, however
-            //we need it here for deserialization purposes because our metric packet object isn't available during
-            //the deserialization process.
-            packet.SetField("counterType", (int)m_Sample.CounterType);
+                //conceptually we shouldn't persist this - it's always the same and it's always on our metric, however
+                //we need it here for deserialization purposes because our metric packet object isn't available during
+                //the deserialization process.
+                packet.SetField("counterType", (int)sample.CounterType);
+                return;
+            }
+#endif
+            var restoredSample = m_RestoredSample.Value;
+            packet.SetField("baseValue", restoredSample.BaseValue);
+            packet.SetField("counterTimeStamp", restoredSample.CounterTimeStamp);
+            packet.SetField("counterFrequency", restoredSample.CounterFrequency);
+            packet.SetField("systemFrequency", restoredSample.SystemFrequency);
+            packet.SetField("timeStamp", restoredSample.TimeStamp);
+            packet.SetField("timeStamp100nSec", restoredSample.TimeStamp100nSec);
+            packet.SetField("counterType", (int)restoredSample.CounterType);
         }
 
         void IPacket.ReadFields(PacketDefinition definition, SerializedPacket packet)
@@ -199,7 +220,7 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
                     PerformanceCounterType counterType = (PerformanceCounterType)rawCounterType;
 
                     //Now, create our sample object from this data
-                    m_Sample = new CounterSample((long)base.RawValue, baseValue, counterFrequency, systemFrequency, timeStamp, timeStamp100nSec, counterType, counterTimeStamp);
+                    m_RestoredSample = new SerializedCounterSample((long)base.RawValue, baseValue, counterFrequency, systemFrequency, timeStamp, timeStamp100nSec, counterType, counterTimeStamp);
                     break;
                 default:
                     throw new GibraltarPacketVersionException(definition.Version);

@@ -26,6 +26,7 @@ namespace Gibraltar.Monitor
         private bool m_NameBound;
         private string m_NameMemberName;
         private MemberTypes m_NameMemberType;
+        private bool m_ValueDefinitionsIndexSet;
 
         /// <summary>
         /// Create a new event metric definition for the active log.
@@ -353,7 +354,7 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
-        /// The type of the member to be invoked to deterine the metric instance name (field, method, or property)
+        /// The type of the member to be invoked to determine the metric instance name (field, method, or property)
         /// </summary>
         /// <remarks>This property is only valid when NameBound is true.</remarks>
         public MemberTypes NameMemberType
@@ -370,7 +371,12 @@ namespace Gibraltar.Monitor
             lock (Lock)
             {
                 base.SetReadOnly();
-                m_MetricValues.SetAllIndex();
+
+                if (m_ValueDefinitionsIndexSet == false)
+                {
+                    m_MetricValues.SetAllIndex();
+                    m_ValueDefinitionsIndexSet = true;
+                }
             }
         }
 

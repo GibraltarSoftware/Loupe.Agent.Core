@@ -1,6 +1,9 @@
 ﻿
 using System;
 using System.Diagnostics;
+#if !NETSTANDARD2_0
+using System.Diagnostics.PerformanceData;
+#endif
 using Gibraltar.Monitor;
 using Loupe.Agent.PerformanceCounters.Serialization;
 
@@ -29,8 +32,6 @@ namespace Loupe.Agent.PerformanceCounters
             : base(metric, metricSamplePacket, ((PerfCounterMetricDefinition) metric.Definition).RequiresMultipleSamples)
         {
         }
-
-        #region Public Properties and Methods
 
         /// <summary>
         /// Compute the counter value for this sample compared with the provided baseline sample
@@ -61,12 +62,11 @@ namespace Loupe.Agent.PerformanceCounters
 
                 //gateway to the counter sample calculator
                 PerfCounterMetricSample baselinePerfCounterSample = (PerfCounterMetricSample) baselineSample;
-                computedValue = CounterSampleCalculator.ComputeCounterValue(baselinePerfCounterSample,
-                                                                   Packet.CounterSample);
+                computedValue = ComputeCounterValue(baselinePerfCounterSample, Packet.CounterSample);
             }
             else
             {
-                computedValue = CounterSampleCalculator.ComputeCounterValue(Packet.CounterSample);
+                computedValue = ComputeCounterValue(Packet.CounterSample);
             }
 
             //is this a percentage value?  Perf counters "upscale" at the calculation stage which we want to undo.
@@ -83,7 +83,7 @@ namespace Loupe.Agent.PerformanceCounters
         /// </summary>
         /// <param name="sample"></param>
         /// <returns></returns>
-        public static implicit operator CounterSample(PerfCounterMetricSample sample)
+        public static implicit operator SerializedCounterSample(PerfCounterMetricSample sample)
         {
             return sample.CounterSample;
         }
@@ -92,12 +92,12 @@ namespace Loupe.Agent.PerformanceCounters
         /// Provide users a handy default conversion since we ultimately just wrapper a counter sample object anyway.
         /// </summary>
         /// <returns>The counter sample object wrappered by this object</returns>
-        public CounterSample ToCounterSample() { return CounterSample; }
-        
+        public SerializedCounterSample ToCounterSample() { return CounterSample; }
+
         /// <summary>
         /// The underlying counter sample for this object
         /// </summary>
-        public CounterSample CounterSample => Packet;
+        public SerializedCounterSample CounterSample => Packet;
 
         /// <summary>
         /// The performance counter metric this sample is for.
@@ -132,12 +132,111 @@ namespace Loupe.Agent.PerformanceCounters
             return base.Equals(other);
         }
 
-        #endregion
-
-        #region Internal Properties and Methods
-
         internal new PerfCounterMetricSamplePacket Packet => (PerfCounterMetricSamplePacket)base.Packet;
 
-        #endregion
+#if NETSTANDARD2_0
+        private double ComputeCounterValue(SerializedCounterSample sample)
+        {
+            throw new PlatformNotSupportedException("Calculating performance counter values is not supported in .NET Standard 2.0");
+        }
+
+        private double ComputeCounterValue(SerializedCounterSample baselineSample, SerializedCounterSample currentSample)
+        {
+            throw new PlatformNotSupportedException("Calculating performance counter values is not supported in .NET Standard 2.0");
+        }
+#else
+        private double ComputeCounterValue(SerializedCounterSample sample)
+        {
+            double computedValue = 0;
+            switch (sample.CounterType)
+            {
+                case PerformanceCounterType.ElapsedTime:
+                    computedValue = (double)(sample.CounterTimeStamp - sample.RawValue) / sample.SystemFrequency;
+                    break;
+                case PerformanceCounterType.NumberOfItemsHEX32:
+                case PerformanceCounterType.NumberOfItemsHEX64:
+                case PerformanceCounterType.NumberOfItems32:
+                case PerformanceCounterType.NumberOfItems64:
+                    computedValue = sample.RawValue;
+                    break;
+                case PerformanceCounterType.RawFraction:
+                    computedValue = sample.BaseValue == 0 ? 0 : (double)sample.RawValue / sample.BaseValue * 100;
+                    break;
+                default:
+                    switch ((CounterType)sample.CounterType) //upgrade it to the newer type which seems to match the values we get
+                    {
+                        case CounterType.RawFraction32:
+                        case CounterType.RawFraction64:
+                            computedValue = sample.BaseValue == 0 ? 0 : (double)sample.RawValue / sample.BaseValue * 100;
+                            break;
+
+                        default:
+                            throw new NotImplementedException($"Calculations for the performance counter type {sample.CounterType} aren't implemented");
+                    }
+                    break;
+            }
+
+            return computedValue;
+        }
+
+        private double ComputeCounterValue(SerializedCounterSample baselineSample, SerializedCounterSample currentSample)
+        {
+            double rawDelta = currentSample.RawValue - baselineSample.RawValue;
+            double baseDelta = currentSample.BaseValue - baselineSample.BaseValue;
+            double ticksDelta = currentSample.TimeStamp - baselineSample.TimeStamp;
+            double ticks100NsDelta = currentSample.TimeStamp100nSec - baselineSample.TimeStamp100nSec;
+            double computedValue = 0;
+
+            switch (currentSample.CounterType)
+            {
+                case PerformanceCounterType.RateOfCountsPerSecond32:
+                case PerformanceCounterType.RateOfCountsPerSecond64:
+                    computedValue = ticksDelta == 0 ? 0 : rawDelta / (ticksDelta / currentSample.SystemFrequency);
+                    break;
+                case PerformanceCounterType.SampleCounter:
+                    computedValue = ticksDelta == 0 ? 0 : rawDelta / (ticksDelta / currentSample.SystemFrequency);
+                    break;
+                case PerformanceCounterType.SampleFraction:
+                    computedValue = ticksDelta == 0 ? 0 : (rawDelta / ticksDelta) * 100;
+                    break;
+                case PerformanceCounterType.Timer100Ns:
+                    computedValue = ticks100NsDelta == 0 ? 0 : (rawDelta / ticks100NsDelta) * 100;
+                    break;
+                case PerformanceCounterType.Timer100NsInverse:
+                    computedValue = ticks100NsDelta == 0 ? 0 : (1 - (rawDelta / ticks100NsDelta)) * 100;
+                    break;
+                default:
+                    //Second pass: switch to CounterType enum since we get some of them too.  I don't know why.
+                    switch ((CounterType)currentSample.CounterType)
+                    {
+                        case CounterType.AverageCount64:
+                            computedValue = baseDelta == 0 ? 0 : rawDelta / baseDelta;
+                            break;
+                        case CounterType.AverageTimer32:
+                            computedValue = baseDelta == 0 ? 0 : (rawDelta / currentSample.SystemFrequency) / baseDelta;
+                            break;
+                        case CounterType.Delta32:
+                        case CounterType.Delta64:
+                            computedValue = rawDelta;
+                            break;
+                        case CounterType.PrecisionTimer100Ns:
+                            computedValue = ticks100NsDelta == 0 ? 0 : (rawDelta / ticks100NsDelta) * 100;
+                            break;
+                        case CounterType.QueueLength:
+                            computedValue = ticksDelta == 0 ? 0 : rawDelta / ticksDelta;
+                            break;
+                        case CounterType.QueueLength100Ns:
+                            computedValue = ticks100NsDelta == 0 ? 0 : rawDelta / ticks100NsDelta;
+                            break;
+                        default:
+                            throw new NotImplementedException($"Calculations for the performance counter type {currentSample.CounterType} aren't implemented");
+                    }
+                    break;
+            }
+
+            return computedValue;
+        }
+#endif
+
     }
 }

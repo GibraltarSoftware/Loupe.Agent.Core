@@ -558,6 +558,8 @@ namespace Gibraltar.Monitor
             }
 
             m_Threads.UniquifyThreadNames(); // And distinguish any thread name (Caption) collisions.
+
+            m_MetricDefinitions.SetReadOnly(); // And lock in any definitions we added on this pass.
         }
 
         /// <summary>
