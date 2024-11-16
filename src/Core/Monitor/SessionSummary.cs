@@ -949,16 +949,16 @@ namespace Gibraltar.Monitor
                     applicationVersion = topAssembly.GetName().Version;
 
                     //now get the attributes we need.
-                    AssemblyFileVersionAttribute[] fileVersionAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)) as AssemblyFileVersionAttribute[];
-                    AssemblyProductAttribute[] productAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute)) as AssemblyProductAttribute[];
-                    AssemblyTitleAttribute[] titleAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute)) as AssemblyTitleAttribute[];
-                    AssemblyDescriptionAttribute[] descriptionAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute[];
+                    var fileVersionAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute)) as AssemblyFileVersionAttribute[];
+                    var productAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute)) as AssemblyProductAttribute[];
+                    var titleAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute)) as AssemblyTitleAttribute[];
+                    var descriptionAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute[];
 
                     //and interpret this information
-                    if ((fileVersionAttributes != null) && (fileVersionAttributes.Length > 0))
+                    if (fileVersionAttributes is { Length: > 0 })
                     {
                         //try to parse this value (it's text so it might not parse)
-                        string rawFileVersion = fileVersionAttributes[0].Version;
+                        var rawFileVersion = fileVersionAttributes[0].Version;
                         try
                         {
                             applicationVersion = new Version(rawFileVersion);
@@ -970,17 +970,17 @@ namespace Gibraltar.Monitor
                         }
                     }
 
-                    if ((productAttributes != null) && (productAttributes.Length > 0))
+                    if (productAttributes is { Length: > 0 })
                     {
                         productName = productAttributes[0].Product ?? string.Empty; //protected against null explicit values
                     }
 
-                    if ((titleAttributes != null) && (titleAttributes.Length > 0))
+                    if (titleAttributes is { Length: > 0 })
                     {
                         applicationName = titleAttributes[0].Title ?? string.Empty; //protected against null explicit values
                     }
 
-                    if ((descriptionAttributes != null) && (descriptionAttributes.Length > 0))
+                    if (descriptionAttributes is { Length: > 0 })
                     {
                         applicationDescription = descriptionAttributes[0].Description ?? string.Empty; //protected against null explicit values
                     }
