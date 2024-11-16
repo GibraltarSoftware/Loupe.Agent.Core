@@ -225,14 +225,18 @@ namespace Loupe.Configuration
                         stringBuilder.AppendFormat("\tLoupe Server '{0}' repository '{1}'", Server, Repository);
                     }
 
-                    stringBuilder.AppendFormat("\tUse Ssl: {0}\r\n", UseSsl);
+                    stringBuilder.AppendFormat(" Use Ssl: {0}", UseSsl);
 
                     if (Port != 0)
-                        stringBuilder.AppendFormat("\tPort: {0}\r\n", Port);
+                        stringBuilder.AppendFormat(" Port: {0}", Port);
+
+                    stringBuilder.AppendLine();
                 }
 
                 if (string.IsNullOrEmpty(ApplicationKey) == false)
+                {
                     stringBuilder.AppendFormat("\tApplication Key: {0}\r\n", ApplicationKey);
+                }
 
                 stringBuilder.AppendFormat("\tAuto Send Sessions: {0}\r\n", AutoSendSessions);
                 stringBuilder.AppendFormat("\tSend All Applications: {0}\r\n", SendAllApplications);

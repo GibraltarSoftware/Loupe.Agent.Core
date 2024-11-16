@@ -127,19 +127,27 @@ namespace Gibraltar.Monitor
         /// <returns></returns>
         private void RegisterPerfCounterFactory(PacketReader packetReader)
         {
-            var assemblyName = "Loupe.Agent.PerformanceCounters.dll";
             var factoryTypeName = "Loupe.Agent.PerformanceCounters.Serialization.PerfCounterMetricPacketFactory";
 
-            var binFolder = AppDomain.CurrentDomain.BaseDirectory;
-            var assemblyPath = Path.Combine(binFolder, assemblyName);
+            // See if the type has already been loaded for any reason
+            var factoryType = Type.GetType(factoryTypeName);
 
-            if (!File.Exists(assemblyPath))
+            if (factoryType == null)
             {
-                return;
-            }
+                // It hasn't - probe for the specific assembly we expect and load that assembly
+                // to load the type.
+                var assemblyName = "Loupe.Agent.PerformanceCounters.dll";
+                var binFolder = AppDomain.CurrentDomain.BaseDirectory;
+                var assemblyPath = Path.Combine(binFolder, assemblyName);
 
-            var assembly = Assembly.LoadFrom(assemblyPath);
-            var factoryType = assembly.GetType(factoryTypeName);
+                if (!File.Exists(assemblyPath))
+                {
+                    return;
+                }
+
+                var assembly = Assembly.LoadFrom(assemblyPath);
+                factoryType = assembly.GetType(factoryTypeName);
+            }
 
             if (factoryType == null)
             {

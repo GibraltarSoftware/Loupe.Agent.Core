@@ -2,7 +2,7 @@
   "profiles": {
     "Packager": {
       "commandName": "Project",
-      "commandLineArgs": "-t -m server -p Loupe -folder Transfer -server loupe-test.onloupe.com -useSsl true -key 13b5459c42a946be82bf74db8c78fc56"
+      "commandLineArgs": "-t -m server -folder \"C:\\ProgramData\\Gibraltar\\Local Logs\\testtransfer\" -p Loupe -server \"api-dev-single.onloupe.com\" -ssl true -key \"9e81f5a7f3584b63a064455aad5281ba\""
     }
   }
 }
