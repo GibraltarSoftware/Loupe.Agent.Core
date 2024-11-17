@@ -955,7 +955,7 @@ namespace Gibraltar.Monitor
                     var descriptionAttributes = topAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute[];
 
                     //and interpret this information
-                    if (fileVersionAttributes is { Length: > 0 })
+                    if (fileVersionAttributes?.Length > 0)
                     {
                         //try to parse this value (it's text so it might not parse)
                         var rawFileVersion = fileVersionAttributes[0].Version;
@@ -970,17 +970,17 @@ namespace Gibraltar.Monitor
                         }
                     }
 
-                    if (productAttributes is { Length: > 0 })
+                    if (productAttributes?.Length > 0)
                     {
                         productName = productAttributes[0].Product ?? string.Empty; //protected against null explicit values
                     }
 
-                    if (titleAttributes is { Length: > 0 })
+                    if (titleAttributes?.Length > 0)
                     {
                         applicationName = titleAttributes[0].Title ?? string.Empty; //protected against null explicit values
                     }
 
-                    if (descriptionAttributes is { Length: > 0 })
+                    if (descriptionAttributes?.Length > 0)
                     {
                         applicationDescription = descriptionAttributes[0].Description ?? string.Empty; //protected against null explicit values
                     }
