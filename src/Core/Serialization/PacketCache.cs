@@ -21,8 +21,7 @@ namespace Gibraltar.Serialization
 
         public int AddOrGet(ICachedPacket packet)
         {
-            int index;
-            if (m_Index.TryGetValue(packet.ID, out index))
+            if (m_Index.TryGetValue(packet.ID, out var index))
                 return index;
 
             index = m_Cache.Count;
@@ -50,8 +49,7 @@ namespace Gibraltar.Serialization
         {
             get
             {
-                int index;
-                if (m_Index.TryGetValue(id, out index))
+                if (m_Index.TryGetValue(id, out var index))
                     return m_Cache[index];
                 else
                     return null;

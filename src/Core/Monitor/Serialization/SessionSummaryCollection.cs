@@ -263,9 +263,8 @@ namespace Gibraltar.Monitor.Serialization
         {
             lock (m_Lock)
             {
-                ISessionSummary victim;
                 bool foundItem = false;
-                if (m_Dictionary.TryGetValue(key, out victim))
+                if (m_Dictionary.TryGetValue(key, out var victim))
                 {
                     foundItem = true;
                     m_Dictionary.Remove(key);

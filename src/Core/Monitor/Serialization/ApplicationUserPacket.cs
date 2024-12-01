@@ -131,7 +131,7 @@ namespace Gibraltar.Monitor.Serialization
         public override bool Equals(object other)
         {
             //use our type-specific override
-            return Equals(other as ThreadInfoPacket);
+            return Equals(other as ApplicationUserPacket);
         }
 
         /// <summary>
@@ -258,11 +258,9 @@ namespace Gibraltar.Monitor.Serialization
                     packet.GetField("EmailAddress", out m_EmailAddress);
                     packet.GetField("Phone", out m_Phone);
 
-                    string[] propertyNames;
-                    packet.GetField("PropertyNames", out propertyNames);
+                    packet.GetField("PropertyNames", out string[] propertyNames);
 
-                    string[] propertyValues;
-                    packet.GetField("PropertyValues", out propertyValues);
+                    packet.GetField("PropertyValues", out string[] propertyValues);
 
                     for (int index = 0; index < propertyNames.Length; index++)
                     {

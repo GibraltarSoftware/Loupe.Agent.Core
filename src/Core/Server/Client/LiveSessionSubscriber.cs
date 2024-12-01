@@ -200,8 +200,7 @@ namespace Gibraltar.Server.Client
                         {
                             // The new serialized version of LMP adds a ThreadIndex field.  Older versions will set this
                             // field from the ThreadId field, so we can rely on ThreadIndex in any case.
-                            ThreadInfo threadInfo;
-                            if (m_PacketCache.Threads.TryGetValue(logMessagePacket.ThreadIndex, out threadInfo))
+                            if (m_PacketCache.Threads.TryGetValue(logMessagePacket.ThreadIndex, out var threadInfo))
                             {
                                 logMessagePacket.ThreadInfoPacket = threadInfo.Packet;
                             }

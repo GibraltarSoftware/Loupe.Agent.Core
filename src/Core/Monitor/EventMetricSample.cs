@@ -52,9 +52,8 @@ namespace Gibraltar.Monitor
             }
 
             //look up the value in the definition so we can find its offset into the array
-            IEventMetricValueDefinition curValueDefinition;
 
-            if (Metric.Definition.Values.TryGetValue(name, out curValueDefinition) == false)
+            if (Metric.Definition.Values.TryGetValue(name, out var curValueDefinition) == false)
             {
 #if DEBUG
                 //if we're compiled in debug mode, tell the user they blew it.

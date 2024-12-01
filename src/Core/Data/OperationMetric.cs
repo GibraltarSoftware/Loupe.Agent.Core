@@ -258,9 +258,8 @@ namespace Gibraltar.Data
             }
 
             //Get the METRIC DEFINITION
-            IMetricDefinition metricDefinition;
             EventMetricDefinition eventDefinition;
-            if (Log.Metrics.TryGetValue(MetricTypeName, m_Category, MetricCounterName, out metricDefinition) == false)
+            if (Log.Metrics.TryGetValue(MetricTypeName, m_Category, MetricCounterName, out var metricDefinition) == false)
             {
                 //it doesn't exist yet - add it
                 eventDefinition = new EventMetricDefinition(MetricTypeName, m_Category, MetricCounterName);
@@ -282,9 +281,8 @@ namespace Gibraltar.Data
             }
 
             //Get the METRIC
-            IMetric metric;
             EventMetric eventMetric;
-            if (eventDefinition.Metrics.TryGetValue(null, out metric) == false)
+            if (eventDefinition.Metrics.TryGetValue(null, out IMetric metric) == false)
             {
                 eventMetric = new EventMetric(eventDefinition, (string)null);
             }

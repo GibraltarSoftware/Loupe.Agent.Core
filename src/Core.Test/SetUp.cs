@@ -103,6 +103,11 @@ namespace Loupe.Core.Test
                 publisher.ApplicationDescription = "NUnit tests of the Gibraltar Core Library";
 
                 e.Configuration.SessionFile.EnableFilePruning = false;
+
+                var server = e.Configuration.Server;
+                server.Server = "localhost";
+                e.Configuration.NetworkViewer.Enabled = true;
+                e.Configuration.NetworkViewer.AllowRemoteClients = true;
             }
         }
 

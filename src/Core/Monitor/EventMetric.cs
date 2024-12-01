@@ -77,9 +77,8 @@ namespace Gibraltar.Monitor
 
             //we need to find the definition, adding it if necessary
             string definitionKey = MetricDefinition.GetKey(metricTypeName, categoryName, counterName);
-            IMetricDefinition definition;
 
-            if (definitions.TryGetValue(definitionKey, out definition))
+            if (definitions.TryGetValue(definitionKey, out var definition))
             {
                 //if the metric definition exists, but is of the wrong type we have a problem.
                 if ((definition is EventMetricDefinition) == false)

@@ -399,8 +399,7 @@ namespace Gibraltar.Data.Internal
             {
                 //it's a bit more complicated:  We need to update each file they don't have.  
                 SessionHeader sessionHeader;
-                IList<FileInfo> sessionFragments;
-                m_SourceRepository.LoadSessionFiles(sessionId, out sessionHeader, out sessionFragments);
+                m_SourceRepository.LoadSessionFiles(sessionId, out sessionHeader, out var sessionFragments);
 
                 foreach (var sessionFragment in sessionFragments)
                 {

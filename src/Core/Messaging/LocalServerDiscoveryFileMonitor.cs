@@ -217,8 +217,7 @@ namespace Gibraltar.Messaging
             LocalServerDiscoveryFileEventArgs eventArgs = null;
             lock (m_Lock)
             {
-                LocalServerDiscoveryFile victim;
-                if (m_DiscoveryFiles.TryGetValue(fullPath, out victim))
+                if (m_DiscoveryFiles.TryGetValue(fullPath, out var victim))
                 {
                     //indeed it existed so we want to raise the event.
                     m_DiscoveryFiles.Remove(fullPath);

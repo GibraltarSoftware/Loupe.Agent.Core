@@ -215,7 +215,7 @@ namespace Loupe.Agent.PerformanceCounters
 
             //we are going to do this in two passes:  One to get all of the samples, the second to write them to the log file.  This 
             //will let us write them as a single call and minimize locking.
-            List<MetricSample> samples = new List<MetricSample>(Count);
+            var samples = new List<MetricSample>(Count);
 
             //For multi-threaded cleanliness, we're going to get an array of our members to iterate, guaranteeing that our 
             //values are constant while we do what could take a minute.

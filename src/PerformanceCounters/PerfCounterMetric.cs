@@ -27,6 +27,20 @@ namespace Loupe.Agent.PerformanceCounters
         private static string s_OurProcessInstanceName;
         private static DateTimeOffset s_OurProcessInstanceNameExpirationDt;
 
+        static PerfCounterMetric()
+        {
+            // Attempt to capture our process name so we get a jump on resolving the right process instances and aren't fooled
+            // if there are multiple processes under the same PID.
+            try
+            {
+                s_OurProcessInstanceNamePrefix = Process.GetCurrentProcess().ProcessName;
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         /// <summary>
         /// Create a new performance counter metric object from the provided windows performance counter
         /// </summary>

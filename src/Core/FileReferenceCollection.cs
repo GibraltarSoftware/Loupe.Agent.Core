@@ -209,8 +209,7 @@ namespace Gibraltar
 
             //otherwise, see if we can find the victim...
             bool itemRemoved;
-            FileReference victim;
-            if (TryGetValue(key, out victim))
+            if (TryGetValue(key, out var victim))
             {
                 itemRemoved = Remove(victim);
             }
@@ -242,11 +241,9 @@ namespace Gibraltar
                 throw new ArgumentNullException(nameof(newFileNamePath), "An new file name and path must be provided to rename an item in the collection.");
 
             //see what condition we fall into
-            FileReference original;
-            FileReference destination;
 
-            TryGetValue(originalFileNamePath, out original);
-            TryGetValue(newFileNamePath, out destination);
+            TryGetValue(originalFileNamePath, out var original);
+            TryGetValue(newFileNamePath, out var destination);
             
             if ((original == null ) && (destination == null))
             {
@@ -574,8 +571,7 @@ namespace Gibraltar
                 foreach (FileInfo definitionFile in reportDefinitionFiles)
                 {
                     //do we have it already or not?
-                    FileReference reference;
-                    if (TryGetValue(definitionFile.FullName, out reference))
+                    if (TryGetValue(definitionFile.FullName, out var reference))
                     {
                         //see if this file has been touched since our last reference time.
                         if (definitionFile.LastWriteTime > reference.LastWriteTime)

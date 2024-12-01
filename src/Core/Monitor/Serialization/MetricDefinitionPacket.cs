@@ -378,15 +378,13 @@ namespace Gibraltar.Monitor.Serialization
                     packet.GetField("CategoryName", out m_CategoryName);
                     packet.GetField("CounterName", out m_CounterName);
 
-                    int rawSampleType;
-                    packet.GetField("SampleType", out rawSampleType);
+                    packet.GetField("SampleType", out int rawSampleType);
                     m_SampleType = (SampleType)rawSampleType;
 
                     packet.GetField("Caption", out m_Caption);
                     packet.GetField("Description", out m_Description);
 
-                    int rawInterval;
-                    packet.GetField("Interval", out rawInterval);
+                    packet.GetField("Interval", out int rawInterval);
                     m_Interval = (MetricSampleInterval)rawInterval;
 
                     //and our stuff that we have to calculate

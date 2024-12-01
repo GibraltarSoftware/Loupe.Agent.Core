@@ -451,8 +451,7 @@ namespace Gibraltar.Messaging.Net
                 if (nextPacket == null)
                 {
                     //go into a blocking wait on the socket..  we'll loop until we get the whole buffer into the stream.
-                    byte[] buffer;
-                    var newDataLength = ReadSocket(out buffer);
+                    var newDataLength = ReadSocket(out var buffer);
 
                     if (newDataLength == 0)
                     {
@@ -569,8 +568,7 @@ namespace Gibraltar.Messaging.Net
                 if (nextPacket == null) //at this point we know we've exhausted the read buffer and haven't found a valid packet.
                 {
                     //go into a blocking wait on the socket..  we'll loop until we get the whole buffer into the stream.
-                    byte[] buffer;
-                    int newDataLength = ReadSocket(out buffer);
+                    int newDataLength = ReadSocket(out var buffer);
 
                     if (newDataLength == 0)
                     {

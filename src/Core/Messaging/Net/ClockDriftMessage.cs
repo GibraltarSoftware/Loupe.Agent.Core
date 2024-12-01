@@ -97,8 +97,7 @@ namespace Gibraltar.Messaging.Net
 
             BinarySerializer.DeserializeValue(stream, out m_Id);
 
-            DateTimeOffset rawValue;
-            BinarySerializer.DeserializeValue(stream, out rawValue);
+            BinarySerializer.DeserializeValue(stream, out DateTimeOffset rawValue);
             if (rawValue != DateTimeOffset.MinValue)
                 m_OriginatorTimestamp = rawValue;
 

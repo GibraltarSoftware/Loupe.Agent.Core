@@ -254,14 +254,12 @@ namespace Gibraltar.Messaging.Net
         /// </summary>
         private static void ReadPacket(Stream stream, out NetworkMessageTypeCode typeCode, out Version version, out int length)
         {
-            int rawTypeCode;
-            BinarySerializer.DeserializeValue(stream, out rawTypeCode);
+            BinarySerializer.DeserializeValue(stream, out int rawTypeCode);
             typeCode = (NetworkMessageTypeCode)rawTypeCode;
 
             //we serialize version as major/minor
-            int majorVer, minorVer;
-            BinarySerializer.DeserializeValue(stream, out majorVer);
-            BinarySerializer.DeserializeValue(stream, out minorVer);
+            BinarySerializer.DeserializeValue(stream, out int majorVer);
+            BinarySerializer.DeserializeValue(stream, out int minorVer);
             version = new Version(majorVer, minorVer);
 
             BinarySerializer.DeserializeValue(stream, out length);

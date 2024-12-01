@@ -2,6 +2,11 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
+
+#if NETSTANDARD2_0
+using System.Runtime.InteropServices;
+#endif
+
 using Gibraltar;
 using Gibraltar.Monitor;
 using Gibraltar.Monitor.Serialization;
@@ -14,17 +19,23 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
     /// </summary>
     internal class PerfCounterMetricSamplePacket : SampledMetricSamplePacket, IPacket, IPacketObjectFactory<MetricSample, Metric>, IComparable<PerfCounterMetricSamplePacket>, IEquatable<PerfCounterMetricSamplePacket>
     {
-#if NET40_OR_GREATER || WINDOWS
-        private CounterSample? m_Sample;
-#endif
+        private readonly CounterSample? m_Sample;
         private SerializedCounterSample? m_RestoredSample;
+
+#if NETFRAMEWORK || WINDOWS
+        private static readonly bool IsWindows = true;
+#elif NETSTANDARD2_0
+        private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#else
+        private static readonly bool IsWindows = OperatingSystem.IsWindows();
+#endif
 
         /// <summary>
         /// Create a new performance counter metric by sampling the provided performance counter object.
         /// </summary>
         /// <remarks>
         /// The counter packet provided must match the performance counter object.  The counter packet is used
-        /// to provide clients with all of the information necessary to process performance metrics without using 
+        /// to provide clients with all the information necessary to process performance metrics without using 
         /// the performance counter infrastructure.
         /// </remarks>
         /// <param name="counter">The windows performance counter to sample</param>
@@ -32,15 +43,14 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
         public PerfCounterMetricSamplePacket(PerformanceCounter counter, PerfCounterMetric metric)
             : base(metric)
         {
-#if NET40_OR_GREATER || WINDOWS
+            if (IsWindows == false)
+                throw new PlatformNotSupportedException("Performance counters are not supported outside of Windows");
+
             //we ask the perf counter for a value right now
             m_Sample = counter.NextSample();
             
             //and we have to stuff a few things into our base object so it knows what we're talking about
             RawValue = m_Sample.Value.RawValue;
-#else
-            throw new PlatformNotSupportedException("Performance counters are not supported outside of Windows");
-#endif
         }
 
 
@@ -165,32 +175,34 @@ namespace Loupe.Agent.PerformanceCounters.Serialization
 
         void IPacket.WriteFields(PacketDefinition definition, SerializedPacket packet)
         {
-#if NET40_OR_GREATER || WINDOWS
-            if (m_Sample.HasValue) 
+            if (m_RestoredSample.HasValue)
             {
-                var sample = m_Sample.Value;
-                packet.SetField("baseValue", sample.BaseValue);
-                packet.SetField("counterTimeStamp", sample.CounterTimeStamp);
-                packet.SetField("counterFrequency", sample.CounterFrequency);
-                packet.SetField("systemFrequency", sample.SystemFrequency);
-                packet.SetField("timeStamp", sample.TimeStamp);
-                packet.SetField("timeStamp100nSec", sample.TimeStamp100nSec);
-
-                //conceptually we shouldn't persist this - it's always the same and it's always on our metric, however
-                //we need it here for deserialization purposes because our metric packet object isn't available during
-                //the deserialization process.
-                packet.SetField("counterType", (int)sample.CounterType);
+                var restoredSample = m_RestoredSample.Value;
+                packet.SetField("baseValue", restoredSample.BaseValue);
+                packet.SetField("counterTimeStamp", restoredSample.CounterTimeStamp);
+                packet.SetField("counterFrequency", restoredSample.CounterFrequency);
+                packet.SetField("systemFrequency", restoredSample.SystemFrequency);
+                packet.SetField("timeStamp", restoredSample.TimeStamp);
+                packet.SetField("timeStamp100nSec", restoredSample.TimeStamp100nSec);
+                packet.SetField("counterType", (int)restoredSample.CounterType);
                 return;
             }
-#endif
-            var restoredSample = m_RestoredSample.Value;
-            packet.SetField("baseValue", restoredSample.BaseValue);
-            packet.SetField("counterTimeStamp", restoredSample.CounterTimeStamp);
-            packet.SetField("counterFrequency", restoredSample.CounterFrequency);
-            packet.SetField("systemFrequency", restoredSample.SystemFrequency);
-            packet.SetField("timeStamp", restoredSample.TimeStamp);
-            packet.SetField("timeStamp100nSec", restoredSample.TimeStamp100nSec);
-            packet.SetField("counterType", (int)restoredSample.CounterType);
+
+            if (IsWindows == false)
+                throw new PlatformNotSupportedException("Performance counters are not supported outside of Windows");
+
+            var sample = m_Sample.Value;
+            packet.SetField("baseValue", sample.BaseValue);
+            packet.SetField("counterTimeStamp", sample.CounterTimeStamp);
+            packet.SetField("counterFrequency", sample.CounterFrequency);
+            packet.SetField("systemFrequency", sample.SystemFrequency);
+            packet.SetField("timeStamp", sample.TimeStamp);
+            packet.SetField("timeStamp100nSec", sample.TimeStamp100nSec);
+
+            //conceptually we shouldn't persist this - it's always the same and it's always on our metric, however
+            //we need it here for deserialization purposes because our metric packet object isn't available during
+            //the deserialization process.
+            packet.SetField("counterType", (int)sample.CounterType);
         }
 
         void IPacket.ReadFields(PacketDefinition definition, SerializedPacket packet)

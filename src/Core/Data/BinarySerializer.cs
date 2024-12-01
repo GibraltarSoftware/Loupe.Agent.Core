@@ -446,8 +446,7 @@ namespace Gibraltar.Data
         /// <param name="hostValue"></param>
         public static void DeserializeValue(Stream networkBytes, out TimeSpan hostValue)
         {
-            long rawTicks;
-            DeserializeValue(networkBytes, out rawTicks);
+            DeserializeValue(networkBytes, out long rawTicks);
             hostValue = TimeSpan.FromTicks(rawTicks);
         }
 
@@ -458,8 +457,7 @@ namespace Gibraltar.Data
         /// <param name="hostValue"></param>
         public static void DeserializeValue(Stream networkBytes, out DateTime hostValue)
         {
-            DateTimeOffset serializedValue;
-            DeserializeValue(networkBytes, out serializedValue);
+            DeserializeValue(networkBytes, out DateTimeOffset serializedValue);
             hostValue = serializedValue.DateTime;
         }
 
@@ -470,8 +468,7 @@ namespace Gibraltar.Data
         /// <param name="hostValue"></param>
         public static void DeserializeValue(Stream networkBytes, out DateTimeOffset hostValue)
         {
-            string serializedValue; //we serialize DateTimeOffset using an ISO standard string format.  Long, but portable.
-            DeserializeValue(networkBytes, out serializedValue);
+            DeserializeValue(networkBytes, out string serializedValue);
             if (s_MonoRuntime == false)
             {
                 try
@@ -571,8 +568,7 @@ namespace Gibraltar.Data
         public static void DeserializeValue(Stream networkBytes, out String hostValue)
         {
             //first get the length of the string
-            int length;
-            DeserializeValue(networkBytes, out length);
+            DeserializeValue(networkBytes, out int length);
 
             //now get the string, based on that length.
             if (length > 0)

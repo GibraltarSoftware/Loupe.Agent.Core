@@ -692,8 +692,7 @@ namespace Gibraltar.Monitor.Serialization
                 foreach (KeyValuePair<string, string> property in m_Properties)
                 {
                     //does the comparable one exist?
-                    string otherValue;
-                    if (other.Properties.TryGetValue(property.Key, out otherValue))
+                    if (other.Properties.TryGetValue(property.Key, out var otherValue))
                     {
                         isEqual = property.Value.Equals(otherValue);
                     }

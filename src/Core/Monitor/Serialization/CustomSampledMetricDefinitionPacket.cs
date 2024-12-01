@@ -200,8 +200,7 @@ namespace Gibraltar.Monitor.Serialization
             switch (definition.Version)
             {
                 case 1:
-                    int rawSampleType;
-                    packet.GetField("metricSampleType", out rawSampleType);
+                    packet.GetField("metricSampleType", out int rawSampleType);
                     m_MetricSampleType = (MetricSampleType)rawSampleType;
                     break;
                 default:

@@ -1069,8 +1069,7 @@ namespace Gibraltar.Server.Client
             bool useCompatibilityMethods = true; //in the end it was just too painful to get all those exceptions.
             lock (s_ServerUseCompatibilitySetting)
             {
-                bool rawValue;
-                if (s_ServerUseCompatibilitySetting.TryGetValue(server, out rawValue))
+                if (s_ServerUseCompatibilitySetting.TryGetValue(server, out var rawValue))
                 {
                     useCompatibilityMethods = rawValue;
                 }
@@ -1092,8 +1091,7 @@ namespace Gibraltar.Server.Client
             bool useHttpVerison10 = m_UseHttpVersion10;
             lock (s_ServerUseHttpVersion10Setting)
             {
-                bool rawValue;
-                if (s_ServerUseHttpVersion10Setting.TryGetValue(server, out rawValue))
+                if (s_ServerUseHttpVersion10Setting.TryGetValue(server, out var rawValue))
                 {
                     useHttpVerison10 = rawValue;
                 }

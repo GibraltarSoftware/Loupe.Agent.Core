@@ -1671,9 +1671,15 @@ namespace Gibraltar.Monitor
                 category = GeneralCategory;
             }
 
+            string userName = null;
             if (s_RunningConfiguration.Publisher.EnableAnonymousMode)
             {
                 principal = null; // blank all user name data in anonymous mode.
+                userName = string.Empty;
+            }
+            else
+            {
+                userName = principal?.Identity?.Name ?? s_SessionStartInfo.FullyQualifiedUserName;
             }
 
             string formattedDescription;
@@ -1694,6 +1700,7 @@ namespace Gibraltar.Monitor
             packet.LogSystem = logSystem;
             packet.CategoryName = category;
             packet.Principal = principal;
+            packet.UserName = userName;
             packet.Caption = caption;
             packet.Description = formattedDescription;
             packet.Details = detailsXml;

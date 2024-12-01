@@ -166,16 +166,16 @@ namespace Loupe.Agent.PerformanceCounters
 #endif
 
                         if ((m_SystemCounters != null) && (m_EnableSystemCounters))
-                            m_SystemCounters.WriteSamples();
+                            SafeWriteSamples(m_SystemCounters);
 
                         if ((m_MemoryCounters != null) && (m_EnableMemoryCounters))
-                            m_MemoryCounters.WriteSamples();
+                            SafeWriteSamples(m_MemoryCounters);
 
                         if ((m_DiskCounters != null) && (m_EnableDiskCounters))
-                            m_DiskCounters.WriteSamples();
+                            SafeWriteSamples(m_DiskCounters);
 
                         if ((m_NetworkCounters != null) && (m_EnableNetworkCounters))
-                            m_NetworkCounters.WriteSamples();
+                            SafeWriteSamples(m_NetworkCounters);
 
 #if DEBUG_PERFMON
                         Log.Write(LogMessageSeverity.Verbose, "Gibraltar.Agent", "Completed performance counter poll.", null);
@@ -196,6 +196,25 @@ namespace Loupe.Agent.PerformanceCounters
 
                     System.Threading.Monitor.PulseAll(m_Lock);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Request the collection write out its samples, catching any exception and logging it if necessary
+        /// </summary>
+        /// <param name="counters"></param>
+        private void SafeWriteSamples(PerfCounterCollection counters)
+        {
+            try
+            {
+                counters.WriteSamples();
+            }
+            catch (Exception exception)
+            {
+                if (!Log.SilentMode) Log.Write(LogMessageSeverity.Information, LogWriteMode.Queued, exception, "Gibraltar.Agent",
+                    "Failed to poll performance counters due to an exception.",
+                    "Exception type: {0}\r\nException message: {1}\r\n",
+                    exception.GetType().FullName, exception.Message);
             }
         }
 
@@ -334,13 +353,16 @@ namespace Loupe.Agent.PerformanceCounters
 
         private void InitializeMemoryCounters()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+#if NETFRAMEWORK || NETSTANDARD2_0
+            // Make sure we're running on Windows in .NET Framework - otherwise the counters aren't available.
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                && RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase))
             {
                 //create a performance counter group for these guys
                 m_MemoryCounters = new PerfCounterCollection(".NET Memory Counters",
                     "Detailed memory utilization counters specific to .NET");
 
-                //register our favorite performance counters with the monitoring system (These should all exist on Mono now, too)
+                //register our favorite performance counters with the monitoring system
                 try
                 {
                     m_MemoryCounters.Add(".NET CLR Memory", "# GC Handles", PerfCounterInstanceAlias.CurrentProcess);
@@ -367,7 +389,8 @@ namespace Loupe.Agent.PerformanceCounters
                         "Specific exception: {0}\r\nException message: {1}",
                         exception.GetType().FullName, exception.Message);
                 }
-            }            
+            }
+#endif            
         }
 
         private void InitializeSystemCounters()

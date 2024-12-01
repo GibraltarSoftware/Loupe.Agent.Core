@@ -86,8 +86,7 @@ namespace Gibraltar.Messaging
         private void Read(FileStream source)
         {
             source.Position = 0;
-            int value;
-            BinarySerializer.DeserializeValue(source, out value);
+            BinarySerializer.DeserializeValue(source, out int value);
             ProcessId = value;
             BinarySerializer.DeserializeValue(source, out value);
             PublisherPort = value;

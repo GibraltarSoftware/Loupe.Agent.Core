@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using Gibraltar.Agent;
 using Microsoft.Extensions.Logging;
 
@@ -32,6 +33,7 @@ namespace Loupe.Extensions.Logging
 
             var description = formatter(state, exception);
             var details = LoupeLogEnricher.GetJson(state, _provider);
+
             Gibraltar.Agent.Log.Write(severity, "Microsoft.Extensions.Logging", 1, exception, LogWriteMode.Queued, details, _category, null, description);
         }
 

@@ -67,17 +67,15 @@ namespace Gibraltar.Monitor
             // We aren't using a lock on the dictionary because a given instance of LMT should only be on a single thread.
 
             //do we already have this group?
-            LogMessageGroup leafGroup;
-            if (m_GroupFullNameCache.TryGetValue(fullyQualifiedName, out leafGroup) == false)
+            if (m_GroupFullNameCache.TryGetValue(fullyQualifiedName, out var leafGroup) == false)
             {
                 //nope, we will need to add it.
                 string[] groupNames = m_MessageGroupFunc(message);
 
-                LogMessageGroup parentGroup;
                 //manually check the first value, it doesn't cleanly fit into the loop.
                 string childGroupName = groupNames[0];
 
-                if (Groups.TryGetValue(childGroupName, out parentGroup) == false)
+                if (Groups.TryGetValue(childGroupName, out var parentGroup) == false)
                 {
                     //no dice - we need to add it from here.
                     parentGroup = Groups.Add(childGroupName, message);
@@ -86,8 +84,7 @@ namespace Gibraltar.Monitor
                 for (int groupNameIndex = 1; groupNameIndex < groupNames.Length; groupNameIndex++)
                 {
                     childGroupName = groupNames[groupNameIndex];
-                    LogMessageGroup childGroup;
-                    if ((parentGroup.Groups.Count == 0) || (parentGroup.Groups.TryGetValue(childGroupName, out childGroup) == false))
+                    if ((parentGroup.Groups.Count == 0) || (parentGroup.Groups.TryGetValue(childGroupName, out var childGroup) == false))
                     {
                         //it doesn't exist - we need to add it
                         childGroup = parentGroup.Groups.Add(childGroupName, message);

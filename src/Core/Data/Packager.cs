@@ -875,9 +875,9 @@ namespace Gibraltar.Data
                 int userNameCount = Math.Min(userNameList.Count, UserListMaxCount);
                 string effectiveUserName = string.Format(UserListFormat[userNameCount], userNameList.ToArray());
 
-                int sessions, problemSessions, files;
+                int files;
                 long bytes;
-                newPackage.GetStats(out sessions, out problemSessions, out files, out bytes);
+                newPackage.GetStats(out var sessions, out var problemSessions, out files, out bytes);
 
                 //now we can figure out the right caption & description
                 string sessionPlural = "s"; // Assume usually plural...

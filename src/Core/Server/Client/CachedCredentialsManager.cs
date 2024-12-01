@@ -293,8 +293,7 @@ namespace Gibraltar.Server.Client
                 if ((forceUpdate == false) && (g_CachedBlockedCredentials.ContainsKey(entryUri))) 
                     return false;
 
-                IWebAuthenticationProvider credentials;
-                g_CachedCredentials.TryGetValue(cacheKey, out credentials);
+                g_CachedCredentials.TryGetValue(cacheKey, out var credentials);
 
                 //we only want one thread to pop up the UI to request authentication at a time.
                 lock(g_RequestLock)

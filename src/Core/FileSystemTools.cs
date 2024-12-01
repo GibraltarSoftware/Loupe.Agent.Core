@@ -105,8 +105,7 @@ namespace Gibraltar
             {
                 int charCount = fileName.Length - maskLength;
                 string suffix = fileName.Substring(startIndex, charCount);
-                int thisCounter;
-                int.TryParse(suffix, out thisCounter);
+                int.TryParse(suffix, out var thisCounter);
                 if (thisCounter > counter)
                     counter = thisCounter;
             }

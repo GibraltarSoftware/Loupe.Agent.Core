@@ -243,15 +243,13 @@ namespace Gibraltar.Monitor.Serialization
                 case 1:
                     packet.GetField("name", out m_Name);
 
-                    string typeName;
-                    packet.GetField("valueType", out typeName);
+                    packet.GetField("valueType", out string typeName);
                     SetType(Type.GetType(typeName));
 
                     packet.GetField("caption", out m_Caption);
                     packet.GetField("description", out m_Description);
 
-                    int rawDefaultTrend;
-                    packet.GetField("defaultTrend", out rawDefaultTrend);
+                    packet.GetField("defaultTrend", out int rawDefaultTrend);
                     m_DefaultTrend = (EventMetricValueTrend)rawDefaultTrend;
 
                     packet.GetField("eventDefinitionPacketId", out m_EventDefinitionPacketId);

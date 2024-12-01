@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading;
 using Loupe.Agent.PerformanceCounters;
+using Loupe.Configuration;
 using NUnit.Framework;
 
 namespace Loupe.PerformanceCounters.Tests
@@ -14,7 +15,6 @@ namespace Loupe.PerformanceCounters.Tests
         public void SetUp()
         {
             _PerformanceMonitor = new PerformanceMonitor();
-
             _PerformanceMonitor.Initialize(null);
         }
 

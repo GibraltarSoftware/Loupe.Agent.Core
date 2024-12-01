@@ -307,8 +307,7 @@ namespace Gibraltar.Data.Internal
                     if ((string.IsNullOrEmpty(ApplicationName) == false) && (Log.IsSessionEnding == false))
                     {
                         //find out if there is any maintenance to do - we start by age and it'll let us know if we have anything else to do.
-                        bool capacityPruningRequired;
-                        bool sessionsRemoved = ProcessPruneForAge(maxAgeDays, maxSizeMegabytes, out capacityPruningRequired);
+                        bool sessionsRemoved = ProcessPruneForAge(maxAgeDays, maxSizeMegabytes, out var capacityPruningRequired);
                         collectionChanged = (collectionChanged || sessionsRemoved);
 
                         //make sure capacity pruning is enabled.

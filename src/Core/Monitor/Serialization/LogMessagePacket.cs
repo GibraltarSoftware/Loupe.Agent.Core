@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Security.Principal;
 using Gibraltar.Messaging;
 using Gibraltar.Serialization;
@@ -38,6 +36,7 @@ namespace Gibraltar.Monitor.Serialization
         private IPrincipal m_Principal;
         private string[] m_ClassNames;
         private string[] m_CategoryNames;
+        private ApplicationUserPacket m_UserPacket;
 
         public LogMessagePacket()
         {
@@ -93,12 +92,33 @@ namespace Gibraltar.Monitor.Serialization
         /// <summary>
         /// Optional.  Extended user information related to this message
         /// </summary>
-        public ApplicationUserPacket UserPacket { get; set; }
+        public ApplicationUserPacket UserPacket 
+        {
+            get => m_UserPacket;
+            set
+            {
+                m_UserPacket = value;
+
+                // Override our simple username - if they set this, it overrides the other.
+                SetUserName();
+            }
+        }
 
         /// <summary>
         /// Optional.  The raw user principal, used for deferred user lookup
         /// </summary>
-        public IPrincipal Principal { get; set; }
+        public IPrincipal Principal 
+        {
+            get => m_Principal;
+            set
+            {
+                m_Principal = value;
+
+                // Recalculate our username each time this is set.  We used to do this when the packet was created,
+                // but we now support deferred resolution of the user principal.
+                SetUserName();
+            }
+        }
 
         public string MethodName { get { return m_MethodName; } set { m_MethodName = value; } }
 
@@ -597,8 +617,7 @@ namespace Gibraltar.Monitor.Serialization
                     packet.GetField("Caption", out m_Caption);
 
                     // Hmmm, it's tricky to handle the enum with an out parameter; use a temporary int and cast it.
-                    int severity;
-                    packet.GetField("Severity", out severity);
+                    packet.GetField("Severity", out int severity);
                     m_Severity = (LogMessageSeverity)severity;
 
                     packet.GetField("LogSystem", out m_LogSystem);
@@ -630,23 +649,17 @@ namespace Gibraltar.Monitor.Serialization
                     }
 
                     //we now know enough to get our thread info packet (if we don't, we can't re-serialize ourselves)
-                    ThreadInfo threadInfo;
-                    if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out threadInfo))
+                    if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out var threadInfo))
                     {
                         ThreadInfoPacket = threadInfo.Packet;
                     }
 
                     // Now the Exception info...
 
-                    string[] typeNames;
-                    string[] messages;
-                    string[] sources;
-                    string[] stackTraces;
-
-                    packet.GetField("TypeNames", out typeNames);
-                    packet.GetField("Messages", out messages);
-                    packet.GetField("Sources", out sources);
-                    packet.GetField("StackTraces", out stackTraces);
+                    packet.GetField("TypeNames", out string[] typeNames);
+                    packet.GetField("Messages", out string[] messages);
+                    packet.GetField("Sources", out string[] sources);
+                    packet.GetField("StackTraces", out string[] stackTraces);
 
                     //these are supposed to be parallel arrays - assume they're all the same size.
                     int arrayLength = typeNames.GetLength(0);
@@ -673,12 +686,10 @@ namespace Gibraltar.Monitor.Serialization
 
                     if (definition.Version >= 3)
                     {
-                        Guid applicationUserId;
-                        packet.GetField("ApplicationUserId", out applicationUserId);
+                        packet.GetField("ApplicationUserId", out Guid applicationUserId);
 
                         //we now know enough to get our user packet now if it was specified..
-                        ApplicationUser applicationUser;
-                        if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser))
+                        if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out ApplicationUser applicationUser))
                         {
                             UserPacket = applicationUser.Packet;
                         }
@@ -719,16 +730,14 @@ namespace Gibraltar.Monitor.Serialization
                 m_ThreadIndex = m_ThreadId; // Zero isn't legal, so it must not have had it.  Fall back to ThreadId.
 
             //we now know enough to get our thread info packet (if we don't, we can't re-serialize ourselves)
-            ThreadInfo threadInfo;
-            if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out threadInfo))
+            if (m_SessionPacketCache.Threads.TryGetValue(m_ThreadIndex, out var threadInfo))
             {
                 ThreadInfoPacket = threadInfo.Packet;
             }
 
             if (applicationUserId != Guid.Empty)
             {
-                ApplicationUser applicationUser;
-                if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out applicationUser))
+                if (m_SessionPacketCache.Users.TryGetValue(applicationUserId, out ApplicationUser applicationUser))
                 {
                     UserPacket = applicationUser.Packet;
                 }
@@ -759,6 +768,23 @@ namespace Gibraltar.Monitor.Serialization
         #endregion
 
         #region Private Properties and Methods
+
+        /// <summary>
+        /// Calculate the derived username based on the best information we have.
+        /// </summary>
+        private void SetUserName()
+        {
+            // Our priority order is ApplicationUser, Principal, then Session.
+            if (m_UserPacket != null)
+            {
+                m_UserName = m_UserPacket.FullyQualifiedUserName;
+            }
+            else if (m_Principal != null)
+            {
+                // we don't have access to the session user here so we'd be setting it to empty if we can't figure it out
+                m_UserName = m_Principal?.Identity?.Name ?? string.Empty;
+            }
+        }
 
         private static IExceptionInfo[] ExceptionToArray(Exception exception)
         {
