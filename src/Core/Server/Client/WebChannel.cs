@@ -1154,6 +1154,7 @@ namespace Gibraltar.Server.Client
             var options = new JsonSerializerOptions()
             {
                 WriteIndented = true,
+                PropertyNameCaseInsensitive = true,
                 Converters = 
                 {
                     new JsonVersionConverter(),
