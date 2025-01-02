@@ -9,7 +9,6 @@ using Gibraltar.Monitor.Serialization;
 using Gibraltar.Serialization;
 using Loupe.Extensibility.Data;
 using System.Reflection;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Gibraltar.Monitor
 {

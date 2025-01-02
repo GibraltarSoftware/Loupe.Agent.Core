@@ -1,9 +1,11 @@
-﻿namespace Loupe.Extensibility.Data
+﻿using System;
+
+namespace Loupe.Extensibility.Data
 {
     /// <summary>
     /// A single user of one of the applications in this repository
     /// </summary>
-    public interface IApplicationUser
+    public interface IApplicationUser : IComparable<IApplicationUser>
     {
         /// <summary>
         /// Optional.  The authoritative key provided by the Agent for this user.

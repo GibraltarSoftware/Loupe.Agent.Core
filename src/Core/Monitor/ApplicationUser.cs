@@ -10,7 +10,8 @@ namespace Gibraltar.Monitor
     /// Extended information for a single application user
     /// </summary>
     [DebuggerDisplay("User {Key} : {FullyQualifiedUserName}")]
-    public class ApplicationUser : IComparable<ApplicationUser>, IEquatable<ApplicationUser>, IApplicationUser
+    public class ApplicationUser : IComparable<ApplicationUser>, IEquatable<ApplicationUser>, IApplicationUser,
+        IComparable<IApplicationUser>, IEquatable<IApplicationUser>
     {
         private readonly ApplicationUserPacket m_Packet;
 
@@ -164,6 +165,19 @@ namespace Gibraltar.Monitor
         }
 
         /// <summary>
+        /// Compares this ApplicationUser object to another to determine sorting order.
+        /// </summary>
+        /// <remarks>ApplicationUser instances are sorted by their Domain then User Name properties.</remarks>
+        /// <param name="other">The other ApplicationUser object to compare this object to.</param>
+        /// <returns>An int which is less than zero, equal to zero, or greater than zero to reflect whether
+        /// this ApplicationUser should sort as being less-than, equal to, or greater-than the other
+        /// ApplicationUser, respectively.</returns>
+        public int CompareTo(IApplicationUser other)
+        {
+            return CompareTo(other as ApplicationUser);
+        }
+
+        /// <summary>
         /// Determines if the provided ApplicationUser object is identical to this object.
         /// </summary>
         /// <param name="other">The ApplicationUser object to compare this object to</param>
@@ -174,6 +188,16 @@ namespace Gibraltar.Monitor
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Determines if the provided ApplicationUser object is identical to this object.
+        /// </summary>
+        /// <param name="other">The ApplicationUser object to compare this object to</param>
+        /// <returns>True if the objects represent the same data.</returns>
+        public bool Equals(IApplicationUser other)
+        {
+            return Equals(other as ApplicationUser);
         }
 
         /// <summary>

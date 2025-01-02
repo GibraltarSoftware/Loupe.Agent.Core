@@ -121,6 +121,33 @@ namespace Gibraltar.Monitor.Serialization
         /// </summary>
         public Dictionary<string, string> Properties { get { return m_Properties; } }
 
+        #region IComparable and IEquatable Methods
+
+        /// <summary>
+        /// Compares this ApplicationUser object to another to determine sorting order.
+        /// </summary>
+        /// <remarks>ApplicationUser instances are sorted by their Domain then User Name properties.</remarks>
+        /// <param name="other">The other ApplicationUser object to compare this object to.</param>
+        /// <returns>An int which is less than zero, equal to zero, or greater than zero to reflect whether
+        /// this ApplicationUser should sort as being less-than, equal to, or greater-than the other
+        /// ApplicationUser, respectively.</returns>
+        public int CompareTo(IApplicationUser other)
+        {
+            if (ReferenceEquals(other, null))
+                return 1; // We're not null, so we're greater than anything that is null.
+
+            if (ReferenceEquals(this, other))
+                return 0; // Refers to the same instance, so obviously we're equal.
+
+            //we want to sort by the domain and user name, but we don't want to let things be considered equal if they have a key missmatch..
+            var compare = string.Compare(FullyQualifiedUserName, other.FullyQualifiedUserName, StringComparison.OrdinalIgnoreCase);
+
+            if ((compare == 0) && (string.IsNullOrEmpty(Key) == false))
+                compare = string.Compare(Key, other.Key, StringComparison.OrdinalIgnoreCase);
+
+            return compare;
+        }
+
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
@@ -131,7 +158,7 @@ namespace Gibraltar.Monitor.Serialization
         public override bool Equals(object other)
         {
             //use our type-specific override
-            return Equals(other as ApplicationUserPacket);
+            return Equals(other as ThreadInfoPacket);
         }
 
         /// <summary>
@@ -159,6 +186,18 @@ namespace Gibraltar.Monitor.Serialization
         }
 
         /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.</param>
+        public bool Equals(IApplicationUser other)
+        {
+            return Equals(other as ApplicationUserPacket);
+        }
+
+        /// <summary>
         /// Provides a representative hash code for objects of this type to spread out distribution
         /// in hash tables.
         /// </summary>
@@ -176,11 +215,14 @@ namespace Gibraltar.Monitor.Serialization
             if (string.IsNullOrEmpty(Key) == false)
                 return Key.GetHashCode();
 
-            if (string.IsNullOrEmpty(FullyQualifiedUserName) == false) 
+            if (string.IsNullOrEmpty(FullyQualifiedUserName) == false)
                 return FullyQualifiedUserName.GetHashCode();
 
             return base.GetHashCode();
         }
+
+        #endregion
+
 
         #region IPacket Implementation
 
